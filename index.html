@@ -113,7 +113,9 @@
 
   <script>
     const $ = s=>document.querySelector(s);
-    const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'), startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'), log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
+    const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'),
+          startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'),
+          log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
 
     // simple in-memory history for persona context
     const convo = [];
@@ -125,59 +127,76 @@
       });
     }
 
-    persona.addEventListener('keydown', e=>{if(e.key==='Enter') start();});
+    persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
     startBtn.addEventListener('click', start);
-    back.addEventListener('click', ()=>{chat.classList.add('hide'); landing.classList.remove('hide'); persona.focus();});
-    ask.addEventListener('keydown', e=>{if(e.key==='Enter') doSend();});
+    back.addEventListener('click', ()=>{
+      chat.classList.add('hide');
+      landing.classList.remove('hide');
+      persona.focus();
+    });
+    ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
     send.addEventListener('click', doSend);
 
     async function start(){
-      const p=persona.value.trim(); if(!p) return;
-      landing.classList.add('hide'); chat.classList.remove('hide');
+      const p = persona.value.trim(); if(!p) return;
 
-      // Generate avatar via API
+      landing.classList.add('hide');
+      chat.classList.remove('hide');
+
+      // ===== Generate avatar via API =====
       avatar.innerHTML = loader();
       try {
         const res = await fetch('/api/generate-avatar', {
           method:'POST',
-          headers: {'Content-Type':'application/json'},
+          headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({ prompt: p })
         });
-        const { dataUrl, error } = await res.json();
-        if (error || !dataUrl) throw new Error(error || 'No image');
-        avatar.innerHTML = `<img src="${dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+
+        const json = await res.json().catch(() => ({}));
+        if (!res.ok || !json?.dataUrl) {
+          console.error('Avatar API error:', json);
+          throw new Error(json?.error || `HTTP ${res.status}`);
+        }
+
+        avatar.innerHTML =
+          `<img src="${json.dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
       } catch (err) {
-        console.error(err);
+        console.error('Avatar load failed:', err);
         avatar.innerHTML = fallbackAvatar();
         add('from-bot', 'Image generation failed. Using a placeholder.');
       }
 
-      log.innerHTML='';
+      // reset chat UI
+      log.innerHTML = '';
       convo.length = 0;
-      add('from-bot', 'Persona set: '+p);
+      add('from-bot', 'Persona set: ' + p);
     }
 
     function loader(){
       return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;">Generating…</div>`;
     }
     function fallbackAvatar(){
-      return `<img src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' alt='Avatar Placeholder' style='width:100%;height:100%;object-fit:cover;border-radius:24px;'>`;
+      return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                 alt="Avatar Placeholder"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
     }
 
     function add(who,text){
-      const row=document.createElement('div'); row.className='row';
-      const b=document.createElement('div'); b.className='bubble '+who; b.textContent=text;
+      const row = document.createElement('div'); row.className = 'row';
+      const b = document.createElement('div'); b.className = 'bubble ' + who; b.textContent = text;
       row.appendChild(b); log.appendChild(row);
-      setTimeout(()=>{log.scrollTop=log.scrollHeight;},0);
+      setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
     }
 
     async function doSend(){
-      const t=ask.value.trim(); if(!t) return; ask.value=''; add('from-me',t);
+      const t = ask.value.trim(); if(!t) return;
+      ask.value=''; add('from-me',t);
       convo.push({ role:'user', content:t });
+
       try {
         const res = await fetch('/api/chat', {
           method:'POST',
-          headers:{'Content-Type':'application/json'},
+          headers:{ 'Content-Type':'application/json' },
           body: JSON.stringify({ persona: persona.value.trim(), message: t, history: convo })
         });
         const { text, error } = await res.json();
@@ -185,7 +204,7 @@
         add('from-bot', text);
         convo.push({ role:'assistant', content:text });
       } catch (err) {
-        console.error(err);
+        console.error('Chat error:', err);
         add('from-bot', 'Chat failed. Try again.');
       }
     }
