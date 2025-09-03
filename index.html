@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatTBD — Avatar Personas</title>
+  <style>
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#d9d9d9;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+
+    /* ===== Landing ===== */
+    .landing{display:grid; place-items:center; padding:32px}
+    .heroRow{display:flex; align-items:center; gap:14px}
+    .heroInput{display:flex; align-items:center; width:min(688px,92vw); border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; background:transparent}
+    .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:27px; line-height:1}
+.heroInput input::placeholder { color: #fff; opacity: 1; }
+    .circleBtn{width:58px; height:58px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
+    .circleBtn svg{width:42px; height:42px; fill:var(--ink)}
+
+    /* ===== Chat ===== */
+    .chat{position:relative; padding:32px 22px 96px; max-width:1200px; margin:0 auto}
+
+    .backBtn{position:fixed; top:22px; left:22px; z-index:4}
+    .backBtn .circleBtn{width:50px; height:50px}
+  .backBtn .circleBtn svg { margin-left: -6px; }
+
+    .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
+
+    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center; margin-bottom:0;}
+
+    .pane{position:relative; width:100%; max-width:760px;}
+    .scroller{max-height:300px; overflow:auto; padding:0 0 0 0}
+    .scroller::-webkit-scrollbar{width:12px}
+    .scroller::-webkit-scrollbar-track{background:transparent}
+    .scroller::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
+
+    .row{display:flex; margin:12px 0}
+    .bubble{max-width:520px; background:var(--bubble); color:var(--muted); border-radius:18px; padding:14px 18px; font-size:14px; line-height:1.3; border:2px solid #2a2a2a}
+.bubble.from-bot{border:none; background:none;}
+.bubble.from-me{border:1px solid #fff; background:rgba(0,0,0,0.4); margin-right:10px;}
+    .from-me{margin-left:auto; border-top-right-radius:8px}
+    .from-bot{margin-right:auto; border-top-left-radius:8px}
+
+    .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; width:min(766px, 92vw); display:flex; align-items:center; gap:14px; z-index:3}
+  .composer{flex:1; border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; display:flex; align-items:center; gap:10px; background:#000; max-height:70px; overflow-y:auto;}
+    .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:22px}
+.composer input::placeholder { color: #fff; opacity: 1; }
+    .sendBtn .circleBtn{width:50px; height:50px}
+
+    .hide{display:none}
+  </style>
+</head>
+<body>
+
+  <!-- ===== Landing ===== -->
+  <section id="landing" class="screen landing">
+    <div class="heroRow">
+      <label class="heroInput" aria-label="Persona prompt">
+        <input id="persona" type="text" placeholder="Enter a prompt to create an avatar…" />
+      </label>
+      <button id="startBtn" class="circleBtn" title="Generate persona">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== Chat ===== -->
+  <section id="chat" class="screen chat hide">
+    <div class="backBtn">
+      <button id="back" class="circleBtn" title="Back">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+    </div>
+
+    <div class="column">
+      <!-- Avatar top -->
+      <div id="avatar" class="avatarFrame"></div>
+      <!-- Conversation pane -->
+      <div class="pane" style="position:relative;">
+        <button id="clearChat" title="Clear chat" style="position:absolute; top:10px; right:10px; background:transparent; border:none; cursor:pointer; z-index:2;">
+          <span style="display:inline-grid; place-items:center; width:42px; height:42px; border-radius:50%; border:1px solid #fff; background:#000;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <rect x="6" y="6" width="12" height="12" rx="1" fill="#fff" stroke="#fff" stroke-width="1"/>
+            </svg>
+          </span>
+        </button>
+        <div id="log" class="scroller" role="log" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Bottom composer -->
+    <div class="composerWrap">
+      <label class="composer">
+        <input id="ask" type="text" placeholder="Ask anything" />
+      </label>
+      <button id="send" class="circleBtn sendBtn" title="Send">
+  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <script>
+  const $ = s=>document.querySelector(s);
+  const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'), startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'), log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
+    if (clearChat) {
+      clearChat.addEventListener('click', () => {
+        log.innerHTML = '';
+      });
+    }
+
+    persona.addEventListener('keydown', e=>{if(e.key==='Enter') start();});
+    startBtn.addEventListener('click', start);
+    back.addEventListener('click', ()=>{chat.classList.add('hide'); landing.classList.remove('hide'); persona.focus();});
+    ask.addEventListener('keydown', e=>{if(e.key==='Enter') doSend();});
+    send.addEventListener('click', doSend);
+
+    function start(){
+      const p=persona.value.trim(); if(!p) return;
+      landing.classList.add('hide'); chat.classList.remove('hide');
+      avatar.innerHTML=makeAvatarSVG(p);
+      log.innerHTML='';
+      add('from-bot', 'Persona set: '+p);
+    }
+
+    function add(who,text){
+  const row=document.createElement('div'); row.className='row';
+  const b=document.createElement('div'); b.className='bubble '+who; b.textContent=text;
+  row.appendChild(b); log.appendChild(row);
+  // Snap to bottom after DOM update
+  setTimeout(()=>{log.scrollTop=log.scrollHeight;},0);
+    }
+
+    function doSend(){
+      const t=ask.value.trim(); if(!t) return; ask.value=''; add('from-me',t);
+      const p=persona.value.trim(); add('from-bot',`(${p}) reply stub`);
+    }
+
+    function makeAvatarSVG(seed){
+  // Use Wikimedia portrait placeholder image
+  return `<img src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' alt='Avatar Placeholder' style='width:100%;height:100%;object-fit:cover;border-radius:24px;'>`;
+    }
+
+    function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0;}
+  </script>
+</body>
+</html>
