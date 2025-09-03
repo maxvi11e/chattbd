@@ -1,4 +1,4 @@
-// api/generate-avatar.js  (Node runtime)
+// api/generate-avatar.js
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -20,10 +20,9 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-image-1",
         prompt: `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Persona: ${prompt}`,
-        size: "512x512",
-        quality: "high",
-        n: 1
-        // NOTE: no response_format field — some deployments reject it
+        size: "1024x1024",   // ✅ valid size
+        n: 1,
+        quality: "high"
       }),
     });
 
@@ -35,16 +34,13 @@ export default async function handler(req, res) {
     const data = await r.json();
     const item = data?.data?.[0];
 
-    // The API may return either base64 or a URL depending on config.
     const b64 = item?.b64_json;
     const url = item?.url;
 
     if (b64) {
       return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}` });
     }
-
     if (url) {
-      // Return the URL directly; client can set it as <img src=...>
       return res.status(200).json({ dataUrl: url });
     }
 
