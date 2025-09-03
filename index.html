@@ -25,7 +25,7 @@
     .heroRow{display:flex; align-items:center; gap:14px}
     .heroInput{display:flex; align-items:center; width:min(688px,92vw); border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; background:transparent}
     .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:27px; line-height:1}
-.heroInput input::placeholder { color: #fff; opacity: 1; }
+    .heroInput input::placeholder { color:#fff; opacity:1; }
     .circleBtn{width:58px; height:58px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
     .circleBtn svg{width:42px; height:42px; fill:var(--ink)}
 
@@ -34,7 +34,7 @@
 
     .backBtn{position:fixed; top:22px; left:22px; z-index:4}
     .backBtn .circleBtn{width:50px; height:50px}
-  .backBtn .circleBtn svg { margin-left: -6px; }
+    .backBtn .circleBtn svg { margin-left: -6px; }
 
     .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
 
@@ -48,15 +48,15 @@
 
     .row{display:flex; margin:12px 0}
     .bubble{max-width:520px; background:var(--bubble); color:var(--muted); border-radius:18px; padding:14px 18px; font-size:14px; line-height:1.3; border:2px solid #2a2a2a}
-.bubble.from-bot{border:none; background:none;}
-.bubble.from-me{border:1px solid #fff; background:rgba(0,0,0,0.4); margin-right:10px;}
+    .bubble.from-bot{border:none; background:none;}
+    .bubble.from-me{border:1px solid #fff; background:rgba(0,0,0,0.4); margin-right:10px;}
     .from-me{margin-left:auto; border-top-right-radius:8px}
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
     .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; width:min(766px, 92vw); display:flex; align-items:center; gap:14px; z-index:3}
-  .composer{flex:1; border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; display:flex; align-items:center; gap:10px; background:#000; max-height:70px; overflow-y:auto;}
+    .composer{flex:1; border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; display:flex; align-items:center; gap:10px; background:#000; max-height:70px; overflow-y:auto;}
     .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:22px}
-.composer input::placeholder { color: #fff; opacity: 1; }
+    .composer input::placeholder { color:#fff; opacity:1; }
     .sendBtn .circleBtn{width:50px; height:50px}
 
     .hide{display:none}
@@ -106,17 +106,22 @@
         <input id="ask" type="text" placeholder="Ask anything" />
       </label>
       <button id="send" class="circleBtn sendBtn" title="Send">
-  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
     </div>
   </section>
 
   <script>
-  const $ = s=>document.querySelector(s);
-  const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'), startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'), log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
+    const $ = s=>document.querySelector(s);
+    const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'), startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'), log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
+
+    // simple in-memory history for persona context
+    const convo = [];
+
     if (clearChat) {
       clearChat.addEventListener('click', () => {
         log.innerHTML = '';
+        convo.length = 0;
       });
     }
 
@@ -126,33 +131,64 @@
     ask.addEventListener('keydown', e=>{if(e.key==='Enter') doSend();});
     send.addEventListener('click', doSend);
 
-    function start(){
+    async function start(){
       const p=persona.value.trim(); if(!p) return;
       landing.classList.add('hide'); chat.classList.remove('hide');
-      avatar.innerHTML=makeAvatarSVG(p);
+
+      // Generate avatar via API
+      avatar.innerHTML = loader();
+      try {
+        const res = await fetch('/api/generate-avatar', {
+          method:'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ prompt: p })
+        });
+        const { dataUrl, error } = await res.json();
+        if (error || !dataUrl) throw new Error(error || 'No image');
+        avatar.innerHTML = `<img src="${dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+      } catch (err) {
+        console.error(err);
+        avatar.innerHTML = fallbackAvatar();
+        add('from-bot', 'Image generation failed. Using a placeholder.');
+      }
+
       log.innerHTML='';
+      convo.length = 0;
       add('from-bot', 'Persona set: '+p);
     }
 
+    function loader(){
+      return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;">Generating…</div>`;
+    }
+    function fallbackAvatar(){
+      return `<img src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' alt='Avatar Placeholder' style='width:100%;height:100%;object-fit:cover;border-radius:24px;'>`;
+    }
+
     function add(who,text){
-  const row=document.createElement('div'); row.className='row';
-  const b=document.createElement('div'); b.className='bubble '+who; b.textContent=text;
-  row.appendChild(b); log.appendChild(row);
-  // Snap to bottom after DOM update
-  setTimeout(()=>{log.scrollTop=log.scrollHeight;},0);
+      const row=document.createElement('div'); row.className='row';
+      const b=document.createElement('div'); b.className='bubble '+who; b.textContent=text;
+      row.appendChild(b); log.appendChild(row);
+      setTimeout(()=>{log.scrollTop=log.scrollHeight;},0);
     }
 
-    function doSend(){
+    async function doSend(){
       const t=ask.value.trim(); if(!t) return; ask.value=''; add('from-me',t);
-      const p=persona.value.trim(); add('from-bot',`(${p}) reply stub`);
+      convo.push({ role:'user', content:t });
+      try {
+        const res = await fetch('/api/chat', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ persona: persona.value.trim(), message: t, history: convo })
+        });
+        const { text, error } = await res.json();
+        if (error || !text) throw new Error(error || 'No response');
+        add('from-bot', text);
+        convo.push({ role:'assistant', content:text });
+      } catch (err) {
+        console.error(err);
+        add('from-bot', 'Chat failed. Try again.');
+      }
     }
-
-    function makeAvatarSVG(seed){
-  // Use Wikimedia portrait placeholder image
-  return `<img src='https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png' alt='Avatar Placeholder' style='width:100%;height:100%;object-fit:cover;border-radius:24px;'>`;
-    }
-
-    function hash(s){let h=2166136261>>>0; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0;}
   </script>
 </body>
 </html>
