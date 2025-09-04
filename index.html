@@ -21,19 +21,19 @@
     .screen{min-height:100vh; width:100%;}
 
     /* ===== Landing ===== */
-    .landing{display:grid; place-items:center; padding:32px}
-    .heroRow{display:flex; align-items:center; gap:14px}
-    .heroInput{display:flex; align-items:center; width:min(688px,92vw); border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; background:transparent}
-    .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:27px; line-height:1}
+  .landing{display:grid; place-items:center; padding:25.6px}
+  .heroRow{display:flex; align-items:center; gap:11.2px}
+  .heroInput{display:flex; align-items:center; width:min(715.52px,95.68vw); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
+  .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1}
     .heroInput input::placeholder { color:#fff; opacity:1; }
-    .circleBtn{width:58px; height:58px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
-    .circleBtn svg{width:42px; height:42px; fill:var(--ink)}
+  .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
+  .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
 
     /* ===== Chat ===== */
     .chat{position:relative; padding:32px 22px 96px; max-width:1200px; margin:0 auto}
 
     .backBtn{position:fixed; top:22px; left:22px; z-index:4}
-    .backBtn .circleBtn{width:50px; height:50px}
+  .backBtn .circleBtn{width:50px; height:50px; background:#000;}
     .backBtn .circleBtn svg { margin-left: -6px; }
 
     .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
@@ -53,11 +53,11 @@
     .from-me{margin-left:auto; border-top-right-radius:8px}
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
-    .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:26px; width:min(766px, 92vw); display:flex; align-items:center; gap:14px; z-index:3}
-    .composer{flex:1; border:1px solid var(--stroke); border-radius:1000px; padding:14px 18px; display:flex; align-items:center; gap:10px; background:#000; max-height:70px; overflow-y:auto;}
-    .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:22px}
+  .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:20.8px; width:min(735.36px, 88.32vw); display:flex; align-items:center; gap:11.2px; z-index:3}
+  .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
+  .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
     .composer input::placeholder { color:#fff; opacity:1; }
-    .sendBtn .circleBtn{width:50px; height:50px}
+  .sendBtn .circleBtn{width:40px; height:40px}
 
     .hide{display:none}
   </style>
