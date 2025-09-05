@@ -85,7 +85,7 @@
 
     .title {
       font-size: 48px;
-      font-weight: 700;
+      font-weight: 650;
       color: var(--ink);
       margin-bottom: 32px;
       letter-spacing: -0.02em;
@@ -167,6 +167,9 @@
       chat.classList.add('hide');
       landing.classList.remove('hide');
       persona.focus();
+      // Clear chat when going back to landing
+      log.innerHTML = '';
+      convo.length = 0;
     });
     ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
     send.addEventListener('click', doSend);
