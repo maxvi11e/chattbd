@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChatTBD — Avatar Personas</title>
   <style>
+  @media (max-width: 900px) {
+    .heroInput {
+      width: min(572.416px, calc(80vw - 32px));
+    }
+  }
     @keyframes blink-opacity {
       0% { opacity: 1; }
       50% { opacity: 0.3; }
@@ -28,7 +33,7 @@
     /* ===== Landing ===== */
   .landing{display:grid; place-items:center; padding:25.6px}
   .heroRow{display:flex; align-items:center; gap:11.2px}
-  .heroInput{display:flex; align-items:center; width:min(715.52px,95.68vw); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
+  .heroInput{display:flex; align-items:center; width:min(715.52px,calc(100vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
   .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1}
     .heroInput input::placeholder { color:#fff; opacity:1; }
   .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
@@ -63,6 +68,13 @@
   .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
     .composer input::placeholder { color:#fff; opacity:1; }
   .sendBtn .circleBtn{width:40px; height:40px}
+
+  .avatar-set-bubble {
+    border: 1px solid #fff !important;
+    background: rgba(0,0,0,0.4) !important;
+    color: #fff !important;
+    margin-right: 10px;
+  }
 
     .hide{display:none}
   </style>
@@ -99,8 +111,12 @@
       <div class="pane" style="position:relative;">
         <button id="clearChat" title="Clear chat" style="position:absolute; top:10px; right:10px; background:transparent; border:none; cursor:pointer; z-index:2;">
           <span style="display:inline-grid; place-items:center; width:42px; height:42px; border-radius:50%; border:1px solid #fff; background:#000;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <rect x="6" y="6" width="12" height="12" rx="1" fill="#fff" stroke="#fff" stroke-width="1"/>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="6" width="18" height="13" rx="2" fill="none"/>
+              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              <line x1="1" y1="6" x2="23" y2="6"/>
+              <line x1="10" y1="11" x2="10" y2="17"/>
+              <line x1="14" y1="11" x2="14" y2="17"/>
             </svg>
           </span>
         </button>
@@ -192,11 +208,11 @@
       // reset chat UI
       log.innerHTML = '';
       convo.length = 0;
-      add('from-bot', 'Persona set: ' + p);
+      add('from-bot', 'Avatar set: ' + p);
     }
 
     function loader(){
-  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 3s infinite;'>Generating (1-2 mins)...</span></div>`;
+  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 3s infinite;'>Generating...</span></div>`;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
@@ -206,7 +222,14 @@
 
     function add(who,text){
       const row = document.createElement('div'); row.className = 'row';
-      const b = document.createElement('div'); b.className = 'bubble ' + who; b.textContent = text;
+      const b = document.createElement('div');
+      // If the message is the 'Avatar set:' message, add a special class for styling
+      if (who === 'from-bot' && typeof text === 'string' && text.startsWith('Avatar set:')) {
+        b.className = 'bubble from-bot avatar-set-bubble';
+      } else {
+        b.className = 'bubble ' + who;
+      }
+      b.textContent = text;
       row.appendChild(b); log.appendChild(row);
       setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
     }
