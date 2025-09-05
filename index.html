@@ -171,7 +171,7 @@
             msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
             msg.style.display = 'block';
             // Hide after 3 seconds
-            setTimeout(() => { msg.style.display = 'none'; }, 3000);
+            setTimeout(() => { msg.style.display = 'none'; }, 6000);
           }
           persona.focus();
           return;
@@ -196,7 +196,7 @@
     }
 
     function loader(){
-  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 1.5s infinite;'>Generating...</span></div>`;
+  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 3s infinite;'>Generating (1-2 mins)...</span></div>`;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
