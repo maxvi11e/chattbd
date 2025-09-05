@@ -7,13 +7,18 @@
   <style>
   @media (max-width: 900px) {
     .heroInput {
-      width: min(572.416px, calc(80vw - 32px));
+      width: min(400.69px, calc(56vw - 32px));
     }
   }
     @keyframes blink-opacity {
       0% { opacity: 1; }
       50% { opacity: 0.3; }
       100% { opacity: 1; }
+    }
+    @media (max-width: 600px) {
+      #persona::placeholder {
+        content: "Create avatar...";
+      }
     }
     :root{
       --bg:#000;
@@ -33,7 +38,7 @@
     /* ===== Landing ===== */
   .landing{display:grid; place-items:center; padding:25.6px}
   .heroRow{display:flex; align-items:center; gap:11.2px}
-  .heroInput{display:flex; align-items:center; width:min(715.52px,calc(100vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
+  .heroInput{display:flex; align-items:center; width:min(715.52px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
   .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1}
     .heroInput input::placeholder { color:#fff; opacity:1; }
   .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
@@ -87,7 +92,7 @@
     <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-32px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
     <div class="heroRow">
       <label class="heroInput" aria-label="Persona prompt">
-        <input id="persona" type="text" placeholder="Enter a prompt to create an avatar…" />
+        <input id="persona" type="text" placeholder="Enter a prompt to create an avatar…" data-short-placeholder="Create avatar..." />
       </label>
       <button id="startBtn" class="circleBtn" title="Generate persona">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -143,6 +148,18 @@
 
     // simple in-memory history for persona context
     const convo = [];
+
+    // Handle responsive placeholder text
+    function updatePlaceholder() {
+      const input = document.getElementById('persona');
+      if (window.innerWidth <= 600) {
+        input.placeholder = input.dataset.shortPlaceholder;
+      } else {
+        input.placeholder = "Enter a prompt to create an avatar…";
+      }
+    }
+    window.addEventListener('resize', updatePlaceholder);
+    updatePlaceholder();
 
     if (clearChat) {
       clearChat.addEventListener('click', () => {
