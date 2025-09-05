@@ -66,7 +66,8 @@
 
   <!-- ===== Landing ===== -->
   <section id="landing" class="screen landing">
-    <div class="heroRow">
+  <div id="safetyMsg" style="display:none; color:#ff5252; margin-bottom:16px; text-align:center; font-weight:500;"></div>
+  <div class="heroRow">
       <label class="heroInput" aria-label="Persona prompt">
         <input id="persona" type="text" placeholder="Enter a prompt to create an avatar…" />
       </label>
@@ -155,20 +156,16 @@
         const json = await res.json().catch(() => ({}));
         if (!res.ok || !json?.dataUrl) {
           console.error('Avatar API error:', json);
-          // Show landing, hide chat, and show error message
+          // Show landing, hide chat, and show error message above heroRow
           chat.classList.add('hide');
           landing.classList.remove('hide');
-          // Add or show a message element below the input
           let msg = document.getElementById('safetyMsg');
-          if (!msg) {
-            msg = document.createElement('div');
-            msg.id = 'safetyMsg';
-            msg.style.color = '#ff5252';
-            msg.style.marginTop = '12px';
-            msg.style.textAlign = 'center';
-            persona.parentElement.parentElement.appendChild(msg);
+          if (msg) {
+            msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
+            msg.style.display = 'block';
+            // Hide after 3 seconds
+            setTimeout(() => { msg.style.display = 'none'; }, 3000);
           }
-          msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
           persona.focus();
           return;
         }
@@ -192,7 +189,7 @@
     }
 
     function loader(){
-      return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;">Generating…</div>`;
+      return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;">Generating (allow 1-2 min)</div>`;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
