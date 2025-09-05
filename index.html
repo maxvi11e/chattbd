@@ -155,8 +155,27 @@
         const json = await res.json().catch(() => ({}));
         if (!res.ok || !json?.dataUrl) {
           console.error('Avatar API error:', json);
-          throw new Error(json?.error || `HTTP ${res.status}`);
+          // Show landing, hide chat, and show error message
+          chat.classList.add('hide');
+          landing.classList.remove('hide');
+          // Add or show a message element below the input
+          let msg = document.getElementById('safetyMsg');
+          if (!msg) {
+            msg = document.createElement('div');
+            msg.id = 'safetyMsg';
+            msg.style.color = '#ff5252';
+            msg.style.marginTop = '12px';
+            msg.style.textAlign = 'center';
+            persona.parentElement.parentElement.appendChild(msg);
+          }
+          msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
+          persona.focus();
+          return;
         }
+
+        // Remove safety message if present
+        let msg = document.getElementById('safetyMsg');
+        if (msg) msg.remove();
 
         avatar.innerHTML =
           `<img src="${json.dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
