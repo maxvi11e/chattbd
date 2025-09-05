@@ -85,7 +85,7 @@
 
     .title {
       font-size: 48px;
-      font-weight: 650;
+      font-weight: 700;
       color: var(--ink);
       margin-bottom: 32px;
       letter-spacing: -0.02em;
@@ -135,9 +135,6 @@
       <button id="send" class="circleBtn sendBtn" title="Send">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
-      <button id="clearChat" class="circleBtn" title="Clear chat">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5">
-          <path d="M4 7h16M10 11v6M14 11v6M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
     </div>
@@ -147,7 +144,7 @@
     const $ = s=>document.querySelector(s);
     const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'),
           startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'),
-          log=$('#log'), ask=$('#ask'), send=$('#send'), clearChat=$('#clearChat');
+          log=$('#log'), ask=$('#ask'), send=$('#send');
 
     // simple in-memory history for persona context
     const convo = [];
@@ -163,13 +160,6 @@
     }
     window.addEventListener('resize', updatePlaceholder);
     updatePlaceholder();
-
-    if (clearChat) {
-      clearChat.addEventListener('click', () => {
-        log.innerHTML = '';
-        convo.length = 0;
-      });
-    }
 
     persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
     startBtn.addEventListener('click', start);
