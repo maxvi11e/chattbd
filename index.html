@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ChatTBD — Avatar Personas</title>
   <style>
+    @keyframes blink-opacity {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
     :root{
       --bg:#000;
       --ink:#fff;
@@ -66,8 +71,9 @@
 
   <!-- ===== Landing ===== -->
   <section id="landing" class="screen landing">
-  <div id="safetyMsg" style="display:none; color:#ff5252; margin-bottom:16px; text-align:center; font-weight:500;"></div>
-  <div class="heroRow">
+  <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center;">
+    <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-32px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
+    <div class="heroRow">
       <label class="heroInput" aria-label="Persona prompt">
         <input id="persona" type="text" placeholder="Enter a prompt to create an avatar…" />
       </label>
@@ -75,6 +81,7 @@
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
     </div>
+  </div>
   </section>
 
   <!-- ===== Chat ===== -->
@@ -189,7 +196,7 @@
     }
 
     function loader(){
-      return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;">Generating (allow 1-2 min)</div>`;
+  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 1.5s infinite;'>Generating...</span></div>`;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
