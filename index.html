@@ -11,9 +11,11 @@
     }
   }
     @keyframes blink-opacity {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
+      0% { opacity: 1; content: "Generating..."; }
+      25% { opacity: 0; }
+      50% { opacity: 1; content: "est. 1-2 minutes"; }
+      75% { opacity: 0; }
+      100% { opacity: 1; content: "Generating..."; }
     }
     @media (max-width: 600px) {
       #persona::placeholder {
@@ -28,6 +30,12 @@
       --stroke:#fff;
       --radius-lg:24px;
       --radius-md:14px;
+    }
+    span[data-text]::before {
+      content: attr(data-text);
+    }
+    span[data-text].alt::before {
+      content: attr(data-alt-text);
     }
     *{box-sizing:border-box}
     html,body{height:100%}
@@ -82,7 +90,7 @@
     font-size: 18px !important;
     font-weight: 600 !important;
     width: fit-content !important;
-    margin: 24px auto !important;
+    margin: 0 auto !important;
     left: 0 !important;
     right: 0 !important;
     padding: 0 20px !important;
@@ -232,7 +240,7 @@
     }
 
     function loader(){
-  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 3s infinite;'>Generating...</span></div>`;
+  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 6s infinite;' data-text="Generating..." data-alt-text="est. 1-2 minutes"></span></div>`;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
