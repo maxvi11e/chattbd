@@ -36,10 +36,10 @@
     .screen{min-height:100vh; width:100%;}
 
     /* ===== Landing ===== */
-  .landing{display:grid; place-items:center; padding:25.6px; margin-top:-60px}
+  .landing{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
   .heroRow{display:flex; align-items:center; gap:11.2px}
   .heroInput{display:flex; align-items:center; width:min(715.52px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; background:transparent}
-  .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1}
+  .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
     .heroInput input::placeholder { color:#fff; opacity:1; }
   .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
   .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
@@ -75,10 +75,17 @@
   .sendBtn .circleBtn{width:40px; height:40px}
 
   .avatar-set-bubble {
-    border: 1px solid #fff !important;
-    background: rgba(0,0,0,0.4) !important;
+    border: none !important;
+    background: transparent !important;
     color: #fff !important;
-    margin-right: 10px;
+    text-align: center !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+    width: fit-content !important;
+    margin: 24px auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: 0 20px !important;
   }
 
     .hide{display:none}
