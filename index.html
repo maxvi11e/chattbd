@@ -11,11 +11,8 @@
     }
   }
     @keyframes blink-opacity {
-      0% { opacity: 1; content: "Generating..."; }
-      25% { opacity: 0; }
-      50% { opacity: 1; content: "est. 1-2 minutes"; }
-      75% { opacity: 0; }
-      100% { opacity: 1; content: "Generating..."; }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
     @media (max-width: 600px) {
       #persona::placeholder {
@@ -61,7 +58,21 @@
 
     .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
 
-    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center; margin-bottom:0;}
+    .avatar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center;}
+
+  #avatar-message {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+  }
 
     .pane{position:relative; width:100%; max-width:760px;}
     .scroller{max-height:300px; overflow:auto; padding:0 0 0 0}
@@ -134,8 +145,11 @@
     </div>
 
     <div class="column">
-      <!-- Avatar top -->
-      <div id="avatar" class="avatarFrame"></div>
+      <!-- Avatar section -->
+      <div class="avatar-section">
+        <div id="avatar-message"></div>
+        <div id="avatar" class="avatarFrame"></div>
+      </div>
       <!-- Conversation pane -->
       <div class="pane" style="position:relative;">
         <div id="log" class="scroller" role="log" aria-live="polite"></div>
@@ -159,6 +173,7 @@
     const $ = s=>document.querySelector(s);
     const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'),
           startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'),
+          avatarMessage=$('#avatar-message'),
           log=$('#log'), ask=$('#ask'), send=$('#send');
 
     // simple in-memory history for persona context
@@ -236,11 +251,27 @@
       // reset chat UI
       log.innerHTML = '';
       convo.length = 0;
-      add('from-bot', 'Avatar set: ' + p);
+      document.getElementById('avatar-message').textContent = 'Avatar set: ' + p;
     }
 
     function loader(){
-  return `<div style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style='animation:blink-opacity 6s infinite;' data-text="Generating..." data-alt-text="est. 1-2 minutes"></span></div>`;
+      const div = document.createElement('div');
+      div.style.cssText = 'width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;';
+      const span = document.createElement('span');
+      span.style.animation = 'blink-opacity 4s infinite';
+      span.textContent = 'Generating...';
+      div.appendChild(span);
+      
+      // Alternate between messages
+      let isGenerating = true;
+      setInterval(() => {
+        if (span.style.opacity !== '0') {  // Only change text when fully faded
+          span.textContent = isGenerating ? 'est. 1-2 minutes' : 'Generating...';
+          isGenerating = !isGenerating;
+        }
+      }, 2000);
+      
+      return div;
     }
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
