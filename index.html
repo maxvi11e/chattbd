@@ -11,8 +11,11 @@
     }
   }
     @keyframes blink-opacity {
-      0%, 100% { opacity: 1; }
+      0% { opacity: 1; }
+      40% { opacity: 1; }
       50% { opacity: 0; }
+      90% { opacity: 0; }
+      100% { opacity: 1; }
     }
     @media (max-width: 600px) {
       #persona::placeholder {
@@ -256,7 +259,7 @@
     }
 
     function loader(){
-      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span class="loading-text" style="animation:blink-opacity 4s infinite">Generating...</span></div>`;
+      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span class="loading-text" style="animation:blink-opacity 6s infinite">Generating...</span></div>`;
     }
 
     // Start the message alternation after loader is inserted
@@ -267,14 +270,15 @@
       let isGenerating = true;
       const interval = setInterval(() => {
         if (document.querySelector('.loading-text')) {
-          if (getComputedStyle(loadingText).opacity !== '0') {
+          const opacity = getComputedStyle(loadingText).opacity;
+          if (opacity === '0') {
             loadingText.textContent = isGenerating ? 'est. 1-2 minutes' : 'Generating...';
             isGenerating = !isGenerating;
           }
         } else {
           clearInterval(interval);
         }
-      }, 2000);
+      }, 100);
     }
     
     function fallbackAvatar(){
