@@ -212,6 +212,7 @@
 
       // ===== Generate avatar via API =====
       avatar.innerHTML = loader();
+      startLoaderAnimation();
       try {
         const res = await fetch('/api/generate-avatar', {
           method:'POST',
@@ -255,24 +256,27 @@
     }
 
     function loader(){
-      const div = document.createElement('div');
-      div.style.cssText = 'width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;';
-      const span = document.createElement('span');
-      span.style.animation = 'blink-opacity 4s infinite';
-      span.textContent = 'Generating...';
-      div.appendChild(span);
+      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span class="loading-text" style="animation:blink-opacity 4s infinite">Generating...</span></div>`;
+    }
+
+    // Start the message alternation after loader is inserted
+    function startLoaderAnimation() {
+      const loadingText = document.querySelector('.loading-text');
+      if (!loadingText) return;
       
-      // Alternate between messages
       let isGenerating = true;
-      setInterval(() => {
-        if (span.style.opacity !== '0') {  // Only change text when fully faded
-          span.textContent = isGenerating ? 'est. 1-2 minutes' : 'Generating...';
-          isGenerating = !isGenerating;
+      const interval = setInterval(() => {
+        if (document.querySelector('.loading-text')) {
+          if (getComputedStyle(loadingText).opacity !== '0') {
+            loadingText.textContent = isGenerating ? 'est. 1-2 minutes' : 'Generating...';
+            isGenerating = !isGenerating;
+          }
+        } else {
+          clearInterval(interval);
         }
       }, 2000);
-      
-      return div;
     }
+    
     function fallbackAvatar(){
       return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
                  alt="Avatar Placeholder"
