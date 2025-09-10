@@ -215,7 +215,6 @@
 
       // ===== Generate avatar via API =====
       avatar.innerHTML = loader();
-      startLoaderAnimation();
       try {
         const res = await fetch('/api/generate-avatar', {
           method:'POST',
@@ -259,26 +258,7 @@
     }
 
     function loader(){
-      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span class="loading-text" style="animation:blink-opacity 6s infinite">Generating...</span></div>`;
-    }
-
-    // Start the message alternation after loader is inserted
-    function startLoaderAnimation() {
-      const loadingText = document.querySelector('.loading-text');
-      if (!loadingText) return;
-      
-      let isGenerating = true;
-      const interval = setInterval(() => {
-        if (document.querySelector('.loading-text')) {
-          const opacity = getComputedStyle(loadingText).opacity;
-          if (opacity === '0') {
-            loadingText.textContent = isGenerating ? 'est. 1-2 minutes' : 'Generating...';
-            isGenerating = !isGenerating;
-          }
-        } else {
-          clearInterval(interval);
-        }
-      }, 100);
+      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;color:#fff;font-size:14px;"><span style="animation:blink-opacity 1.5s infinite">Generating (est. 1-2 min)</span></div>`;
     }
     
     function fallbackAvatar(){
