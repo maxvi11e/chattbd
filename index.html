@@ -182,7 +182,7 @@
     </div>
   </section>
 
-  <script>
+  <script type="module">
     const $ = s=>document.querySelector(s);
     const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'),
           startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'),
@@ -363,10 +363,6 @@
     }
 
         // --- Supabase Upload Helper ---
-        // 1. Load supabase client
-        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-        const supabase = createClient("SUPABASE_URL", "SUPABASE_ANON_KEY");
-
         // 2. Convert dataURL → Blob
         function dataUrlToBlob(dataUrl){
           const [meta, b64] = dataUrl.split(",");
