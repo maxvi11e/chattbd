@@ -204,6 +204,17 @@
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+    // Check for existing session on page load
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log("Existing session found:", session.user.email);
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+      }
+    }
+    checkSession();
+
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
@@ -262,6 +273,19 @@
 
           if (error) throw error;
 
+          // Create profile for new user
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({ 
+                id: user.id,
+                display_name: email.split('@')[0], // Default display name from email
+                created_at: new Date().toISOString()
+              });
+            if (profileError) console.error('Error creating profile:', profileError);
+          }
+
           // Reset form
           otpInput.style.display = 'none';
           emailInput.readOnly = false;
@@ -316,6 +340,9 @@
       // Clear chat when going back to landing
       log.innerHTML = '';
       convo.length = 0;
+      // Clear current conversation and avatar IDs
+      window.currentConversationId = null;
+      window.currentAvatarId = null;
     });
     ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
     send.addEventListener('click', doSend);
@@ -360,6 +387,26 @@
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
               const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
+              
+              // Save avatar to database
+              const { data: avatarData, error: avatarError } = await supabase
+                .from('avatars')
+                .insert({
+                  user_id: user.id,
+                  name: p,
+                  image_url: url,
+                  traits: json.traits || {}
+                })
+                .select()
+                .single();
+                
+              if (avatarError) {
+                console.error('Error saving avatar:', avatarError);
+              } else {
+                // Store the avatar ID for conversation tracking
+                window.currentAvatarId = avatarData.id;
+              }
+              
               avatar.innerHTML =
                 `<img src="${url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
             } else {
@@ -414,6 +461,38 @@
       convo.push({ role:'user', content:t });
 
       try {
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user || !window.currentAvatarId) {
+          throw new Error('Please sign in to save conversations');
+        }
+
+        // Get or create conversation
+        if (!window.currentConversationId) {
+          const { data: convoData, error: convoError } = await supabase
+            .from('conversations')
+            .insert({
+              avatar_id: window.currentAvatarId,
+              title: 'Conversation with ' + persona.value.trim()
+            })
+            .select()
+            .single();
+          
+          if (convoError) throw convoError;
+          window.currentConversationId = convoData.id;
+        }
+
+        // Save user message
+        const { error: msgError } = await supabase
+          .from('messages')
+          .insert({
+            conversation_id: window.currentConversationId,
+            role: 'user',
+            text: t
+          });
+        if (msgError) console.error('Error saving message:', msgError);
+
+        // Get AI response
         const res = await fetch('/api/chat', {
           method:'POST',
           headers:{ 'Content-Type':'application/json' },
@@ -421,11 +500,22 @@
         });
         const { text, error } = await res.json();
         if (error || !text) throw new Error(error || 'No response');
+        
+        // Save AI response
+        const { error: aiMsgError } = await supabase
+          .from('messages')
+          .insert({
+            conversation_id: window.currentConversationId,
+            role: 'assistant',
+            text: text
+          });
+        if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
+
         add('from-bot', text);
         convo.push({ role:'assistant', content:text });
       } catch (err) {
         console.error('Chat error:', err);
-        add('from-bot', 'Chat failed. Try again.');
+        add('from-bot', err.message || 'Chat failed. Try again.');
       }
     }
 
