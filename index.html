@@ -276,16 +276,27 @@
 
         if (error) throw error;
 
-        // Create profile for new user
-        if (data.user) {
+        // Wait a moment for the session to be established
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Get the latest session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session && session.user) {
+          // Create profile for new user
           const { error: profileError } = await supabase
             .from('profiles')
-            .upsert({ 
-              id: data.user.id,
-              display_name: email.split('@')[0], // Default display name from email
+            .insert({ 
+              id: session.user.id,
+              display_name: email.split('@')[0],
               created_at: new Date().toISOString()
             });
-          if (profileError) console.error('Error creating profile:', profileError);
+            
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            console.log('Current user ID:', session.user.id);
+            console.log('Session state:', session);
+          }
         }
 
         // Clear inputs on success
