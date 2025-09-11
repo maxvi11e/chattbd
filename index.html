@@ -224,7 +224,11 @@
         try {
           const { error } = await supabase.auth.signInWithOtp({
             email,
-            options: { shouldCreateUser: true }
+            options: { 
+              shouldCreateUser: true,
+              channel: 'email',
+              type: 'otp'
+            }
           });
           
           if (error) throw error;
@@ -234,7 +238,7 @@
           emailInput.readOnly = true;
           loginBtn.textContent = 'Verify code';
           isVerifying = true;
-          alert('Check your email for the verification code');
+          alert('Check your email for the numeric verification code');
         } catch (error) {
           console.error('Error sending OTP:', error.message);
           alert('Error sending verification code. Please try again.');
