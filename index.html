@@ -118,6 +118,19 @@
     }
   </style>
 </head>
+
+<!-- Auth buttons -->
+<div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">
+  <button id="loginBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;">
+    Sign in
+  </button>
+  <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;display:none;">
+    Sign out
+  </button>
+</div>
+
+
+
 <body>
 
   <!-- ===== Landing ===== -->
@@ -178,6 +191,42 @@
 
     // simple in-memory history for persona context
     const convo = [];
+
+        // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // Replace with your keys
+    const supabaseUrl = "SUPABASE_URL";
+    const supabaseAnonKey = "SUPABASE_ANON_KEY";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    // Sign in with Google popup
+    loginBtn.addEventListener("click", async () => {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
+      if (error) console.error("Login error:", error.message);
+    });
+
+    // Sign out
+    logoutBtn.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+    });
+
+    // Watch auth state
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        console.log("Signed in as", session.user.email);
+      } else {
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        console.log("Signed out");
+      }
+    });
+
 
     // Handle responsive placeholder text
     function updatePlaceholder() {
@@ -240,8 +289,18 @@
         let msg = document.getElementById('safetyMsg');
         if (msg) msg.remove();
 
-        avatar.innerHTML =
-          `<img src="${json.dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+            // Upload avatar image to Supabase and then show it
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
+              avatar.innerHTML =
+                `<img src="${url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+            } else {
+              avatar.innerHTML =
+                `<img src="${json.dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+}
+
+
       } catch (err) {
         console.error('Avatar load failed:', err);
         avatar.innerHTML = fallbackAvatar();
@@ -302,6 +361,33 @@
         add('from-bot', 'Chat failed. Try again.');
       }
     }
+
+        // --- Supabase Upload Helper ---
+        // 1. Load supabase client
+        import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+        const supabase = createClient("SUPABASE_URL", "SUPABASE_ANON_KEY");
+
+        // 2. Convert dataURL → Blob
+        function dataUrlToBlob(dataUrl){
+          const [meta, b64] = dataUrl.split(",");
+          const mime = meta.match(/data:(.*?);base64/)[1] || "image/png";
+          const bin = atob(b64), len = bin.length;
+          const bytes = new Uint8Array(len);
+          for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i);
+          return new Blob([bytes], { type: mime });
+        }
+
+        // 3. Upload + return public URL
+        async function uploadAvatarImage({ dataUrl, userId, fileName="avatar.png" }){
+          const blob = dataUrlToBlob(dataUrl);
+          const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
+          const { error: upErr } = await supabase.storage.from("avatars")
+            .upload(path, blob, { upsert:true, contentType:blob.type });
+          if (upErr) throw upErr;
+          const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+          return data.publicUrl;
+        }
+
   </script>
 </body>
 </html>
