@@ -209,6 +209,13 @@
       if (error) console.error("Login error:", error.message);
     });
 
+        // request a 6-digit code
+    await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+
+    // then verify the code from your UI input
+    await supabase.auth.verifyOtp({ email, token: codeFromUser, type: 'email' });
+
+
     // Sign out
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
