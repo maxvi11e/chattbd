@@ -119,11 +119,15 @@
   </style>
 </head>
 
-<!-- Auth buttons -->
-<div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;">
-  <button id="loginBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;">
-    Sign in
-  </button>
+<!-- Auth controls -->
+<div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:center;">
+  <div id="loginForm" style="display:flex;gap:8px;align-items:center;">
+    <input type="email" id="emailInput" placeholder="Enter your email" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;" />
+    <input type="text" id="otpInput" placeholder="Enter OTP code" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;display:none;outline:none;" />
+    <button id="loginBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;">
+      Send code
+    </button>
+  </div>
   <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;display:none;">
     Sign out
   </button>
@@ -203,18 +207,70 @@
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // // Sign in with Google popup
-    // loginBtn.addEventListener("click", async () => {
-    //   const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
-    //   if (error) console.error("Login error:", error.message);
-    // });
+    // Email OTP authentication
+    let isVerifying = false;
+    const emailInput = document.getElementById("emailInput");
+    const otpInput = document.getElementById("otpInput");
 
-        // request a 6-digit code
-    await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+    loginBtn.addEventListener("click", async () => {
+      if (!isVerifying) {
+        // First click - send OTP
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+          alert('Please enter a valid email address');
+          return;
+        }
 
-    // then verify the code from your UI input
-    await supabase.auth.verifyOtp({ email, token: codeFromUser, type: 'email' });
+        try {
+          const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: { shouldCreateUser: true }
+          });
+          
+          if (error) throw error;
+          
+          // Show OTP input
+          otpInput.style.display = 'block';
+          emailInput.readOnly = true;
+          loginBtn.textContent = 'Verify code';
+          isVerifying = true;
+          alert('Check your email for the verification code');
+        } catch (error) {
+          console.error('Error sending OTP:', error.message);
+          alert('Error sending verification code. Please try again.');
+        }
+      } else {
+        // Second click - verify OTP
+        const email = emailInput.value.trim();
+        const token = otpInput.value.trim();
+        
+        if (!token) {
+          alert('Please enter the verification code');
+          return;
+        }
 
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            email,
+            token,
+            type: 'email'
+          });
+
+          if (error) throw error;
+
+          // Reset form
+          otpInput.style.display = 'none';
+          emailInput.readOnly = false;
+          emailInput.value = '';
+          otpInput.value = '';
+          loginBtn.textContent = 'Send code';
+          isVerifying = false;
+        } catch (error) {
+          console.error('Error verifying OTP:', error.message);
+          alert('Invalid verification code. Please try again.');
+        }
+      }
+    });
 
     // Sign out
     logoutBtn.addEventListener("click", async () => {
