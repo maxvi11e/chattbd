@@ -203,11 +203,11 @@
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // Sign in with Google popup
-    loginBtn.addEventListener("click", async () => {
-      const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
-      if (error) console.error("Login error:", error.message);
-    });
+    // // Sign in with Google popup
+    // loginBtn.addEventListener("click", async () => {
+    //   const { error } = await supabase.auth.signInWithOAuth({ provider: "google" });
+    //   if (error) console.error("Login error:", error.message);
+    // });
 
         // request a 6-digit code
     await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
