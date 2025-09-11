@@ -122,10 +122,13 @@
 <!-- Auth controls -->
 <div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:center;">
   <div id="loginForm" style="display:flex;gap:8px;align-items:center;">
-    <input type="email" id="emailInput" placeholder="Enter your email" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;" />
-    <input type="text" id="otpInput" placeholder="Enter OTP code" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;display:none;outline:none;" />
+    <input type="email" id="emailInput" placeholder="Email" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;" />
+    <input type="password" id="passwordInput" placeholder="Password" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;" />
     <button id="loginBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;">
-      Send code
+      Sign in
+    </button>
+    <button id="signupBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;">
+      Sign up
     </button>
   </div>
   <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;display:none;">
@@ -218,85 +221,82 @@
     const loginBtn = document.getElementById("loginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    // Email OTP authentication
-    let isVerifying = false;
     const emailInput = document.getElementById("emailInput");
-    const otpInput = document.getElementById("otpInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const signupBtn = document.getElementById("signupBtn");
 
+    // Sign in handler
     loginBtn.addEventListener("click", async () => {
-      if (!isVerifying) {
-        // First click - send OTP
-        const email = emailInput.value.trim();
-        if (!email || !email.includes('@')) {
-          alert('Please enter a valid email address');
-          return;
-        }
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
 
-        try {
-          const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: { 
-              shouldCreateUser: true,
-              channel: 'email',
-              type: 'otp'
-            }
-          });
-          
-          if (error) throw error;
-          
-          // Show OTP input
-          otpInput.style.display = 'block';
-          emailInput.readOnly = true;
-          loginBtn.textContent = 'Verify code';
-          isVerifying = true;
-          alert('Check your email for the numeric verification code');
-        } catch (error) {
-          console.error('Error sending OTP:', error.message);
-          alert('Error sending verification code. Please try again.');
-        }
-      } else {
-        // Second click - verify OTP
-        const email = emailInput.value.trim();
-        const token = otpInput.value.trim();
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        // Clear inputs on success
+        emailInput.value = '';
+        passwordInput.value = '';
         
-        if (!token) {
-          alert('Please enter the verification code');
-          return;
+      } catch (error) {
+        console.error('Error signing in:', error.message);
+        alert(error.message);
+      }
+    });
+
+    // Sign up handler
+    signupBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        // Create profile for new user
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({ 
+              id: data.user.id,
+              display_name: email.split('@')[0], // Default display name from email
+              created_at: new Date().toISOString()
+            });
+          if (profileError) console.error('Error creating profile:', profileError);
         }
 
-        try {
-          const { error } = await supabase.auth.verifyOtp({
-            email,
-            token,
-            type: 'email'
-          });
-
-          if (error) throw error;
-
-          // Create profile for new user
-          const { data: { user } } = await supabase.auth.getUser();
-          if (user) {
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .upsert({ 
-                id: user.id,
-                display_name: email.split('@')[0], // Default display name from email
-                created_at: new Date().toISOString()
-              });
-            if (profileError) console.error('Error creating profile:', profileError);
-          }
-
-          // Reset form
-          otpInput.style.display = 'none';
-          emailInput.readOnly = false;
-          emailInput.value = '';
-          otpInput.value = '';
-          loginBtn.textContent = 'Send code';
-          isVerifying = false;
-        } catch (error) {
-          console.error('Error verifying OTP:', error.message);
-          alert('Invalid verification code. Please try again.');
-        }
+        // Clear inputs on success
+        emailInput.value = '';
+        passwordInput.value = '';
+        
+        alert('Sign up successful! You can now sign in.');
+        
+      } catch (error) {
+        console.error('Error signing up:', error.message);
+        alert(error.message);
       }
     });
 
