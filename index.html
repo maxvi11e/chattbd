@@ -249,7 +249,11 @@
         
       } catch (error) {
         console.error('Error signing in:', error.message);
-        alert(error.message);
+        if (error.message.includes('Email not confirmed')) {
+          alert('Please check your email and click the confirmation link before signing in.');
+        } else {
+          alert(error.message);
+        }
       }
     });
 
@@ -271,31 +275,37 @@
       try {
         const { data, error } = await supabase.auth.signUp({
           email,
-          password
+          password,
+          options: {
+            data: {
+              display_name: email.split('@')[0]
+            }
+          }
         });
 
         if (error) throw error;
 
-        // Wait a moment for the session to be established
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (data.user?.identities?.length === 0) {
+          alert('An account with this email already exists.');
+          return;
+        }
 
-        // Get the latest session
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (session && session.user) {
-          // Create profile for new user
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({ 
-              id: session.user.id,
-              display_name: email.split('@')[0],
-              created_at: new Date().toISOString()
-            });
-            
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-            console.log('Current user ID:', session.user.id);
-            console.log('Session state:', session);
+        // Create profile immediately after signup
+        if (data.user) {
+          try {
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .insert({ 
+                id: data.user.id,
+                display_name: email.split('@')[0],
+                created_at: new Date().toISOString()
+              });
+              
+            if (profileError) {
+              console.error('Error creating profile:', profileError);
+            }
+          } catch (profileError) {
+            console.error('Profile creation error:', profileError);
           }
         }
 
@@ -303,7 +313,7 @@
         emailInput.value = '';
         passwordInput.value = '';
         
-        alert('Sign up successful! You can now sign in.');
+        alert('Please check your email for a confirmation link to complete your registration.');
         
       } catch (error) {
         console.error('Error signing up:', error.message);
