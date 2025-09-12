@@ -273,16 +273,27 @@
       }
 
       try {
+        console.log('Starting sign up process for:', email);
+        
+        // Sign out if there's an existing session
+        await supabase.auth.signOut();
+
         // Create auth user with auto-confirm
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { confirmed: true }
+            data: { confirmed: true },
+            emailRedirectTo: window.location.origin
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Sign up error:', error);
+          throw error;
+        }
+
+        console.log('Sign up successful, attempting immediate sign in');
 
         // Immediately sign in
         const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -290,7 +301,12 @@
           password
         });
 
-        if (signInError) throw signInError;
+        if (signInError) {
+          console.error('Auto sign in error:', signInError);
+          throw signInError;
+        }
+
+        console.log('Sign in successful after signup');
 
         // Create profile for new user
         if (data.user) {
@@ -330,29 +346,51 @@
       }
 
       try {
+        console.log('Attempting to sign in with:', email);
+        
+        // Check if the user exists first
+        const { data: { user }, error: checkError } = await supabase.auth.getUser();
+        console.log('Current auth state:', user ? 'Signed in' : 'Signed out');
+
+        // Sign out first if there's an existing session
+        if (user) {
+          await supabase.auth.signOut();
+        }
+
+        // Attempt sign in
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
-          password
+          password,
         });
 
         if (error) {
-          console.error('Sign in error:', error);
+          console.error('Sign in error details:', error);
           if (error.message.includes('Invalid login credentials')) {
             alert('Incorrect email or password. Please try again.');
           } else {
-            alert(error.message);
+            alert(error.message || 'Failed to sign in. Please try again.');
           }
           return;
         }
 
-        // Clear inputs on success
+        // Verify we have a valid session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('Failed to establish session');
+        }
+
+        console.log('Successfully signed in as:', data.user.email);
         emailInput.value = '';
         passwordInput.value = '';
-        console.log('Successfully signed in:', data.user.email);
+        
+        // Update UI
+        loginBtn.style.display = 'none';
+        signupBtn.style.display = 'none';
+        logoutBtn.style.display = 'inline-block';
         
       } catch (error) {
-        console.error('Error:', error);
-        alert(error.message);
+        console.error('Sign in error:', error);
+        alert(error.message || 'An error occurred during sign in');
       }
     });
 
