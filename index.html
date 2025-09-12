@@ -273,39 +273,38 @@
       }
 
       try {
+        // Create auth user with auto-confirm
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: {
-              display_name: email.split('@')[0]
-            }
+            data: { confirmed: true }
           }
         });
 
         if (error) throw error;
 
-        if (data.user?.identities?.length === 0) {
-          alert('An account with this email already exists.');
-          return;
-        }
+        // Immediately sign in
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
 
-        // Create profile immediately after signup
+        if (signInError) throw signInError;
+
+        // Create profile for new user
         if (data.user) {
-          try {
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .insert({ 
-                id: data.user.id,
-                display_name: email.split('@')[0],
-                created_at: new Date().toISOString()
-              });
-              
-            if (profileError) {
-              console.error('Error creating profile:', profileError);
-            }
-          } catch (profileError) {
-            console.error('Profile creation error:', profileError);
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({ 
+              id: data.user.id,
+              display_name: email.split('@')[0],
+              created_at: new Date().toISOString()
+            });
+            
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            throw profileError;
           }
         }
 
@@ -313,14 +312,51 @@
         emailInput.value = '';
         passwordInput.value = '';
         
-        alert('Please check your email for a confirmation link to complete your registration.');
-        
+        alert('Sign up successful! You are now signed in.');
       } catch (error) {
-        console.error('Error signing up:', error.message);
+        console.error('Error:', error);
         alert(error.message);
       }
     });
 
+    // Sign in handler
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          console.error('Sign in error:', error);
+          if (error.message.includes('Invalid login credentials')) {
+            alert('Incorrect email or password. Please try again.');
+          } else {
+            alert(error.message);
+          }
+          return;
+        }
+
+        // Clear inputs on success
+        emailInput.value = '';
+        passwordInput.value = '';
+        console.log('Successfully signed in:', data.user.email);
+        
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message);
+      }
+    });
+
+    
     // Sign out
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
