@@ -119,26 +119,14 @@
   </style>
 </head>
 
-<!-- Auth controls -->
+<body>
+
+<!-- Logout button for authenticated users -->
 <div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:center;">
-  <div id="loginForm" style="display:flex;gap:8px;align-items:center;">
-    <input type="email" id="emailInput" placeholder="Email" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;border-radius:9999px;" />
-    <input type="password" id="passwordInput" placeholder="Password" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;outline:none;border-radius:9999px;" />
-    <button id="loginBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;border-radius:9999px;">
-      Sign in
-    </button>
-    <button id="signupBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;border-radius:9999px;">
-      Sign up
-    </button>
-  </div>
-  <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;display:none;border-radius:9999px;">
+  <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;border-radius:9999px;">
     Sign out
   </button>
 </div>
-
-
-
-<body>
 
   <!-- ===== Landing ===== -->
   <section id="landing" class="screen landing">
@@ -207,209 +195,37 @@
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    // Check for existing session on page load
-    async function checkSession() {
+    // Check auth and redirect if not authenticated
+    async function checkAuthAndRedirect() {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        console.log("Existing session found:", session.user.email);
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
+      if (!session) {
+        window.location.href = 'auth.html';
+        return false;
       }
+      console.log("User authenticated:", session.user.email);
+      return true;
     }
-    checkSession();
 
-    const loginBtn = document.getElementById("loginBtn");
+    // Initialize auth check - wrap everything in this check
+    const isAuthenticated = await checkAuthAndRedirect();
+    if (!isAuthenticated) {
+      // Don't initialize the rest of the app if not authenticated
+    } else {
+      // Continue with app initialization only if authenticated
+
     const logoutBtn = document.getElementById("logoutBtn");
 
-    const emailInput = document.getElementById("emailInput");
-    const passwordInput = document.getElementById("passwordInput");
-    const signupBtn = document.getElementById("signupBtn");
-
-    // Sign in handler
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      
-      if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        // Clear inputs on success
-        emailInput.value = '';
-        passwordInput.value = '';
-        
-      } catch (error) {
-        console.error('Error signing in:', error.message);
-        if (error.message.includes('Email not confirmed')) {
-          alert('Please check your email and click the confirmation link before signing in.');
-        } else {
-          alert(error.message);
-        }
-      }
-    });
-
-    // Sign up handler
-    signupBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      
-      if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-      }
-
-      if (password.length < 6) {
-        alert('Password must be at least 6 characters long');
-        return;
-      }
-
-      try {
-        console.log('Starting sign up process for:', email);
-        
-        // Sign out if there's an existing session
-        await supabase.auth.signOut();
-
-        // Create auth user with auto-confirm
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { confirmed: true },
-            emailRedirectTo: window.location.origin
-          }
-        });
-
-        if (error) {
-          console.error('Sign up error:', error);
-          throw error;
-        }
-
-        console.log('Sign up successful, attempting immediate sign in');
-
-        // Immediately sign in
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (signInError) {
-          console.error('Auto sign in error:', signInError);
-          throw signInError;
-        }
-
-        console.log('Sign in successful after signup');
-
-        // Create profile for new user
-        if (data.user) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({ 
-              id: data.user.id,
-              display_name: email.split('@')[0],
-              created_at: new Date().toISOString()
-            });
-            
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-            throw profileError;
-          }
-        }
-
-        // Clear inputs on success
-        emailInput.value = '';
-        passwordInput.value = '';
-        
-        alert('Sign up successful! You are now signed in.');
-      } catch (error) {
-        console.error('Error:', error);
-        alert(error.message);
-      }
-    });
-
-    // Sign in handler
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
-      
-      if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-      }
-
-      try {
-        console.log('Attempting to sign in with:', email);
-        
-        // Check if the user exists first
-        const { data: { user }, error: checkError } = await supabase.auth.getUser();
-        console.log('Current auth state:', user ? 'Signed in' : 'Signed out');
-
-        // Sign out first if there's an existing session
-        if (user) {
-          await supabase.auth.signOut();
-        }
-
-        // Attempt sign in
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) {
-          console.error('Sign in error details:', error);
-          if (error.message.includes('Invalid login credentials')) {
-            alert('Incorrect email or password. Please try again.');
-          } else {
-            alert(error.message || 'Failed to sign in. Please try again.');
-          }
-          return;
-        }
-
-        // Verify we have a valid session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          throw new Error('Failed to establish session');
-        }
-
-        console.log('Successfully signed in as:', data.user.email);
-        emailInput.value = '';
-        passwordInput.value = '';
-        
-        // Update UI
-        loginBtn.style.display = 'none';
-        signupBtn.style.display = 'none';
-        logoutBtn.style.display = 'inline-block';
-        
-      } catch (error) {
-        console.error('Sign in error:', error);
-        alert(error.message || 'An error occurred during sign in');
-      }
-    });
-
-
-    // Sign out
+    // Sign out handler
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
+      window.location.href = 'auth.html';
     });
 
-    // Watch auth state
+    // Watch auth state changes
     supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        console.log("Signed in as", session.user.email);
-      } else {
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-        console.log("Signed out");
+      if (!session) {
+        // User signed out, redirect to auth page
+        window.location.href = 'auth.html';
       }
     });
 
@@ -691,6 +507,8 @@
             throw err;
           }
         }
+
+    } // End of authenticated check
 
   </script>
 </body>

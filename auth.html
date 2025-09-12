@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatTBD — Sign In</title>
+  <style>
+    @media (max-width: 900px) {
+      .authInput {
+        width: min(400.69px, calc(56vw - 32px));
+      }
+    }
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#d9d9d9;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+
+    /* ===== Auth Landing ===== */
+    .auth-landing{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
+    .authColumn{display:flex; flex-direction:column; align-items:center; gap:32px;}
+    .authInput{display:flex; align-items:center; width:min(400px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:9999px; padding:0 14.4px; height:46.4px; background:transparent}
+    .authInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
+    .authInput input::placeholder { color:#fff; opacity:1; }
+    .authBtn{width:min(400px,calc(70vw - 32px)); height:46.4px; border-radius:9999px; border:1px solid var(--stroke); background:transparent; color:var(--ink); font-size:17.6px; cursor:pointer; font-family: inherit;}
+    .authBtn:hover{background:rgba(255,255,255,0.1);}
+    .authBtn.primary{background:var(--ink); color:var(--bg);}
+    .authBtn.primary:hover{background:var(--muted);}
+
+    .title {
+      font-size: 48px;
+      font-weight: 650;
+      color: var(--ink);
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+    .subtitle {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===== Auth Landing ===== -->
+  <section class="screen auth-landing">
+    <div class="authColumn">
+      <img src="images/logo.png" alt="ChatTBD Logo" style="height:57.6px; width:auto; margin-bottom:24px;">
+      
+      <div style="text-align: center; margin-bottom: 32px;">
+        <h1 class="title">Welcome to ChatTBD</h1>
+        <p class="subtitle">Sign in to create your avatar personas</p>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:16px; width:100%; align-items:center;">
+        <label class="authInput" aria-label="Email">
+          <input id="email" type="email" placeholder="Enter your email" />
+        </label>
+        
+        <label class="authInput" aria-label="Password">
+          <input id="password" type="password" placeholder="Enter your password" />
+        </label>
+        
+        <button id="signin-btn" class="authBtn primary">Sign In</button>
+        <button id="signup-btn" class="authBtn">Create Account</button>
+      </div>
+    </div>
+  </section>
+  
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    // Replace with your keys
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    // Check if already authenticated
+    async function checkExistingAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        console.log("Already authenticated, redirecting to main app");
+        window.location.href = 'index.html';
+      }
+    }
+    checkExistingAuth();
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const signinBtn = document.getElementById("signin-btn");
+    const signupBtn = document.getElementById("signup-btn");
+
+    // Sign in handler
+    signinBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+
+      try {
+        signinBtn.textContent = 'Signing in...';
+        signinBtn.disabled = true;
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        console.log('Successfully signed in as:', data.user.email);
+        // Redirect to main app
+        window.location.href = 'index.html';
+        
+      } catch (error) {
+        console.error('Error signing in:', error.message);
+        if (error.message.includes('Invalid login credentials')) {
+          alert('Incorrect email or password. Please try again.');
+        } else {
+          alert(error.message);
+        }
+      } finally {
+        signinBtn.textContent = 'Sign In';
+        signinBtn.disabled = false;
+      }
+    });
+
+    // Sign up handler
+    signupBtn.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      if (!email || !password) {
+        alert('Please enter both email and password');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+      }
+
+      try {
+        signupBtn.textContent = 'Creating account...';
+        signupBtn.disabled = true;
+
+        console.log('Starting sign up process for:', email);
+        
+        // Sign out if there's an existing session
+        await supabase.auth.signOut();
+
+        // Create auth user with auto-confirm
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { confirmed: true },
+            emailRedirectTo: window.location.origin
+          }
+        });
+
+        if (error) {
+          console.error('Sign up error:', error);
+          throw error;
+        }
+
+        console.log('Sign up successful, attempting immediate sign in');
+
+        // Immediately sign in
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (signInError) {
+          console.error('Auto sign in error:', signInError);
+          throw signInError;
+        }
+
+        console.log('Sign in successful after signup');
+
+        // Create profile for new user
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({ 
+              id: data.user.id,
+              display_name: email.split('@')[0],
+              created_at: new Date().toISOString()
+            });
+            
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+            // Don't throw here, profile creation failure shouldn't block auth
+          }
+        }
+
+        // Redirect to main app
+        window.location.href = 'index.html';
+        
+      } catch (error) {
+        console.error('Error:', error);
+        alert(error.message);
+      } finally {
+        signupBtn.textContent = 'Create Account';
+        signupBtn.disabled = false;
+      }
+    });
+
+    // Enter key support
+    emailInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') passwordInput.focus();
+    });
+
+    passwordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') signinBtn.click();
+    });
+
+    // Watch auth state changes
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        console.log("Signed in as", session.user.email);
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
