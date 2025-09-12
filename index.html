@@ -3,22 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Build a Bot — Avatar Personas</title>
+  <title>Build a Bot — Dashboard</title>
   <style>
-  @media (max-width: 900px) {
-    .heroInput {
-      width: min(400.69px, calc(56vw - 32px));
-    }
-  }
-    @keyframes progress {
-      0% { width: 0%; }
-      100% { width: 100%; }
-    }
-    @media (max-width: 600px) {
-      #persona::placeholder {
-        content: "Create avatar...";
-      }
-    }
     :root{
       --bg:#000;
       --ink:#fff;
@@ -28,169 +14,99 @@
       --radius-lg:24px;
       --radius-md:14px;
     }
-    span[data-text]::before {
-      content: attr(data-text);
-    }
-    span[data-text].alt::before {
-      content: attr(data-alt-text);
-    }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
 
     .screen{min-height:100vh; width:100%;}
 
-    /* ===== Landing ===== */
-  .landing{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
-  .heroRow{display:flex; align-items:center; gap:11.2px}
-  .heroInput{display:flex; align-items:center; width:min(715.52px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
-  .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
-    .heroInput input::placeholder { color:#fff; opacity:1; }
-  .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
-  .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
+    /* ===== Dashboard ===== */
+    .dashboard{padding:32px 24px; max-width:1200px; margin:0 auto; min-height:100vh;}
+    
+    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;}
+    .logo-section{display:flex; align-items:center; gap:16px;}
+    .logo-section img{height:48px; width:auto;}
+    .app-title{font-size:32px; font-weight:650; letter-spacing:-0.02em;}
+    
+    .user-controls{display:flex; gap:12px; align-items:center;}
+    .user-email{color:var(--muted); font-size:14px;}
+    .logout-btn{padding:8px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px;}
+    .logout-btn:hover{background:rgba(255,255,255,0.1);}
 
-    /* ===== Chat ===== */
-    .chat{position:relative; padding:32px 22px 96px; max-width:1200px; margin:0 auto}
+    .main-content{display:flex; flex-direction:column; gap:32px;}
+    
+    .create-section{text-align:center; padding:48px 24px; border:2px dashed var(--stroke); border-radius:var(--radius-lg);}
+    .create-title{font-size:24px; font-weight:600; margin-bottom:16px;}
+    .create-subtitle{color:var(--muted); margin-bottom:32px; font-size:16px;}
+    .create-btn{padding:16px 32px; background:var(--ink); color:var(--bg); border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit;}
+    .create-btn:hover{background:var(--muted);}
 
-    .backBtn{position:fixed; top:22px; left:22px; z-index:4}
-  .backBtn .circleBtn{width:50px; height:50px; background:#000;}
-    .backBtn .circleBtn svg { margin-left: -6px; }
+    .avatars-section{margin-top:48px;}
+    .section-title{font-size:24px; font-weight:600; margin-bottom:24px;}
+    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;}
+    
+    .avatar-card{border:1px solid var(--stroke); border-radius:var(--radius-lg); overflow:hidden; background:rgba(255,255,255,0.02); cursor:pointer;}
+    .avatar-card:hover{background:rgba(255,255,255,0.05); transform:translateY(-2px); transition:all 0.2s ease;}
+    
+    .avatar-image{width:100%; height:200px; background:#1c1c1c; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+    .avatar-image img{width:100%; height:100%; object-fit:cover;}
+    .avatar-placeholder{color:var(--muted); font-size:14px;}
+    
+    .avatar-info{padding:16px;}
+    .avatar-name{font-weight:600; margin-bottom:4px; font-size:16px;}
+    .avatar-description{color:var(--muted); font-size:14px; line-height:1.4;}
+    .avatar-date{color:var(--muted); font-size:12px; margin-top:8px;}
 
-    .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
+    .empty-state{text-align:center; padding:48px 24px; color:var(--muted);}
+    .empty-state-icon{font-size:48px; margin-bottom:16px; opacity:0.5;}
 
-    .avatar-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center;}
-
-  #avatar-message {
-    color: #fff;
-    font-size: 18px;
-    font-weight: 600;
-    text-align: center;
-  }
-
-    .pane{position:relative; width:100%; max-width:760px;}
-    .scroller{max-height:300px; overflow:auto; padding:0 0 0 0}
-    .scroller::-webkit-scrollbar{width:12px}
-    .scroller::-webkit-scrollbar-track{background:transparent}
-    .scroller::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
-
-    .row{display:flex; margin:12px 0}
-    .bubble{max-width:520px; background:var(--bubble); color:var(--muted); border-radius:18px; padding:14px 18px; font-size:14px; line-height:1.3; border:2px solid #2a2a2a}
-    .bubble.from-bot{border:none; background:none;}
-    .bubble.from-me{border:1px solid #fff; background:rgba(0,0,0,0.4); margin-right:10px;}
-    .from-me{margin-left:auto; border-top-right-radius:8px}
-    .from-bot{margin-right:auto; border-top-left-radius:8px}
-
-  .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:20.8px; width:min(735.36px, 88.32vw); display:flex; align-items:center; gap:11.2px; z-index:3}
-  .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
-  .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
-    .composer input::placeholder { color:#fff; opacity:1; }
-  .sendBtn .circleBtn{width:40px; height:40px}
-
-  .avatar-set-bubble {
-    border: none !important;
-    background: transparent !important;
-    color: #fff !important;
-    text-align: center !important;
-    font-size: 18px !important;
-    font-weight: 600 !important;
-    width: fit-content !important;
-    margin: 0 auto !important;
-    left: 0 !important;
-    right: 0 !important;
-    padding: 0 20px !important;
-  }
-
-    .hide{display:none}
-
-    .title {
-      font-size: 48px;
-      font-weight: 650;
-      color: var(--ink);
-      margin-bottom: 32px;
-      letter-spacing: -0.02em;
+    @media (max-width: 768px) {
+      .dashboard{padding:24px 16px;}
+      .header{flex-direction:column; gap:16px; align-items:stretch;}
+      .user-controls{justify-content:space-between;}
+      .avatars-grid{grid-template-columns:1fr;}
+      .create-section{padding:32px 16px;}
     }
   </style>
 </head>
 
 <body>
+  <div class="screen dashboard">
+    <div class="header">
+      <div class="logo-section">
+        <img src="images/logo.png" alt="Build a Bot Logo">
+        <h1 class="app-title">Build a Bot</h1>
+      </div>
+      
+      <div class="user-controls">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn">Sign out</button>
+      </div>
+    </div>
 
-<!-- Logout button for authenticated users -->
-<div id="authControls" style="position:absolute;top:16px;right:16px;display:flex;gap:8px;align-items:center;">
-  <button id="logoutBtn" style="padding:6px 12px;border:1px solid #fff;background:transparent;color:#fff;cursor:pointer;border-radius:9999px;">
-    Sign out
-  </button>
-</div>
+    <div class="main-content">
+      <div class="create-section">
+        <h2 class="create-title">Create Your First Avatar</h2>
+        <p class="create-subtitle">Design a unique AI persona to chat with</p>
+        <button id="createBtn" class="create-btn">Create New Avatar</button>
+      </div>
 
-  <!-- ===== Landing ===== -->
-  <section id="landing" class="screen landing">
-  <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center;">
-    <img src="images/logo.png" alt="Build a Bot Logo" style="height:57.6px; width:auto; margin-bottom:42px;">
-    <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-32px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
-    <div class="heroRow">
-      <label class="heroInput" aria-label="Persona prompt">
-        <input id="persona" type="text" placeholder="Enter a prompt to create an avatar" data-short-placeholder="Create an avatar" />
-      </label>
-      <button id="startBtn" class="circleBtn" title="Generate persona">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </button>
+      <div id="avatarsSection" class="avatars-section" style="display:none;">
+        <h2 class="section-title">Your Avatars</h2>
+        <div id="avatarsGrid" class="avatars-grid"></div>
+      </div>
+
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-icon">🤖</div>
+        <p>No avatars yet. Create your first one to get started!</p>
+      </div>
     </div>
   </div>
-  </section>
-
-  <!-- ===== Chat ===== -->
-  <section id="chat" class="screen chat hide">
-    <div class="backBtn">
-      <button id="back" class="circleBtn" title="Back">
-        <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-      </button>
-    </div>
-
-    <div class="column">
-      <!-- Avatar section -->
-      <div class="avatar-section">
-        <div id="avatar-message"></div>
-        <div id="avatar" class="avatarFrame"></div>
-      </div>
-      <!-- Conversation pane -->
-      <div class="pane" style="position:relative;">
-        <div id="log" class="scroller" role="log" aria-live="polite"></div>
-      </div>
-    </div>
-
-    <!-- Bottom composer -->
-    <div class="composerWrap">
-      <label class="composer">
-        <input id="ask" type="text" placeholder="Ask anything" />
-      </label>
-      <button id="send" class="circleBtn sendBtn" title="Send">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </button>
-        </svg>
-      </button>
-    </div>
-  </section>
 
   <script type="module">
-    const $ = s=>document.querySelector(s);
-    const landing=$('#landing'), chat=$('#chat'), persona=$('#persona'),
-          startBtn=$('#startBtn'), back=$('#back'), avatar=$('#avatar'),
-          avatarMessage=$('#avatar-message'),
-          log=$('#log'), ask=$('#ask'), send=$('#send');
-
-    // simple in-memory history for persona context
-    const convo = [];
-
-        // === Supabase Auth ===
+    // === Supabase Auth ===
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // Replace with your keys
     const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -203,310 +119,110 @@
         return false;
       }
       console.log("User authenticated:", session.user.email);
+      document.getElementById('userEmail').textContent = session.user.email;
       return true;
     }
 
-    // Initialize auth check - wrap everything in this check
+    // Initialize auth check
     const isAuthenticated = await checkAuthAndRedirect();
     if (!isAuthenticated) {
       // Don't initialize the rest of the app if not authenticated
     } else {
       // Continue with app initialization only if authenticated
 
-    const logoutBtn = document.getElementById("logoutBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const createBtn = document.getElementById("createBtn");
+      const avatarsSection = document.getElementById("avatarsSection");
+      const avatarsGrid = document.getElementById("avatarsGrid");
+      const emptyState = document.getElementById("emptyState");
 
-    // Sign out handler
-    logoutBtn.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      window.location.href = 'auth.html';
-    });
-
-    // Watch auth state changes
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        // User signed out, redirect to auth page
+      // Sign out handler
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
         window.location.href = 'auth.html';
-      }
-    });
+      });
+
+      // Create new avatar handler
+      createBtn.addEventListener("click", () => {
+        window.location.href = 'create.html';
+      });
+
+      // Watch auth state changes
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.href = 'auth.html';
+        }
+      });
 
 
-    // Handle responsive placeholder text
-    function updatePlaceholder() {
-      const input = document.getElementById('persona');
-      if (window.innerWidth <= 600) {
-        input.placeholder = input.dataset.shortPlaceholder;
-      } else {
-        input.placeholder = "Enter a prompt to create an avatar!";
-      }
-    }
-    window.addEventListener('resize', updatePlaceholder);
-    updatePlaceholder();
+      // Load user's avatars
+      async function loadAvatars() {
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
 
-    persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
-    startBtn.addEventListener('click', start);
-    back.addEventListener('click', ()=>{
-      chat.classList.add('hide');
-      landing.classList.remove('hide');
-      persona.focus();
-      // Clear chat when going back to landing
-      log.innerHTML = '';
-      convo.length = 0;
-      // Clear current conversation and avatar IDs
-      window.currentConversationId = null;
-      window.currentAvatarId = null;
-    });
-    ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
-    send.addEventListener('click', doSend);
+          const { data: avatars, error } = await supabase
+            .from('avatars')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
 
-    async function start(){
-      const p = persona.value.trim(); if(!p) return;
-
-      landing.classList.add('hide');
-      chat.classList.remove('hide');
-
-      // ===== Generate avatar via API =====
-      avatar.innerHTML = loader();
-      try {
-        const res = await fetch('/api/generate-avatar', {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify({ prompt: p })
-        });
-
-        const json = await res.json().catch(() => ({}));
-        if (!res.ok || !json?.dataUrl) {
-          console.error('Avatar API error:', json);
-          // Show landing, hide chat, and show error message above heroRow
-          chat.classList.add('hide');
-          landing.classList.remove('hide');
-          let msg = document.getElementById('safetyMsg');
-          if (msg) {
-            msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
-            msg.style.display = 'block';
-            // Hide after 3 seconds
-            setTimeout(() => { msg.style.display = 'none'; }, 6000);
+          if (error) {
+            console.error('Error loading avatars:', error);
+            return;
           }
-          persona.focus();
-          return;
+
+          if (avatars && avatars.length > 0) {
+            displayAvatars(avatars);
+            avatarsSection.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            // Update create section title for existing users
+            document.querySelector('.create-title').textContent = 'Create Another Avatar';
+            document.querySelector('.create-subtitle').textContent = 'Design another unique AI persona';
+          } else {
+            avatarsSection.style.display = 'none';
+            emptyState.style.display = 'block';
+          }
+        } catch (error) {
+          console.error('Error in loadAvatars:', error);
         }
-
-        // Remove safety message if present
-        let msg = document.getElementById('safetyMsg');
-        if (msg) msg.remove();
-
-            // Upload avatar image to Supabase and then show it
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-              try {
-                const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
-                
-                // Save avatar to database
-                const { data: avatarData, error: avatarError } = await supabase
-                  .from('avatars')
-                  .insert({
-                    user_id: user.id,
-                    name: p,
-                    image_url: url,
-                    traits: json.traits || {}
-                  })
-                  .select()
-                  .single();
-                  
-                if (avatarError) {
-                  console.error('Error saving avatar:', avatarError);
-                  throw avatarError;
-                }
-                
-                // Store the avatar ID for conversation tracking
-                window.currentAvatarId = avatarData.id;
-                
-                // Create a new image and wait for it to load
-                const img = new Image();
-                img.onload = () => {
-                  avatar.innerHTML = '';
-                  img.style.width = '100%';
-                  img.style.height = '100%';
-                  img.style.objectFit = 'cover';
-                  img.style.borderRadius = '24px';
-                  avatar.appendChild(img);
-                };
-                img.onerror = (e) => {
-                  console.error('Error loading avatar image:', e);
-                  throw new Error('Failed to load avatar image');
-                };
-                img.src = url;
-                img.alt = 'Avatar';
-                
-              } catch (err) {
-                console.error('Avatar upload/save error:', err);
-                throw err;
-              }
-            } else {
-              // For non-authenticated users, show the generated image directly
-              const img = new Image();
-              img.onload = () => {
-                avatar.innerHTML = '';
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'cover';
-                img.style.borderRadius = '24px';
-                avatar.appendChild(img);
-              };
-              img.src = json.dataUrl;
-              img.alt = 'Avatar';
-}
-
-
-      } catch (err) {
-        console.error('Avatar load failed:', err);
-        avatar.innerHTML = fallbackAvatar();
-        add('from-bot', 'Image generation failed. Using a placeholder.');
       }
 
-      // reset chat UI
-      log.innerHTML = '';
-      convo.length = 0;
-      document.getElementById('avatar-message').textContent = 'Avatar set: ' + p;
-    }
-
-    function loader(){
-      return `<div class="loading-container" style="width:100%;height:100%;display:grid;place-items:center;">
-        <div style="width:80%;height:4px;background:#333;border-radius:2px;overflow:hidden;">
-          <div style="height:100%;background:#fff;border-radius:2px;animation:progress 60s linear infinite"></div>
-        </div>
-      </div>`;
-    }
-    
-    function fallbackAvatar(){
-      return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
-                 alt="Avatar Placeholder"
-                 style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
-    }
-
-    function add(who,text){
-      const row = document.createElement('div'); row.className = 'row';
-      const b = document.createElement('div');
-      // If the message is the 'Avatar set:' message, add a special class for styling
-      if (who === 'from-bot' && typeof text === 'string' && text.startsWith('Avatar set:')) {
-        b.className = 'bubble from-bot avatar-set-bubble';
-      } else {
-        b.className = 'bubble ' + who;
-      }
-      b.textContent = text;
-      row.appendChild(b); log.appendChild(row);
-      setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
-    }
-
-    async function doSend(){
-      const t = ask.value.trim(); if(!t) return;
-      ask.value=''; add('from-me',t);
-      convo.push({ role:'user', content:t });
-
-      try {
-        // Get current user
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !window.currentAvatarId) {
-          throw new Error('Please sign in to save conversations');
-        }
-
-        // Get or create conversation
-        if (!window.currentConversationId) {
-          const { data: convoData, error: convoError } = await supabase
-            .from('conversations')
-            .insert({
-              avatar_id: window.currentAvatarId,
-              title: 'Conversation with ' + persona.value.trim()
-            })
-            .select()
-            .single();
-          
-          if (convoError) throw convoError;
-          window.currentConversationId = convoData.id;
-        }
-
-        // Save user message
-        const { error: msgError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: window.currentConversationId,
-            role: 'user',
-            text: t
-          });
-        if (msgError) console.error('Error saving message:', msgError);
-
-        // Get AI response
-        const res = await fetch('/api/chat', {
-          method:'POST',
-          headers:{ 'Content-Type':'application/json' },
-          body: JSON.stringify({ persona: persona.value.trim(), message: t, history: convo })
-        });
-        const { text, error } = await res.json();
-        if (error || !text) throw new Error(error || 'No response');
+      // Display avatars in grid
+      function displayAvatars(avatars) {
+        avatarsGrid.innerHTML = '';
         
-        // Save AI response
-        const { error: aiMsgError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: window.currentConversationId,
-            role: 'assistant',
-            text: text
-          });
-        if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
-
-        add('from-bot', text);
-        convo.push({ role:'assistant', content:text });
-      } catch (err) {
-        console.error('Chat error:', err);
-        add('from-bot', err.message || 'Chat failed. Try again.');
+        avatars.forEach(avatar => {
+          const card = document.createElement('div');
+          card.className = 'avatar-card';
+          card.onclick = () => openChat(avatar.id);
+          
+          card.innerHTML = `
+            <div class="avatar-image">
+              ${avatar.image_url 
+                ? `<img src="${avatar.image_url}" alt="${avatar.name}" />`
+                : `<div class="avatar-placeholder">No image</div>`
+              }
+            </div>
+            <div class="avatar-info">
+              <div class="avatar-name">${avatar.name || 'Unnamed Avatar'}</div>
+              <div class="avatar-description">${avatar.description || 'No description'}</div>
+              <div class="avatar-date">Created ${new Date(avatar.created_at).toLocaleDateString()}</div>
+            </div>
+          `;
+          
+          avatarsGrid.appendChild(card);
+        });
       }
-    }
 
-        // --- Supabase Upload Helper ---
-        // 2. Convert dataURL → Blob
-        function dataUrlToBlob(dataUrl){
-          const [meta, b64] = dataUrl.split(",");
-          const mime = meta.match(/data:(.*?);base64/)[1] || "image/png";
-          const bin = atob(b64), len = bin.length;
-          const bytes = new Uint8Array(len);
-          for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i);
-          return new Blob([bytes], { type: mime });
-        }
+      // Open chat with selected avatar
+      function openChat(avatarId) {
+        window.location.href = `chat.html?avatar=${avatarId}`;
+      }
 
-        // 3. Upload + return public URL
-        async function uploadAvatarImage({ dataUrl, userId, fileName="avatar.png" }){
-          try {
-            const blob = dataUrlToBlob(dataUrl);
-            const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
-            
-            // Upload the file
-            const { error: upErr } = await supabase.storage.from("avatars")
-              .upload(path, blob, { 
-                upsert: true, 
-                contentType: blob.type,
-                cacheControl: '3600'
-              });
-            if (upErr) throw upErr;
-            
-            // Get the public URL with custom options
-            const { data } = supabase.storage.from("avatars")
-              .getPublicUrl(path, {
-                download: false,
-                transform: {
-                  width: 333,
-                  height: 333,
-                  resize: 'cover'
-                }
-              });
-              
-            // Ensure the URL is using HTTPS
-            const url = new URL(data.publicUrl);
-            url.protocol = 'https:';
-            return url.toString();
-          } catch (err) {
-            console.error('Error in uploadAvatarImage:', err);
-            throw err;
-          }
-        }
+      // Load avatars on page load
+      loadAvatars();
 
     } // End of authenticated check
 

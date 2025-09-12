@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build a Bot — Create Avatar</title>
+  <style>
+  @media (max-width: 900px) {
+    .heroInput {
+      width: min(400.69px, calc(56vw - 32px));
+    }
+  }
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+    @media (max-width: 600px) {
+      #persona::placeholder {
+        content: "Create avatar...";
+      }
+    }
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#d9d9d9;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+
+    /* ===== Create Page ===== */
+    .create{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
+    .heroRow{display:flex; align-items:center; gap:11.2px}
+    .heroInput{display:flex; align-items:center; width:min(715.52px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
+    .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
+    .heroInput input::placeholder { color:#fff; opacity:1; }
+    .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
+    .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
+
+    .backBtn{position:fixed; top:22px; left:22px; z-index:4}
+    .backBtn .circleBtn{width:50px; height:50px; background:#000;}
+    .backBtn .circleBtn svg { margin-left: -6px; }
+
+    .title {
+      font-size: 48px;
+      font-weight: 650;
+      color: var(--ink);
+      margin-bottom: 32px;
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      text-align: center;
+      max-width: 600px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="backBtn">
+    <button id="back" class="circleBtn" title="Back to Dashboard">
+      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+    </button>
+  </div>
+
+  <!-- ===== Create Avatar ===== -->
+  <section class="screen create">
+    <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center;">
+      <img src="images/logo.png" alt="Build a Bot Logo" style="height:57.6px; width:auto; margin-bottom:24px;">
+      
+      <h1 class="title">Create New Avatar</h1>
+      <p class="subtitle">Describe the personality, appearance, or character you want your AI avatar to embody</p>
+      
+      <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-32px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
+      
+      <div class="heroRow">
+        <label class="heroInput" aria-label="Persona prompt">
+          <input id="persona" type="text" placeholder="Enter a prompt to create an avatar" data-short-placeholder="Create an avatar" />
+        </label>
+        <button id="startBtn" class="circleBtn" title="Generate persona">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    // Check auth and redirect if not authenticated
+    async function checkAuthAndRedirect() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'auth.html';
+        return false;
+      }
+      console.log("User authenticated:", session.user.email);
+      return true;
+    }
+
+    // Initialize auth check
+    const isAuthenticated = await checkAuthAndRedirect();
+    if (!isAuthenticated) {
+      // Don't initialize the rest of the app if not authenticated
+    } else {
+      // Continue with app initialization only if authenticated
+
+      const persona = document.getElementById('persona');
+      const startBtn = document.getElementById('startBtn');
+      const back = document.getElementById('back');
+
+      // Back to dashboard
+      back.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      // Watch auth state changes
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.href = 'auth.html';
+        }
+      });
+
+      // Handle responsive placeholder text
+      function updatePlaceholder() {
+        if (window.innerWidth <= 600) {
+          persona.placeholder = persona.dataset.shortPlaceholder;
+        } else {
+          persona.placeholder = "Enter a prompt to create an avatar";
+        }
+      }
+      window.addEventListener('resize', updatePlaceholder);
+      updatePlaceholder();
+
+      persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
+      startBtn.addEventListener('click', start);
+
+      async function start(){
+        const p = persona.value.trim(); 
+        if(!p) return;
+
+        // Disable form while processing
+        persona.disabled = true;
+        startBtn.disabled = true;
+        startBtn.innerHTML = loader();
+
+        try {
+          // ===== Generate avatar via API =====
+          const res = await fetch('/api/generate-avatar', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ prompt: p })
+          });
+
+          const json = await res.json().catch(() => ({}));
+          if (!res.ok || !json?.dataUrl) {
+            console.error('Avatar API error:', json);
+            // Show error message
+            let msg = document.getElementById('safetyMsg');
+            if (msg) {
+              msg.textContent = 'Content blocked by safety system. Avoid copyrighted, controversial, or explicit characters!';
+              msg.style.display = 'block';
+              // Hide after 6 seconds
+              setTimeout(() => { msg.style.display = 'none'; }, 6000);
+            }
+            return;
+          }
+
+          // Remove safety message if present
+          let msg = document.getElementById('safetyMsg');
+          if (msg) msg.style.display = 'none';
+
+          // Upload avatar image to Supabase and save it
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
+            
+            // Save avatar to database
+            const { data: avatarData, error: avatarError } = await supabase
+              .from('avatars')
+              .insert({
+                user_id: user.id,
+                name: p,
+                image_url: url,
+                traits: json.traits || {},
+                description: `AI avatar: ${p}`
+              })
+              .select()
+              .single();
+              
+            if (avatarError) {
+              console.error('Error saving avatar:', avatarError);
+              throw avatarError;
+            }
+            
+            console.log('Avatar created successfully:', avatarData);
+            
+            // Redirect to chat with the new avatar
+            window.location.href = `chat.html?avatar=${avatarData.id}&new=true`;
+          }
+
+        } catch (err) {
+          console.error('Avatar creation failed:', err);
+          let msg = document.getElementById('safetyMsg');
+          if (msg) {
+            msg.textContent = 'Avatar creation failed. Please try again.';
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 4000);
+          }
+        } finally {
+          // Re-enable form
+          persona.disabled = false;
+          startBtn.disabled = false;
+          startBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+          persona.focus();
+        }
+      }
+
+      function loader(){
+        return `<div style="width:24px;height:24px;border:2px solid #333;border-top:2px solid #fff;border-radius:50%;animation:spin 1s linear infinite;"></div>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>`;
+      }
+
+      // --- Supabase Upload Helper ---
+      function dataUrlToBlob(dataUrl){
+        const [meta, b64] = dataUrl.split(",");
+        const mime = meta.match(/data:(.*?);base64/)[1] || "image/png";
+        const bin = atob(b64), len = bin.length;
+        const bytes = new Uint8Array(len);
+        for(let i=0;i<len;i++) bytes[i]=bin.charCodeAt(i);
+        return new Blob([bytes], { type: mime });
+      }
+
+      async function uploadAvatarImage({ dataUrl, userId, fileName="avatar.png" }){
+        try {
+          const blob = dataUrlToBlob(dataUrl);
+          const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
+          
+          // Upload the file
+          const { error: upErr } = await supabase.storage.from("avatars")
+            .upload(path, blob, { 
+              upsert: true, 
+              contentType: blob.type,
+              cacheControl: '3600'
+            });
+          if (upErr) throw upErr;
+          
+          // Get the public URL
+          const { data } = supabase.storage.from("avatars")
+            .getPublicUrl(path, {
+              download: false,
+              transform: {
+                width: 333,
+                height: 333,
+                resize: 'cover'
+              }
+            });
+            
+          // Ensure the URL is using HTTPS
+          const url = new URL(data.publicUrl);
+          url.protocol = 'https:';
+          return url.toString();
+        } catch (err) {
+          console.error('Error in uploadAvatarImage:', err);
+          throw err;
+        }
+      }
+
+      // Focus on input when page loads
+      persona.focus();
+
+    } // End of authenticated check
+  </script>
+</body>
+</html>

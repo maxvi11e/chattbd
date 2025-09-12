@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build a Bot — Chat</title>
+  <style>
+    @keyframes progress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#d9d9d9;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+
+    /* ===== Chat ===== */
+    .chat{position:relative; padding:32px 22px 96px; max-width:1200px; margin:0 auto}
+
+    .backBtn{position:fixed; top:22px; left:22px; z-index:4}
+    .backBtn .circleBtn{width:50px; height:50px; background:#000;}
+    .backBtn .circleBtn svg { margin-left: -6px; }
+
+    .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center;}
+
+    #avatar-message {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .pane{position:relative; width:100%; max-width:760px;}
+    .scroller{max-height:300px; overflow:auto; padding:0 0 0 0}
+    .scroller::-webkit-scrollbar{width:12px}
+    .scroller::-webkit-scrollbar-track{background:transparent}
+    .scroller::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
+
+    .row{display:flex; margin:12px 0}
+    .bubble{max-width:520px; background:var(--bubble); color:var(--muted); border-radius:18px; padding:14px 18px; font-size:14px; line-height:1.3; border:2px solid #2a2a2a}
+    .bubble.from-bot{border:none; background:none;}
+    .bubble.from-me{border:1px solid #fff; background:rgba(0,0,0,0.4); margin-right:10px;}
+    .from-me{margin-left:auto; border-top-right-radius:8px}
+    .from-bot{margin-right:auto; border-top-left-radius:8px}
+
+    .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:20.8px; width:min(735.36px, 88.32vw); display:flex; align-items:center; gap:11.2px; z-index:3}
+    .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
+    .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
+    .composer input::placeholder { color:#fff; opacity:1; }
+    .sendBtn .circleBtn{width:40px; height:40px}
+    .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
+    .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
+
+    .avatar-set-bubble {
+      border: none !important;
+      background: transparent !important;
+      color: #fff !important;
+      text-align: center !important;
+      font-size: 18px !important;
+      font-weight: 600 !important;
+      width: fit-content !important;
+      margin: 0 auto !important;
+      left: 0 !important;
+      right: 0 !important;
+      padding: 0 20px !important;
+    }
+
+    .loading-message {
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      margin: 16px 0;
+    }
+
+    .hide{display:none}
+  </style>
+</head>
+
+<body>
+  <!-- ===== Chat ===== -->
+  <section class="screen chat">
+    <div class="backBtn">
+      <button id="back" class="circleBtn" title="Back to Dashboard">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+      </button>
+    </div>
+
+    <div class="column">
+      <!-- Avatar section -->
+      <div class="avatar-section">
+        <div id="avatar-message"></div>
+        <div id="avatar" class="avatarFrame"></div>
+      </div>
+      <!-- Conversation pane -->
+      <div class="pane" style="position:relative;">
+        <div id="log" class="scroller" role="log" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Bottom composer -->
+    <div class="composerWrap">
+      <label class="composer">
+        <input id="ask" type="text" placeholder="Ask anything" />
+      </label>
+      <button id="send" class="circleBtn sendBtn" title="Send">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    // Check auth and redirect if not authenticated
+    async function checkAuthAndRedirect() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'auth.html';
+        return false;
+      }
+      console.log("User authenticated:", session.user.email);
+      return true;
+    }
+
+    // Initialize auth check
+    const isAuthenticated = await checkAuthAndRedirect();
+    if (!isAuthenticated) {
+      // Don't initialize the rest of the app if not authenticated
+    } else {
+      // Continue with app initialization only if authenticated
+
+      const avatar = document.getElementById('avatar');
+      const avatarMessage = document.getElementById('avatar-message');
+      const log = document.getElementById('log');
+      const ask = document.getElementById('ask');
+      const send = document.getElementById('send');
+      const back = document.getElementById('back');
+
+      // Global state
+      let currentAvatar = null;
+      let currentConversationId = null;
+      const convo = [];
+
+      // Back to dashboard
+      back.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      // Watch auth state changes
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.href = 'auth.html';
+        }
+      });
+
+      // Get avatar ID from URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const avatarId = urlParams.get('avatar');
+      const isNewAvatar = urlParams.get('new') === 'true';
+
+      if (!avatarId) {
+        // No avatar ID provided, redirect to dashboard
+        window.location.href = 'index.html';
+      } else {
+        loadAvatar(avatarId, isNewAvatar);
+      }
+
+      // Load avatar and conversation
+      async function loadAvatar(avatarId, isNew = false) {
+        try {
+          // Load avatar data
+          const { data: avatarData, error: avatarError } = await supabase
+            .from('avatars')
+            .select('*')
+            .eq('id', avatarId)
+            .single();
+
+          if (avatarError || !avatarData) {
+            console.error('Error loading avatar:', avatarError);
+            window.location.href = 'index.html';
+            return;
+          }
+
+          currentAvatar = avatarData;
+          
+          // Display avatar
+          if (avatarData.image_url) {
+            const img = new Image();
+            img.onload = () => {
+              avatar.innerHTML = '';
+              img.style.width = '100%';
+              img.style.height = '100%';
+              img.style.objectFit = 'cover';
+              img.style.borderRadius = '24px';
+              avatar.appendChild(img);
+            };
+            img.onerror = () => {
+              avatar.innerHTML = fallbackAvatar();
+            };
+            img.src = avatarData.image_url;
+            img.alt = avatarData.name;
+          } else {
+            avatar.innerHTML = fallbackAvatar();
+          }
+
+          avatarMessage.textContent = `Chatting with: ${avatarData.name}`;
+
+          if (isNew) {
+            // Show welcome message for new avatars
+            add('from-bot', `Hi! I'm ${avatarData.name}. What would you like to talk about?`);
+          } else {
+            // Load existing conversation
+            await loadConversation(avatarId);
+          }
+
+          // Focus on input
+          ask.focus();
+
+        } catch (error) {
+          console.error('Error in loadAvatar:', error);
+          window.location.href = 'index.html';
+        }
+      }
+
+      // Load existing conversation
+      async function loadConversation(avatarId) {
+        try {
+          const { data: conversations, error: convoError } = await supabase
+            .from('conversations')
+            .select(`
+              id,
+              messages (
+                id,
+                role,
+                text,
+                created_at
+              )
+            `)
+            .eq('avatar_id', avatarId)
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          if (convoError) {
+            console.error('Error loading conversation:', convoError);
+            return;
+          }
+
+          if (conversations && conversations.length > 0) {
+            currentConversationId = conversations[0].id;
+            const messages = conversations[0].messages || [];
+            
+            // Sort messages by creation time
+            messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            
+            // Display messages
+            messages.forEach(msg => {
+              add(msg.role === 'user' ? 'from-me' : 'from-bot', msg.text);
+              convo.push({ role: msg.role, content: msg.text });
+            });
+
+            if (messages.length === 0) {
+              add('from-bot', `Hi! I'm ${currentAvatar.name}. What would you like to talk about?`);
+            }
+          } else {
+            add('from-bot', `Hi! I'm ${currentAvatar.name}. What would you like to talk about?`);
+          }
+        } catch (error) {
+          console.error('Error loading conversation:', error);
+          add('from-bot', `Hi! I'm ${currentAvatar.name}. What would you like to talk about?`);
+        }
+      }
+
+      ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
+      send.addEventListener('click', doSend);
+
+      async function doSend(){
+        const t = ask.value.trim(); 
+        if(!t) return;
+        
+        ask.value=''; 
+        add('from-me',t);
+        convo.push({ role:'user', content:t });
+
+        // Show loading indicator
+        const loadingId = 'loading-' + Date.now();
+        addLoading(loadingId);
+
+        try {
+          // Get current user
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user || !currentAvatar) {
+            throw new Error('Please sign in to chat');
+          }
+
+          // Get or create conversation
+          if (!currentConversationId) {
+            const { data: convoData, error: convoError } = await supabase
+              .from('conversations')
+              .insert({
+                avatar_id: currentAvatar.id,
+                title: `Conversation with ${currentAvatar.name}`
+              })
+              .select()
+              .single();
+            
+            if (convoError) throw convoError;
+            currentConversationId = convoData.id;
+          }
+
+          // Save user message
+          const { error: msgError } = await supabase
+            .from('messages')
+            .insert({
+              conversation_id: currentConversationId,
+              role: 'user',
+              text: t
+            });
+          if (msgError) console.error('Error saving message:', msgError);
+
+          // Get AI response
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              message: t, 
+              history: convo.slice(-10) // Send last 10 messages for context
+            })
+          });
+          
+          const { text, error } = await res.json();
+          if (error || !text) throw new Error(error || 'No response');
+          
+          // Remove loading indicator
+          removeLoading(loadingId);
+          
+          // Save AI response
+          const { error: aiMsgError } = await supabase
+            .from('messages')
+            .insert({
+              conversation_id: currentConversationId,
+              role: 'assistant',
+              text: text
+            });
+          if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
+
+          add('from-bot', text);
+          convo.push({ role:'assistant', content:text });
+          
+        } catch (err) {
+          console.error('Chat error:', err);
+          removeLoading(loadingId);
+          add('from-bot', err.message || 'Chat failed. Try again.');
+        }
+      }
+
+      function add(who, text){
+        const row = document.createElement('div'); 
+        row.className = 'row';
+        const b = document.createElement('div');
+        b.className = 'bubble ' + who;
+        b.textContent = text;
+        row.appendChild(b); 
+        log.appendChild(row);
+        setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
+      }
+
+      function addLoading(id) {
+        const row = document.createElement('div'); 
+        row.className = 'row';
+        row.id = id;
+        const b = document.createElement('div');
+        b.className = 'bubble from-bot loading-message';
+        b.innerHTML = 'Thinking...';
+        row.appendChild(b); 
+        log.appendChild(row);
+        setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
+      }
+
+      function removeLoading(id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.remove();
+        }
+      }
+
+      function fallbackAvatar(){
+        return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
+                   alt="Avatar Placeholder"
+                   style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+      }
+
+    } // End of authenticated check
+  </script>
+</body>
+</html>
