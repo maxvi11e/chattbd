@@ -356,7 +356,7 @@
       }
     });
 
-    
+
     // Sign out
     logoutBtn.addEventListener("click", async () => {
       await supabase.auth.signOut();
@@ -443,32 +443,63 @@
             // Upload avatar image to Supabase and then show it
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-              const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
-              
-              // Save avatar to database
-              const { data: avatarData, error: avatarError } = await supabase
-                .from('avatars')
-                .insert({
-                  user_id: user.id,
-                  name: p,
-                  image_url: url,
-                  traits: json.traits || {}
-                })
-                .select()
-                .single();
+              try {
+                const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
                 
-              if (avatarError) {
-                console.error('Error saving avatar:', avatarError);
-              } else {
+                // Save avatar to database
+                const { data: avatarData, error: avatarError } = await supabase
+                  .from('avatars')
+                  .insert({
+                    user_id: user.id,
+                    name: p,
+                    image_url: url,
+                    traits: json.traits || {}
+                  })
+                  .select()
+                  .single();
+                  
+                if (avatarError) {
+                  console.error('Error saving avatar:', avatarError);
+                  throw avatarError;
+                }
+                
                 // Store the avatar ID for conversation tracking
                 window.currentAvatarId = avatarData.id;
+                
+                // Create a new image and wait for it to load
+                const img = new Image();
+                img.onload = () => {
+                  avatar.innerHTML = '';
+                  img.style.width = '100%';
+                  img.style.height = '100%';
+                  img.style.objectFit = 'cover';
+                  img.style.borderRadius = '24px';
+                  avatar.appendChild(img);
+                };
+                img.onerror = (e) => {
+                  console.error('Error loading avatar image:', e);
+                  throw new Error('Failed to load avatar image');
+                };
+                img.src = url;
+                img.alt = 'Avatar';
+                
+              } catch (err) {
+                console.error('Avatar upload/save error:', err);
+                throw err;
               }
-              
-              avatar.innerHTML =
-                `<img src="${url}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
             } else {
-              avatar.innerHTML =
-                `<img src="${json.dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+              // For non-authenticated users, show the generated image directly
+              const img = new Image();
+              img.onload = () => {
+                avatar.innerHTML = '';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '24px';
+                avatar.appendChild(img);
+              };
+              img.src = json.dataUrl;
+              img.alt = 'Avatar';
 }
 
 
@@ -589,13 +620,38 @@
 
         // 3. Upload + return public URL
         async function uploadAvatarImage({ dataUrl, userId, fileName="avatar.png" }){
-          const blob = dataUrlToBlob(dataUrl);
-          const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
-          const { error: upErr } = await supabase.storage.from("avatars")
-            .upload(path, blob, { upsert:true, contentType:blob.type });
-          if (upErr) throw upErr;
-          const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-          return data.publicUrl;
+          try {
+            const blob = dataUrlToBlob(dataUrl);
+            const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
+            
+            // Upload the file
+            const { error: upErr } = await supabase.storage.from("avatars")
+              .upload(path, blob, { 
+                upsert: true, 
+                contentType: blob.type,
+                cacheControl: '3600'
+              });
+            if (upErr) throw upErr;
+            
+            // Get the public URL with custom options
+            const { data } = supabase.storage.from("avatars")
+              .getPublicUrl(path, {
+                download: false,
+                transform: {
+                  width: 333,
+                  height: 333,
+                  resize: 'cover'
+                }
+              });
+              
+            // Ensure the URL is using HTTPS
+            const url = new URL(data.publicUrl);
+            url.protocol = 'https:';
+            return url.toString();
+          } catch (err) {
+            console.error('Error in uploadAvatarImage:', err);
+            throw err;
+          }
         }
 
   </script>
