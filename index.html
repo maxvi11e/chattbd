@@ -1,5 +1,7 @@
 <!doctype html>
-<html lang="en">
+<html lan    /* Top Navigation */
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:12px 48px 0px 48px;}
+    .nav-left{display:flex; align-items:center; gap:24px;}en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -24,24 +26,25 @@
     .dashboard{padding:0; min-height:100vh;}
     
     /* Top Navigation */
-    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:24px 48px;}
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 48px 0px 48px;}
     .nav-left{display:flex; align-items:center; gap:24px;}
-    .nav-logo{height:48px; width:auto;}
+    .nav-logo{height:48px; width:auto; transition:transform 0.2s ease;}
+    .nav-logo:hover{transform:scale(1.05);}
     .nav-right{display:flex; gap:16px; align-items:center;}
     .user-email{color:var(--ink); font-size:16px;}
     .logout-btn{padding:8px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px;}
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
 
     /* Main Content */
-    .main-content{padding:48px; max-width:1200px; margin:0 auto;}
+    .main-content{padding:0px; max-width:1200px; margin:0 auto;}
     
     /* Page Title */
-    .page-header{display:flex; align-items:center; gap:16px; margin-bottom:48px; justify-content:center;}
+    .page-header{display:flex; align-items:center; gap:16px; margin-bottom:40px; justify-content:center;}
     .page-icon{height:48px; width:auto;}
-    .page-title{font-size:48px; font-weight:600; margin:0;}
+    .page-title{font-size:40px; font-weight:600; margin:0;}
 
     /* Avatar Grid */
-    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:48px; max-width:1000px; margin:0 auto;}
+    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; max-width:1000px; margin:0 auto;}
     
     /* Avatar Items */
     .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease;}
@@ -53,9 +56,9 @@
     /* Create New Button */
     .create-new{border:3px solid var(--ink); background:transparent; display:flex; align-items:center; justify-content:center;}
     .create-new:hover{background:rgba(255,255,255,0.1);}
-    .create-plus{font-size:48px; color:var(--ink); font-weight:300;}
+    .create-plus{font-size:100px; color:var(--ink); font-weight:400;}
     
-    .avatar-name{color:var(--ink); font-size:18px; font-weight:400; text-align:center; margin:0;}
+    .avatar-name{color:var(--ink); font-size:16px; font-weight:400; text-align:center; margin:0;}
 
     /* Empty state */
     .empty-state{display:none;}
@@ -75,7 +78,9 @@
     <!-- Top Navigation -->
     <div class="top-nav">
       <div class="nav-left">
-        <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
+        <a href="create.html">
+          <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
+        </a>
       </div>
       <div class="nav-right">
         <span id="userEmail" class="user-email"></span>

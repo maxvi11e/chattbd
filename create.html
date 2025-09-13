@@ -34,65 +34,77 @@
 
     .screen{min-height:100vh; width:100%;}
 
-    /* ===== Create Page ===== */
-    .create{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
-    .heroRow{display:flex; align-items:center; gap:11.2px}
-    .heroInput{display:flex; align-items:center; width:min(715.52px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
+    /* ===== Dashboard ===== */
+    .dashboard{padding:0; min-height:100vh;}
+    
+    /* Top Navigation */
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:12px 48px 4px 48px;}
+    .nav-left{display:flex; align-items:center; gap:24px;}
+    .nav-logo{height:48px; width:auto; transition:transform 0.2s ease;}
+    .nav-logo:hover{transform:scale(1.05);}
+    .nav-right{display:flex; gap:16px; align-items:center;}
+    .user-email{color:var(--ink); font-size:16px;}
+    .logout-btn{padding:8px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px;}
+    .logout-btn:hover{background:rgba(255,255,255,0.1);}
+
+    /* Main Content */
+    .main-content{padding:0px; max-width:1200px; margin:0 auto;}
+    
+    /* Page Title */
+    .page-header{display:flex; align-items:center; gap:16px; margin-bottom:50px; justify-content:center;}
+    .page-icon{height:48px; width:auto;}
+    .page-title{font-size:40px; font-weight:600; margin:0;}
+
+    /* Create Form */
+    .create-form{display:flex; justify-content:center; padding:0 48px;}
+    .input-container{display:flex; align-items:center; gap:11.2px; max-width:800px; width:100%;}
+    .heroInput{display:flex; align-items:center; flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
     .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
     .heroInput input::placeholder { color:#fff; opacity:1; }
-    .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
+    .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer;}
+    .circleBtn:hover{background:rgba(255,255,255,0.1);}
     .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
-
-    .backBtn{position:fixed; top:22px; left:22px; z-index:4}
-    .backBtn .circleBtn{width:50px; height:50px; background:#000;}
-    .backBtn .circleBtn svg { margin-left: -6px; }
-
-    .title {
-      font-size: 48px;
-      font-weight: 650;
-      color: var(--ink);
-      margin-bottom: 32px;
-      letter-spacing: -0.02em;
-      text-align: center;
-    }
-
-    .subtitle {
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: 48px;
-      text-align: center;
-      max-width: 600px;
-    }
   </style>
 </head>
 
 <body>
-  <div class="backBtn">
-    <button id="back" class="circleBtn" title="Back to Dashboard">
-      <svg viewBox="0 0 24 24"><path d="M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-    </button>
-  </div>
-
-  <!-- ===== Create Avatar ===== -->
-  <section class="screen create">
-    <div style="position:relative; width:100%; display:flex; flex-direction:column; align-items:center;">
-      <img src="images/logo.png" alt="Build a Bot Logo" style="height:57.6px; width:auto; margin-bottom:24px;">
-      
-      <h1 class="title">Create New Avatar</h1>
-      <p class="subtitle">Describe the personality, appearance, or character you want your AI avatar to embody</p>
-      
-      <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-32px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
-      
-      <div class="heroRow">
-        <label class="heroInput" aria-label="Persona prompt">
-          <input id="persona" type="text" placeholder="Enter a prompt to create an avatar" data-short-placeholder="Create an avatar" />
-        </label>
-        <button id="startBtn" class="circleBtn" title="Generate persona">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
+  <div class="screen dashboard">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="nav-left">
+        <a href="index.html">
+          <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
+        </a>
+      </div>
+      <div class="nav-right">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn">Sign out</button>
       </div>
     </div>
-  </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <img src="images/creator_icon.png" alt="Creator" class="page-icon">
+        <h1 class="page-title">Bot Creator</h1>
+      </div>
+
+      <!-- Create Form -->
+      <div class="create-form">
+        <div class="input-container">
+          <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-40px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
+          
+          <label class="heroInput" aria-label="Persona prompt">
+            <input id="persona" type="text" placeholder="Describe the personality, appearance, or character of the Bot" data-short-placeholder="Create an avatar" />
+          </label>
+          <button id="startBtn" class="circleBtn" title="Generate persona">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="module">
     // === Supabase Auth ===
@@ -110,6 +122,7 @@
         return false;
       }
       console.log("User authenticated:", session.user.email);
+      document.getElementById('userEmail').textContent = session.user.email;
       return true;
     }
 
@@ -122,11 +135,12 @@
 
       const persona = document.getElementById('persona');
       const startBtn = document.getElementById('startBtn');
-      const back = document.getElementById('back');
+      const logoutBtn = document.getElementById('logoutBtn');
 
-      // Back to dashboard
-      back.addEventListener('click', () => {
-        window.location.href = 'index.html';
+      // Sign out handler
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'auth.html';
       });
 
       // Watch auth state changes
@@ -141,7 +155,7 @@
         if (window.innerWidth <= 600) {
           persona.placeholder = persona.dataset.shortPlaceholder;
         } else {
-          persona.placeholder = "Enter a prompt to create an avatar";
+          persona.placeholder = "Describe the personality, appearance, or character of the Bot";
         }
       }
       window.addEventListener('resize', updatePlaceholder);
