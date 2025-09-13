@@ -21,44 +21,44 @@
     .screen{min-height:100vh; width:100%;}
 
     /* ===== Dashboard ===== */
-    .dashboard{padding:32px 24px; max-width:1200px; margin:0 auto; min-height:100vh;}
+    .dashboard{padding:0; min-height:100vh;}
     
-    .header{display:flex; justify-content:space-between; align-items:center; margin-bottom:48px;}
-    .logo-section{display:flex; align-items:center; gap:16px;}
-    .logo-section img{height:48px; width:auto;}
-    .app-title{font-size:32px; font-weight:650; letter-spacing:-0.02em;}
-    
-    .user-controls{display:flex; gap:12px; align-items:center;}
-    .user-email{color:var(--muted); font-size:14px;}
+    /* Top Navigation */
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:24px 48px;}
+    .nav-left{display:flex; align-items:center; gap:24px;}
+    .nav-logo{height:48px; width:auto;}
+    .nav-right{display:flex; gap:16px; align-items:center;}
+    .user-email{color:var(--ink); font-size:16px;}
     .logout-btn{padding:8px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px;}
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
 
-    .main-content{display:flex; flex-direction:column; gap:32px;}
+    /* Main Content */
+    .main-content{padding:48px; max-width:1200px; margin:0 auto;}
     
-    .create-section{text-align:center; padding:48px 24px; border:2px dashed var(--stroke); border-radius:var(--radius-lg);}
-    .create-title{font-size:24px; font-weight:600; margin-bottom:16px;}
-    .create-subtitle{color:var(--muted); margin-bottom:32px; font-size:16px;}
-    .create-btn{padding:16px 32px; background:var(--ink); color:var(--bg); border:none; border-radius:8px; font-size:16px; font-weight:600; cursor:pointer; font-family:inherit;}
-    .create-btn:hover{background:var(--muted);}
+    /* Page Title */
+    .page-header{display:flex; align-items:center; gap:16px; margin-bottom:48px; justify-content:center;}
+    .page-icon{height:48px; width:auto;}
+    .page-title{font-size:48px; font-weight:600; margin:0;}
 
-    .avatars-section{margin-top:48px;}
-    .section-title{font-size:24px; font-weight:600; margin-bottom:24px;}
-    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:24px;}
+    /* Avatar Grid */
+    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:48px; max-width:1000px; margin:0 auto;}
     
-    .avatar-card{border:1px solid var(--stroke); border-radius:var(--radius-lg); overflow:hidden; background:rgba(255,255,255,0.02); cursor:pointer;}
-    .avatar-card:hover{background:rgba(255,255,255,0.05); transform:translateY(-2px); transition:all 0.2s ease;}
+    /* Avatar Items */
+    .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease;}
+    .avatar-item:hover{transform:scale(1.05);}
     
-    .avatar-image{width:100%; height:200px; background:#1c1c1c; display:flex; align-items:center; justify-content:center; overflow:hidden;}
-    .avatar-image img{width:100%; height:100%; object-fit:cover;}
-    .avatar-placeholder{color:var(--muted); font-size:14px;}
+    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:16px; background:#1a1a1a; display:flex; align-items:center; justify-content:center;}
+    .avatar-circle img{width:100%; height:100%; object-fit:cover;}
     
-    .avatar-info{padding:16px;}
-    .avatar-name{font-weight:600; margin-bottom:4px; font-size:16px;}
-    .avatar-description{color:var(--muted); font-size:14px; line-height:1.4;}
-    .avatar-date{color:var(--muted); font-size:12px; margin-top:8px;}
+    /* Create New Button */
+    .create-new{border:3px solid var(--ink); background:transparent; display:flex; align-items:center; justify-content:center;}
+    .create-new:hover{background:rgba(255,255,255,0.1);}
+    .create-plus{font-size:48px; color:var(--ink); font-weight:300;}
+    
+    .avatar-name{color:var(--ink); font-size:18px; font-weight:400; text-align:center; margin:0;}
 
-    .empty-state{text-align:center; padding:48px 24px; color:var(--muted);}
-    .empty-state-icon{font-size:48px; margin-bottom:16px; opacity:0.5;}
+    /* Empty state */
+    .empty-state{display:none;}
 
     @media (max-width: 768px) {
       .dashboard{padding:24px 16px;}
@@ -72,33 +72,34 @@
 
 <body>
   <div class="screen dashboard">
-    <div class="header">
-      <div class="logo-section">
-        <img src="images/logo.png" alt="Build a Bot Logo">
-        <h1 class="app-title">Build a Bot</h1>
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="nav-left">
+        <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
       </div>
-      
-      <div class="user-controls">
+      <div class="nav-right">
         <span id="userEmail" class="user-email"></span>
         <button id="logoutBtn" class="logout-btn">Sign out</button>
       </div>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
-      <div class="create-section">
-        <h2 class="create-title">Create Your First Avatar</h2>
-        <p class="create-subtitle">Design a unique AI persona to chat with</p>
-        <button id="createBtn" class="create-btn">Create New Avatar</button>
+      <!-- Page Header -->
+      <div class="page-header">
+        <img src="images/library_icon.png" alt="Library" class="page-icon">
+        <h1 class="page-title">Bot Library</h1>
       </div>
 
-      <div id="avatarsSection" class="avatars-section" style="display:none;">
-        <h2 class="section-title">Your Avatars</h2>
-        <div id="avatarsGrid" class="avatars-grid"></div>
-      </div>
-
-      <div id="emptyState" class="empty-state">
-        <div class="empty-state-icon">🤖</div>
-        <p>No avatars yet. Create your first one to get started!</p>
+      <!-- Avatar Grid -->
+      <div id="avatarsGrid" class="avatars-grid">
+        <!-- Create New Button (always first) -->
+        <div class="avatar-item" id="createBtn">
+          <div class="avatar-circle create-new">
+            <div class="create-plus">+</div>
+          </div>
+          <p class="avatar-name">Create new</p>
+        </div>
       </div>
     </div>
   </div>
@@ -132,9 +133,7 @@
 
       const logoutBtn = document.getElementById("logoutBtn");
       const createBtn = document.getElementById("createBtn");
-      const avatarsSection = document.getElementById("avatarsSection");
       const avatarsGrid = document.getElementById("avatarsGrid");
-      const emptyState = document.getElementById("emptyState");
 
       // Sign out handler
       logoutBtn.addEventListener("click", async () => {
@@ -174,15 +173,6 @@
 
           if (avatars && avatars.length > 0) {
             displayAvatars(avatars);
-            avatarsSection.style.display = 'block';
-            emptyState.style.display = 'none';
-            
-            // Update create section title for existing users
-            document.querySelector('.create-title').textContent = 'Create Another Avatar';
-            document.querySelector('.create-subtitle').textContent = 'Design another unique AI persona';
-          } else {
-            avatarsSection.style.display = 'none';
-            emptyState.style.display = 'block';
           }
         } catch (error) {
           console.error('Error in loadAvatars:', error);
@@ -191,28 +181,27 @@
 
       // Display avatars in grid
       function displayAvatars(avatars) {
+        // Clear existing avatars but keep the create button
+        const createButton = avatarsGrid.querySelector('#createBtn');
         avatarsGrid.innerHTML = '';
+        avatarsGrid.appendChild(createButton);
         
         avatars.forEach(avatar => {
-          const card = document.createElement('div');
-          card.className = 'avatar-card';
-          card.onclick = () => openChat(avatar.id);
+          const avatarItem = document.createElement('div');
+          avatarItem.className = 'avatar-item';
+          avatarItem.onclick = () => openChat(avatar.id);
           
-          card.innerHTML = `
-            <div class="avatar-image">
+          avatarItem.innerHTML = `
+            <div class="avatar-circle">
               ${avatar.image_url 
                 ? `<img src="${avatar.image_url}" alt="${avatar.name}" />`
-                : `<div class="avatar-placeholder">No image</div>`
+                : `<div style="color:#666; text-align:center;">No image</div>`
               }
             </div>
-            <div class="avatar-info">
-              <div class="avatar-name">${avatar.name || 'Unnamed Avatar'}</div>
-              <div class="avatar-description">AI Avatar</div>
-              <div class="avatar-date">Created ${new Date(avatar.created_at).toLocaleDateString()}</div>
-            </div>
+            <p class="avatar-name">${avatar.name || 'Unnamed Avatar'}</p>
           `;
           
-          avatarsGrid.appendChild(card);
+          avatarsGrid.appendChild(avatarItem);
         });
       }
 
