@@ -5,77 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Build a Bot — Sign In</title>
   <style>
-    @media (max-width: 900px) {
-      .authInput {
-        width: min(400.69px, calc(56vw - 32px));
-      }
-    }
     :root{
       --bg:#000;
       --ink:#fff;
-      --muted:#d9d9d9;
-      --bubble:#333;
-      --stroke:#fff;
-      --radius-lg:24px;
-      --radius-md:14px;
+      --muted:#999;
+      --input-bg:#1a1a1a;
+      --input-border:#333;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+    html,body{height:100%; margin:0; padding:0;}
+    body{background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
 
-    .screen{min-height:100vh; width:100%;}
-
-    /* ===== Auth Landing ===== */
-    .auth-landing{display:flex; align-items:center; justify-content:center; min-height:100vh; padding:25.6px}
-    .authColumn{display:flex; flex-direction:column; align-items:center; gap:32px;}
-    .authInput{display:flex; align-items:center; width:min(400px,calc(70vw - 32px)); border:1px solid var(--stroke); border-radius:9999px; padding:0 14.4px; height:46.4px; background:transparent}
-    .authInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
-    .authInput input::placeholder { color:#fff; opacity:1; }
-    .authBtn{width:min(400px,calc(70vw - 32px)); height:46.4px; border-radius:9999px; border:1px solid var(--stroke); background:transparent; color:var(--ink); font-size:17.6px; cursor:pointer; font-family: inherit;}
-    .authBtn:hover{background:rgba(255,255,255,0.1);}
-    .authBtn.primary{background:var(--ink); color:var(--bg);}
-    .authBtn.primary:hover{background:var(--muted);}
-
-    .title {
-      font-size: 48px;
-      font-weight: 650;
-      color: var(--ink);
-      margin-bottom: 16px;
-      letter-spacing: -0.02em;
-      text-align: center;
+    .auth-container{
+      min-height:100vh; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      padding:40px 20px;
     }
-    .subtitle {
-      font-size: 18px;
-      color: var(--muted);
-      margin-bottom: 32px;
+    
+    .auth-content{
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      width:100%; 
+      max-width:360px;
+      gap:40px;
+    }
+
+    /* Logo Image */
+    .logo-image {
+      width: 380px;
+      height: auto;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: 24px;
+      color: var(--ink);
+      margin: -77px 0 0px 0;
       text-align: center;
+      font-weight: 400;
+    }
+
+    /* Form Sections */
+    .auth-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-divider {
+      text-align: center;
+      color: var(--ink);
+      font-size: 16px;
+      margin: -10px 0 -10px 0;
+    }
+
+    /* Input Styling */
+    .auth-input {
+      width: 100%;
+      height: 48px;
+      background: var(--bg);
+      border: 1px solid var(--ink);
+      border-radius: 24px;
+      padding: 0 20px;
+      color: var(--ink);
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .auth-input::placeholder {
+      color: var(--ink);
+      opacity: 0.7;
+    }
+
+    .auth-input:focus {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 1px var(--ink);
+    }
+
+    /* Button Styling */
+    .auth-btn {
+      width: 100%;
+      height: 48px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      outline: none;
+    }
+
+    .auth-btn.primary {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    .auth-btn.primary:hover {
+      background: #e0e0e0;
+    }
+
+    .auth-btn.secondary {
+      background: var(--ink);
+      color: var(--bg);
+    }
+
+    .auth-btn.secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .auth-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 480px) {
+      .auth-content {
+        max-width: 100%;
+        gap: 30px;
+      }
+      
+      .logo-bubble {
+        font-size: 28px;
+        padding: 14px 28px;
+      }
+      
+      .tagline {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- ===== Auth Landing ===== -->
-  <section class="screen auth-landing">
-    <div class="authColumn">
-      <img src="images/logo.png" alt="Build a Bot Logo" style="height:74.88px; width:auto; margin-bottom:10px;">
+  <div class="auth-container">
+    <div class="auth-content">
+      <!-- Logo -->
+      <img src="images/logo.png" alt="Build a Bot Logo" class="logo-image" />
+      <div class="tagline">Your Bots. Your way.</div>
       
-      <div style="text-align: center; margin: 0 0 10px 0; line-height: 1;">
-        <p class="subtitle" style="margin: 0; padding: 0;">Sign in to create avatar personas</p>
+      <!-- Sign In Section -->
+      <div class="auth-section" id="signin-section">
+        <input id="signin-email" type="email" class="auth-input" placeholder="Enter your email" />
+        <input id="signin-password" type="password" class="auth-input" placeholder="Enter your password" />
+        <button id="signin-btn" class="auth-btn primary">Sign In</button>
       </div>
       
-      <div style="display:flex; flex-direction:column; gap:16px; width:100%; align-items:center;">
-        <label class="authInput" aria-label="Email">
-          <input id="email" type="email" placeholder="Enter your email" />
-        </label>
-        
-        <label class="authInput" aria-label="Password">
-          <input id="password" type="password" placeholder="Enter your password" />
-        </label>
-        
-        <button id="signin-btn" class="authBtn primary">Sign In</button>
-        <button id="signup-btn" class="authBtn">Create Account</button>
+      <!-- Divider -->
+      <div class="section-divider">Don't have an account?</div>
+      
+      <!-- Create Account Section -->
+      <div class="auth-section" id="signup-section">
+        <input id="signup-username" type="text" class="auth-input" placeholder="Enter your username" />
+        <input id="signup-email" type="email" class="auth-input" placeholder="Enter your email" />
+        <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
+        <button id="signup-btn" class="auth-btn secondary">Create new account</button>
       </div>
     </div>
-  </section>
+  </div>
   
   <script type="module">
     // === Supabase Auth ===
@@ -96,15 +186,19 @@
     }
     checkExistingAuth();
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
+    // Get form elements
+    const signinEmailInput = document.getElementById("signin-email");
+    const signinPasswordInput = document.getElementById("signin-password");
+    const signupUsernameInput = document.getElementById("signup-username");
+    const signupEmailInput = document.getElementById("signup-email");
+    const signupPasswordInput = document.getElementById("signup-password");
     const signinBtn = document.getElementById("signin-btn");
     const signupBtn = document.getElementById("signup-btn");
 
     // Sign in handler
     signinBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+      const email = signinEmailInput.value.trim();
+      const password = signinPasswordInput.value;
       
       if (!email || !password) {
         alert('Please enter both email and password');
@@ -141,11 +235,12 @@
 
     // Sign up handler
     signupBtn.addEventListener("click", async () => {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+      const username = signupUsernameInput.value.trim();
+      const email = signupEmailInput.value.trim();
+      const password = signupPasswordInput.value;
       
-      if (!email || !password) {
-        alert('Please enter both email and password');
+      if (!username || !email || !password) {
+        alert('Please fill in all fields');
         return;
       }
 
@@ -168,7 +263,10 @@
           email,
           password,
           options: {
-            data: { confirmed: true },
+            data: { 
+              confirmed: true,
+              display_name: username
+            },
             emailRedirectTo: window.location.origin
           }
         });
@@ -199,7 +297,7 @@
             .from('profiles')
             .insert({ 
               id: data.user.id,
-              display_name: email.split('@')[0],
+              display_name: username,
               created_at: new Date().toISOString()
             });
             
@@ -216,18 +314,30 @@
         console.error('Error:', error);
         alert(error.message);
       } finally {
-        signupBtn.textContent = 'Create Account';
+        signupBtn.textContent = 'Create new account';
         signupBtn.disabled = false;
       }
     });
 
     // Enter key support
-    emailInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') passwordInput.focus();
+    signinEmailInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') signinPasswordInput.focus();
     });
 
-    passwordInput.addEventListener('keydown', (e) => {
+    signinPasswordInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') signinBtn.click();
+    });
+
+    signupUsernameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') signupEmailInput.focus();
+    });
+
+    signupEmailInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') signupPasswordInput.focus();
+    });
+
+    signupPasswordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') signupBtn.click();
     });
 
     // Watch auth state changes
