@@ -286,7 +286,6 @@
         window.location.href = 'index.html';
       } else {
         loadAvatar(avatarId, isNewAvatar);
-        loadConversationHistory();
       }
 
       // Load conversation history for sidebar (filtered by current avatar)
@@ -432,6 +431,9 @@
           }
 
           currentAvatar = avatarData;
+          
+          // Load conversation history now that we have the avatar
+          loadConversationHistory();
           
           // Display avatar
           console.log('Loading avatar image:', avatarData.image_url);
