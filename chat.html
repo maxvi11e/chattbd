@@ -31,7 +31,7 @@
     .sidebar{width:300px; background:var(--bg); border-right:1px solid #333; display:flex; flex-direction:column;}
     
     /* Top Navigation in Sidebar */
-    .sidebar-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 24px 0px 24px; border-bottom:1px solid #333;}
+    .sidebar-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 24px 0px 24px;}
     .nav-left{display:flex; align-items:center; gap:16px;}
     .nav-logo{height:32px; width:auto; transition:transform 0.2s ease;}
     .nav-logo:hover{transform:scale(1.05);}
@@ -41,8 +41,8 @@
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
     
     /* Sidebar Actions */
-    .sidebar-actions{padding:16px; border-bottom:1px solid #333;}
-    .action-btn{display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; background:transparent; border:1px solid var(--stroke); border-radius:8px; color:var(--ink); cursor:pointer; font-size:14px; margin-bottom:8px;}
+    .sidebar-actions{padding:16px;}
+    .action-btn{display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; background:transparent; border:none; border-radius:8px; color:var(--ink); cursor:pointer; font-size:14px; margin-bottom:8px;}
     .action-btn:hover{background:rgba(255,255,255,0.1);}
     .action-btn svg{width:16px; height:16px; fill:var(--ink);}
     
@@ -53,9 +53,15 @@
     .conversation-item:hover{background:rgba(255,255,255,0.1);}
     .conversation-item.active{background:rgba(255,255,255,0.15);}
     
+    /* Sidebar Bottom */
+    .sidebar-bottom{padding:16px; display:flex; flex-direction:column; gap:8px;}
+    .sidebar-bottom .user-email{color:var(--muted); font-size:12px;}
+    .sidebar-bottom .logout-btn{padding:8px 12px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:6px; cursor:pointer; font-size:12px; align-self:flex-start;}
+    .sidebar-bottom .logout-btn:hover{background:rgba(255,255,255,0.1);}
+    
     /* Main Chat Area */
     .main-chat{flex:1; display:flex; flex-direction:column; position:relative;}
-    .chat{position:relative; padding:32px 22px 32px; max-width:1200px; margin:0 auto; flex:1; width:100%;}
+    .chat{position:relative; padding:10px 22px 32px; max-width:1200px; margin:0 auto; flex:1; width:100%;}
 
     .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
 
@@ -66,17 +72,10 @@
       align-items: center;
     }
 
-    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; border:1px solid var(--stroke); background:#1c1c1c; display:grid; place-items:center;}
-
-    #avatar-message {
-      color: #fff;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-    }
+    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center;}
 
     .pane{position:relative; width:100%; max-width:760px;}
-    .scroller{max-height:300px; overflow:auto; padding:0 0 0 0}
+    .scroller{max-height:270px; overflow:auto; padding:0 0 0 0}
     .scroller::-webkit-scrollbar{width:12px}
     .scroller::-webkit-scrollbar-track{background:transparent}
     .scroller::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
@@ -88,7 +87,7 @@
     .from-me{margin-left:auto; border-top-right-radius:8px}
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
-    .composerWrap{position:relative; margin-top:20px; width:100%; max-width:735.36px; margin-left:auto; margin-right:auto; display:flex; align-items:center; gap:11.2px; z-index:3}
+    .composerWrap{position:relative; margin-top:20px; margin-bottom:10px; width:100%; max-width:735.36px; margin-left:auto; margin-right:auto; display:flex; align-items:center; gap:11.2px; z-index:3}
     .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
     .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
     .composer input::placeholder { color:#fff; opacity:1; }
@@ -132,10 +131,6 @@
             <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
           </a>
         </div>
-        <div class="nav-right">
-          <span id="userEmail" class="user-email"></span>
-          <button id="logoutBtn" class="logout-btn">Sign out</button>
-        </div>
       </div>
       
       <!-- Sidebar Actions -->
@@ -152,8 +147,14 @@
       
       <!-- Conversations List -->
       <div class="conversations">
-        <div class="conversations-header">Chats</div>
+        <div id="conversationsHeader" class="conversations-header">Chats</div>
         <div id="conversationsList"></div>
+      </div>
+      
+      <!-- Bottom User Section -->
+      <div class="sidebar-bottom">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn">Sign out</button>
       </div>
     </div>
     
@@ -163,7 +164,6 @@
         <div class="column">
           <!-- Avatar section -->
           <div class="avatar-section">
-            <div id="avatar-message"></div>
             <div id="avatar" class="avatarFrame"></div>
           </div>
           <!-- Conversation pane -->
@@ -236,8 +236,8 @@
       // Continue with app initialization only if authenticated
 
       const avatar = document.getElementById('avatar');
-      const avatarMessage = document.getElementById('avatar-message');
       const log = document.getElementById('log');
+      const conversationsHeader = document.getElementById('conversationsHeader');
       const ask = document.getElementById('ask');
       const send = document.getElementById('send');
       const logoutBtn = document.getElementById('logoutBtn');
@@ -312,6 +312,11 @@
 
           allConversations = conversations || [];
           displayConversations(allConversations);
+          
+          // Update conversations header with avatar name
+          if (currentAvatar) {
+            conversationsHeader.textContent = `Chats with ${currentAvatar.name}`;
+          }
         } catch (error) {
           console.error('Error in loadConversationHistory:', error);
         }
@@ -407,11 +412,6 @@
         
         // Remove active state from all conversations
         displayConversations(allConversations);
-        
-        // Show avatar message again
-        if (currentAvatar) {
-          avatarMessage.textContent = `Chat with ${currentAvatar.name}`;
-        }
       }
 
       // Load avatar and conversation
@@ -458,8 +458,6 @@
             console.log('No avatar image URL, using fallback');
             avatar.innerHTML = fallbackAvatar();
           }
-
-          avatarMessage.textContent = `Chat with ${avatarData.name}`;
 
           if (isNew) {
             // Show welcome message for new avatars
@@ -576,19 +574,26 @@
             });
           if (msgError) console.error('Error saving message:', msgError);
 
-          // Get AI response
-          const res = await fetch('/api/chat', {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ 
-              persona: currentAvatar.name, 
-              message: t, 
-              history: convo.slice(-10) // Send last 10 messages for context
+          // Call AI API
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: t,
+              conversationId: currentConversationId,
+              avatarId: currentAvatarId,
+              conversation: convo
             })
           });
-          
-          const { text, error } = await res.json();
-          if (error || !text) throw new Error(error || 'No response');
+
+          if (!response.ok) {
+            throw new Error(`API call failed: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const text = data.message;
           
           // Remove loading indicator
           removeLoading(loadingId);
