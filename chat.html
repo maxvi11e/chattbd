@@ -377,14 +377,14 @@
         }
       }
 
-      // Save current conversation
+      // Save current conversation (fallback title generation for edge cases)
       async function saveCurrentConversation() {
         if (!currentConversationId || convo.length === 0) return;
         
         try {
-          // Update conversation title if it's still default
+          // Only generate title if it's still default and wasn't generated immediately
           const currentConv = allConversations.find(c => c.id === currentConversationId);
-          if (currentConv && (currentConv.title.includes('Conversation with') || currentConv.title.length > 50)) {
+          if (currentConv && currentConv.title.includes('Conversation with')) {
             const firstUserMessage = convo.find(m => m.role === 'user');
             if (firstUserMessage && firstUserMessage.content) {
               // Get AI-generated title
@@ -435,6 +435,35 @@
           // Fallback to first few words of the message
           const words = firstMessage.split(' ').slice(0, 4).join(' ');
           return words + (firstMessage.split(' ').length > 4 ? '...' : '');
+        }
+      }
+
+      // Generate and update title immediately after first exchange
+      async function generateAndUpdateTitle() {
+        if (!currentConversationId || convo.length < 2) return; // Need at least user + assistant message
+        
+        try {
+          const currentConv = allConversations.find(c => c.id === currentConversationId);
+          if (currentConv && currentConv.title.includes('Conversation with')) {
+            const firstUserMessage = convo.find(m => m.role === 'user');
+            if (firstUserMessage && firstUserMessage.content) {
+              // Get AI-generated title
+              const smartTitle = await generateConversationTitle(firstUserMessage.content, currentAvatar.name);
+              
+              const { error } = await supabase
+                .from('conversations')
+                .update({ title: smartTitle })
+                .eq('id', currentConversationId);
+                
+              if (!error) {
+                currentConv.title = smartTitle;
+                // Refresh the conversations list to show new title immediately
+                displayConversations(allConversations);
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error generating immediate title:', error);
         }
       }
 
@@ -637,6 +666,9 @@
 
           add('from-bot', text);
           convo.push({ role:'assistant', content:text });
+          
+          // Generate smart title after first exchange
+          await generateAndUpdateTitle();
           
         } catch (err) {
           console.error('Chat error:', err);
