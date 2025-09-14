@@ -575,18 +575,23 @@
           if (msgError) console.error('Error saving message:', msgError);
 
           // Call AI API
+          const requestBody = {
+            message: t,
+            persona: currentAvatar.persona,
+            conversationId: currentConversationId,
+            avatarId: avatarId,
+            conversation: convo
+          };
+          
+          console.log('Sending to API:', requestBody);
+          console.log('Current avatar:', currentAvatar);
+          
           const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              message: t,
-              persona: currentAvatar.persona,
-              conversationId: currentConversationId,
-              avatarId: avatarId,
-              conversation: convo
-            })
+            body: JSON.stringify(requestBody)
           });
 
           if (!response.ok) {
