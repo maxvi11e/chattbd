@@ -289,11 +289,11 @@
         loadConversationHistory();
       }
 
-      // Load conversation history for sidebar
+      // Load conversation history for sidebar (filtered by current avatar)
       async function loadConversationHistory() {
         try {
           const { data: { user } } = await supabase.auth.getUser();
-          if (!user) return;
+          if (!user || !currentAvatar) return;
 
           const { data: conversations, error } = await supabase
             .from('conversations')
@@ -301,10 +301,9 @@
               id,
               title,
               created_at,
-              avatar_id,
-              avatars(name)
+              avatar_id
             `)
-            .eq('avatars.user_id', user.id)
+            .eq('avatar_id', currentAvatar.id)
             .order('created_at', { ascending: false });
 
           if (error) {
@@ -330,7 +329,7 @@
             item.classList.add('active');
           }
           
-          item.textContent = conv.title || `Chat with ${conv.avatars?.name || 'Unknown'}`;
+          item.textContent = conv.title || `Chat ${new Date(conv.created_at).toLocaleDateString()}`;
           item.onclick = () => loadConversation(conv.id);
           
           conversationsList.appendChild(item);
@@ -362,8 +361,8 @@
 
           // Display messages
           messages.forEach(message => {
-            convo.push({ role: message.role, text: message.text });
-            appendMessage(message.role, message.text);
+            convo.push({ role: message.role, content: message.text });
+            add(message.role === 'user' ? 'from-me' : 'from-bot', message.text);
           });
 
           // Update active conversation in sidebar
