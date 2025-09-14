@@ -358,7 +358,7 @@
           log.innerHTML = '';
           currentConversationId = conversationId;
 
-          // Display messages
+          // Display messages in conversation
           messages.forEach(message => {
             convo.push({ role: message.role, content: message.text });
             add(message.role === 'user' ? 'from-me' : 'from-bot', message.text);
