@@ -435,9 +435,11 @@
           currentAvatar = avatarData;
           
           // Display avatar
-          if (avatarData.image_url) {
+          console.log('Loading avatar image:', avatarData.image_url);
+          if (avatarData.image_url && avatarData.image_url.trim()) {
             const img = new Image();
             img.onload = () => {
+              console.log('Avatar image loaded successfully');
               avatar.innerHTML = '';
               img.style.width = '100%';
               img.style.height = '100%';
@@ -445,23 +447,25 @@
               img.style.borderRadius = '24px';
               avatar.appendChild(img);
             };
-            img.onerror = () => {
+            img.onerror = (e) => {
+              console.error('Avatar image failed to load:', e);
               avatar.innerHTML = fallbackAvatar();
             };
             img.src = avatarData.image_url;
             img.alt = avatarData.name;
           } else {
+            console.log('No avatar image URL, using fallback');
             avatar.innerHTML = fallbackAvatar();
           }
 
-          avatarMessage.textContent = `Chatting with: ${avatarData.name}`;
+          avatarMessage.textContent = `Chat with ${avatarData.name}`;
 
           if (isNew) {
             // Show welcome message for new avatars
             add('from-bot', `Hi! I'm ${avatarData.name}. What would you like to talk about?`);
           } else {
             // Load existing conversation
-            await loadConversation(avatarId);
+            await loadExistingConversation(avatarId);
           }
 
           // Focus on input
@@ -474,7 +478,7 @@
       }
 
       // Load existing conversation
-      async function loadConversation(avatarId) {
+      async function loadExistingConversation(avatarId) {
         try {
           const { data: conversations, error: convoError } = await supabase
             .from('conversations')
