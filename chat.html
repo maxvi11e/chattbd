@@ -381,8 +381,8 @@
           const currentConv = allConversations.find(c => c.id === currentConversationId);
           if (currentConv && currentConv.title.includes('Conversation with')) {
             const firstUserMessage = convo.find(m => m.role === 'user');
-            if (firstUserMessage) {
-              const newTitle = firstUserMessage.text.substring(0, 50) + (firstUserMessage.text.length > 50 ? '...' : '');
+            if (firstUserMessage && firstUserMessage.content) {
+              const newTitle = firstUserMessage.content.substring(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '');
               
               const { error } = await supabase
                 .from('conversations')
