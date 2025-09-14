@@ -574,33 +574,19 @@
             });
           if (msgError) console.error('Error saving message:', msgError);
 
-          // Call AI API
-          const requestBody = {
-            message: t,
-            persona: currentAvatar.name,
-            conversationId: currentConversationId,
-            avatarId: avatarId,
-            conversation: convo
-          };
-          
-          console.log('Sending to API:', requestBody);
-          console.log('Current avatar:', currentAvatar);
-          
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody)
+          // Get AI response
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              message: t, 
+              history: convo.slice(-10) // Send last 10 messages for context
+            })
           });
-
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API call failed (${response.status}): ${errorText}`);
-          }
-
-          const data = await response.json();
-          const text = data.message;
+          
+          const { text, error } = await res.json();
+          if (error || !text) throw new Error(error || 'No response');
           
           // Remove loading indicator
           removeLoading(loadingId);
