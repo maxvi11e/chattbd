@@ -384,23 +384,57 @@
         try {
           // Update conversation title if it's still default
           const currentConv = allConversations.find(c => c.id === currentConversationId);
-          if (currentConv && currentConv.title.includes('Conversation with')) {
+          if (currentConv && (currentConv.title.includes('Conversation with') || currentConv.title.length > 50)) {
             const firstUserMessage = convo.find(m => m.role === 'user');
             if (firstUserMessage && firstUserMessage.content) {
-              const newTitle = firstUserMessage.content.substring(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '');
+              // Get AI-generated title
+              const smartTitle = await generateConversationTitle(firstUserMessage.content, currentAvatar.name);
               
               const { error } = await supabase
                 .from('conversations')
-                .update({ title: newTitle })
+                .update({ title: smartTitle })
                 .eq('id', currentConversationId);
                 
               if (!error) {
-                currentConv.title = newTitle;
+                currentConv.title = smartTitle;
+                // Refresh the conversations list to show new title
+                displayConversations(allConversations);
               }
             }
           }
         } catch (error) {
           console.error('Error saving conversation:', error);
+        }
+      }
+
+      // Generate smart conversation title using AI
+      async function generateConversationTitle(firstMessage, avatarName) {
+        try {
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              persona: 'assistant',
+              message: `Create a short, descriptive title (max 4-6 words) for a conversation that starts with: "${firstMessage}". The conversation is with ${avatarName}. Return only the title, no quotes or extra text.`,
+              history: []
+            })
+          });
+          
+          const { text, error } = await res.json();
+          if (error || !text) throw new Error('Failed to generate title');
+          
+          // Clean up the response and ensure it's not too long
+          let title = text.trim().replace(/^["']|["']$/g, ''); // Remove quotes
+          if (title.length > 40) {
+            title = title.substring(0, 37) + '...';
+          }
+          
+          return title;
+        } catch (error) {
+          console.error('Error generating title:', error);
+          // Fallback to first few words of the message
+          const words = firstMessage.split(' ').slice(0, 4).join(' ');
+          return words + (firstMessage.split(' ').length > 4 ? '...' : '');
         }
       }
 
