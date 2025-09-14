@@ -61,6 +61,28 @@
       color: var(--ink);
       font-size: 16px;
       margin: -10px 0 -10px 0;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .section-divider:hover {
+      opacity: 0.8;
+    }
+
+    /* Collapsible signup section */
+    .signup-section {
+      overflow: hidden;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+    }
+
+    .signup-section.collapsed {
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .signup-section.expanded {
+      max-height: 300px;
+      opacity: 1;
     }
 
     /* Input Styling */
@@ -155,10 +177,10 @@
       </div>
       
       <!-- Divider -->
-      <div class="section-divider">Don't have an account?</div>
+      <div class="section-divider" id="toggle-signup">Don't have an account?</div>
       
       <!-- Create Account Section -->
-      <div class="auth-section" id="signup-section">
+      <div class="auth-section signup-section collapsed" id="signup-section">
         <input id="signup-username" type="text" class="auth-input" placeholder="Enter your username" />
         <input id="signup-email" type="email" class="auth-input" placeholder="Enter your email" />
         <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
@@ -194,6 +216,21 @@
     const signupPasswordInput = document.getElementById("signup-password");
     const signinBtn = document.getElementById("signin-btn");
     const signupBtn = document.getElementById("signup-btn");
+    const toggleSignup = document.getElementById("toggle-signup");
+    const signupSection = document.getElementById("signup-section");
+
+    // Toggle signup section
+    toggleSignup.addEventListener("click", () => {
+      if (signupSection.classList.contains("collapsed")) {
+        signupSection.classList.remove("collapsed");
+        signupSection.classList.add("expanded");
+        toggleSignup.textContent = "Already have an account?";
+      } else {
+        signupSection.classList.remove("expanded");
+        signupSection.classList.add("collapsed");
+        toggleSignup.textContent = "Don't have an account?";
+      }
+    });
 
     // Sign in handler
     signinBtn.addEventListener("click", async () => {

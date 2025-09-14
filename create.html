@@ -122,8 +122,31 @@
         return false;
       }
       console.log("User authenticated:", session.user.email);
-      document.getElementById('userEmail').textContent = session.user.email;
+      
+      // Load and display username from profiles table
+      await loadUserProfile(session.user);
       return true;
+    }
+
+    // Load user profile and display username
+    async function loadUserProfile(user) {
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+          document.getElementById('userEmail').textContent = user.email; // Fallback to email
+        } else {
+          document.getElementById('userEmail').textContent = profile?.display_name || user.email;
+        }
+      } catch (error) {
+        console.error('Error in loadUserProfile:', error);
+        document.getElementById('userEmail').textContent = user.email; // Fallback to email
+      }
     }
 
     // Initialize auth check
