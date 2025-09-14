@@ -55,7 +55,7 @@
     
     /* Main Chat Area */
     .main-chat{flex:1; display:flex; flex-direction:column; position:relative;}
-    .chat{position:relative; padding:32px 22px 96px; max-width:1200px; margin:0 auto; flex:1;}
+    .chat{position:relative; padding:32px 22px 32px; max-width:1200px; margin:0 auto; flex:1; width:100%;}
 
     .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
 
@@ -88,7 +88,7 @@
     .from-me{margin-left:auto; border-top-right-radius:8px}
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
-    .composerWrap{position:fixed; left:50%; transform:translateX(-50%); bottom:20.8px; width:min(735.36px, 88.32vw); display:flex; align-items:center; gap:11.2px; z-index:3}
+    .composerWrap{position:relative; margin-top:20px; width:100%; max-width:735.36px; margin-left:auto; margin-right:auto; display:flex; align-items:center; gap:11.2px; z-index:3}
     .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
     .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
     .composer input::placeholder { color:#fff; opacity:1; }
@@ -169,17 +169,17 @@
           <!-- Conversation pane -->
           <div class="pane" style="position:relative;">
             <div id="log" class="scroller" role="log" aria-live="polite"></div>
+            
+            <!-- Bottom composer -->
+            <div class="composerWrap">
+              <label class="composer">
+                <input id="ask" type="text" placeholder="Ask anything" />
+              </label>
+              <button id="send" class="circleBtn sendBtn" title="Send">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
           </div>
-        </div>
-
-        <!-- Bottom composer -->
-        <div class="composerWrap">
-          <label class="composer">
-            <input id="ask" type="text" placeholder="Ask anything" />
-          </label>
-          <button id="send" class="circleBtn sendBtn" title="Send">
-            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          </button>
         </div>
       </section>
     </div>
