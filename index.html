@@ -47,11 +47,23 @@
     .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; max-width:1000px; margin:0 auto;}
     
     /* Avatar Items */
-    .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease;}
+    .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease; position:relative;}
     .avatar-item:hover{transform:scale(1.05);}
     
-    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:16px; background:#1a1a1a; display:flex; align-items:center; justify-content:center;}
+    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:16px; background:#1a1a1a; display:flex; align-items:center; justify-content:center; position:relative;}
     .avatar-circle img{width:100%; height:100%; object-fit:cover;}
+
+    /* Avatar Actions Menu */
+    .avatar-actions{position:absolute; top:8px; right:8px; z-index:10;}
+    .avatar-menu-btn{position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:14px; opacity:0; transition:opacity 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center;}
+    .avatar-item:hover .avatar-menu-btn{opacity:1;}
+    .avatar-menu-btn:hover{background:rgba(0,0,0,0.9);}
+    .dropdown{position:absolute; top:100%; right:0; background:var(--bg); border:1px solid var(--stroke); border-radius:8px; padding:8px; min-width:120px; z-index:20; display:none; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
+    .dropdown.show{display:block;}
+    .dropdown-item{display:block; width:100%; text-align:left; background:none; border:none; color:var(--ink); padding:8px 12px; cursor:pointer; font-size:14px; border-radius:4px;}
+    .dropdown-item:hover{background:rgba(255,255,255,0.1);}
+    .dropdown-item.danger{color:#ff5252;}
+    .dropdown-item.danger:hover{background:rgba(255,82,82,0.1);}
     
     /* Create New Button */
     .create-new{border:3px solid var(--ink); background:transparent; display:flex; align-items:center; justify-content:center;}
@@ -217,16 +229,22 @@
         avatars.forEach(avatar => {
           const avatarItem = document.createElement('div');
           avatarItem.className = 'avatar-item';
-          avatarItem.onclick = () => openChat(avatar.id);
           
           avatarItem.innerHTML = `
-            <div class="avatar-circle">
+            <div class="avatar-circle" onclick="openChat('${avatar.id}')">
               ${avatar.image_url 
-                ? `<img src="${avatar.image_url}" alt="${avatar.name}" />`
+                ? `<img src="${avatar.image_url}" alt="${avatar.nickname || avatar.name}" />`
                 : `<div style="color:#666; text-align:center;">No image</div>`
               }
+              <div class="avatar-actions">
+                <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
+                <div id="menu-${avatar.id}" class="dropdown">
+                  <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
+                  <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
+                </div>
+              </div>
             </div>
-            <p class="avatar-name">${avatar.name || 'Unnamed Avatar'}</p>
+            <p class="avatar-name">${avatar.nickname || avatar.name || 'Unnamed Avatar'}</p>
           `;
           
           avatarsGrid.appendChild(avatarItem);
@@ -237,6 +255,94 @@
       function openChat(avatarId) {
         window.location.href = `chat.html?avatar=${avatarId}`;
       }
+
+      // Avatar management functions
+      window.toggleAvatarMenu = function(event, avatarId) {
+        event.stopPropagation();
+        const menu = document.getElementById(`menu-${avatarId}`);
+        const isShowing = menu.classList.contains('show');
+        
+        // Close all menus
+        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+        
+        if (!isShowing) {
+          menu.classList.add('show');
+        }
+      };
+
+      window.renameAvatar = async function(avatarId, currentName) {
+        const newName = prompt('Enter new display name:', currentName);
+        if (!newName || newName === currentName) return;
+        
+        try {
+          const { error } = await supabase
+            .from('avatars')
+            .update({ nickname: newName })
+            .eq('id', avatarId);
+            
+          if (error) throw error;
+          
+          // Refresh avatars
+          loadAvatars();
+        } catch (error) {
+          console.error('Error renaming avatar:', error);
+          alert('Failed to rename avatar');
+        }
+      };
+
+      window.deleteAvatar = async function(avatarId, name) {
+        if (!confirm(`Are you sure you want to delete "${name}"? This will also delete all conversations with this avatar. This cannot be undone.`)) return;
+        
+        try {
+          // First, delete all conversations and messages for this avatar
+          const { data: conversations, error: convoError } = await supabase
+            .from('conversations')
+            .select('id')
+            .eq('avatar_id', avatarId);
+            
+          if (convoError) throw convoError;
+          
+          // Delete messages for each conversation
+          if (conversations && conversations.length > 0) {
+            const conversationIds = conversations.map(c => c.id);
+            const { error: msgError } = await supabase
+              .from('messages')
+              .delete()
+              .in('conversation_id', conversationIds);
+              
+            if (msgError) throw msgError;
+          }
+          
+          // Delete conversations
+          const { error: convDeleteError } = await supabase
+            .from('conversations')
+            .delete()
+            .eq('avatar_id', avatarId);
+            
+          if (convDeleteError) throw convDeleteError;
+          
+          // Finally, delete the avatar
+          const { error } = await supabase
+            .from('avatars')
+            .delete()
+            .eq('id', avatarId);
+            
+          if (error) throw error;
+          
+          // Refresh avatars
+          loadAvatars();
+        } catch (error) {
+          console.error('Error deleting avatar:', error);
+          alert('Failed to delete avatar');
+        }
+      };
+
+      // Close menus when clicking outside
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('.avatar-actions')) {
+          document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+        }
+      });
 
       // Load avatars on page load
       loadAvatars();
