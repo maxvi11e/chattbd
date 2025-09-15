@@ -59,7 +59,7 @@
     
     /* Sidebar Actions */
     .sidebar-actions{padding:16px;}
-    .action-btn{display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; background:transparent; border:none; border-radius:8px; color:var(--ink); cursor:pointer; font-size:14px; margin-bottom:8px;}
+    .action-btn{display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; background:transparent; border:none; border-radius:8px; color:var(--ink); cursor:pointer; font-size:14px; margin-bottom:8px; text-decoration:none;}
     .action-btn:hover{background:rgba(255,255,255,0.1);}
     .action-btn svg{width:16px; height:16px; fill:var(--ink);}
     
@@ -169,17 +169,19 @@
       <div class="sidebar-nav">
         <div class="nav-left">
           <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
-          <a href="index.html">
-            <img src="images/library_icon.png" alt="Bot Library" class="nav-icon" title="Bot library">
-          </a>
-                    <a href="create.html">
-            <img src="images/creator_icon.png" alt="Create Bot" class="nav-icon" title="Create new bot">
-          </a>
         </div>
       </div>
       
       <!-- Sidebar Actions -->
       <div class="sidebar-actions">
+        <a href="index.html" class="action-btn" title="Bot library">
+          <img src="images/library_icon.png" alt="Bot Library" style="width:16px; height:16px;">
+          Bot Library
+        </a>
+        <a href="create.html" class="action-btn" title="Create new bot">
+          <img src="images/creator_icon.png" alt="Create Bot" style="width:16px; height:16px;">
+          Create New Bot
+        </a>
         <button id="newChatBtn" class="action-btn">
           <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           New Chat
