@@ -34,11 +34,17 @@
     .chat-container{display:flex; height:100vh;}
     
     /* Sidebar */
-    .sidebar{width:300px; background:var(--bg); border-right:1px solid #333; display:flex; flex-direction:column;}
+    .sidebar{width:300px; background:var(--bg); border-right:1px solid #333; display:flex; flex-direction:column; transition:width 0.3s ease; position:relative;}
+    .sidebar.collapsed{width:0; overflow:hidden;}
     .sidebar *::-webkit-scrollbar{width:12px}
     .sidebar *::-webkit-scrollbar-track{background:#000 !important}
     .sidebar *::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
     .sidebar *::-webkit-scrollbar-corner{background:#000}
+    
+    /* Sidebar Toggle Button */
+    .sidebar-toggle{position:fixed; top:20px; left:260px; width:32px; height:32px; background:var(--bg); border:1px solid #333; border-radius:0 8px 8px 0; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:16px; z-index:1000; transition:left 0.3s ease;}
+    .sidebar-toggle:hover{background:#222;}
+    .sidebar.collapsed + .main-chat .sidebar-toggle{left:0; border-radius:8px;}
     
     /* Top Navigation in Sidebar */
     .sidebar-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 24px 0px 24px;}
@@ -201,6 +207,9 @@
     
     <!-- Main Chat Area -->
     <div class="main-chat">
+      <!-- Sidebar Toggle Button -->
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">‹</button>
+      
       <section class="screen chat">
         <div class="column">
           <!-- Avatar section -->
@@ -285,6 +294,8 @@
       const newChatBtn = document.getElementById('newChatBtn');
       const searchBtn = document.getElementById('searchBtn');
       const conversationsList = document.getElementById('conversationsList');
+      const sidebar = document.querySelector('.sidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
 
       // Global state
       let currentAvatar = null;
@@ -310,6 +321,21 @@
         if (!searchTerm || !searchTerm.trim()) return;
         
         performSearch(searchTerm.trim().toLowerCase());
+      });
+
+      // Sidebar toggle handler
+      sidebarToggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('collapsed')) {
+          // Expand sidebar
+          sidebar.classList.remove('collapsed');
+          sidebarToggle.innerHTML = '‹';
+          sidebarToggle.title = 'Collapse sidebar';
+        } else {
+          // Collapse sidebar
+          sidebar.classList.add('collapsed');
+          sidebarToggle.innerHTML = '›';
+          sidebarToggle.title = 'Expand sidebar';
+        }
       });
 
       // Simple search function
