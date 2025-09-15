@@ -366,7 +366,7 @@
       }
 
       // Load a specific conversation
-      async function loadConversation(conversationId) {
+      window.loadConversation = async function(conversationId) {
         try {
           // Save current conversation first
           await saveCurrentConversation();
@@ -400,7 +400,7 @@
         } catch (error) {
           console.error('Error in loadConversation:', error);
         }
-      }
+      };
 
       // Save current conversation (fallback title generation for edge cases)
       async function saveCurrentConversation() {
