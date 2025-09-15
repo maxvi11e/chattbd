@@ -325,7 +325,7 @@
           clearBtn.addEventListener('click', () => {
             displayConversations(allConversations);
             clearBtn.remove();
-            conversationsHeader.textContent = currentAvatar ? `Chats with ${currentAvatar.name}` : 'Chats';
+            conversationsHeader.textContent = currentAvatar ? `Chats with ${currentAvatar.nickname || currentAvatar.name}` : 'Chats';
           });
           
           // Add clear button after search button
@@ -381,9 +381,10 @@
           allConversations = conversations || [];
           displayConversations(allConversations);
           
-          // Update conversations header with avatar name
+          // Update conversations header with avatar name (use nickname if available)
           if (currentAvatar) {
-            conversationsHeader.textContent = `Chats with ${currentAvatar.name}`;
+            const displayName = currentAvatar.nickname || currentAvatar.name;
+            conversationsHeader.textContent = `Chats with ${displayName}`;
           }
         } catch (error) {
           console.error('Error in loadConversationHistory:', error);
