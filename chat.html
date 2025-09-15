@@ -50,7 +50,7 @@
     
     /* Conversations List */
     .conversations{flex:1; overflow-y:auto; padding:16px;}
-    .conversations-header{font-size:14px; font-weight:600; color:var(--muted); margin-bottom:12px;}
+    .conversations-header{font-size:14px; font-weight:300; font-style:italic; color:#dddddd; margin-bottom:12px; padding-left:32px;}
     .conversation-item{padding:12px; border-radius:8px; cursor:pointer; margin-bottom:4px; color:var(--ink); font-size:14px; position:relative; display:flex; justify-content:space-between; align-items:center;}
     .conversation-item:hover{background:rgba(255,255,255,0.1);}
     .conversation-item.active{background:rgba(255,255,255,0.15);}
@@ -410,8 +410,15 @@
             item.classList.add('active');
           }
           
+          item.onclick = (e) => {
+            // Don't trigger if clicking on the menu button or dropdown
+            if (!e.target.closest('.conversation-actions')) {
+              loadConversation(conv.id);
+            }
+          };
+          
           item.innerHTML = `
-            <div class="conversation-title" onclick="loadConversation('${conv.id}')">${conv.title || `Chat ${new Date(conv.created_at).toLocaleDateString()}`}</div>
+            <div class="conversation-title">${conv.title || `Chat ${new Date(conv.created_at).toLocaleDateString()}`}</div>
             <div class="conversation-actions">
               <button class="conversation-menu-btn" onclick="toggleConversationMenu(event, '${conv.id}')">⋯</button>
               <div id="conv-menu-${conv.id}" class="conversation-dropdown">
