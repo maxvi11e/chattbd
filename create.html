@@ -81,7 +81,9 @@
         <a href="index.html">
           <img src="images/library_icon.png" alt="Bot Library" class="nav-icon" title="Bot library">
         </a>
-
+        <a href="#" id="chatNavIcon">
+          <img src="images/chat_icon.png" alt="Chat" class="nav-icon" title="Chat with latest bot">
+        </a>
 
       </div>
       <div class="nav-right">
@@ -176,6 +178,18 @@
         window.location.href = 'auth.html';
       });
 
+      // Chat navigation handler
+      const chatNavIcon = document.getElementById("chatNavIcon");
+      chatNavIcon.addEventListener("click", (e) => {
+        e.preventDefault();
+        const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
+        if (lastAvatarId) {
+          window.location.href = `chat.html?avatar=${lastAvatarId}`;
+        } else {
+          alert('Please select an avatar to chat with first!');
+        }
+      });
+
       // Watch auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
@@ -255,6 +269,9 @@
             }
             
             console.log('Avatar created successfully:', avatarData);
+            
+            // Store the new avatar ID for future navigation
+            localStorage.setItem('lastSelectedAvatar', avatarData.id);
             
             // Redirect to chat with the new avatar
             window.location.href = `chat.html?avatar=${avatarData.id}&new=true`;
