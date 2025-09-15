@@ -289,11 +289,52 @@
         startNewChat();
       });
 
-      // Search handler (placeholder for now)
+      // Search handler - simple search through conversations
       searchBtn.addEventListener('click', () => {
-        // TODO: Implement search functionality
-        alert('Search functionality coming soon!');
+        const searchTerm = prompt('Search conversations:');
+        if (!searchTerm || !searchTerm.trim()) return;
+        
+        performSearch(searchTerm.trim().toLowerCase());
       });
+
+      // Simple search function
+      function performSearch(searchTerm) {
+        const filteredConversations = allConversations.filter(conv => {
+          // Search in conversation titles
+          const titleMatch = conv.title.toLowerCase().includes(searchTerm);
+          return titleMatch;
+        });
+        
+        if (filteredConversations.length === 0) {
+          alert(`No conversations found containing "${searchTerm}"`);
+          return;
+        }
+        
+        // Display filtered results
+        displayConversations(filteredConversations);
+        
+        // Add a way to clear search and show all conversations
+        if (!document.getElementById('clearSearchBtn')) {
+          const clearBtn = document.createElement('button');
+          clearBtn.id = 'clearSearchBtn';
+          clearBtn.className = 'action-btn';
+          clearBtn.innerHTML = `
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            Clear Search
+          `;
+          clearBtn.addEventListener('click', () => {
+            displayConversations(allConversations);
+            clearBtn.remove();
+            conversationsHeader.textContent = currentAvatar ? `Chats with ${currentAvatar.name}` : 'Chats';
+          });
+          
+          // Add clear button after search button
+          searchBtn.parentNode.insertBefore(clearBtn, searchBtn.nextSibling);
+          
+          // Update header to show search results
+          conversationsHeader.textContent = `Search: "${searchTerm}" (${filteredConversations.length} results)`;
+        }
+      }
 
       // Watch auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
