@@ -45,20 +45,20 @@
     .page-title{font-size:40px; font-weight:600; margin:0;}
 
     /* Avatar Grid */
-    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:20px; max-width:1000px; margin:0 auto;}
+    .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:30px; max-width:1000px; margin:0 auto;}
     
     /* Avatar Items */
     .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease; position:relative;}
     .avatar-item:hover{transform:scale(1.05);}
     
-    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:16px; background:#1a1a1a; display:flex; align-items:center; justify-content:center; position:relative;}
+    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:10px; background:#1a1a1a; display:flex; align-items:center; justify-content:center; position:relative;}
     .avatar-circle img{width:100%; height:100%; object-fit:cover;}
 
     /* Avatar Actions Menu */
     .avatar-actions{position:absolute; top:8px; right:8px; z-index:15;}
-    .avatar-menu-btn{background:rgba(0,0,0,0.9); border:none; color:var(--ink); cursor:pointer; padding:8px; border-radius:8px; font-size:18px; font-weight:600; opacity:0; transition:opacity 0.2s ease; width:32px; height:32px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 4px rgba(0,0,0,0.3);}
+    .avatar-menu-btn{background:transparent; border:none; color:var(--ink); cursor:pointer; padding:8px; border-radius:8px; font-size:18px; font-weight:600; opacity:0; transition:all 0.2s ease; width:32px; height:32px; display:flex; align-items:center; justify-content:center;}
     .avatar-item:hover .avatar-menu-btn{opacity:1;}
-    .avatar-menu-btn:hover{background:rgba(0,0,0,1); transform:scale(1.1);}
+    .avatar-menu-btn:hover{background:transparent; transform:scale(1.3);}
     .dropdown{position:absolute; top:100%; right:0; background:var(--bg); border:1px solid var(--stroke); border-radius:8px; padding:8px; min-width:120px; z-index:25; display:none; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
     .dropdown.show{display:block;}
     .dropdown-item{display:block; width:100%; text-align:left; background:none; border:none; color:var(--ink); padding:8px 12px; cursor:pointer; font-size:14px; border-radius:4px;}
