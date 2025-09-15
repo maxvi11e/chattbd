@@ -55,7 +55,7 @@
 
     /* Avatar Actions Menu */
     .avatar-actions{position:absolute; top:8px; right:8px; z-index:15;}
-    .avatar-menu-btn{background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:14px; opacity:0; transition:opacity 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center; z-index:15; position:relative;}
+    .avatar-menu-btn{background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:14px; opacity:0; transition:opacity 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center;}
     .avatar-item:hover .avatar-menu-btn{opacity:1;}
     .avatar-menu-btn:hover{background:rgba(0,0,0,0.9);}
     .dropdown{position:absolute; top:100%; right:0; background:var(--bg); border:1px solid var(--stroke); border-radius:8px; padding:8px; min-width:120px; z-index:25; display:none; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
@@ -236,12 +236,12 @@
                 ? `<img src="${avatar.image_url}" alt="${avatar.nickname || avatar.name}" />`
                 : `<div style="color:#666; text-align:center;">No image</div>`
               }
-              <div class="avatar-actions">
-                <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
-                <div id="menu-${avatar.id}" class="dropdown">
-                  <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
-                  <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
-                </div>
+            </div>
+            <div class="avatar-actions">
+              <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
+              <div id="menu-${avatar.id}" class="dropdown">
+                <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
+                <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
               </div>
             </div>
             <p class="avatar-name">${avatar.nickname || avatar.name || 'Unnamed Avatar'}</p>
