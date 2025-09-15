@@ -29,7 +29,7 @@
       flex-direction:column; 
       align-items:center; 
       width:100%; 
-      max-width:360px;
+      max-width:330px;
       gap:40px;
     }
 
@@ -181,7 +181,7 @@
       
       <!-- Create Account Section -->
       <div class="auth-section signup-section collapsed" id="signup-section">
-        <input id="signup-username" type="text" class="auth-input" placeholder="Enter your username" />
+        <input id="signup-username" type="text" class="auth-input" placeholder="Create your username" />
         <input id="signup-email" type="email" class="auth-input" placeholder="Enter your email" />
         <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
         <button id="signup-btn" class="auth-btn secondary">Create new account</button>
@@ -220,14 +220,20 @@
     const signupSection = document.getElementById("signup-section");
 
     // Toggle signup section
+    const signinSection = document.getElementById("signin-section");
+    
     toggleSignup.addEventListener("click", () => {
       if (signupSection.classList.contains("collapsed")) {
+        // Show signup, hide signin
         signupSection.classList.remove("collapsed");
         signupSection.classList.add("expanded");
+        signinSection.style.display = "none";
         toggleSignup.textContent = "Already have an account?";
       } else {
+        // Show signin, hide signup
         signupSection.classList.remove("expanded");
         signupSection.classList.add("collapsed");
+        signinSection.style.display = "flex";
         toggleSignup.textContent = "Don't have an account?";
       }
     });
