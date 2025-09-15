@@ -28,8 +28,7 @@
     /* Top Navigation */
     .top-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 48px 0px 48px;}
     .nav-left{display:flex; align-items:center; gap:24px;}
-    .nav-logo{height:48px; width:auto; transition:transform 0.2s ease;}
-    .nav-logo:hover{transform:scale(1.05);}
+    .nav-logo{height:48px; width:auto;}
     .nav-icon{height:32px; width:auto; transition:transform 0.2s ease; cursor:pointer; opacity:1;}
     .nav-icon:hover{transform:scale(1.1);}
     .nav-right{display:flex; gap:16px; align-items:center;}
@@ -43,8 +42,8 @@
     
     /* Page Title */
     .page-header{display:flex; align-items:center; gap:16px; margin-bottom:40px; justify-content:center;}
-    .page-icon{height:48px; width:auto;}
-    .page-title{font-size:40px; font-weight:600; margin:0;}
+    .page-icon{height:40px; width:auto;}
+    .page-title{font-size:32px; font-weight:600; margin:0;}
 
     /* Avatar Grid */
     .avatars-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:30px; max-width:1000px; margin:0 auto;}
@@ -93,9 +92,7 @@
     <!-- Top Navigation -->
     <div class="top-nav">
       <div class="nav-left">
-        <a href="index.html">
-          <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
-        </a>
+        <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
 
         <a href="create.html">
           <img src="images/creator_icon.png" alt="Create Bot" class="nav-icon" title="Create new bot">
