@@ -84,12 +84,23 @@
       flex-direction: column;
       gap: 8px;
       align-items: center;
+      transition: all 0.3s ease;
     }
 
-    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center;}
-
+    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: all 0.3s ease;}
+    
+    /* Minimized avatar state */
+    .avatar-section.minimized .avatarFrame{width:50px; height:50px; cursor:pointer;}
+    .avatar-section.minimized .avatarFrame:hover{transform:scale(1.1);}
+    
+    /* Minimize button */
+    .minimize-btn{position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:12px; opacity:0; transition:opacity 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center; z-index:10;}
+    .avatarFrame:hover .minimize-btn{opacity:1;}
+    .minimize-btn:hover{background:rgba(0,0,0,0.9);}
+    
     .pane{position:relative; width:100%; max-width:760px;}
-    .scroller{max-height:270px; overflow:auto; padding:0 0 0 0}
+    .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.3s ease;}
+    .scroller.expanded{max-height:520px;}
     .scroller::-webkit-scrollbar{width:12px}
     .scroller::-webkit-scrollbar-track{background:transparent}
     .scroller::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
@@ -622,6 +633,9 @@
               img.style.objectFit = 'cover';
               img.style.borderRadius = '24px';
               avatar.appendChild(img);
+              
+              // Add minimize button
+              addMinimizeButton();
             };
             img.onerror = (e) => {
               console.error('Avatar image failed to load:', e);
@@ -632,6 +646,9 @@
           } else {
             console.log('No avatar image URL, using fallback');
             avatar.innerHTML = fallbackAvatar();
+            
+            // Add minimize button to fallback avatar too
+            addMinimizeButton();
           }
 
           if (isNew) {
@@ -823,6 +840,51 @@
         return `<img src="https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png"
                    alt="Avatar Placeholder"
                    style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
+      }
+
+      // Avatar minimize functionality
+      let isMinimized = false;
+      const avatarSection = document.querySelector('.avatar-section');
+      const scroller = document.getElementById('log');
+
+      function addMinimizeButton() {
+        // Remove existing minimize button if any
+        const existingBtn = avatar.querySelector('.minimize-btn');
+        if (existingBtn) existingBtn.remove();
+        
+        const minimizeBtn = document.createElement('button');
+        minimizeBtn.className = 'minimize-btn';
+        minimizeBtn.innerHTML = '−';
+        minimizeBtn.title = 'Minimize avatar';
+        minimizeBtn.onclick = toggleMinimize;
+        avatar.appendChild(minimizeBtn);
+      }
+
+      function toggleMinimize() {
+        isMinimized = !isMinimized;
+        const minimizeBtn = avatar.querySelector('.minimize-btn');
+        
+        if (isMinimized) {
+          // Minimize avatar and expand chat
+          avatarSection.classList.add('minimized');
+          scroller.classList.add('expanded');
+          minimizeBtn.innerHTML = '+';
+          minimizeBtn.title = 'Expand avatar';
+          
+          // Make minimized avatar clickable to expand
+          avatar.style.cursor = 'pointer';
+          avatar.onclick = toggleMinimize;
+        } else {
+          // Expand avatar and reduce chat space
+          avatarSection.classList.remove('minimized');
+          scroller.classList.remove('expanded');
+          minimizeBtn.innerHTML = '−';
+          minimizeBtn.title = 'Minimize avatar';
+          
+          // Remove click handler from avatar
+          avatar.style.cursor = 'default';
+          avatar.onclick = null;
+        }
       }
 
     } // End of authenticated check
