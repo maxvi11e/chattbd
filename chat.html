@@ -94,9 +94,8 @@
     .avatar-section.minimized .avatarFrame:hover{transform:scale(1.1);}
     
     /* Minimize button */
-    .minimize-btn{position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:12px; opacity:0; transition:opacity 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center; z-index:10;}
-    .avatarFrame:hover .minimize-btn{opacity:1;}
-    .minimize-btn:hover{background:rgba(0,0,0,0.9);}
+    .minimize-btn{position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:12px; opacity:1; transition:opacity 0.2s ease, background 0.2s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center; z-index:10;}
+    .minimize-btn:hover{background:rgba(0,0,0,0.9); transform:scale(1.1);}
     
     .pane{position:relative; width:100%; max-width:760px;}
     .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.3s ease;}
@@ -856,34 +855,49 @@
         minimizeBtn.className = 'minimize-btn';
         minimizeBtn.innerHTML = '−';
         minimizeBtn.title = 'Minimize avatar';
-        minimizeBtn.onclick = toggleMinimize;
+        minimizeBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          console.log('Minimize button clicked!'); // Debug log
+          toggleMinimize();
+        });
         avatar.appendChild(minimizeBtn);
       }
 
       function toggleMinimize() {
+        console.log('toggleMinimize called, current state:', isMinimized); // Debug log
         isMinimized = !isMinimized;
         const minimizeBtn = avatar.querySelector('.minimize-btn');
         
         if (isMinimized) {
           // Minimize avatar and expand chat
+          console.log('Minimizing avatar...'); // Debug log
           avatarSection.classList.add('minimized');
           scroller.classList.add('expanded');
-          minimizeBtn.innerHTML = '+';
-          minimizeBtn.title = 'Expand avatar';
+          if (minimizeBtn) {
+            minimizeBtn.innerHTML = '+';
+            minimizeBtn.title = 'Expand avatar';
+          }
           
           // Make minimized avatar clickable to expand
           avatar.style.cursor = 'pointer';
-          avatar.onclick = toggleMinimize;
+          avatar.addEventListener('click', function(e) {
+            if (e.target !== minimizeBtn) {
+              toggleMinimize();
+            }
+          });
         } else {
           // Expand avatar and reduce chat space
+          console.log('Expanding avatar...'); // Debug log
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
-          minimizeBtn.innerHTML = '−';
-          minimizeBtn.title = 'Minimize avatar';
+          if (minimizeBtn) {
+            minimizeBtn.innerHTML = '−';
+            minimizeBtn.title = 'Minimize avatar';
+          }
           
           // Remove click handler from avatar
           avatar.style.cursor = 'default';
-          avatar.onclick = null;
+          avatar.removeEventListener('click', toggleMinimize);
         }
       }
 
