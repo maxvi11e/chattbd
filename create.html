@@ -44,8 +44,9 @@
     .nav-logo:hover{transform:scale(1.05);}
     .nav-right{display:flex; gap:16px; align-items:center;}
     .user-email{color:var(--ink); font-size:16px;}
-    .logout-btn{padding:8px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px;}
+    .logout-btn{padding:8px; border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;}
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
+    .logout-btn img{width:36px; height:36px;}
 
     /* Main Content */
     .main-content{padding:0px; max-width:1200px; margin:0 auto;}
@@ -78,7 +79,9 @@
       </div>
       <div class="nav-right">
         <span id="userEmail" class="user-email"></span>
-        <button id="logoutBtn" class="logout-btn">Sign out</button>
+        <button id="logoutBtn" class="logout-btn" title="Sign out">
+          <img src="images/logout_icon.png" alt="Sign out" />
+        </button>
       </div>
     </div>
 
