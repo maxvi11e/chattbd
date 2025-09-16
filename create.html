@@ -183,15 +183,17 @@
 
       // Chat navigation handler
       const chatNavIcon = document.getElementById("chatNavIcon");
-      chatNavIcon.addEventListener("click", (e) => {
-        e.preventDefault();
-        const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
-        if (lastAvatarId) {
-          window.location.href = `chat.html?avatar=${lastAvatarId}`;
-        } else {
-          alert('Please select an avatar to chat with first!');
-        }
-      });
+      if (chatNavIcon) {
+        chatNavIcon.addEventListener("click", (e) => {
+          e.preventDefault();
+          const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
+          if (lastAvatarId) {
+            window.location.href = `chat.html?avatar=${lastAvatarId}`;
+          } else {
+            alert('Please select an avatar to chat with first!');
+          }
+        });
+      }
 
       // Watch auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
