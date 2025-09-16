@@ -48,7 +48,7 @@
     .resize-handle.resizing{background:rgba(255,255,255,0.2);}
     
     /* Sidebar Toggle Button */
-    .sidebar-toggle{position:fixed; top:70px; left:260px; width:32px; height:32px; background:none; border:none; border-radius:8px; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; z-index:1000; transition:left 0.3s ease;}
+    .sidebar-toggle{position:fixed; top:0px; left:260px; width:32px; height:32px; background:none; border:1px solid #fff; border-radius:8px; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; z-index:1000; transition:left 0.3s ease;}
     .sidebar-toggle:hover{background:#222;}
     .sidebar.collapsed + .main-chat .sidebar-toggle{left:0; border-radius:8px;}
     .sidebar.resizing + .main-chat .sidebar-toggle{transition:none;}
@@ -145,9 +145,9 @@
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
     .composerWrap{position:relative; margin-top:20px; margin-bottom:10px; width:100%; max-width:735.36px; margin-left:auto; margin-right:auto; display:flex; align-items:center; gap:11.2px; z-index:3}
-    .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; max-height:56px; overflow-y:auto;}
-    .composer input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px}
-    .composer input::placeholder { color:#fff; opacity:1; }
+    .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; min-height:46.4px; max-height:200px; overflow-y:auto;}
+    .composer textarea{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px; resize:none; font-family:inherit; line-height:1.4; min-height:22px; padding:0;}
+    .composer textarea::placeholder { color:#fff; opacity:1; }
     .sendBtn .circleBtn{width:40px; height:40px}
     .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer}
     .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
@@ -178,6 +178,10 @@
     /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       .scroller.expanded{max-height:400px;}
+      
+      /* Sidebar toggle positioning for mobile */
+      .sidebar-toggle{left:220px;} /* Just inside the right edge of 300px sidebar */
+      .sidebar.collapsed + .main-chat .sidebar-toggle{left:0;}
     }
   </style>
 </head>
@@ -249,7 +253,7 @@
             <!-- Bottom composer -->
             <div class="composerWrap">
               <label class="composer">
-                <input id="ask" type="text" placeholder="Ask anything" />
+                <textarea id="ask" placeholder="Ask anything" rows="1"></textarea>
               </label>
               <button id="send" class="circleBtn sendBtn" title="Send">
                 <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -906,7 +910,21 @@
         }
       }
 
-      ask.addEventListener('keydown', e=>{ if(e.key==='Enter') doSend(); });
+      // Auto-expand textarea as user types
+      function autoResizeTextarea() {
+        ask.style.height = 'auto';
+        ask.style.height = Math.min(ask.scrollHeight, 200) + 'px';
+      }
+
+      // Event listeners for textarea
+      ask.addEventListener('input', autoResizeTextarea);
+      ask.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          doSend();
+        }
+        // Allow Shift+Enter for new lines
+      });
       send.addEventListener('click', doSend);
 
       async function doSend(){
@@ -914,6 +932,7 @@
         if(!t) return;
         
         ask.value=''; 
+        ask.style.height = 'auto'; // Reset height after sending
         add('from-me',t);
         convo.push({ role:'user', content:t });
 
