@@ -71,6 +71,7 @@
     .create-new{border:3px solid var(--ink); background:transparent; display:flex; align-items:center; justify-content:center;}
     .create-new:hover{background:rgba(255,255,255,0.1);}
     .create-plus{font-size:100px; color:var(--ink); font-weight:400;}
+    .create-plus img{width:80px; height:80px;}
     
     .avatar-name{color:var(--ink); font-size:16px; font-weight:400; text-align:center; margin:0;}
 
@@ -183,9 +184,9 @@
       <div class="nav-left">
         <img src="images/logo.png" alt="Build a Bot Logo" class="nav-logo">
 
-        <a href="create.html">
+        <!-- <a href="create.html">
           <img src="images/creator_icon.png" alt="Create Bot" class="nav-icon" title="Create new bot">
-        </a>
+        </a> -->
         <a href="#" id="chatNavIcon">
           <img src="images/chat_icon.png" alt="Chat" class="nav-icon" title="Chat with latest bot">
         </a>
@@ -212,7 +213,7 @@
         <!-- Create New Button (always first) -->
         <div class="avatar-item" id="createBtn">
           <div class="avatar-circle create-new">
-            <div class="create-plus">+</div>
+            <div class="create-plus"><img src="images/creator_icon.png" alt="Create" /></div>
           </div>
           <p class="avatar-name">Create new</p>
         </div>
