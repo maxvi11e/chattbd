@@ -353,6 +353,16 @@
         performSearch(searchTerm.trim().toLowerCase());
       });
 
+      // Helper function to set toggle position based on screen size
+      function setTogglePosition(width) {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebarToggle.style.left = '200px'; // Fixed position on mobile
+        } else {
+          sidebarToggle.style.left = `${width - 40}px`; // Dynamic position on desktop
+        }
+      }
+
       // Sidebar toggle handler
       sidebarToggle.addEventListener('click', () => {
         if (sidebar.classList.contains('collapsed')) {
@@ -361,7 +371,7 @@
           // Restore the saved width or default
           const savedWidth = localStorage.getItem('sidebarWidth') || '300';
           sidebar.style.width = `${savedWidth}px`;
-          sidebarToggle.style.left = `${parseInt(savedWidth) - 40}px`;
+          setTogglePosition(parseInt(savedWidth));
           sidebarToggle.innerHTML = '‹';
           sidebarToggle.title = 'Collapse sidebar';
         } else {
@@ -410,7 +420,7 @@
           sidebar.style.width = `${width}px`;
           
           // Update the sidebar toggle position
-          sidebarToggle.style.left = `${width - 40}px`;
+          setTogglePosition(width);
           
           // Store the width preference
           localStorage.setItem('sidebarWidth', width);
@@ -439,7 +449,7 @@
         const width = parseInt(savedWidth, 10);
         if (width >= 200 && width <= 600) {
           sidebar.style.width = `${width}px`;
-          sidebarToggle.style.left = `${width - 40}px`;
+          setTogglePosition(width);
         }
       }
 
