@@ -34,17 +34,24 @@
     .chat-container{display:flex; height:100vh;}
     
     /* Sidebar */
-    .sidebar{width:300px; background:var(--bg); border-right:1px solid #333; display:flex; flex-direction:column; transition:width 0.3s ease; position:relative;}
-    .sidebar.collapsed{width:0; overflow:hidden;}
+    .sidebar{width:300px; background:var(--bg); border-right:1px solid #333; display:flex; flex-direction:column; transition:width 0.3s ease; position:relative; min-width:200px; max-width:600px;}
+    .sidebar.collapsed{width:0 !important; min-width:0 !important; overflow:hidden;}
+    .sidebar.resizing{transition:none;} /* Disable transition while resizing */
     .sidebar *::-webkit-scrollbar{width:12px}
     .sidebar *::-webkit-scrollbar-track{background:#000 !important}
     .sidebar *::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
     .sidebar *::-webkit-scrollbar-corner{background:#000}
     
+    /* Resize Handle */
+    .resize-handle{position:absolute; top:0; right:-3px; width:6px; height:100%; cursor:col-resize; background:transparent; z-index:100;}
+    .resize-handle:hover{background:rgba(255,255,255,0.1);}
+    .resize-handle.resizing{background:rgba(255,255,255,0.2);}
+    
     /* Sidebar Toggle Button */
     .sidebar-toggle{position:fixed; top:20px; left:260px; width:32px; height:32px; background:none; border:none; border-radius:8px; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; z-index:1000; transition:left 0.3s ease;}
     .sidebar-toggle:hover{background:#222;}
     .sidebar.collapsed + .main-chat .sidebar-toggle{left:0; border-radius:8px;}
+    .sidebar.resizing + .main-chat .sidebar-toggle{transition:none;}
     
     /* Top Navigation in Sidebar */
     .sidebar-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 24px 0px 24px;}
@@ -205,6 +212,9 @@
           <img src="images/logout_icon.png" alt="Sign out" />
         </button>
       </div>
+      
+      <!-- Resize Handle -->
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize sidebar"></div>
     </div>
     
     <!-- Main Chat Area -->
@@ -330,15 +340,90 @@
         if (sidebar.classList.contains('collapsed')) {
           // Expand sidebar
           sidebar.classList.remove('collapsed');
+          // Restore the saved width or default
+          const savedWidth = localStorage.getItem('sidebarWidth') || '300';
+          sidebar.style.width = `${savedWidth}px`;
+          sidebarToggle.style.left = `${parseInt(savedWidth) - 40}px`;
           sidebarToggle.innerHTML = '‹';
           sidebarToggle.title = 'Collapse sidebar';
         } else {
           // Collapse sidebar
           sidebar.classList.add('collapsed');
+          // Override inline width with 0 for collapse
+          sidebar.style.width = '0px';
+          sidebarToggle.style.left = '0px';
           sidebarToggle.innerHTML = '›';
           sidebarToggle.title = 'Expand sidebar';
         }
       });
+
+      // Sidebar resize functionality
+      const resizeHandle = document.getElementById('resizeHandle');
+      let isResizing = false;
+      let startX = 0;
+      let startWidth = 0;
+
+      resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+        
+        sidebar.classList.add('resizing');
+        resizeHandle.classList.add('resizing');
+        
+        // Add global listeners for mouse events
+        document.addEventListener('mousemove', handleResize);
+        document.addEventListener('mouseup', stopResize);
+        
+        // Prevent text selection during drag
+        e.preventDefault();
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'col-resize';
+      });
+
+      function handleResize(e) {
+        if (!isResizing) return;
+        
+        const width = startWidth + (e.clientX - startX);
+        const minWidth = 200;
+        const maxWidth = 600;
+        
+        if (width >= minWidth && width <= maxWidth) {
+          sidebar.style.width = `${width}px`;
+          
+          // Update the sidebar toggle position
+          sidebarToggle.style.left = `${width - 40}px`;
+          
+          // Store the width preference
+          localStorage.setItem('sidebarWidth', width);
+        }
+      }
+
+      function stopResize() {
+        if (!isResizing) return;
+        
+        isResizing = false;
+        sidebar.classList.remove('resizing');
+        resizeHandle.classList.remove('resizing');
+        
+        // Remove global listeners
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', stopResize);
+        
+        // Restore normal cursor and text selection
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+      }
+
+      // Load saved sidebar width on page load
+      const savedWidth = localStorage.getItem('sidebarWidth');
+      if (savedWidth) {
+        const width = parseInt(savedWidth, 10);
+        if (width >= 200 && width <= 600) {
+          sidebar.style.width = `${width}px`;
+          sidebarToggle.style.left = `${width - 40}px`;
+        }
+      }
 
       // Simple search function
       function performSearch(searchTerm) {
