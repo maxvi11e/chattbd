@@ -5,6 +5,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const startTime = Date.now();
+  
   try {
     const { prompt, botName, artStyle, personalityPrompt } = req.body || {};
     if (!prompt) {
@@ -34,16 +36,21 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-image-1",
+        model: "dall-e-3",
         prompt: enhancedPrompt,
         size: "1024x1024",   // ✅ valid size
         n: 1,
-        quality: "high"
+        quality: "hd"
       }),
     });
 
     if (!r.ok) {
       const errTxt = await r.text();
+      console.log(`❌ Image generation failed:`, {
+        error: errTxt,
+        prompt_length: enhancedPrompt.length,
+        timestamp: new Date().toISOString()
+      });
       return res.status(500).json({ error: errTxt });
     }
 
@@ -52,6 +59,21 @@ export default async function handler(req, res) {
 
     const b64 = item?.b64_json;
     const url = item?.url;
+
+    // Log successful generation
+    const duration = Date.now() - startTime;
+    console.log(`✅ Image generated successfully:`, {
+      model: "dall-e-3",
+      size: "1024x1024",
+      quality: "hd",
+      cost_estimate: "$0.040",
+      duration_ms: duration,
+      prompt_length: enhancedPrompt.length,
+      has_bot_name: !!(botName && botName.trim()),
+      has_art_style: !!(artStyle && artStyle.trim()),
+      has_personality_prompt: !!(personalityPrompt && personalityPrompt.trim()),
+      timestamp: new Date().toISOString()
+    });
 
     if (b64) {
       return res.status(200).json({ 
@@ -72,6 +94,10 @@ export default async function handler(req, res) {
 
     return res.status(500).json({ error: "No image returned" });
   } catch (e) {
+    console.log(`❌ Image generation error:`, {
+      error: e.message,
+      timestamp: new Date().toISOString()
+    });
     return res.status(500).json({ error: e.message || "Unexpected error" });
   }
 }
