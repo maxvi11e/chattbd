@@ -126,7 +126,7 @@
         <div class="input-container">
           <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-40px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
           
-          <label class="heroInput" aria-label="Persona prompt">
+          <label class="heroInput" aria-label="Persona prompt" style="flex: 1;">
             <input id="persona" type="text" placeholder="Describe the personality, appearance, or character of the Bot" data-short-placeholder="Create an avatar" />
           </label>
           <button id="startBtn" class="circleBtn" title="Generate persona">
@@ -154,6 +154,10 @@
           <label class="heroInput" aria-label="Personality prompt" style="flex: none;">
             <input id="personalityPrompt" type="text" placeholder="Add personality details" />
           </label>
+        </div>
+        
+        <!-- Dynamic Start Button Container (when advanced panel is open) -->
+        <div id="dynamicStartContainer" style="display: none; justify-content: center; margin-top: 16px;">
         </div>
       </div>
     </div>
@@ -259,8 +263,22 @@
       // Advanced options toggle
       advancedToggle.addEventListener('click', () => {
         const isVisible = advancedPanel.style.display !== 'none';
-        advancedPanel.style.display = isVisible ? 'none' : 'flex';
-        advancedToggle.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+        const dynamicStartContainer = document.getElementById('dynamicStartContainer');
+        const inputContainer = document.querySelector('.input-container');
+        
+        if (isVisible) {
+          // Closing advanced panel - move button back to input container
+          advancedPanel.style.display = 'none';
+          dynamicStartContainer.style.display = 'none';
+          inputContainer.appendChild(startBtn);
+          advancedToggle.style.transform = 'rotate(0deg)';
+        } else {
+          // Opening advanced panel - move button below panel
+          advancedPanel.style.display = 'flex';
+          dynamicStartContainer.style.display = 'flex';
+          dynamicStartContainer.appendChild(startBtn);
+          advancedToggle.style.transform = 'rotate(180deg)';
+        }
       });
 
       async function start(){
