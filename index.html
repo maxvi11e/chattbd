@@ -53,7 +53,7 @@
     .avatar-item{display:flex; flex-direction:column; align-items:center; cursor:pointer; transition:transform 0.2s ease; position:relative;}
     .avatar-item:hover{transform:scale(1.05);}
     
-    .avatar-circle{width:200px; height:200px; border-radius:50%; overflow:hidden; margin-bottom:10px; background:#1a1a1a; display:flex; align-items:center; justify-content:center; position:relative;}
+    .avatar-circle{width:190px; height:190px; border-radius:50%; overflow:hidden; margin-bottom:10px; background:#1a1a1a; display:flex; align-items:center; justify-content:center; position:relative;}
     .avatar-circle img{width:100%; height:100%; object-fit:cover;}
 
     /* Avatar Actions Menu */
@@ -344,7 +344,7 @@
           avatarItem.className = 'avatar-item';
           
           avatarItem.innerHTML = `
-            <div class="avatar-circle" onclick="openChat('${avatar.id}')">
+            <div class="avatar-circle" data-avatar-id="${avatar.id}">
               ${avatar.image_url 
                 ? `<img src="${avatar.image_url}" alt="${avatar.nickname || avatar.name}" />`
                 : `<div style="color:#666; text-align:center;">No image</div>`
@@ -360,7 +360,56 @@
             <p class="avatar-name">${avatar.nickname || avatar.name || 'Unnamed Avatar'}</p>
           `;
           
+          // Add touch/click handlers for better mobile UX
+          const avatarCircle = avatarItem.querySelector('.avatar-circle');
+          setupAvatarInteraction(avatarCircle, avatar.id);
+          
           avatarsGrid.appendChild(avatarItem);
+        });
+      }
+
+      // Setup avatar interaction for mobile and desktop
+      function setupAvatarInteraction(avatarCircle, avatarId) {
+        let touchStartTime = 0;
+        let longPressTimer = null;
+        let longPressTriggered = false;
+        
+        // Touch start - start timing for long press
+        avatarCircle.addEventListener('touchstart', (e) => {
+          touchStartTime = Date.now();
+          longPressTriggered = false;
+          
+          longPressTimer = setTimeout(() => {
+            // Long press detected - show menu
+            longPressTriggered = true;
+            navigator.vibrate && navigator.vibrate(50); // Haptic feedback if available
+            toggleAvatarMenu(e, avatarId);
+          }, 500); // 500ms for long press
+        });
+        
+        // Touch end - determine if it's a tap or long press
+        avatarCircle.addEventListener('touchend', (e) => {
+          clearTimeout(longPressTimer);
+          
+          if (!longPressTriggered) {
+            // Short tap - open chat
+            e.preventDefault();
+            openChat(avatarId);
+          }
+        });
+        
+        // Touch cancel - clean up
+        avatarCircle.addEventListener('touchcancel', () => {
+          clearTimeout(longPressTimer);
+          longPressTriggered = false;
+        });
+        
+        // Mouse click for desktop - keep original behavior
+        avatarCircle.addEventListener('click', (e) => {
+          // Only handle if not a touch device or if no touch events fired
+          if (!('ontouchstart' in window)) {
+            openChat(avatarId);
+          }
         });
       }
 
