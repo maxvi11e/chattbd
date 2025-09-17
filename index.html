@@ -60,6 +60,7 @@
     .avatar-actions{position:absolute; top:8px; right:8px; z-index:15;}
     .avatar-menu-btn{background:transparent; border:none; color:var(--ink); cursor:pointer; padding:8px; border-radius:8px; font-size:18px; font-weight:600; opacity:0; transition:all 0.2s ease; width:32px; height:32px; display:flex; align-items:center; justify-content:center;}
     .avatar-item:hover .avatar-menu-btn{opacity:1;}
+    .avatar-item.menu-visible .avatar-menu-btn{opacity:1;} /* Mobile menu visibility class */
     .avatar-menu-btn:hover{background:transparent; transform:scale(1.3);}
     .dropdown{position:absolute; top:100%; right:0; background:var(--bg); border:1px solid var(--stroke); border-radius:8px; padding:8px; min-width:120px; z-index:25; display:none; box-shadow:0 4px 6px rgba(0,0,0,0.3);}
     .dropdown.show{display:block;}
@@ -126,7 +127,6 @@
         height: 24px;
         font-size: 14px;
         padding: 4px;
-        opacity: 1; /* Always visible on mobile */
       }
       
       /* Dropdown adjustments */
@@ -174,7 +174,6 @@
         width: 20px;
         height: 20px;
         font-size: 12px;
-        opacity: 1; /* Always visible on small mobile */
       }
     }
   </style>
@@ -364,21 +363,49 @@
           
           // Add touch/click handlers for better mobile UX
           const avatarCircle = avatarItem.querySelector('.avatar-circle');
-          setupAvatarInteraction(avatarCircle, avatar.id);
+          setupAvatarInteraction(avatarItem, avatarCircle, avatar.id);
           
           avatarsGrid.appendChild(avatarItem);
         });
       }
 
       // Setup avatar interaction for mobile and desktop
-      function setupAvatarInteraction(avatarCircle, avatarId) {
+      function setupAvatarInteraction(avatarItem, avatarCircle, avatarId) {
         let touchStartX = 0;
         let touchStartY = 0;
         let touchStartTime = 0;
         let hasMoved = false;
         
-        // Track touch start position and time
-        avatarCircle.addEventListener('touchstart', (e) => {
+        // Handle taps on the entire avatar item for mobile
+        function handleAvatarItemTouch(e) {
+          // Don't handle if tapping directly on menu button or dropdown
+          if (e.target.closest('.avatar-menu-btn') || e.target.closest('.dropdown')) {
+            return;
+          }
+          
+          const touchDuration = Date.now() - touchStartTime;
+          
+          // Only proceed if it was a quick tap without movement
+          if (!hasMoved && touchDuration < 300) {
+            e.preventDefault();
+            
+            // If menu button is not visible, show it
+            if (!avatarItem.classList.contains('menu-visible')) {
+              // Hide all other menu buttons first
+              document.querySelectorAll('.avatar-item.menu-visible').forEach(item => {
+                item.classList.remove('menu-visible');
+              });
+              // Show this menu button
+              avatarItem.classList.add('menu-visible');
+            } else {
+              // Menu button is visible, so open chat
+              openChat(avatarId);
+            }
+          }
+        }
+        
+        // Track touch start position and time for the entire avatar item
+        avatarItem.addEventListener('touchstart', (e) => {
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
           touchStartTime = Date.now();
@@ -386,7 +413,7 @@
         });
         
         // Track if user is moving/scrolling
-        avatarCircle.addEventListener('touchmove', (e) => {
+        avatarItem.addEventListener('touchmove', (e) => {
           const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
           const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
           
@@ -396,24 +423,21 @@
           }
         });
         
-        // Only open chat on touchend if it was a quick tap without movement
-        avatarCircle.addEventListener('touchend', (e) => {
-          const touchDuration = Date.now() - touchStartTime;
-          
-          // Only open chat if:
-          // 1. No significant movement (not scrolling)
-          // 2. Quick tap (less than 300ms to avoid long press confusion)
-          if (!hasMoved && touchDuration < 300) {
-            e.preventDefault();
-            openChat(avatarId);
-          }
-        });
+        // Handle touch end on avatar item
+        avatarItem.addEventListener('touchend', handleAvatarItemTouch);
         
-        // Mouse click for desktop - keep simple
+        // Mouse click for desktop - keep simple, direct to chat
         avatarCircle.addEventListener('click', (e) => {
           // Only handle if not a touch device
           if (!('ontouchstart' in window)) {
             openChat(avatarId);
+          }
+        });
+        
+        // Hide menu button when clicking elsewhere
+        document.addEventListener('touchstart', (e) => {
+          if (!e.target.closest('.avatar-item')) {
+            avatarItem.classList.remove('menu-visible');
           }
         });
       }
