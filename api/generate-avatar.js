@@ -40,7 +40,8 @@ export default async function handler(req, res) {
         prompt: enhancedPrompt,
         size: "1024x1024",   // ✅ valid size
         n: 1,
-        quality: "hd"
+        quality: "hd",
+        response_format: "b64_json"  // ✅ Request base64 format
       }),
     });
 
