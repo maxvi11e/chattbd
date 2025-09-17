@@ -6,9 +6,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt } = req.body || {};
+    const { prompt, botName, artStyle, personalityPrompt } = req.body || {};
     if (!prompt) {
       return res.status(400).json({ error: "Missing prompt" });
+    }
+
+    // Build enhanced prompt with additional fields
+    let enhancedPrompt = `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.`;
+    
+    // Add art style if provided
+    if (artStyle && artStyle.trim()) {
+      enhancedPrompt += ` Art style: ${artStyle.trim()}.`;
+    }
+    
+    // Add main persona description
+    enhancedPrompt += ` Persona: ${prompt}`;
+    
+    // Add additional personality details if provided
+    if (personalityPrompt && personalityPrompt.trim()) {
+      enhancedPrompt += ` Additional details: ${personalityPrompt.trim()}`;
     }
 
     const r = await fetch("https://api.openai.com/v1/images/generations", {
@@ -19,7 +35,7 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-image-1",
-        prompt: `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Persona: ${prompt}`,
+        prompt: enhancedPrompt,
         size: "1024x1024",   // ✅ valid size
         n: 1,
         quality: "high"
@@ -38,10 +54,20 @@ export default async function handler(req, res) {
     const url = item?.url;
 
     if (b64) {
-      return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}` });
+      return res.status(200).json({ 
+        dataUrl: `data:image/png;base64,${b64}`,
+        botName: botName || null,
+        artStyle: artStyle || null,
+        personalityPrompt: personalityPrompt || null
+      });
     }
     if (url) {
-      return res.status(200).json({ dataUrl: url });
+      return res.status(200).json({ 
+        dataUrl: url,
+        botName: botName || null,
+        artStyle: artStyle || null,
+        personalityPrompt: personalityPrompt || null
+      });
     }
 
     return res.status(500).json({ error: "No image returned" });

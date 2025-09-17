@@ -252,6 +252,11 @@
         const p = persona.value.trim(); 
         if(!p) return;
 
+        // Get values from advanced panel
+        const botName = document.getElementById('botName').value.trim();
+        const artStyle = document.getElementById('artStyle').value.trim();
+        const personalityPrompt = document.getElementById('personalityPrompt').value.trim();
+
         // Disable form while processing
         persona.disabled = true;
         startBtn.disabled = true;
@@ -262,7 +267,12 @@
           const res = await fetch('/api/generate-avatar', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ prompt: p })
+            body: JSON.stringify({ 
+              prompt: p,
+              botName: botName,
+              artStyle: artStyle,
+              personalityPrompt: personalityPrompt
+            })
           });
 
           const json = await res.json().catch(() => ({}));
@@ -286,16 +296,22 @@
           // Upload avatar image to Supabase and save it
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
-            const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${p}.png` });
+            const finalBotName = json.botName || p;
+            const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${finalBotName}.png` });
             
             // Save avatar to database
             const { data: avatarData, error: avatarError } = await supabase
               .from('avatars')
               .insert({
                 user_id: user.id,
-                name: p,
+                name: finalBotName,
                 image_url: url,
-                traits: json.traits || {},
+                traits: {
+                  original_prompt: p,
+                  art_style: json.artStyle,
+                  personality_prompt: json.personalityPrompt,
+                  ...(json.traits || {})
+                },
               })
               .select()
               .single();
