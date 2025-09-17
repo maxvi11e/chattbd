@@ -6,9 +6,24 @@
   <title>Build a Bot — Create</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <style>
+  /* Advanced Panel Styling - Match input-container exactly */
+  #advancedPanel {
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  /* Ensure advanced panel heroInput elements don't get responsive sizing */
+  #advancedPanel .heroInput {
+    width: 100% !important;
+  }
+  
   @media (max-width: 900px) {
     .heroInput {
       width: min(400.69px, calc(56vw - 32px));
+    }
+    /* Override responsive sizing for advanced panel inputs */
+    #advancedPanel .heroInput {
+      width: 100% !important;
     }
   }
     @keyframes progress {
@@ -127,7 +142,7 @@
         </div>
         
         <!-- Advanced Options Panel -->
-        <div id="advancedPanel" style="display: none; margin-top: 16px; width: 100%; max-width: 800px; flex-direction: column;">
+        <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column;">
           <label class="heroInput" aria-label="Bot name" style="margin-bottom: 16px; flex: none;">
             <input id="botName" type="text" placeholder="Give your bot a name" />
           </label>
