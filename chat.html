@@ -578,13 +578,6 @@
             item.classList.add('active');
           }
           
-          item.onclick = (e) => {
-            // Don't trigger if clicking on the menu button or dropdown
-            if (!e.target.closest('.conversation-actions')) {
-              loadConversation(conv.id);
-            }
-          };
-          
           item.innerHTML = `
             <div class="conversation-title">${conv.title || `Chat ${new Date(conv.created_at).toLocaleDateString()}`}</div>
             <div class="conversation-actions">
@@ -595,6 +588,9 @@
               </div>
             </div>
           `;
+          
+          // Setup touch/click interaction for better mobile UX
+          setupConversationInteraction(item, conv.id);
           
           conversationsList.appendChild(item);
         });
@@ -738,6 +734,60 @@
       }
 
       // Conversation management functions
+      // Setup conversation interaction for mobile and desktop
+      function setupConversationInteraction(conversationItem, conversationId) {
+        let touchStartTime = 0;
+        let longPressTimer = null;
+        let longPressTriggered = false;
+        
+        // Touch start - start timing for long press
+        conversationItem.addEventListener('touchstart', (e) => {
+          // Don't handle touch if clicking on menu button
+          if (e.target.closest('.conversation-actions')) return;
+          
+          touchStartTime = Date.now();
+          longPressTriggered = false;
+          
+          longPressTimer = setTimeout(() => {
+            // Long press detected - show menu
+            longPressTriggered = true;
+            navigator.vibrate && navigator.vibrate(50); // Haptic feedback if available
+            toggleConversationMenu(e, conversationId);
+          }, 500); // 500ms for long press
+        });
+        
+        // Touch end - determine if it's a tap or long press
+        conversationItem.addEventListener('touchend', (e) => {
+          // Don't handle touch if clicking on menu button
+          if (e.target.closest('.conversation-actions')) return;
+          
+          clearTimeout(longPressTimer);
+          
+          if (!longPressTriggered) {
+            // Short tap - load conversation
+            e.preventDefault();
+            loadConversation(conversationId);
+          }
+        });
+        
+        // Touch cancel - clean up
+        conversationItem.addEventListener('touchcancel', () => {
+          clearTimeout(longPressTimer);
+          longPressTriggered = false;
+        });
+        
+        // Mouse click for desktop - keep original behavior
+        conversationItem.addEventListener('click', (e) => {
+          // Only handle if not a touch device or if no touch events fired
+          if (!('ontouchstart' in window)) {
+            // Don't trigger if clicking on the menu button or dropdown
+            if (!e.target.closest('.conversation-actions')) {
+              loadConversation(conversationId);
+            }
+          }
+        });
+      }
+
       window.toggleConversationMenu = function(event, conversationId) {
         event.stopPropagation();
         const menu = document.getElementById(`conv-menu-${conversationId}`);
