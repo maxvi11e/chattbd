@@ -454,6 +454,25 @@
         }
       }
 
+      // Auto-collapse sidebar on mobile devices
+      function initializeMobileSidebar() {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile && !sidebar.classList.contains('collapsed')) {
+          // Collapse sidebar on mobile
+          sidebar.classList.add('collapsed');
+          sidebar.style.width = '0px';
+          sidebarToggle.style.left = '0px';
+          sidebarToggle.innerHTML = '›';
+          sidebarToggle.title = 'Expand sidebar';
+        }
+      }
+
+      // Initialize mobile sidebar state
+      initializeMobileSidebar();
+
+      // Re-check on window resize
+      window.addEventListener('resize', initializeMobileSidebar);
+
       // Simple search function
       function performSearch(searchTerm) {
         const filteredConversations = allConversations.filter(conv => {
