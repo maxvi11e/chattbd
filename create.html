@@ -107,7 +107,7 @@
       </div>
 
       <!-- Create Form -->
-      <div class="create-form">
+      <div class="create-form" style="flex-direction: column; align-items: center;">
         <div class="input-container">
           <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-40px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
           
@@ -117,6 +117,28 @@
           <button id="startBtn" class="circleBtn" title="Generate persona">
             <img src="images/creator_icon.png" alt="Generate" style="width: 32px; height: 32px;" />
           </button>
+        </div>
+        
+        <!-- Advanced Options Toggle -->
+        <div style="display: flex; justify-content: center; margin-top: 16px;">
+          <button id="advancedToggle" class="circleBtn" title="Advanced options" style="transition: transform 0.3s ease;">
+            <img src="images/gear_icon.png" alt="Advanced options" style="width: 32px; height: 32px;" />
+          </button>
+        </div>
+        
+        <!-- Advanced Options Panel -->
+        <div id="advancedPanel" style="display: none; margin-top: 16px; width: 100%; max-width: 800px; flex-direction: column;">
+          <label class="heroInput" aria-label="Bot name" style="margin-bottom: 16px; flex: none;">
+            <input id="botName" type="text" placeholder="Give your bot a name" />
+          </label>
+          
+          <label class="heroInput" aria-label="Art style" style="margin-bottom: 16px; flex: none;">
+            <input id="artStyle" type="text" placeholder="Specify an art style" />
+          </label>
+          
+          <label class="heroInput" aria-label="Personality prompt" style="flex: none;">
+            <input id="personalityPrompt" type="text" placeholder="Add personality details" />
+          </label>
         </div>
       </div>
     </div>
@@ -175,6 +197,8 @@
       const persona = document.getElementById('persona');
       const startBtn = document.getElementById('startBtn');
       const logoutBtn = document.getElementById('logoutBtn');
+      const advancedToggle = document.getElementById('advancedToggle');
+      const advancedPanel = document.getElementById('advancedPanel');
 
       // Sign out handler
       logoutBtn.addEventListener("click", async () => {
@@ -216,6 +240,13 @@
 
       persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
       startBtn.addEventListener('click', start);
+      
+      // Advanced options toggle
+      advancedToggle.addEventListener('click', () => {
+        const isVisible = advancedPanel.style.display !== 'none';
+        advancedPanel.style.display = isVisible ? 'none' : 'flex';
+        advancedToggle.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+      });
 
       async function start(){
         const p = persona.value.trim(); 
