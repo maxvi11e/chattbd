@@ -126,6 +126,7 @@
         height: 24px;
         font-size: 14px;
         padding: 4px;
+        opacity: 1; /* Always visible on mobile */
       }
       
       /* Dropdown adjustments */
@@ -173,6 +174,7 @@
         width: 20px;
         height: 20px;
         font-size: 12px;
+        opacity: 1; /* Always visible on small mobile */
       }
     }
   </style>
@@ -370,46 +372,15 @@
 
       // Setup avatar interaction for mobile and desktop
       function setupAvatarInteraction(avatarCircle, avatarId) {
-        let touchStartTime = 0;
-        let longPressTimer = null;
-        let longPressTriggered = false;
-        
-        // Touch start - start timing for long press
-        avatarCircle.addEventListener('touchstart', (e) => {
-          touchStartTime = Date.now();
-          longPressTriggered = false;
-          
-          longPressTimer = setTimeout(() => {
-            // Long press detected - show menu
-            longPressTriggered = true;
-            navigator.vibrate && navigator.vibrate(50); // Haptic feedback if available
-            toggleAvatarMenu(e, avatarId);
-          }, 500); // 500ms for long press
-        });
-        
-        // Touch end - determine if it's a tap or long press
-        avatarCircle.addEventListener('touchend', (e) => {
-          clearTimeout(longPressTimer);
-          
-          if (!longPressTriggered) {
-            // Short tap - open chat
-            e.preventDefault();
-            openChat(avatarId);
-          }
-        });
-        
-        // Touch cancel - clean up
-        avatarCircle.addEventListener('touchcancel', () => {
-          clearTimeout(longPressTimer);
-          longPressTriggered = false;
-        });
-        
-        // Mouse click for desktop - keep original behavior
+        // Simple click/tap for chat entry only
         avatarCircle.addEventListener('click', (e) => {
-          // Only handle if not a touch device or if no touch events fired
-          if (!('ontouchstart' in window)) {
-            openChat(avatarId);
-          }
+          openChat(avatarId);
+        });
+        
+        // Touch event for mobile - just open chat
+        avatarCircle.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          openChat(avatarId);
         });
       }
 
