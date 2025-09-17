@@ -36,12 +36,11 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "dall-e-3",
+        model: "gpt-image-1",
         prompt: enhancedPrompt,
         size: "1024x1024",   // ✅ valid size
         n: 1,
-        quality: "hd",
-        response_format: "b64_json"  // ✅ Request base64 format
+        quality: "high"
       }),
     });
 
@@ -64,10 +63,10 @@ export default async function handler(req, res) {
     // Log successful generation
     const duration = Date.now() - startTime;
     console.log(`✅ Image generated successfully:`, {
-      model: "dall-e-3",
+      model: "gpt-image-1",
       size: "1024x1024",
-      quality: "hd",
-      cost_estimate: "$0.040",
+      quality: "high",
+      cost_estimate: "TBD",
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
       has_bot_name: !!(botName && botName.trim()),
