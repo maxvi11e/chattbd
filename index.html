@@ -376,10 +376,12 @@
         let touchStartTime = 0;
         let hasMoved = false;
         
-        // Handle taps on the entire avatar item for mobile
+        // Handle taps on avatar item (but not avatar-circle) for menu
         function handleAvatarItemTouch(e) {
-          // Don't handle if tapping directly on menu button or dropdown
-          if (e.target.closest('.avatar-menu-btn') || e.target.closest('.dropdown')) {
+          // Don't handle if tapping directly on menu button, dropdown, or avatar-circle
+          if (e.target.closest('.avatar-menu-btn') || 
+              e.target.closest('.dropdown') || 
+              e.target.closest('.avatar-circle')) {
             return;
           }
           
@@ -389,18 +391,23 @@
           if (!hasMoved && touchDuration < 300) {
             e.preventDefault();
             
-            // If menu button is not visible, show it
-            if (!avatarItem.classList.contains('menu-visible')) {
-              // Hide all other menu buttons first
-              document.querySelectorAll('.avatar-item.menu-visible').forEach(item => {
-                item.classList.remove('menu-visible');
-              });
-              // Show this menu button
-              avatarItem.classList.add('menu-visible');
-            } else {
-              // Menu button is visible, so open chat
-              openChat(avatarId);
-            }
+            // Hide all other menu buttons first
+            document.querySelectorAll('.avatar-item.menu-visible').forEach(item => {
+              item.classList.remove('menu-visible');
+            });
+            // Show this menu button
+            avatarItem.classList.add('menu-visible');
+          }
+        }
+
+        // Handle taps on avatar-circle for immediate chat entry
+        function handleAvatarCircleTouch(e) {
+          const touchDuration = Date.now() - touchStartTime;
+          
+          // Only proceed if it was a quick tap without movement
+          if (!hasMoved && touchDuration < 300) {
+            e.preventDefault();
+            openChat(avatarId);
           }
         }
         
@@ -423,8 +430,11 @@
           }
         });
         
-        // Handle touch end on avatar item
+        // Handle touch end on avatar item (for menu)
         avatarItem.addEventListener('touchend', handleAvatarItemTouch);
+        
+        // Handle touch end on avatar circle (for immediate chat entry)
+        avatarCircle.addEventListener('touchend', handleAvatarCircleTouch);
         
         // Mouse click for desktop - keep simple, direct to chat
         avatarCircle.addEventListener('click', (e) => {
