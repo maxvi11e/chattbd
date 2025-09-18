@@ -84,14 +84,14 @@
     .input-container{display:flex; align-items:center; gap:11.2px; max-width:800px; width:100%;}
     .heroInput{display:flex; align-items:center; flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
     .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
-    .heroInput input::placeholder { color:#fff; opacity:1; }
+    .heroInput input::placeholder { color:#a8a8a8; opacity:1; }
     .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer;}
     .circleBtn:hover{background:rgba(255,255,255,0.1);}
     .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
     
     /* Generate Persona Button Styles */
-    #startBtn{background:#fff; border:1px solid #ddd; display:flex; align-items:center; justify-content:center;}
-    #startBtn:hover{background:#f5f5f5;}
+    #startBtn{background:#fff; border:0px solid #ddd; display:flex; align-items:center; justify-content:center;}
+    #startBtn:hover{background:#acacac;}
     #startBtn img{width:40px; height:40px; filter:invert(1); display:block; margin:0; padding:0; border:0;}
   </style>
 </head>
@@ -131,7 +131,7 @@
           <div id="safetyMsg" style="display:none; color:#ff5252; position:absolute; top:-40px; left:50%; transform:translateX(-50%); text-align:center; font-weight:500; pointer-events:none; z-index:10; width:max-content; max-width:90vw;"></div>
           
           <label class="heroInput" aria-label="Persona prompt" style="flex: 1;">
-            <input id="persona" type="text" placeholder="Describe the personality, appearance, or character of your Bot" data-short-placeholder="Describe your bot!" />
+            <input id="persona" type="text" placeholder="Describe the personality, appearance, or character of the Bot" data-short-placeholder="Describe the bot!" />
           </label>
           <button id="startBtn" class="circleBtn" title="Generate persona">
             <img src="images/creator_icon.png" alt="Generate" />
@@ -148,7 +148,7 @@
         <!-- Advanced Options Panel -->
         <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column;">
           <label class="heroInput" aria-label="Bot name" style="margin-bottom: 16px; flex: none;">
-            <input id="botName" type="text" placeholder="Give your bot a name" />
+            <input id="botName" type="text" placeholder="Give the bot a name" />
           </label>
           
           <label class="heroInput" aria-label="Art style" style="margin-bottom: 16px; flex: none;">
