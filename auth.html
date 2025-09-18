@@ -279,6 +279,7 @@
 
     // Sign up handler
     signupBtn.addEventListener("click", async () => {
+      console.log('Signup button clicked!');
       const username = signupUsernameInput.value.trim();
       const email = signupEmailInput.value.trim();
       const password = signupPasswordInput.value;
@@ -300,11 +301,13 @@
         signupBtn.disabled = true;
 
         console.log('Starting sign up process for:', email);
+        console.log('Username for signup:', username);
         
         // Sign out if there's an existing session
         await supabase.auth.signOut();
 
         // Create auth user with auto-confirm
+        console.log('About to call supabase.auth.signUp with username:', username);
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -321,6 +324,8 @@
           console.error('Sign up error:', error);
           throw error;
         }
+        
+        console.log('Sign up response data:', data);
 
         console.log('Sign up successful, attempting immediate sign in');
 
@@ -366,7 +371,12 @@
         window.location.href = 'index.html';
         
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Signup process error:', error);
+        console.error('Error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
         alert(error.message);
       } finally {
         signupBtn.textContent = 'Create new account';
