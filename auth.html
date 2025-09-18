@@ -199,6 +199,9 @@
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+    // Flag to prevent automatic redirect during signup
+    let isSigningUp = false;
+
     // Check if already authenticated
     async function checkExistingAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -297,6 +300,7 @@
       }
 
       try {
+        isSigningUp = true;
         signupBtn.textContent = 'Creating account...';
         signupBtn.disabled = true;
 
@@ -367,7 +371,9 @@
           }
         }
 
-        // Redirect to main app
+        // Reset flag and redirect to main app
+        isSigningUp = false;
+        console.log('Signup process complete, redirecting to index.html');
         window.location.href = 'index.html';
         
       } catch (error) {
@@ -379,6 +385,7 @@
         });
         alert(error.message);
       } finally {
+        isSigningUp = false;
         signupBtn.textContent = 'Create new account';
         signupBtn.disabled = false;
       }
@@ -407,7 +414,7 @@
 
     // Watch auth state changes
     supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
+      if (session?.user && !isSigningUp) {
         console.log("Signed in as", session.user.email);
         window.location.href = 'index.html';
       }
