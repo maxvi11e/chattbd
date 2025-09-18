@@ -283,6 +283,8 @@
       const email = signupEmailInput.value.trim();
       const password = signupPasswordInput.value;
       
+      console.log('Signup form values - Username:', username, 'Email:', email, 'Password length:', password.length);
+      
       if (!username || !email || !password) {
         alert('Please fill in all fields');
         return;
@@ -337,17 +339,26 @@
 
         // Create profile for new user
         if (data.user) {
+          console.log('Creating profile for user:', data.user.id, 'with username:', username);
+          console.log('Username type:', typeof username, 'Username length:', username?.length);
+          
+          const profileData = { 
+            id: data.user.id,
+            display_name: username,
+            created_at: new Date().toISOString()
+          };
+          
+          console.log('Profile data to insert:', profileData);
+          
           const { error: profileError } = await supabase
             .from('profiles')
-            .insert({ 
-              id: data.user.id,
-              display_name: username,
-              created_at: new Date().toISOString()
-            });
+            .insert(profileData);
             
           if (profileError) {
             console.error('Error creating profile:', profileError);
             // Don't throw here, profile creation failure shouldn't block auth
+          } else {
+            console.log('Profile created successfully');
           }
         }
 
