@@ -187,6 +187,11 @@
         <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
         <button id="signup-btn" class="auth-btn secondary">Create new account</button>
       </div>
+      
+      <!-- Debug: Clear Session Button -->
+      <div style="margin-top: 20px; text-align: center;">
+        <button id="clear-session-btn" style="background: #ff5252; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">Clear Session (Debug)</button>
+      </div>
     </div>
   </div>
   
@@ -206,8 +211,10 @@
     async function checkExistingAuth() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        console.log("Already authenticated, redirecting to main app");
+        console.log("Already authenticated as:", session.user.email, "redirecting to main app");
         window.location.href = 'index.html';
+      } else {
+        console.log("No existing session found");
       }
     }
     checkExistingAuth();
@@ -222,6 +229,15 @@
     const signupBtn = document.getElementById("signup-btn");
     const toggleSignup = document.getElementById("toggle-signup");
     const signupSection = document.getElementById("signup-section");
+    const clearSessionBtn = document.getElementById("clear-session-btn");
+
+    // Clear session handler (for debugging)
+    clearSessionBtn.addEventListener("click", async () => {
+      console.log("Manually clearing session...");
+      await supabase.auth.signOut();
+      console.log("Session cleared, reloading page...");
+      window.location.reload();
+    });
 
     // Toggle signup section
     const signinSection = document.getElementById("signin-section");
@@ -361,7 +377,9 @@
           
           const { error: profileError } = await supabase
             .from('profiles')
-            .insert(profileData);
+            .upsert(profileData, { 
+              onConflict: 'id'
+            });
             
           if (profileError) {
             console.error('Error creating profile:', profileError);
