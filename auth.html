@@ -187,11 +187,6 @@
         <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
         <button id="signup-btn" class="auth-btn secondary">Create new account</button>
       </div>
-      
-      <!-- Debug: Clear Session Button -->
-      <div style="margin-top: 20px; text-align: center;">
-        <button id="clear-session-btn" style="background: #ff5252; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 12px;">Clear Session (Debug)</button>
-      </div>
     </div>
   </div>
   
@@ -229,15 +224,6 @@
     const signupBtn = document.getElementById("signup-btn");
     const toggleSignup = document.getElementById("toggle-signup");
     const signupSection = document.getElementById("signup-section");
-    const clearSessionBtn = document.getElementById("clear-session-btn");
-
-    // Clear session handler (for debugging)
-    clearSessionBtn.addEventListener("click", async () => {
-      console.log("Manually clearing session...");
-      await supabase.auth.signOut();
-      console.log("Session cleared, reloading page...");
-      window.location.reload();
-    });
 
     // Toggle signup section
     const signinSection = document.getElementById("signin-section");
