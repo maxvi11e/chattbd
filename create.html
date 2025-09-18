@@ -88,6 +88,11 @@
     .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer;}
     .circleBtn:hover{background:rgba(255,255,255,0.1);}
     .circleBtn svg{width:33.6px; height:33.6px; fill:var(--ink)}
+    
+    /* Generate Persona Button Styles */
+    #startBtn{background:#fff; border:1px solid #ddd; display:flex; align-items:center; justify-content:center;}
+    #startBtn:hover{background:#f5f5f5;}
+    #startBtn img{width:40px; height:40px; filter:invert(1); display:block; margin:0; padding:0; border:0;}
   </style>
 </head>
 
@@ -129,7 +134,7 @@
             <input id="persona" type="text" placeholder="Describe the personality, appearance, or character of your Bot" data-short-placeholder="Describe your bot!" />
           </label>
           <button id="startBtn" class="circleBtn" title="Generate persona">
-            <img src="images/creator_icon.png" alt="Generate" style="width: 32px; height: 32px;" />
+            <img src="images/creator_icon.png" alt="Generate" />
           </button>
         </div>
         
