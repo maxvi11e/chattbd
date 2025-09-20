@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build a Bot — Billing</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <style>
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#999;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+    .dashboard{padding:0; min-height:100vh;}
+    
+    /* Top Navigation */
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 48px 0px 48px;}
+    .nav-left{display:flex; align-items:center; gap:24px;}
+    .nav-logo{height:48px; width:auto;}
+    .nav-icon{height:32px; width:auto; transition:transform 0.2s ease; cursor:pointer; opacity:1;}
+    .nav-icon:hover{transform:scale(1.1);}
+    .nav-right{display:flex; gap:16px; align-items:center;}
+    .user-email{color:var(--ink); font-size:16px;}
+    .logout-btn{padding:8px; border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;}
+    .logout-btn:hover{background:rgba(255,255,255,0.1);}
+    .logout-btn img{width:36px; height:36px;}
+
+    /* Main Content */
+    .main-content{padding:40px; max-width:1000px; margin:0 auto;}
+    .page-header{text-align:center; margin-bottom:48px;}
+    .page-title{font-size:32px; font-weight:600; margin:0 0 16px 0;}
+    .page-subtitle{color:var(--muted); font-size:18px; margin:0;}
+
+    /* Current Plan Card */
+    .current-plan{background:rgba(255,255,255,0.05); border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; margin-bottom:40px; text-align:center;}
+    .plan-name{font-size:28px; font-weight:bold; margin:0 0 8px 0; color:var(--ink);}
+    .plan-price{font-size:24px; color:var(--muted); margin:0 0 16px 0;}
+    .plan-usage{font-size:16px; color:var(--muted); margin:0 0 24px 0;}
+    .usage-bar{width:100%; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; overflow:hidden; margin:16px 0;}
+    .usage-fill{height:100%; background:var(--ink); transition:width 0.3s ease;}
+
+    /* Available Plans */
+    .plans-section{margin-bottom:48px;}
+    .section-title{font-size:24px; font-weight:600; margin:0 0 24px 0; text-align:center;}
+    .plans-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px;}
+    
+    .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg);}
+    .plan-card.recommended{border-color:#2196F3; background:rgba(33, 150, 243, 0.1);}
+    .plan-card.current{border-color:#4CAF50; background:rgba(76, 175, 80, 0.1); opacity:0.7;}
+    
+    .plan-card.recommended::before{content:"Most Popular"; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#2196F3; color:white; padding:4px 16px; border-radius:12px; font-size:12px; font-weight:bold;}
+    .plan-card.current::before{content:"Current Plan"; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#4CAF50; color:white; padding:4px 16px; border-radius:12px; font-size:12px; font-weight:bold;}
+    
+    .plan-card h3{font-size:24px; font-weight:bold; margin:0 0 8px 0;}
+    .plan-card .price{font-size:32px; font-weight:bold; margin:0 0 16px 0;}
+    .plan-card .description{color:var(--muted); font-size:14px; margin:0 0 24px 0;}
+    .plan-card .features{list-style:none; padding:0; margin:0 0 32px 0;}
+    .plan-card .features li{font-size:14px; margin:12px 0; padding-left:20px; position:relative;}
+    .plan-card .features li::before{content:"✓"; color:#4CAF50; font-weight:bold; position:absolute; left:0;}
+    
+    .plan-button{background:var(--ink); color:var(--bg); border:none; padding:16px 32px; border-radius:var(--radius-md); font-size:16px; font-weight:bold; cursor:pointer; width:100%; transition:opacity 0.2s ease;}
+    .plan-button:hover:not(:disabled){opacity:0.8;}
+    .plan-button:disabled{background:var(--muted); cursor:not-allowed;}
+    .plan-button.current{background:#4CAF50; color:white;}
+
+    /* Billing History */
+    .billing-history{margin-top:48px;}
+    .history-table{width:100%; border-collapse:collapse; margin-top:24px;}
+    .history-table th, .history-table td{padding:16px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.1);}
+    .history-table th{color:var(--ink); font-weight:600;}
+    .history-table td{color:var(--muted);}
+    .status-badge{padding:4px 12px; border-radius:16px; font-size:12px; font-weight:bold;}
+    .status-paid{background:#4CAF50; color:white;}
+    .status-pending{background:#ff9800; color:white;}
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .top-nav{padding:12px 16px 0px 16px;}
+      .main-content{padding:20px 16px;}
+      .plans-grid{grid-template-columns:1fr;}
+      .current-plan{padding:24px 16px;}
+      .plan-card{padding:24px 16px;}
+      
+      .history-table{font-size:14px;}
+      .history-table th, .history-table td{padding:12px 8px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="screen dashboard">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <div class="nav-left">
+        <img src="images/favicon.png" alt="Build a Bot Logo" class="nav-logo">
+        <a href="index.html">
+          <img src="images/library_icon.png" alt="Bot Library" class="nav-icon" title="Bot library">
+        </a>
+        <a href="#" id="chatNavIcon">
+          <img src="images/chat_icon.png" alt="Chat" class="nav-icon" title="Chat with latest bot">
+        </a>
+      </div>
+      <div class="nav-right">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn" title="Sign out">
+          <img src="images/logout_icon.png" alt="Sign out" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <h1 class="page-title">Billing & Subscription</h1>
+        <p class="page-subtitle">Manage your subscription and billing preferences</p>
+      </div>
+
+      <!-- Current Plan -->
+      <div class="current-plan" id="currentPlan">
+        <h2 class="plan-name" id="currentPlanName">Free Plan</h2>
+        <div class="plan-price" id="currentPlanPrice">Free</div>
+        <div class="plan-usage" id="currentPlanUsage">
+          <span id="botCount">0</span> of <span id="botLimit">1</span> bots created
+        </div>
+        <div class="usage-bar">
+          <div class="usage-fill" id="usageFill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Available Plans -->
+      <div class="plans-section">
+        <h2 class="section-title">Choose Your Plan</h2>
+        <div class="plans-grid" id="plansGrid">
+          <!-- Plans will be populated here -->
+        </div>
+      </div>
+
+      <!-- Billing History -->
+      <div class="billing-history">
+        <h2 class="section-title">Billing History</h2>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="billingHistory">
+            <tr>
+              <td colspan="4" style="text-align:center; color:var(--muted); padding:40px;">
+                No billing history available
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+  
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5ODM5NDEsImV4cCI6MjA1MDU1OTk0MX0.t6VCKhWKzTYZQq6oNDzXjwzDW4-gVtowkTkLRmKpbqs";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+    // Check authentication and redirect if needed
+    async function checkAuthAndRedirect() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'auth.html';
+        return false;
+      }
+      console.log("User authenticated:", session.user.email);
+      
+      // Load and display username from profiles table
+      await loadUserProfile(session.user);
+      return true;
+    }
+
+    // Load user profile and display username
+    async function loadUserProfile(user) {
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+          document.getElementById('userEmail').textContent = user.email;
+        } else {
+          document.getElementById('userEmail').textContent = profile?.display_name || user.email;
+        }
+      } catch (error) {
+        console.error('Error in loadUserProfile:', error);
+        document.getElementById('userEmail').textContent = user.email;
+      }
+    }
+
+    // Load and display subscription information
+    async function loadSubscriptionInfo() {
+      try {
+        const subscriptionInfo = await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
+        const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+        
+        // Update current plan info
+        document.getElementById('currentPlanName').textContent = subscriptionInfo.plan_name;
+        document.getElementById('currentPlanPrice').textContent = 
+          window.FreemiumUtils.formatPrice(
+            plans.find(p => p.id === subscriptionInfo.plan_id)?.price_cents || 0,
+            plans.find(p => p.id === subscriptionInfo.plan_id)?.billing_interval || 'one_time'
+          );
+        
+        // Update usage info
+        document.getElementById('botCount').textContent = subscriptionInfo.current_bot_count;
+        document.getElementById('botLimit').textContent = subscriptionInfo.bot_limit || 'unlimited';
+        
+        // Update usage bar
+        if (subscriptionInfo.bot_limit) {
+          const percentage = (subscriptionInfo.current_bot_count / subscriptionInfo.bot_limit) * 100;
+          document.getElementById('usageFill').style.width = Math.min(percentage, 100) + '%';
+        } else {
+          document.getElementById('usageFill').style.width = '100%';
+          document.getElementById('usageFill').style.background = '#4CAF50';
+        }
+        
+        // Populate plans grid
+        const plansGrid = document.getElementById('plansGrid');
+        plansGrid.innerHTML = plans.map(plan => {
+          const isCurrent = plan.id === subscriptionInfo.plan_id;
+          const isRecommended = plan.id === 'starter';
+          
+          return `
+            <div class="plan-card ${isCurrent ? 'current' : ''} ${isRecommended ? 'recommended' : ''}">
+              <h3>${plan.name}</h3>
+              <div class="price">${window.FreemiumUtils.formatPrice(plan.price_cents, plan.billing_interval)}</div>
+              <p class="description">${plan.description}</p>
+              <ul class="features">
+                ${(plan.features || []).map(feature => `<li>${feature}</li>`).join('')}
+              </ul>
+              <button class="plan-button ${isCurrent ? 'current' : ''}" 
+                      data-plan-id="${plan.id}" 
+                      ${isCurrent ? 'disabled' : ''}>
+                ${isCurrent ? 'Current Plan' : plan.price_cents === 0 ? 'Downgrade' : 'Upgrade'}
+              </button>
+            </div>
+          `;
+        }).join('');
+        
+        // Add event listeners to plan buttons
+        plansGrid.querySelectorAll('.plan-button:not(:disabled)').forEach(button => {
+          button.addEventListener('click', async () => {
+            const planId = button.dataset.planId;
+            const plan = plans.find(p => p.id === planId);
+            
+            if (plan && plan.price_cents > 0) {
+              await handlePaidPlanUpgrade(plan);
+            } else if (plan && plan.price_cents === 0) {
+              await handleFreePlanDowngrade(plan);
+            }
+          });
+        });
+        
+        return subscriptionInfo;
+      } catch (error) {
+        console.error('Error loading subscription info:', error);
+      }
+    }
+
+    // Handle upgrade to paid plan
+    async function handlePaidPlanUpgrade(plan) {
+      // TODO: Implement Stripe Checkout
+      alert(`Upgrading to ${plan.name} for ${window.FreemiumUtils.formatPrice(plan.price_cents, plan.billing_interval)} - Stripe integration coming soon!`);
+    }
+
+    // Handle downgrade to free plan
+    async function handleFreePlanDowngrade(plan) {
+      const confirm = window.confirm(
+        `Are you sure you want to downgrade to the ${plan.name}? You'll be limited to ${plan.bot_limit} bot(s).`
+      );
+      
+      if (confirm) {
+        // TODO: Implement downgrade logic
+        alert('Downgrade functionality coming soon!');
+      }
+    }
+
+    // Initialize the page
+    async function init() {
+      const isAuthenticated = await checkAuthAndRedirect();
+      if (!isAuthenticated) return;
+
+      // Load subscription info
+      await loadSubscriptionInfo();
+
+      // Setup event handlers
+      const logoutBtn = document.getElementById("logoutBtn");
+      const chatNavIcon = document.getElementById("chatNavIcon");
+
+      // Sign out handler
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'auth.html';
+      });
+
+      // Chat navigation handler
+      chatNavIcon.addEventListener("click", (e) => {
+        e.preventDefault();
+        const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
+        if (lastAvatarId) {
+          window.location.href = `chat.html?avatar=${lastAvatarId}`;
+        } else {
+          alert('Please select an avatar to chat with first!');
+        }
+      });
+
+      // Watch auth state changes
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.href = 'auth.html';
+        }
+      });
+    }
+
+    // Start the app
+    init();
+  </script>
+</body>
+</html>

@@ -3,7 +3,16 @@
 <head>
     <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Build a Bot — Create</title>
+  <title>Build a Bot — Crea  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+  
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5ODM5NDEsImV4cCI6MjA1MDU1OTk0MX0.t6VCKhWKzTYZQq6oNDzXjwzDW4-gVtowkTkLRmKpbqs";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);le>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <style>
   /* Advanced Panel Styling - Match input-container exactly */
@@ -112,6 +121,9 @@
       </div>
       <div class="nav-right">
         <span id="userEmail" class="user-email"></span>
+        <a href="billing.html" class="nav-icon" title="Billing & Subscription">
+          <img src="images/gear_icon.png" alt="Billing" style="width:32px; height:32px;">
+        </a>
         <button id="logoutBtn" class="logout-btn" title="Sign out">
           <img src="images/logout_icon.png" alt="Sign out" />
         </button>
@@ -288,6 +300,15 @@
       async function start(){
         const p = persona.value.trim(); 
         if(!p) return;
+
+        // Check if user can create a new bot (freemium limits)
+        const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+        if (!canCreateResult.canCreate) {
+          // Show upgrade modal
+          const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+          await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+          return;
+        }
 
         // Get values from advanced panel
         const botName = document.getElementById('botName').value.trim();

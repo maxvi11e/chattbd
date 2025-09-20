@@ -3,7 +3,16 @@
     .top-nav{display:flex; justify-content:space-between; align-items:center; padding:12px 48px 0px 48px;}
     .nav-left{display:flex; align-items:center; gap:24px;}en">
 <head>
-  <meta charset="utf-8" />
+  <meta ch  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+  
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5ODM5NDEsImV4cCI6MjA1MDU1OTk0MX0.t6VCKhWKzTYZQq6oNDzXjwzDW4-gVtowkTkLRmKpbqs";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Build a Bot — Dashboard</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
@@ -34,6 +43,9 @@
     .nav-icon:hover{transform:scale(1.1);}
     .nav-right{display:flex; gap:16px; align-items:center;}
     .user-email{color:var(--ink); font-size:16px;}
+    .subscription-status{color:var(--muted); font-size:14px; padding:4px 12px; border:1px solid var(--muted); border-radius:16px; cursor:pointer; transition:all 0.2s ease;}
+    .subscription-status:hover{background:rgba(255,255,255,0.1); color:var(--ink);}
+    .subscription-status.unlimited{color:#4CAF50; border-color:#4CAF50;}
     .logout-btn{padding:8px; border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;}
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
     .logout-btn img{width:36px; height:36px;}
@@ -195,7 +207,11 @@
 
       </div>
       <div class="nav-right">
+        <div id="subscriptionStatus" class="subscription-status" title="Click to manage subscription">Free Plan</div>
         <span id="userEmail" class="user-email"></span>
+        <a href="billing.html" class="nav-icon" title="Billing & Subscription">
+          <img src="images/gear_icon.png" alt="Billing" style="width:32px; height:32px;">
+        </a>
         <button id="logoutBtn" class="logout-btn" title="Sign out">
           <img src="images/logout_icon.png" alt="Sign out" />
         </button>
@@ -208,6 +224,14 @@
       <div class="page-header">
         <img src="images/library_icon.png" alt="Library" class="page-icon">
         <h1 class="page-title">Bot Library</h1>
+      </div>
+      
+      <!-- Usage Stats -->
+      <div class="usage-stats" id="usageStats" style="text-align:center; margin-bottom:32px; padding:16px; background:rgba(255,255,255,0.05); border-radius:var(--radius-md); max-width:400px; margin-left:auto; margin-right:auto;">
+        <p style="margin:0; color:var(--muted); font-size:14px;"><span id="botCount">0</span> of <span id="botLimit">1</span> bots created</p>
+        <div style="width:100%; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; margin:8px 0;">
+          <div id="usageBar" style="height:100%; background:var(--ink); border-radius:2px; width:0%; transition:width 0.3s ease;"></div>
+        </div>
       </div>
 
       <!-- Avatar Grid -->
@@ -266,16 +290,63 @@
       }
     }
 
+    // Load and display subscription info
+    async function loadSubscriptionInfo() {
+      try {
+        const subscriptionInfo = await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
+        
+        // Update subscription status in nav
+        const subscriptionStatus = document.getElementById('subscriptionStatus');
+        subscriptionStatus.textContent = subscriptionInfo.plan_name;
+        if (subscriptionInfo.plan_id === 'unlimited') {
+          subscriptionStatus.classList.add('unlimited');
+        }
+        
+        // Update usage stats
+        const botCount = document.getElementById('botCount');
+        const botLimit = document.getElementById('botLimit');
+        const usageBar = document.getElementById('usageBar');
+        
+        botCount.textContent = subscriptionInfo.current_bot_count;
+        botLimit.textContent = subscriptionInfo.bot_limit || 'unlimited';
+        
+        // Update usage bar
+        if (subscriptionInfo.bot_limit) {
+          const percentage = (subscriptionInfo.current_bot_count / subscriptionInfo.bot_limit) * 100;
+          usageBar.style.width = Math.min(percentage, 100) + '%';
+          
+          // Change color if near limit
+          if (percentage >= 80) {
+            usageBar.style.background = '#ff9800';
+          } else if (percentage >= 100) {
+            usageBar.style.background = '#f44336';
+          }
+        } else {
+          usageBar.style.width = '100%';
+          usageBar.style.background = '#4CAF50';
+        }
+        
+        return subscriptionInfo;
+      } catch (error) {
+        console.error('Error loading subscription info:', error);
+        return null;
+      }
+    }
+
     // Initialize auth check
     const isAuthenticated = await checkAuthAndRedirect();
     if (!isAuthenticated) {
       // Don't initialize the rest of the app if not authenticated
     } else {
       // Continue with app initialization only if authenticated
+      
+      // Load subscription info
+      const subscriptionInfo = await loadSubscriptionInfo();
 
       const logoutBtn = document.getElementById("logoutBtn");
       const createBtn = document.getElementById("createBtn");
       const avatarsGrid = document.getElementById("avatarsGrid");
+      const subscriptionStatus = document.getElementById("subscriptionStatus");
 
       // Sign out handler
       logoutBtn.addEventListener("click", async () => {
@@ -283,9 +354,22 @@
         window.location.href = 'auth.html';
       });
 
-      // Create new avatar handler
-      createBtn.addEventListener("click", () => {
-        window.location.href = 'create.html';
+      // Create new avatar handler with limit check
+      createBtn.addEventListener("click", async () => {
+        const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+        if (!canCreateResult.canCreate) {
+          // Show upgrade modal
+          const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+          await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+        } else {
+          window.location.href = 'create.html';
+        }
+      });
+      
+      // Subscription status click handler
+      subscriptionStatus.addEventListener("click", async () => {
+        const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+        await window.FreemiumUtils.showUpgradeModal(subscriptionInfo, plans);
       });
 
       // Chat navigation handler
