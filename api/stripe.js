@@ -182,7 +182,7 @@ async function handleWebhook(req, res) {
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     // Initialize Stripe and verify webhook
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     
     let event;
     try {
@@ -216,8 +216,9 @@ async function handleWebhook(req, res) {
     return res.status(200).json({ received: true });
 
   } catch (error) {
-    console.error('Webhook error:', error);
-    return res.status(500).json({ error: 'Webhook handling failed' });
+    console.error('Webhook error details:', error.message);
+    console.error('Webhook error stack:', error.stack);
+    return res.status(500).json({ error: 'Webhook handling failed', details: error.message });
   }
 }
 
