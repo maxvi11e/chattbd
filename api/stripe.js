@@ -1,6 +1,8 @@
 // Stripe Integration for Build a Bot
 // This handles payment processing and webhook events
 
+import Stripe from 'stripe';
+
 export default async function handler(req, res) {
   // Handle different Stripe operations based on the request
   const { method } = req;
@@ -43,12 +45,20 @@ async function createCheckoutSession(req, res) {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     const { planId, userId } = body;
 
+    console.log('Received request:', { planId, userId });
+
     if (!planId || !userId) {
       return res.status(400).json({ error: 'Missing planId or userId' });
     }
 
+    // Check for required environment variables
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY not found in environment variables');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     // Initialize Stripe
-    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     // Get plan details from database
     const planDetails = getPlanDetails(planId);
@@ -74,8 +84,8 @@ async function createCheckoutSession(req, res) {
         quantity: 1,
       }],
       mode: planDetails.billing_interval === 'monthly' ? 'subscription' : 'payment',
-      success_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/billing?canceled=true`,
+      success_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/success.html?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/cancel.html`,
       client_reference_id: userId,
       metadata: {
         planId: planId,
@@ -87,7 +97,11 @@ async function createCheckoutSession(req, res) {
 
   } catch (error) {
     console.error('Error creating checkout session:', error);
-    return res.status(500).json({ error: 'Failed to create checkout session' });
+    console.error('Error details:', error.message);
+    return res.status(500).json({ 
+      error: 'Failed to create checkout session',
+      details: error.message 
+    });
   }
 }
 
