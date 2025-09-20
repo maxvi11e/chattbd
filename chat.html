@@ -1,13 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta c    /* Conversations List */
-    .conversations{flex:1; overflow-y:auto; padding:16px;}
-    .conversations::-webkit-scrollbar{width:12px}
-    .conversations::-webkit-scrollbar-track{background:#000 !important}
-    .conversations::-webkit-scrollbar-thumb{background:var(--stroke); border-radius:999px}
-    .conversations::-webkit-scrollbar-corner{background:#000}
-    .conversations-header{font-size:14px; font-weight:300; font-style:italic; color:#666; margin-bottom:12px; padding-left:32px;}set="utf-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Build a Bot — Chat</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
@@ -268,6 +262,9 @@
     </div>
   </div>
 
+  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+  
   <script type="module">
     // === Supabase Auth ===
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
