@@ -445,61 +445,30 @@ function setupUpgradeModalEvents(modal, plans) {
  * Handle upgrade to a paid plan with Stripe
  */
 async function handlePaidPlanUpgrade(plan) {
+  let button = null;
+  let originalText = '';
+  
   try {
     // Show loading state
-    const button = document.querySelector(`[data-plan-id="${plan.id}"]`);
-    const originalText = button.textContent;
-    button.textContent = 'Loading...';
-    button.disabled = true;
-
-    // Get current user
-    const supabase = window.supabase || await import('https://esm.sh/@supabase/supabase-js@2').then(module => {
-      const { createClient } = module;
-      return createClient(
-        "https://eyptqyzkwcpaillnwmle.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5ODM5NDEsImV4cCI6MjA1MDU1OTk0MX0.t6VCKhWKzTYZQq6oNDzXjwzDW4-gVtowkTkLRmKpbqs"
-      );
-    });
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error('User not authenticated');
+    button = document.querySelector(`[data-plan-id="${plan.id}"]`);
+    if (button) {
+      originalText = button.textContent;
+      button.textContent = 'Loading...';
+      button.disabled = true;
     }
 
-    // Create checkout session
-    const response = await fetch('/api/stripe/create-checkout-session', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        planId: plan.id,
-        userId: user.id
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Failed to create checkout session');
-    }
-
-    if (data.url) {
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
-    } else {
-      // Temporary alert for development
-      alert(`Upgrade to ${plan.name} for ${formatPrice(plan.price_cents, plan.billing_interval)} - Stripe integration in progress!`);
-    }
+    // For now, show a simple upgrade message
+    // TODO: Implement actual Stripe integration
+    alert(`Ready to upgrade to ${plan.name} for ${formatPrice(plan.price_cents, plan.billing_interval)}!\n\nStripe integration will be added next. This would:\n- Create checkout session\n- Process payment  
+- Update your subscription\n- Unlock ${plan.bot_limit || 'unlimited'} bots`);
 
   } catch (error) {
     console.error('Error upgrading plan:', error);
     alert('Failed to start upgrade process. Please try again.');
   } finally {
     // Reset button state
-    const button = document.querySelector(`[data-plan-id="${plan.id}"]`);
-    if (button) {
-      button.textContent = originalText || 'Upgrade';
+    if (button && originalText) {
+      button.textContent = originalText;
       button.disabled = false;
     }
   }
