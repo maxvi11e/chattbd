@@ -281,11 +281,17 @@ async function handleCheckoutCompleted(session) {
     const customerId = session.customer;
     const subscriptionId = session.subscription;
 
+    console.log('=== CHECKOUT COMPLETED DEBUG ===');
     console.log('Checkout completed:', {
       userId,
       planId,
       customerId,
       subscriptionId
+    });
+    console.log('Environment check:', {
+      hasSupabaseUrl: !!process.env.SUPABASE_URL,
+      hasServiceRole: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      supabaseUrl: process.env.SUPABASE_URL?.substring(0, 30) + '...'
     });
 
     // Initialize Supabase with service role key for database updates
@@ -293,6 +299,7 @@ async function handleCheckoutCompleted(session) {
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+    console.log('Supabase client created successfully');
 
     // Calculate period dates
     const now = new Date();
@@ -309,7 +316,17 @@ async function handleCheckoutCompleted(session) {
     }
 
     // Update user_subscriptions table
-    const { error } = await supabase
+    console.log('Attempting database insert with data:', {
+      user_id: userId,
+      plan_id: planId,
+      status: 'active',
+      stripe_customer_id: customerId,
+      stripe_subscription_id: subscriptionId,
+      current_period_start: now.toISOString(),
+      current_period_end: periodEnd.toISOString()
+    });
+
+    const { data, error } = await supabase
       .from('user_subscriptions')
       .insert({
         user_id: userId,
@@ -319,13 +336,15 @@ async function handleCheckoutCompleted(session) {
         stripe_subscription_id: subscriptionId,
         current_period_start: now.toISOString(),
         current_period_end: periodEnd.toISOString()
-      });
+      })
+      .select();
 
     if (error) {
-      console.error('Error updating subscription in database:', error);
+      console.error('Database error details:', JSON.stringify(error, null, 2));
       throw error;
     }
 
+    console.log('Database insert successful:', data);
     console.log('Subscription successfully activated in database');
 
   } catch (error) {
