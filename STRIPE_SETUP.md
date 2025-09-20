@@ -1,6 +1,6 @@
 # Stripe Integration Setup Guide
 
-This guide will help you set up Stripe payment processing for the ChattBD freemium model.
+This guide will help you set up Stripe payment processing for the Build a Bot freemium model.
 
 ## 1. Create a Stripe Account
 
@@ -20,16 +20,16 @@ This guide will help you set up Stripe payment processing for the ChattBD freemi
 ### Starter Plan ($5/month)
 1. Go to **Products** in Stripe Dashboard
 2. Click **Add product**
-3. Name: "ChattBD Starter Plan"
+3. Name: "Build a Bot Starter Plan"
 4. Description: "Create up to 4 bots"
 5. **Pricing**: Recurring, $5.00 USD, Monthly
 6. Copy the **Price ID** (starts with `price_`)
 
-### Unlimited Plan ($9.99/month)  
+### Unlimited Plan ($9/month)  
 1. Click **Add product** again
-2. Name: "ChattBD Unlimited Plan"
+2. Name: "Build a Bot Unlimited Plan"
 3. Description: "Create unlimited bots"
-4. **Pricing**: Recurring, $9.99 USD, Monthly
+4. **Pricing**: Recurring, $9.00 USD, Monthly
 5. Copy the **Price ID** (starts with `price_`)
 
 ## 4. Update Database with Price IDs

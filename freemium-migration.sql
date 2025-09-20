@@ -32,10 +32,11 @@ CREATE TABLE IF NOT EXISTS public.user_subscriptions (
 );
 
 -- 3. Insert default subscription plans
-INSERT INTO public.subscription_plans (id, name, description, price_cents, billing_interval, bot_limit, features) VALUES
-('free', 'Free Plan', 'Create 1 bot for free', 0, 'one_time', 1, '["Basic bot creation", "Chat with your bot"]'::jsonb),
-('starter', 'Starter Plan', 'Create up to 4 bots', 500, 'one_time', 4, '["Create up to 4 bots", "Chat with all your bots", "Priority support"]'::jsonb),
-('unlimited', 'Unlimited Plan', 'Create unlimited bots', 999, 'monthly', NULL, '["Unlimited bot creation", "Priority support", "Advanced customization", "Export conversations"]'::jsonb)
+-- Insert the subscription plans
+INSERT INTO subscription_plans (plan_type, name, description, price_cents, billing_interval, bot_limit, features) VALUES
+('free', 'Free Plan', 'Perfect for trying out our bot builder', 0, NULL, 1, '["1 bot creation", "Basic customization", "Community support"]'::jsonb),
+('starter', 'Starter Plan', 'Great for small projects and personal use', 500, 'monthly', 4, '["Up to 4 bots", "Advanced customization", "Email support", "Export conversations"]'::jsonb),
+('unlimited', 'Unlimited Plan', 'Create unlimited bots', 900, 'monthly', NULL, '["Unlimited bot creation", "Priority support", "Advanced customization", "Export conversations"]'::jsonb)
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   description = EXCLUDED.description,
