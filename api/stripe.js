@@ -62,8 +62,13 @@ async function createCheckoutSession(req, res) {
     const { planId, userId } = body;
 
     console.log('Received request:', { planId, userId });
+    console.log('Environment check:', {
+      hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+      hasSupabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    });
 
     if (!planId || !userId) {
+      console.log('Missing required fields:', { planId: !!planId, userId: !!userId });
       return res.status(400).json({ error: 'Missing planId or userId' });
     }
 
@@ -76,14 +81,23 @@ async function createCheckoutSession(req, res) {
     // Initialize Stripe (using dynamic import for Vercel compatibility)
     const { default: Stripe } = await import('stripe');
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    console.log('Stripe initialized successfully');
 
     // Get plan details from database
     const planDetails = getPlanDetails(planId);
+    console.log('Plan details retrieved:', { planId, planDetails });
+    
     if (!planDetails) {
-      return res.status(400).json({ error: 'Invalid plan' });
+      return res.status(400).json({ error: `Invalid plan: ${planId}` });
     }
 
     // Create Stripe checkout session
+    console.log('Creating Stripe session with config:', {
+      mode: planDetails.billing_interval === 'monthly' ? 'subscription' : 'payment',
+      price_cents: planDetails.price_cents,
+      billing_interval: planDetails.billing_interval
+    });
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -109,6 +123,8 @@ async function createCheckoutSession(req, res) {
         userId: userId,
       }
     });
+
+    console.log('Stripe session created successfully:', session.id);
 
     return res.status(200).json({ url: session.url });
 
