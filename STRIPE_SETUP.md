@@ -17,12 +17,12 @@ This guide will help you set up Stripe payment processing for the Build a Bot fr
 
 ## 3. Create Your Products in Stripe
 
-### Starter Plan ($5/month)
+### Starter Plan ($5 one-time)
 1. Go to **Products** in Stripe Dashboard
 2. Click **Add product**
 3. Name: "Build a Bot Starter Plan"
 4. Description: "Create up to 4 bots"
-5. **Pricing**: Recurring, $5.00 USD, Monthly
+5. **Pricing**: One-time payment, $5.00 USD
 6. Copy the **Price ID** (starts with `price_`)
 
 ### Unlimited Plan ($9/month)  

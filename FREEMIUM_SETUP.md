@@ -6,7 +6,7 @@ This guide explains how to implement the freemium model that has been built for 
 
 ### Pricing Tiers
 - **Free Plan**: 1 bot (always free)
-- **Starter Plan**: Up to 4 bots for $5/month  
+- **Starter Plan**: Up to 4 bots for $5 one-time  
 - **Unlimited Plan**: Unlimited bots for $9/month
 
 ### Features Added
@@ -98,7 +98,7 @@ Edit the plans in `freemium-migration.sql`:
 
 ```sql
 INSERT INTO public.subscription_plans (id, name, description, price_cents, billing_interval, bot_limit) VALUES
-('starter', 'Starter Plan', 'Create up to 4 bots', 500, 'one_time', 4),  -- $5
+('starter', 'Starter Plan', 'Create up to 4 bots', 500, 'one_time', 4),  -- $5 one-time
 ('unlimited', 'Unlimited Plan', 'Unlimited bots', 900, 'monthly', NULL); -- $9.00/month
 ```
 

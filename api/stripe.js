@@ -320,7 +320,7 @@ function getPlanDetails(planId) {
     },
     'starter': {
       name: 'Starter Plan',
-      description: 'Create up to 4 bots',
+      description: 'Great for small projects and personal use',
       price_cents: 500,
       billing_interval: 'one_time',
       bot_limit: 4
