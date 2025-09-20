@@ -4,7 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Build a Bot — Create</title>
-  <link rel="icon" type="image/png" href="images/favicon.png" />
+     const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    
+    // Make supabase available globally for freemium-utils.js
+    window.supabase = supabase;ink rel="icon" type="image/png" href="images/favicon.png" />
   <style>
   /* Advanced Panel Styling - Match input-container exactly */
   #advancedPanel {

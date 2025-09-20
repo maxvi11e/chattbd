@@ -40,12 +40,12 @@ Update your `subscription_plans` table with the Stripe Price IDs:
 -- Update Starter plan with Stripe Price ID
 UPDATE subscription_plans 
 SET stripe_price_id = 'price_YOUR_STARTER_PRICE_ID_HERE'
-WHERE id = 2;
+WHERE id = 'starter';
 
 -- Update Unlimited plan with Stripe Price ID  
 UPDATE subscription_plans
 SET stripe_price_id = 'price_YOUR_UNLIMITED_PRICE_ID_HERE'
-WHERE id = 3;
+WHERE id = 'unlimited';
 ```
 
 ## 5. Set Environment Variables

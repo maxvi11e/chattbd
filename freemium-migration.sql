@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
   billing_interval text CHECK (billing_interval IN ('one_time', 'monthly', 'yearly')) DEFAULT 'one_time',
   bot_limit integer, -- NULL means unlimited
   features jsonb DEFAULT '[]'::jsonb,
+  stripe_price_id text, -- Stripe Price ID for payment processing
   is_active boolean DEFAULT true,
   created_at timestamp with time zone DEFAULT now()
 );
@@ -33,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.user_subscriptions (
 
 -- 3. Insert default subscription plans
 -- Insert the subscription plans
-INSERT INTO subscription_plans (plan_type, name, description, price_cents, billing_interval, bot_limit, features) VALUES
+INSERT INTO subscription_plans (id, name, description, price_cents, billing_interval, bot_limit, features) VALUES
 ('free', 'Free Plan', 'Perfect for trying out our bot builder', 0, NULL, 1, '["1 bot creation", "Basic customization", "Community support"]'::jsonb),
 ('starter', 'Starter Plan', 'Great for small projects and personal use', 500, 'one_time', 4, '["Up to 4 bots", "Advanced customization", "Email support", "Export conversations"]'::jsonb),
 ('unlimited', 'Unlimited Plan', 'Create unlimited bots', 900, 'monthly', NULL, '["Unlimited bot creation", "Priority support", "Advanced customization", "Export conversations"]'::jsonb)
