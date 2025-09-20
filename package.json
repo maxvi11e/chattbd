@@ -4,6 +4,9 @@
   "description": "Build a Bot - AI Chat Bot Builder",
   "main": "index.html",
   "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "stripe": "^14.15.0",
     "@supabase/supabase-js": "^2.38.4"
