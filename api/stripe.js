@@ -6,6 +6,13 @@ import { createClient } from '@supabase/supabase-js';
 
 // Force fresh deployment for API route recognition
 
+// Disable body parsing for webhooks to get raw body for signature verification
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,7 +39,8 @@ export default async function handler(req, res) {
         }
         
         // Otherwise, parse body and check action
-        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        const rawBody = await getRawBody(req);
+        const body = JSON.parse(rawBody);
         const { action } = body;
         
         if (action === 'create-checkout-session') {
@@ -175,18 +183,36 @@ async function createPortalSession(req, res) {
   }
 }
 
+// Helper function to get raw body from request
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
+    req.on('end', () => {
+      resolve(body);
+    });
+    req.on('error', reject);
+  });
+}
+
 // Handle Stripe webhooks
 async function handleWebhook(req, res) {
   try {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+    // Get raw body for signature verification
+    const rawBody = await getRawBody(req);
+    console.log('Raw body length:', rawBody.length);
+
     // Initialize Stripe and verify webhook
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     
     let event;
     try {
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+      event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
     } catch (err) {
       console.error('Webhook signature verification failed:', err.message);
       return res.status(400).send(`Webhook Error: ${err.message}`);
