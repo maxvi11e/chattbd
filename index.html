@@ -1,18 +1,7 @@
 <!doctype html>
-<html lan    /* Top Navigation */
-    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:12px 48px 0px 48px;}
-    .nav-left{display:flex; align-items:center; gap:24px;}en">
+<html lang="en">
 <head>
-  <meta ch  <!-- Freemium utilities -->
-  <script type="module" src="freemium-utils.js"></script>
-  
-  <script type="module">
-    // === Supabase Auth ===
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ5ODM5NDEsImV4cCI6MjA1MDU1OTk0MX0.t6VCKhWKzTYZQq6oNDzXjwzDW4-gVtowkTkLRmKpbqs";
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);utf-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Build a Bot — Dashboard</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
@@ -247,6 +236,9 @@
     </div>
   </div>
 
+  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+  
   <script type="module">
     // === Supabase Auth ===
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
