@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/stripe.js": {
+      "runtime": "@vercel/node"
+    }
+  }
+}

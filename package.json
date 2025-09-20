@@ -12,9 +12,7 @@
     "@supabase/supabase-js": "^2.38.4"
   },
   "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'No build step required'",
-    "start": "echo 'Static site - no server start needed'"
+    "dev": "vercel dev"
   },
   "keywords": [
     "chatbot",
