@@ -4,6 +4,8 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
+// Trigger redeploy: removing vercel.json for Vercel auto-detection
+
 export default async function handler(req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
