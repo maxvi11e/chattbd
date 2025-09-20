@@ -1,7 +1,9 @@
 // Stripe Integration for Build a Bot
 // This handles payment processing and webhook events
 
-export default async function handler(req, res) {
+const Stripe = require('stripe');
+
+module.exports = async function handler(req, res) {
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -78,8 +80,7 @@ async function createCheckoutSession(req, res) {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Initialize Stripe (using dynamic import for Vercel compatibility)
-    const { default: Stripe } = await import('stripe');
+    // Initialize Stripe
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     console.log('Stripe initialized successfully');
 

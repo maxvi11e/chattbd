@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/stripe.js": {
+    "api/*.js": {
       "runtime": "nodejs18.x"
     }
   }
