@@ -4,7 +4,7 @@
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Trigger redeploy: removing vercel.json for Vercel auto-detection
+// Force fresh deployment for API route recognition
 
 export default async function handler(req, res) {
   // Add CORS headers
