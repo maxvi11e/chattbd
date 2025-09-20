@@ -296,12 +296,25 @@
         if(!p) return;
 
         // Check if user can create a new bot (freemium limits)
-        const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
-        if (!canCreateResult.canCreate) {
-          // Show upgrade modal
-          const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
-          await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
-          return;
+        console.log('Checking if user can create bot...');
+        console.log('FreemiumUtils available:', !!window.FreemiumUtils);
+        
+        if (!window.FreemiumUtils) {
+          console.error('FreemiumUtils not loaded!');
+          // Continue without limits for now
+        } else {
+          const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+          console.log('Can create bot result:', canCreateResult);
+          
+          if (!canCreateResult.canCreate) {
+            console.log('Bot creation blocked - showing upgrade modal');
+            // Show upgrade modal
+            const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+            await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+            return;
+          } else {
+            console.log('Bot creation allowed');
+          }
         }
 
         // Get values from advanced panel
