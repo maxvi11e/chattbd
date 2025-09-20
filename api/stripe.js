@@ -2,6 +2,7 @@
 // This handles payment processing and webhook events
 
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
   // Add CORS headers
@@ -259,7 +260,6 @@ async function handleCheckoutCompleted(session) {
     });
 
     // Initialize Supabase with service role key for database updates
-    const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(
       process.env.SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
