@@ -7,16 +7,24 @@ export default async function handler(req, res) {
 
   switch (method) {
     case 'POST':
-      if (req.url?.includes('/create-checkout-session')) {
-        return await createCheckoutSession(req, res);
-      } else if (req.url?.includes('/webhook')) {
+      // Check if this is a webhook (raw body)
+      if (req.headers['stripe-signature']) {
         return await handleWebhook(req, res);
-      } else if (req.url?.includes('/create-portal-session')) {
+      }
+      
+      // Otherwise, parse body and check action
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const { action } = body;
+      
+      if (action === 'create-checkout-session') {
+        return await createCheckoutSession(req, res);
+      } else if (action === 'create-portal-session') {
         return await createPortalSession(req, res);
       }
       break;
     case 'GET':
-      if (req.url?.includes('/subscription-status')) {
+      const { action: getAction } = req.query;
+      if (getAction === 'subscription-status') {
         return await getSubscriptionStatus(req, res);
       }
       break;
@@ -31,7 +39,9 @@ export default async function handler(req, res) {
 // Create a Stripe Checkout session for subscription upgrade
 async function createCheckoutSession(req, res) {
   try {
-    const { planId, userId } = await req.json();
+    // Parse request body
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const { planId, userId } = body;
 
     if (!planId || !userId) {
       return res.status(400).json({ error: 'Missing planId or userId' });
