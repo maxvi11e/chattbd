@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Build a Bot - AI Chat Bot Builder",
   "main": "index.html",
+  "type": "module",
   "engines": {
     "node": ">=18.0.0"
   },
