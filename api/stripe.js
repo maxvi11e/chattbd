@@ -1,41 +1,57 @@
 // Stripe Integration for Build a Bot
 // This handles payment processing and webhook events
 
-import Stripe from 'stripe';
-
 export default async function handler(req, res) {
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  console.log('API called with method:', req.method);
+  console.log('Request body:', req.body);
+
   // Handle different Stripe operations based on the request
   const { method } = req;
 
-  switch (method) {
-    case 'POST':
-      // Check if this is a webhook (raw body)
-      if (req.headers['stripe-signature']) {
-        return await handleWebhook(req, res);
-      }
-      
-      // Otherwise, parse body and check action
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      const { action } = body;
-      
-      if (action === 'create-checkout-session') {
-        return await createCheckoutSession(req, res);
-      } else if (action === 'create-portal-session') {
-        return await createPortalSession(req, res);
-      }
-      break;
-    case 'GET':
-      const { action: getAction } = req.query;
-      if (getAction === 'subscription-status') {
-        return await getSubscriptionStatus(req, res);
-      }
-      break;
-    default:
-      res.setHeader('Allow', ['POST', 'GET']);
-      return res.status(405).json({ error: 'Method not allowed' });
-  }
+  try {
+    switch (method) {
+      case 'POST':
+        // Check if this is a webhook (raw body)
+        if (req.headers['stripe-signature']) {
+          return await handleWebhook(req, res);
+        }
+        
+        // Otherwise, parse body and check action
+        const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+        const { action } = body;
+        
+        if (action === 'create-checkout-session') {
+          return await createCheckoutSession(req, res);
+        } else if (action === 'create-portal-session') {
+          return await createPortalSession(req, res);
+        }
+        break;
+      case 'GET':
+        const { action: getAction } = req.query;
+        if (getAction === 'subscription-status') {
+          return await getSubscriptionStatus(req, res);
+        }
+        break;
+      default:
+        res.setHeader('Allow', ['POST', 'GET']);
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-  return res.status(404).json({ error: 'Not found' });
+    return res.status(404).json({ error: 'Not found' });
+  } catch (error) {
+    console.error('API handler error:', error);
+    return res.status(500).json({ error: 'Internal server error', details: error.message });
+  }
 }
 
 // Create a Stripe Checkout session for subscription upgrade
@@ -57,7 +73,8 @@ async function createCheckoutSession(req, res) {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Initialize Stripe
+    // Initialize Stripe (using dynamic import for Vercel compatibility)
+    const { default: Stripe } = await import('stripe');
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     // Get plan details from database
