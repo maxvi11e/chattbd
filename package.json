@@ -1,0 +1,24 @@
+{
+  "name": "build-a-bot",
+  "version": "1.0.0",
+  "description": "Build a Bot - AI Chat Bot Builder",
+  "main": "index.html",
+  "type": "module",
+  "dependencies": {
+    "stripe": "^14.15.0",
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "echo 'Static site - no server start needed'"
+  },
+  "keywords": [
+    "chatbot",
+    "ai",
+    "stripe",
+    "supabase"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
