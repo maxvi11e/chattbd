@@ -305,6 +305,11 @@
         } else {
           const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
           console.log('Can create bot result:', canCreateResult);
+          console.log('Subscription info details:', canCreateResult.subscriptionInfo);
+          console.log('Plan ID:', canCreateResult.subscriptionInfo.plan_id);
+          console.log('Current bot count:', canCreateResult.subscriptionInfo.current_bot_count);
+          console.log('Bot limit:', canCreateResult.subscriptionInfo.bot_limit);
+          console.log('Can create bot:', canCreateResult.subscriptionInfo.can_create_bot);
           
           if (!canCreateResult.canCreate) {
             console.log('Bot creation blocked - showing upgrade modal');
@@ -313,7 +318,7 @@
             await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
             return;
           } else {
-            console.log('Bot creation allowed');
+            console.log('Bot creation allowed - this might be wrong!');
           }
         }
 
