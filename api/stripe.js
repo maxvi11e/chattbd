@@ -37,8 +37,8 @@ async function createCheckoutSession(req, res) {
       return res.status(400).json({ error: 'Missing planId or userId' });
     }
 
-    // TODO: Add Stripe initialization
-    // const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    // Initialize Stripe
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
     // Get plan details from database
     const planDetails = getPlanDetails(planId);
@@ -46,8 +46,7 @@ async function createCheckoutSession(req, res) {
       return res.status(400).json({ error: 'Invalid plan' });
     }
 
-    // TODO: Create Stripe checkout session
-    /*
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{
@@ -65,8 +64,8 @@ async function createCheckoutSession(req, res) {
         quantity: 1,
       }],
       mode: planDetails.billing_interval === 'monthly' ? 'subscription' : 'payment',
-      success_url: `${process.env.FRONTEND_URL}/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.FRONTEND_URL}/billing?canceled=true`,
+      success_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.FRONTEND_URL || 'https://www.buildabot.chat'}/billing?canceled=true`,
       client_reference_id: userId,
       metadata: {
         planId: planId,
@@ -75,15 +74,6 @@ async function createCheckoutSession(req, res) {
     });
 
     return res.status(200).json({ url: session.url });
-    */
-
-    // Temporary response for development
-    return res.status(200).json({ 
-      message: 'Stripe integration not yet implemented',
-      planId,
-      userId,
-      planDetails
-    });
 
   } catch (error) {
     console.error('Error creating checkout session:', error);
@@ -130,8 +120,7 @@ async function handleWebhook(req, res) {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-    // TODO: Add Stripe webhook verification
-    /*
+    // Initialize Stripe and verify webhook
     const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
     
     let event;
@@ -162,7 +151,6 @@ async function handleWebhook(req, res) {
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
-    */
 
     return res.status(200).json({ received: true });
 
@@ -205,7 +193,6 @@ async function handleCheckoutCompleted(session) {
     const customerId = session.customer;
     const subscriptionId = session.subscription;
 
-    // TODO: Update user subscription in database
     console.log('Checkout completed:', {
       userId,
       planId,
@@ -213,9 +200,29 @@ async function handleCheckoutCompleted(session) {
       subscriptionId
     });
 
+    // Initialize Supabase with service role key for database updates
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Calculate period dates
+    const now = new Date();
+    const planDetails = getPlanDetails(planId);
+    let periodEnd = now;
+    
+    if (planDetails.billing_interval === 'monthly') {
+      periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days
+    } else if (planDetails.billing_interval === 'yearly') {
+      periodEnd = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 365 days
+    } else {
+      // One-time payment, set a far future date
+      periodEnd = new Date('2099-12-31');
+    }
+
     // Update user_subscriptions table
-    /*
-    await supabase
+    const { error } = await supabase
       .from('user_subscriptions')
       .insert({
         user_id: userId,
@@ -223,10 +230,16 @@ async function handleCheckoutCompleted(session) {
         status: 'active',
         stripe_customer_id: customerId,
         stripe_subscription_id: subscriptionId,
-        current_period_start: new Date(),
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+        current_period_start: now.toISOString(),
+        current_period_end: periodEnd.toISOString()
       });
-    */
+
+    if (error) {
+      console.error('Error updating subscription in database:', error);
+      throw error;
+    }
+
+    console.log('Subscription successfully activated in database');
 
   } catch (error) {
     console.error('Error handling checkout completion:', error);

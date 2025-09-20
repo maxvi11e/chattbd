@@ -457,14 +457,47 @@ async function handlePaidPlanUpgrade(plan) {
       button.disabled = true;
     }
 
-    // For now, show a simple upgrade message
-    // TODO: Implement actual Stripe integration
-    alert(`Ready to upgrade to ${plan.name} for ${formatPrice(plan.price_cents, plan.billing_interval)}!\n\nStripe integration will be added next. This would:\n- Create checkout session\n- Process payment  
-- Update your subscription\n- Unlock ${plan.bot_limit || 'unlimited'} bots`);
+    // Get current user from the global supabase instance
+    const supabase = window.supabase;
+    if (!supabase) {
+      throw new Error('Supabase client not available');
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Create checkout session
+    const response = await fetch('/api/stripe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        action: 'create-checkout-session',
+        planId: plan.id,
+        userId: user.id
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to create checkout session');
+    }
+
+    if (data.url) {
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
+    } else {
+      // Fallback message
+      alert(`Stripe checkout session created! Redirecting to payment...`);
+    }
 
   } catch (error) {
     console.error('Error upgrading plan:', error);
-    alert('Failed to start upgrade process. Please try again.');
+    alert('Failed to start upgrade process. Please try again.\n\nError: ' + error.message);
   } finally {
     // Reset button state
     if (button && originalText) {

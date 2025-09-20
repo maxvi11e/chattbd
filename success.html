@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Successful - ChattBD</title>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #22c55e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        h1 {
+            color: #1f2937;
+            margin: 0 0 20px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 18px;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .plan-info {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .plan-name {
+            font-weight: bold;
+            color: #1f2937;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .plan-details {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .actions {
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .loading {
+            display: none;
+            color: #6b7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        
+        <h1>Subscription Successful!</h1>
+        
+        <p class="subtitle">
+            Thank you for upgrading! We're setting up your account and you'll be able to create more bots in just a moment.
+        </p>
+
+        <div id="planInfo" class="plan-info">
+            <div class="plan-name">Updating your subscription...</div>
+            <div class="plan-details">Please wait while we process your payment</div>
+        </div>
+
+        <div class="loading" id="loading">
+            Processing your subscription... This may take a few seconds.
+        </div>
+
+        <div class="actions">
+            <a href="create.html" class="btn btn-primary" id="createBotBtn" style="display: none;">Create Your First Bot</a>
+            <a href="index.html" class="btn btn-secondary" id="dashboardBtn" style="display: none;">Go to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="freemium-utils.js"></script>
+    <script>
+        // Initialize Supabase
+        const supabaseUrl = 'https://ncbagbiwqhcvkjrjhvqd.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jYmFnYml3cWhjdmtqcmpodnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3NzE1MzksImV4cCI6MjA0OTM0NzUzOX0.VkmHI0dOyKRGJz6S6YCtCtcbMv-TLZnZ8eR8MjVjPOg';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        window.supabase = supabase;
+
+        async function checkSubscriptionStatus() {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                
+                if (!user) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                document.getElementById('loading').style.display = 'block';
+
+                // Poll for subscription update (webhooks might take a moment)
+                let attempts = 0;
+                const maxAttempts = 10;
+                
+                const checkStatus = async () => {
+                    const subscriptionInfo = await getUserSubscriptionInfo();
+                    
+                    if (subscriptionInfo && subscriptionInfo.plan && subscriptionInfo.plan.name !== 'Free') {
+                        // Subscription is active!
+                        displaySuccess(subscriptionInfo);
+                        return true;
+                    }
+                    
+                    attempts++;
+                    if (attempts < maxAttempts) {
+                        setTimeout(checkStatus, 2000); // Check again in 2 seconds
+                    } else {
+                        // Fallback - show generic success
+                        displayGenericSuccess();
+                    }
+                    
+                    return false;
+                };
+
+                await checkStatus();
+
+            } catch (error) {
+                console.error('Error checking subscription:', error);
+                displayGenericSuccess();
+            }
+        }
+
+        function displaySuccess(subscriptionInfo) {
+            document.getElementById('loading').style.display = 'none';
+            
+            const planInfo = document.getElementById('planInfo');
+            planInfo.innerHTML = `
+                <div class="plan-name">${subscriptionInfo.plan.name} Plan</div>
+                <div class="plan-details">
+                    ${subscriptionInfo.plan.bot_limit ? `Up to ${subscriptionInfo.plan.bot_limit} bots` : 'Unlimited bots'} • 
+                    $${(subscriptionInfo.plan.price_cents / 100).toFixed(2)}/${subscriptionInfo.plan.billing_interval}
+                </div>
+            `;
+            
+            document.getElementById('createBotBtn').style.display = 'inline-block';
+            document.getElementById('dashboardBtn').style.display = 'inline-block';
+        }
+
+        function displayGenericSuccess() {
+            document.getElementById('loading').style.display = 'none';
+            
+            const planInfo = document.getElementById('planInfo');
+            planInfo.innerHTML = `
+                <div class="plan-name">Subscription Activated</div>
+                <div class="plan-details">Your subscription has been processed successfully</div>
+            `;
+            
+            document.getElementById('createBotBtn').style.display = 'inline-block';
+            document.getElementById('dashboardBtn').style.display = 'inline-block';
+        }
+
+        // Check status when page loads
+        checkSubscriptionStatus();
+    </script>
+</body>
+</html>
