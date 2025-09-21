@@ -509,9 +509,10 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            avatarId: currentBot.id,
             editPrompt: prompt,
-            originalImage: currentBot.image_url
+            originalPrompt: currentBot.traits?.original_prompt,
+            artStyle: currentBot.traits?.art_style,
+            personalityPrompt: currentBot.traits?.personality_prompt
           })
         });
 

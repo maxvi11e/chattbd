@@ -8,48 +8,35 @@ export default async function handler(req, res) {
   const startTime = Date.now();
   
   try {
-    const { avatarId, editPrompt, originalImage } = req.body || {};
+    const { 
+      editPrompt, 
+      originalPrompt, 
+      artStyle, 
+      personalityPrompt 
+    } = req.body || {};
     
-    if (!avatarId || !editPrompt) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!editPrompt) {
+      return res.status(400).json({ error: "Missing edit prompt" });
     }
 
-    console.log('🔄 Regenerating avatar:', { avatarId, editPrompt: editPrompt.substring(0, 50) + '...' });
-
-    // Get the original avatar data from the database
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-
-    const { data: originalAvatar, error: fetchError } = await supabase
-      .from('avatars')
-      .select('*')
-      .eq('id', avatarId)
-      .single();
-
-    if (fetchError || !originalAvatar) {
-      console.error('Error fetching original avatar:', fetchError);
-      return res.status(404).json({ error: "Avatar not found" });
-    }
+    console.log('🔄 Regenerating avatar with edit:', editPrompt.substring(0, 50) + '...');
 
     // Build enhanced prompt that combines original traits with edit request
     let enhancedPrompt = `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.`;
     
     // Add original style information if available
-    if (originalAvatar.traits?.art_style) {
-      enhancedPrompt += ` Art style: ${originalAvatar.traits.art_style}.`;
+    if (artStyle && artStyle.trim()) {
+      enhancedPrompt += ` Art style: ${artStyle.trim()}.`;
     }
     
     // Add original persona as base
-    if (originalAvatar.traits?.original_prompt) {
-      enhancedPrompt += ` Base persona: ${originalAvatar.traits.original_prompt}.`;
+    if (originalPrompt && originalPrompt.trim()) {
+      enhancedPrompt += ` Base persona: ${originalPrompt.trim()}.`;
     }
     
     // Add personality prompt if available
-    if (originalAvatar.traits?.personality_prompt) {
-      enhancedPrompt += ` Personality: ${originalAvatar.traits.personality_prompt}.`;
+    if (personalityPrompt && personalityPrompt.trim()) {
+      enhancedPrompt += ` Personality: ${personalityPrompt.trim()}.`;
     }
     
     // Add the edit request
