@@ -267,19 +267,23 @@
 
     // Auth check function
     async function checkAuthAndRedirect() {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          window.location.href = 'auth.html';
-          return false;
-        }
-        await loadUserProfile(session.user);
-        return true;
-      } catch (error) {
-        console.error('Error checking auth:', error);
+      console.log('🔐 Checking authentication...');
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      console.log('🔐 Auth check result:', { 
+        session: session ? 'Found' : 'None', 
+        user: session?.user?.email
+      });
+      
+      if (!session) {
+        console.log('❌ No session found, redirecting to auth');
         window.location.href = 'auth.html';
         return false;
       }
+      
+      console.log('✅ User authenticated:', session.user.email);
+      await loadUserProfile(session.user);
+      return true;
     }
 
     // Load user profile
@@ -324,6 +328,9 @@
     // Initialize the page
     async function initializePage() {
       console.log('🚀 Initializing edit page...');
+      
+      // Small delay to ensure session is available after redirect
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const isAuthenticated = await checkAuthAndRedirect();
       if (!isAuthenticated) return;
