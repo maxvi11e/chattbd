@@ -19,33 +19,28 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing edit prompt" });
     }
 
-    console.log('🔄 Regenerating avatar with edit:', editPrompt.substring(0, 50) + '...');
-
-    // Build enhanced prompt that combines original traits with edit request
+    // Build enhanced prompt exactly like generate-avatar.js but with modifications
     let enhancedPrompt = `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.`;
     
-    // Add original style information if available
+    // Add art style if provided
     if (artStyle && artStyle.trim()) {
       enhancedPrompt += ` Art style: ${artStyle.trim()}.`;
     }
     
-    // Add original persona as base
+    // Add main persona description (original prompt)
     if (originalPrompt && originalPrompt.trim()) {
-      enhancedPrompt += ` Base persona: ${originalPrompt.trim()}.`;
+      enhancedPrompt += ` Persona: ${originalPrompt.trim()}`;
     }
     
-    // Add personality prompt if available
+    // Add additional personality details if provided
     if (personalityPrompt && personalityPrompt.trim()) {
-      enhancedPrompt += ` Personality: ${personalityPrompt.trim()}.`;
+      enhancedPrompt += ` Additional details: ${personalityPrompt.trim()}`;
     }
     
-    // Add the edit request
+    // Add the modifications
     enhancedPrompt += ` MODIFICATIONS: ${editPrompt}`;
 
-    console.log('🎨 Enhanced prompt for regeneration:', enhancedPrompt.substring(0, 200) + '...');
-
-    // Call OpenAI API to regenerate the image
-    const openaiResponse = await fetch("https://api.openai.com/v1/images/generations", {
+    const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -54,81 +49,76 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "gpt-image-1",
         prompt: enhancedPrompt,
-        size: "1024x1024",
+        size: "1024x1024",   // ✅ valid size
         n: 1,
         quality: "high"
       }),
     });
 
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error(`❌ Image regeneration failed:`, {
-        status: openaiResponse.status,
-        error: errorText,
-        prompt: enhancedPrompt.substring(0, 100) + '...'
+    if (!r.ok) {
+      const errTxt = await r.text();
+      console.log(`❌ Image regeneration failed:`, {
+        error: errTxt,
+        status: r.status,
+        prompt: enhancedPrompt.substring(0, 200) + '...'
       });
-      
-      // Check for content policy violations
-      if (openaiResponse.status === 400 && errorText.includes('content_policy_violation')) {
+
+      // Check for safety/content policy issues
+      if (r.status === 400) {
         return res.status(400).json({ 
           error: "Content blocked by safety system. Please try a different description." 
         });
       }
-      
+
       return res.status(500).json({ 
         error: "Image generation failed. Please try again." 
       });
     }
 
-    const imageData = await openaiResponse.json();
-    console.log('🔍 OpenAI response structure:', {
-      hasData: !!imageData.data,
-      dataLength: imageData.data?.length,
-      firstItem: imageData.data?.[0] ? Object.keys(imageData.data[0]) : 'none',
-      fullResponse: JSON.stringify(imageData, null, 2).substring(0, 500) + '...'
-    });
-    
-    const imageUrl = imageData?.data?.[0]?.url;
-
-    if (!imageUrl) {
-      console.error('❌ No image URL in response:', imageData);
+    const json = await r.json().catch(() => ({}));
+    if (!json?.data?.[0]?.url) {
+      console.error('Invalid OpenAI response:', json);
       return res.status(500).json({ 
         error: "No image generated",
-        details: imageData
+        details: json
       });
     }
 
-    // Download the image and convert to base64
-    console.log('📥 Downloading generated image...');
-    const imageResponse = await fetch(imageUrl);
-    if (!imageResponse.ok) {
-      console.error('❌ Failed to download image:', imageResponse.status);
-      return res.status(500).json({ error: "Failed to download generated image" });
+    const imageUrl = json.data[0].url;
+
+    // Get the first item from response
+    const item = json.data[0];
+    const b64 = item?.b64_json;
+    const url = item?.url;
+
+    // Log successful regeneration
+    const duration = Date.now() - startTime;
+    console.log(`✅ Image regenerated successfully:`, {
+      model: "gpt-image-1",
+      duration_ms: duration,
+      prompt_length: enhancedPrompt.length,
+      timestamp: new Date().toISOString()
+    });
+
+    if (b64) {
+      return res.status(200).json({ 
+        dataUrl: `data:image/png;base64,${b64}`,
+        editPrompt: editPrompt
+      });
+    }
+    if (url) {
+      return res.status(200).json({ 
+        dataUrl: url,
+        editPrompt: editPrompt
+      });
     }
 
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const base64Image = Buffer.from(imageBuffer).toString('base64');
-    const dataUrl = `data:image/png;base64,${base64Image}`;
-
-    const processingTime = Date.now() - startTime;
-    console.log(`✅ Avatar regenerated successfully in ${processingTime}ms`);
-
-    // Return the regenerated image data
-    res.status(200).json({
-      success: true,
-      dataUrl: dataUrl,
-      originalPrompt: originalAvatar.traits?.original_prompt,
-      editPrompt: editPrompt,
-      processingTime: processingTime
+    return res.status(500).json({ error: "No image returned" });
+  } catch (e) {
+    console.log(`❌ Image regeneration error:`, {
+      error: e.message,
+      timestamp: new Date().toISOString()
     });
-
-  } catch (error) {
-    const processingTime = Date.now() - startTime;
-    console.error(`❌ Avatar regeneration error after ${processingTime}ms:`, error);
-    
-    res.status(500).json({ 
-      error: "Internal server error during regeneration",
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    return res.status(500).json({ error: e.message || "Unexpected error" });
   }
 }
