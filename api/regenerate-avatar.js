@@ -40,6 +40,11 @@ export default async function handler(req, res) {
     // Add the modifications
     enhancedPrompt += ` MODIFICATIONS: ${editPrompt}`;
 
+    console.log('➡️ Calling OpenAI Images API with:', {
+      model: 'gpt-image-1', size: '1024x1024', quality: 'high',
+      promptPreview: enhancedPrompt.slice(0, 180) + (enhancedPrompt.length > 180 ? '…' : '')
+    });
+
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
@@ -58,9 +63,10 @@ export default async function handler(req, res) {
     if (!r.ok) {
       const errTxt = await r.text();
       console.log(`❌ Image regeneration failed:`, {
-        error: errTxt,
         status: r.status,
-        prompt: enhancedPrompt.substring(0, 200) + '...'
+        statusText: r.statusText,
+        errorTextPreview: errTxt?.slice(0, 500),
+        promptLength: enhancedPrompt.length
       });
 
       // Check for safety/content policy issues
@@ -71,25 +77,23 @@ export default async function handler(req, res) {
       }
 
       return res.status(500).json({ 
-        error: "Image generation failed. Please try again." 
+        error: "Image generation failed. Please try again.",
+        debug: { status: r.status, statusText: r.statusText, errorPreview: errTxt?.slice(0, 500) }
       });
     }
 
-    const json = await r.json().catch(() => ({}));
-    if (!json?.data?.[0]?.url) {
-      console.error('Invalid OpenAI response:', json);
-      return res.status(500).json({ 
-        error: "No image generated",
-        details: json
-      });
-    }
-
-    const imageUrl = json.data[0].url;
-
-    // Get the first item from response
-    const item = json.data[0];
+    const json = await r.json().catch((e) => ({ __parseError: e?.message }));
+    console.log('⬅️ OpenAI response meta:', {
+      hasData: !!json?.data,
+      items: json?.data?.length || 0,
+      hasB64: !!json?.data?.[0]?.b64_json,
+      hasUrl: !!json?.data?.[0]?.url,
+      parseError: json?.__parseError
+    });
+  // Get the first item from response (can include b64_json and/or url)
+  const item = json?.data?.[0] || {};
     const b64 = item?.b64_json;
-    const url = item?.url;
+  const url = item?.url;
 
     // Log successful regeneration
     const duration = Date.now() - startTime;
@@ -100,7 +104,7 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString()
     });
 
-    if (b64) {
+  if (b64) {
       return res.status(200).json({ 
         dataUrl: `data:image/png;base64,${b64}`,
         editPrompt: editPrompt
@@ -113,12 +117,14 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(500).json({ error: "No image returned" });
+    console.error('No image returned from OpenAI:', json);
+    return res.status(500).json({ error: "No image returned", debug: { openaiMeta: { items: json?.data?.length || 0, hasB64: !!b64, hasUrl: !!url } } });
   } catch (e) {
     console.log(`❌ Image regeneration error:`, {
       error: e.message,
+      stackPreview: e?.stack?.split('\n').slice(0, 3).join(' | '),
       timestamp: new Date().toISOString()
     });
-    return res.status(500).json({ error: e.message || "Unexpected error" });
+    return res.status(500).json({ error: e.message || "Unexpected error", debug: { stack: e?.stack?.split('\n').slice(0, 3).join(' | ') } });
   }
 }

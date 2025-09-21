@@ -505,22 +505,27 @@
         }
 
         // Call regeneration API
-        const response = await fetch('/api/regenerate-avatar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+        const payload = {
             editPrompt: prompt,
             originalPrompt: currentBot.traits?.original_prompt,
             artStyle: currentBot.traits?.art_style,
             personalityPrompt: currentBot.traits?.personality_prompt
-          })
+        };
+        console.log('🔧 Regenerate payload:', payload);
+        const response = await fetch('/api/regenerate-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
 
-        const result = await response.json();
+        const result = await response.json().catch(() => ({}));
+        console.log('🔧 Regenerate response:', { status: response.status, ok: response.ok, resultPreview: JSON.stringify(result).slice(0, 400) });
         
         if (!response.ok || !result.dataUrl) {
           console.error('Regeneration API error:', result);
-          showError(result.error || 'Failed to regenerate bot. Please try again.');
+          const serverMsg = result?.error || 'Failed to regenerate bot. Please try again.';
+          const serverDebug = result?.debug ? ` [${JSON.stringify(result.debug).slice(0, 300)}]` : '';
+          showError(serverMsg + serverDebug);
           return;
         }
 
