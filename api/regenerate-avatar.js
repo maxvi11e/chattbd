@@ -58,9 +58,7 @@ export default async function handler(req, res) {
       form.append('model', 'gpt-image-1');
       form.append('prompt', enhancedPrompt);
       form.append('size', '1024x1024');
-      form.append('n', '1');
-      // Prefer b64 to avoid extra network hop
-      form.append('response_format', 'b64_json');
+  form.append('n', '1');
       form.append('image', new Blob([buf], { type: 'image/png' }), 'source.png');
 
       console.log('➡️ Calling OpenAI Images Edits with original image');
@@ -83,12 +81,12 @@ export default async function handler(req, res) {
         hasData: !!json?.data, items: json?.data?.length || 0, hasB64: !!json?.data?.[0]?.b64_json, hasUrl: !!json?.data?.[0]?.url, parseError: json?.__parseError
       });
 
-      const item = json?.data?.[0] || {};
-      const b64 = item?.b64_json;
-      const url = item?.url;
+  const item = json?.data?.[0] || {};
+  const b64 = item?.b64_json;
+  const url = item?.url;
 
-      if (b64) return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}`, editPrompt });
-      if (url) return res.status(200).json({ dataUrl: url, editPrompt });
+  if (b64) return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}`, editPrompt });
+  if (url) return res.status(200).json({ dataUrl: url, editPrompt });
 
       console.error('No image returned from OpenAI (edit):', json);
       return res.status(500).json({ error: 'No image returned from edit', debug: { items: json?.data?.length || 0 } });
