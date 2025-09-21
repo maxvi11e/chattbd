@@ -12,7 +12,8 @@ export default async function handler(req, res) {
       editPrompt, 
       originalPrompt, 
       artStyle, 
-      personalityPrompt 
+      personalityPrompt,
+      originalImage
     } = req.body || {};
     
     if (!editPrompt) {
@@ -40,7 +41,61 @@ export default async function handler(req, res) {
     // Add the modifications
     enhancedPrompt += ` MODIFICATIONS: ${editPrompt}`;
 
-    console.log('➡️ Calling OpenAI Images API with:', {
+    // If we have an original image, attempt an image edit to preserve identity
+    if (originalImage) {
+      const fetchUrl = originalImage.split('?')[0]; // strip transforms for best fidelity
+      console.log('🖼️ Using original image for edit:', fetchUrl);
+
+      const src = await fetch(fetchUrl);
+      if (!src.ok) {
+        const t = await src.text().catch(() => src.statusText);
+        console.log('❌ Failed to fetch original image:', { status: src.status, text: t?.slice(0, 300) });
+        return res.status(400).json({ error: 'Could not fetch original image for edit' });
+      }
+      const buf = await src.arrayBuffer();
+
+      const form = new FormData();
+      form.append('model', 'gpt-image-1');
+      form.append('prompt', enhancedPrompt);
+      form.append('size', '1024x1024');
+      form.append('n', '1');
+      // Prefer b64 to avoid extra network hop
+      form.append('response_format', 'b64_json');
+      form.append('image', new Blob([buf], { type: 'image/png' }), 'source.png');
+
+      console.log('➡️ Calling OpenAI Images Edits with original image');
+      const r = await fetch('https://api.openai.com/v1/images/edits', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+        },
+        body: form
+      });
+
+      if (!r.ok) {
+        const errTxt = await r.text();
+        console.log('❌ Image edit failed:', { status: r.status, statusText: r.statusText, errorTextPreview: errTxt?.slice(0, 500) });
+        return res.status(500).json({ error: 'Image edit failed', debug: { status: r.status, errorPreview: errTxt?.slice(0, 400) } });
+      }
+
+      const json = await r.json().catch((e) => ({ __parseError: e?.message }));
+      console.log('⬅️ OpenAI edit response meta:', {
+        hasData: !!json?.data, items: json?.data?.length || 0, hasB64: !!json?.data?.[0]?.b64_json, hasUrl: !!json?.data?.[0]?.url, parseError: json?.__parseError
+      });
+
+      const item = json?.data?.[0] || {};
+      const b64 = item?.b64_json;
+      const url = item?.url;
+
+      if (b64) return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}`, editPrompt });
+      if (url) return res.status(200).json({ dataUrl: url, editPrompt });
+
+      console.error('No image returned from OpenAI (edit):', json);
+      return res.status(500).json({ error: 'No image returned from edit', debug: { items: json?.data?.length || 0 } });
+    }
+
+    // Otherwise: text-to-image generation (no base image)
+    console.log('➡️ Calling OpenAI Images Generations with:', {
       model: 'gpt-image-1', size: '1024x1024', quality: 'high',
       promptPreview: enhancedPrompt.slice(0, 180) + (enhancedPrompt.length > 180 ? '…' : '')
     });

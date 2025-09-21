@@ -505,11 +505,12 @@
         }
 
         // Call regeneration API
-        const payload = {
+    const payload = {
             editPrompt: prompt,
             originalPrompt: currentBot.traits?.original_prompt,
             artStyle: currentBot.traits?.art_style,
-            personalityPrompt: currentBot.traits?.personality_prompt
+      personalityPrompt: currentBot.traits?.personality_prompt,
+      originalImage: currentBot.image_url
         };
         console.log('🔧 Regenerate payload:', payload);
         const response = await fetch('/api/regenerate-avatar', {
