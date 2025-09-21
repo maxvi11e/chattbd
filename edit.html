@@ -323,6 +323,8 @@
 
     // Initialize the page
     async function initializePage() {
+      console.log('🚀 Initializing edit page...');
+      
       const isAuthenticated = await checkAuthAndRedirect();
       if (!isAuthenticated) return;
 
@@ -330,7 +332,14 @@
       const urlParams = new URLSearchParams(window.location.search);
       const botId = urlParams.get('avatar') || localStorage.getItem('lastGeneratedAvatar');
       
+      console.log('🔍 Looking for bot ID:', {
+        fromURL: urlParams.get('avatar'),
+        fromStorage: localStorage.getItem('lastGeneratedAvatar'),
+        finalBotId: botId
+      });
+      
       if (!botId) {
+        console.error('❌ No bot ID found');
         showError('No bot found. Please create a bot first.');
         setTimeout(() => {
           window.location.href = 'create.html';
@@ -345,6 +354,8 @@
     // Load bot data
     async function loadBot(botId) {
       try {
+        console.log('🔍 Loading bot with ID:', botId);
+        
         const { data: bot, error } = await supabase
           .from('avatars')
           .select('*')
@@ -352,16 +363,32 @@
           .single();
 
         if (error) {
-          console.error('Error loading bot:', error);
-          showError('Failed to load bot data.');
+          console.error('❌ Error loading bot:', error);
+          showError('Failed to load bot data. Redirecting to create page...');
+          setTimeout(() => {
+            window.location.href = 'create.html';
+          }, 3000);
           return;
         }
 
+        if (!bot) {
+          console.error('❌ No bot found with ID:', botId);
+          showError('Bot not found. Redirecting to create page...');
+          setTimeout(() => {
+            window.location.href = 'create.html';
+          }, 3000);
+          return;
+        }
+
+        console.log('✅ Bot loaded successfully:', bot.name);
         currentBot = bot;
         displayBot(bot);
       } catch (error) {
-        console.error('Error in loadBot:', error);
-        showError('Failed to load bot data.');
+        console.error('❌ Error in loadBot:', error);
+        showError('Failed to load bot data. Redirecting to create page...');
+        setTimeout(() => {
+          window.location.href = 'create.html';
+        }, 3000);
       }
     }
 

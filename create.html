@@ -381,18 +381,27 @@
               throw avatarError;
             }
             
-            console.log('Avatar created successfully:', avatarData);
+            console.log('✅ Avatar created successfully:', avatarData);
             
             // Store the new avatar ID for future navigation
             localStorage.setItem('lastSelectedAvatar', avatarData.id);
             localStorage.setItem('lastGeneratedAvatar', avatarData.id);
             
-            // Redirect to edit page instead of directly to chat
-            window.location.href = `edit.html?avatar=${avatarData.id}`;
+            console.log('🔄 Redirecting to edit page with avatar ID:', avatarData.id);
+            
+            // Add a small delay to ensure database consistency
+            setTimeout(() => {
+              console.log('🔄 Executing redirect now...');
+              window.location.href = `edit.html?avatar=${avatarData.id}`;
+            }, 100);
           }
 
         } catch (err) {
-          console.error('Avatar creation failed:', err);
+          console.error('❌ Avatar creation failed:', err);
+          console.error('❌ Error details:', {
+            message: err.message,
+            stack: err.stack
+          });
           let msg = document.getElementById('safetyMsg');
           if (msg) {
             msg.textContent = 'Avatar creation failed. Please try again.';
