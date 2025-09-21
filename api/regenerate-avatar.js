@@ -94,11 +94,21 @@ export default async function handler(req, res) {
     }
 
     const imageData = await openaiResponse.json();
+    console.log('🔍 OpenAI response structure:', {
+      hasData: !!imageData.data,
+      dataLength: imageData.data?.length,
+      firstItem: imageData.data?.[0] ? Object.keys(imageData.data[0]) : 'none',
+      fullResponse: JSON.stringify(imageData, null, 2).substring(0, 500) + '...'
+    });
+    
     const imageUrl = imageData?.data?.[0]?.url;
 
     if (!imageUrl) {
       console.error('❌ No image URL in response:', imageData);
-      return res.status(500).json({ error: "No image generated" });
+      return res.status(500).json({ 
+        error: "No image generated",
+        details: imageData
+      });
     }
 
     // Download the image and convert to base64
