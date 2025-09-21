@@ -385,9 +385,10 @@
             
             // Store the new avatar ID for future navigation
             localStorage.setItem('lastSelectedAvatar', avatarData.id);
+            localStorage.setItem('lastGeneratedAvatar', avatarData.id);
             
-            // Redirect to chat with the new avatar
-            window.location.href = `chat.html?avatar=${avatarData.id}&new=true`;
+            // Redirect to edit page instead of directly to chat
+            window.location.href = `edit.html?avatar=${avatarData.id}`;
           }
 
         } catch (err) {

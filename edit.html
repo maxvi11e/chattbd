@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Build a Bot — Edit</title>
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <style>
+    :root{
+      --bg:#000;
+      --ink:#fff;
+      --muted:#d9d9d9;
+      --bubble:#333;
+      --stroke:#fff;
+      --radius-lg:24px;
+      --radius-md:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial}
+
+    .screen{min-height:100vh; width:100%;}
+
+    /* ===== Dashboard ===== */
+    .dashboard{padding:0; min-height:100vh;}
+    
+    /* Top Navigation */
+    .top-nav{display:flex; justify-content:space-between; align-items:center; padding:12px 48px 4px 48px;}
+    .nav-left{display:flex; align-items:center; gap:24px;}
+    .nav-logo{height:48px; width:auto;}
+    .nav-icon{height:32px; width:auto; transition:transform 0.2s ease; cursor:pointer; opacity:1;}
+    .nav-icon:hover{transform:scale(1.1);}
+    .nav-right{display:flex; gap:16px; align-items:center;}
+    .user-email{color:var(--ink); font-size:16px;}
+    .logout-btn{padding:8px; border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;}
+    .logout-btn:hover{background:rgba(255,255,255,0.1);}
+    .logout-btn img{width:36px; height:36px;}
+
+    /* Main Content */
+    .main-content{padding:24px; max-width:1200px; margin:0 auto; display:flex; flex-direction:column; align-items:center;}
+    
+    /* Page Title */
+    .page-header{display:flex; align-items:center; gap:16px; margin-bottom:40px; justify-content:center;}
+    .page-icon{height:40px; width:auto;}
+    .page-title{font-size:32px; font-weight:600; margin:0;}
+
+    /* Bot Preview */
+    .bot-preview{display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom:40px;}
+    .bot-image{width:300px; height:300px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--stroke);}
+    .bot-name{font-size:24px; font-weight:600; text-align:center;}
+
+    /* Action Buttons */
+    .action-buttons{display:flex; gap:24px; margin-bottom:40px;}
+    .action-btn{
+      padding:16px 32px;
+      border:2px solid var(--stroke);
+      border-radius:var(--radius-md);
+      background:transparent;
+      color:var(--ink);
+      font-size:18px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      min-width:140px;
+    }
+    .action-btn:hover{
+      background:rgba(255,255,255,0.1);
+      transform:translateY(-2px);
+    }
+    .confirm-btn{
+      background:var(--ink);
+      color:var(--bg);
+    }
+    .confirm-btn:hover{
+      background:var(--muted);
+      color:var(--bg);
+    }
+
+    /* Edit Form */
+    .edit-form{
+      display:none;
+      flex-direction:column;
+      gap:24px;
+      width:100%;
+      max-width:600px;
+      padding:32px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.05);
+    }
+    .edit-form.visible{display:flex;}
+    
+    .form-group{display:flex; flex-direction:column; gap:8px;}
+    .form-label{font-size:16px; font-weight:600; color:var(--ink);}
+    .form-input{
+      padding:12px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius-md);
+      background:transparent;
+      color:var(--ink);
+      font-size:16px;
+      resize:vertical;
+      min-height:44px;
+    }
+    .form-input:focus{
+      outline:none;
+      border-color:var(--muted);
+      box-shadow:0 0 0 2px rgba(217,217,217,0.2);
+    }
+    .form-input::placeholder{color:#a8a8a8;}
+
+    .form-textarea{
+      min-height:120px;
+      font-family:inherit;
+    }
+
+    .form-buttons{display:flex; gap:16px; justify-content:center;}
+    .form-btn{
+      padding:12px 24px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius-md);
+      background:transparent;
+      color:var(--ink);
+      font-size:16px;
+      cursor:pointer;
+      transition:all 0.2s ease;
+    }
+    .form-btn:hover{background:rgba(255,255,255,0.1);}
+    .form-btn:disabled{
+      opacity:0.5;
+      cursor:not-allowed;
+    }
+    .regenerate-btn{
+      background:var(--ink);
+      color:var(--bg);
+    }
+    .regenerate-btn:hover:not(:disabled){
+      background:var(--muted);
+    }
+
+    /* Loading State */
+    .loading{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:16px;
+      padding:40px;
+      text-align:center;
+    }
+    .loading.hidden{display:none;}
+    .spinner{
+      width:40px;
+      height:40px;
+      border:3px solid rgba(255,255,255,0.3);
+      border-top:3px solid var(--ink);
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Error Message */
+    .error-message{
+      display:none;
+      padding:16px;
+      border:1px solid #ff6b6b;
+      border-radius:var(--radius-md);
+      background:rgba(255,107,107,0.1);
+      color:#ff6b6b;
+      text-align:center;
+      margin-bottom:24px;
+    }
+    .error-message.visible{display:block;}
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .main-content{padding:16px;}
+      .bot-image{width:250px; height:250px;}
+      .action-buttons{flex-direction:column; align-items:center;}
+      .action-btn{width:200px;}
+      .form-buttons{flex-direction:column;}
+      .form-btn{width:100%;}
+    }
+
+    @media (max-width: 600px) {
+      .user-email{display:none;}
+      .logout-btn{display:none !important;}
+      .top-nav{padding:12px 24px 4px 24px;}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="screen dashboard">
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <img src="images/BaB_logo.png" alt="Build a Bot" class="nav-logo" onclick="window.location.href='index.html'" style="cursor:pointer;" />
+        <img src="images/library_icon.png" alt="Library" class="nav-icon" onclick="window.location.href='index.html'" />
+        <img src="images/creator_icon.png" alt="Create" class="nav-icon" onclick="window.location.href='create.html'" />
+        <img id="chatNavIcon" src="images/chat_icon.png" alt="Chat" class="nav-icon" style="cursor:pointer;" />
+      </div>
+      <div class="nav-right">
+        <span id="userEmail" class="user-email">Loading...</span>
+        <button id="logoutBtn" class="logout-btn">
+          <img src="images/logout_icon.png" alt="Logout" />
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <img src="images/wand_icon.png" alt="Edit" class="page-icon" />
+        <h1 class="page-title">Edit Your Bot</h1>
+      </div>
+
+      <!-- Error Message -->
+      <div id="errorMessage" class="error-message"></div>
+
+      <!-- Bot Preview -->
+      <div id="botPreview" class="bot-preview">
+        <img id="botImage" src="" alt="Generated Bot" class="bot-image" />
+        <h2 id="botName" class="bot-name">Loading...</h2>
+      </div>
+
+      <!-- Action Buttons -->
+      <div id="actionButtons" class="action-buttons">
+        <button id="editBtn" class="action-btn edit-btn">Edit Bot</button>
+        <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Chat</button>
+      </div>
+
+      <!-- Edit Form -->
+      <div id="editForm" class="edit-form">
+        <div class="form-group">
+          <label class="form-label">What would you like to change?</label>
+          <textarea id="editPrompt" class="form-input form-textarea" placeholder="Describe the changes you'd like to make to your bot's appearance or personality..."></textarea>
+        </div>
+        <div class="form-buttons">
+          <button id="cancelEdit" class="form-btn">Cancel</button>
+          <button id="regenerateBtn" class="form-btn regenerate-btn">Regenerate Bot</button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="loading hidden">
+        <div class="spinner"></div>
+        <p>Regenerating your bot...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Freemium Utils -->
+  <script src="freemium-utils.js"></script>
+
+  <script>
+    // Initialize Supabase
+    const supabaseUrl = 'https://dwtmwuhzogzgdogohvgh.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dG13dWh6b2d6Z2RvZ29odmdoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjY3ODA0MjMsImV4cCI6MjA0MjM1NjQyM30.3z1_dKFp68vgn_IEhKbO6m8CjqJpj9TyGGWv-EaU8Uo';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Auth check function
+    async function checkAuthAndRedirect() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = 'auth.html';
+          return false;
+        }
+        await loadUserProfile(session.user);
+        return true;
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        window.location.href = 'auth.html';
+        return false;
+      }
+    }
+
+    // Load user profile
+    async function loadUserProfile(user) {
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error loading profile:', error);
+          document.getElementById('userEmail').textContent = user.email;
+        } else {
+          document.getElementById('userEmail').textContent = profile?.display_name || user.email;
+        }
+      } catch (error) {
+        console.error('Error in loadUserProfile:', error);
+        document.getElementById('userEmail').textContent = user.email;
+      }
+    }
+
+    // Global variables
+    let currentBot = null;
+    let isRegenerating = false;
+
+    // DOM elements
+    const botImage = document.getElementById('botImage');
+    const botName = document.getElementById('botName');
+    const editBtn = document.getElementById('editBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const editForm = document.getElementById('editForm');
+    const actionButtons = document.getElementById('actionButtons');
+    const editPrompt = document.getElementById('editPrompt');
+    const cancelEdit = document.getElementById('cancelEdit');
+    const regenerateBtn = document.getElementById('regenerateBtn');
+    const loadingState = document.getElementById('loadingState');
+    const errorMessage = document.getElementById('errorMessage');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // Initialize the page
+    async function initializePage() {
+      const isAuthenticated = await checkAuthAndRedirect();
+      if (!isAuthenticated) return;
+
+      // Get bot data from URL parameters or localStorage
+      const urlParams = new URLSearchParams(window.location.search);
+      const botId = urlParams.get('avatar') || localStorage.getItem('lastGeneratedAvatar');
+      
+      if (!botId) {
+        showError('No bot found. Please create a bot first.');
+        setTimeout(() => {
+          window.location.href = 'create.html';
+        }, 2000);
+        return;
+      }
+
+      await loadBot(botId);
+      setupEventListeners();
+    }
+
+    // Load bot data
+    async function loadBot(botId) {
+      try {
+        const { data: bot, error } = await supabase
+          .from('avatars')
+          .select('*')
+          .eq('id', botId)
+          .single();
+
+        if (error) {
+          console.error('Error loading bot:', error);
+          showError('Failed to load bot data.');
+          return;
+        }
+
+        currentBot = bot;
+        displayBot(bot);
+      } catch (error) {
+        console.error('Error in loadBot:', error);
+        showError('Failed to load bot data.');
+      }
+    }
+
+    // Display bot information
+    function displayBot(bot) {
+      botImage.src = bot.image_url;
+      botImage.alt = bot.name;
+      botName.textContent = bot.name;
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Logout button
+      logoutBtn.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'auth.html';
+      });
+
+      // Chat navigation
+      const chatNavIcon = document.getElementById('chatNavIcon');
+      if (chatNavIcon) {
+        chatNavIcon.addEventListener('click', (e) => {
+          e.preventDefault();
+          const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
+          if (lastAvatarId) {
+            window.location.href = `chat.html?avatar=${lastAvatarId}`;
+          } else {
+            alert('Please select an avatar to chat with first!');
+          }
+        });
+      }
+
+      // Edit button
+      editBtn.addEventListener('click', () => {
+        showEditForm();
+      });
+
+      // Confirm button
+      confirmBtn.addEventListener('click', () => {
+        confirmBot();
+      });
+
+      // Cancel edit
+      cancelEdit.addEventListener('click', () => {
+        hideEditForm();
+      });
+
+      // Regenerate button
+      regenerateBtn.addEventListener('click', () => {
+        regenerateBot();
+      });
+
+      // Auth state changes
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (!session) {
+          window.location.href = 'auth.html';
+        }
+      });
+    }
+
+    // Show edit form
+    function showEditForm() {
+      editForm.classList.add('visible');
+      actionButtons.style.display = 'none';
+      editPrompt.focus();
+    }
+
+    // Hide edit form
+    function hideEditForm() {
+      editForm.classList.remove('visible');
+      actionButtons.style.display = 'flex';
+      editPrompt.value = '';
+    }
+
+    // Confirm bot and go to chat
+    function confirmBot() {
+      if (!currentBot) return;
+      
+      localStorage.setItem('lastSelectedAvatar', currentBot.id);
+      window.location.href = `chat.html?avatar=${currentBot.id}&new=true`;
+    }
+
+    // Regenerate bot with edits
+    async function regenerateBot() {
+      const prompt = editPrompt.value.trim();
+      if (!prompt) {
+        showError('Please describe what you\'d like to change.');
+        return;
+      }
+
+      if (isRegenerating) return;
+      isRegenerating = true;
+
+      try {
+        // Show loading state
+        setLoadingState(true);
+        hideError();
+
+        // Check freemium limits
+        if (window.FreemiumUtils) {
+          const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+          if (!canCreateResult.canCreate) {
+            const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+            await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+            return;
+          }
+        }
+
+        // Call regeneration API
+        const response = await fetch('/api/regenerate-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            avatarId: currentBot.id,
+            editPrompt: prompt,
+            originalImage: currentBot.image_url
+          })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok || !result.dataUrl) {
+          console.error('Regeneration API error:', result);
+          showError(result.error || 'Failed to regenerate bot. Please try again.');
+          return;
+        }
+
+        // Update the bot image and data
+        await updateBotImage(result);
+        hideEditForm();
+        
+      } catch (error) {
+        console.error('Error regenerating bot:', error);
+        showError('Failed to regenerate bot. Please try again.');
+      } finally {
+        setLoadingState(false);
+        isRegenerating = false;
+      }
+    }
+
+    // Update bot image after regeneration
+    async function updateBotImage(result) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Upload new image
+        const url = await uploadAvatarImage({
+          dataUrl: result.dataUrl,
+          userId: user.id,
+          fileName: `${currentBot.name}-edit.png`
+        });
+
+        // Update database
+        const { data: updatedBot, error } = await supabase
+          .from('avatars')
+          .update({ 
+            image_url: url,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentBot.id)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Error updating bot:', error);
+          throw error;
+        }
+
+        // Update display
+        currentBot = updatedBot;
+        displayBot(updatedBot);
+        
+      } catch (error) {
+        console.error('Error updating bot image:', error);
+        throw error;
+      }
+    }
+
+    // Utility functions
+    function setLoadingState(loading) {
+      if (loading) {
+        loadingState.classList.remove('hidden');
+        editForm.style.display = 'none';
+        actionButtons.style.display = 'none';
+      } else {
+        loadingState.classList.add('hidden');
+        editForm.classList.add('visible');
+      }
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('visible');
+      setTimeout(() => {
+        hideError();
+      }, 6000);
+    }
+
+    function hideError() {
+      errorMessage.classList.remove('visible');
+    }
+
+    // Image upload helper
+    function dataUrlToBlob(dataUrl) {
+      const [meta, b64] = dataUrl.split(",");
+      const mime = meta.match(/data:(.*?);base64/)[1] || "image/png";
+      const bin = atob(b64), len = bin.length;
+      const bytes = new Uint8Array(len);
+      for(let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+      return new Blob([bytes], { type: mime });
+    }
+
+    async function uploadAvatarImage({ dataUrl, userId, fileName = "avatar.png" }) {
+      try {
+        const blob = dataUrlToBlob(dataUrl);
+        const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
+        
+        const { error: upErr } = await supabase.storage.from("avatars")
+          .upload(path, blob, { 
+            upsert: true, 
+            contentType: blob.type,
+            cacheControl: '3600'
+          });
+        if (upErr) throw upErr;
+        
+        const { data } = supabase.storage.from("avatars")
+          .getPublicUrl(path, {
+            download: false,
+            transform: {
+              width: 333,
+              height: 333,
+              resize: 'cover'
+            }
+          });
+          
+        const url = new URL(data.publicUrl);
+        url.protocol = 'https:';
+        return url.toString();
+      } catch (err) {
+        console.error('Error in uploadAvatarImage:', err);
+        throw err;
+      }
+    }
+
+    // Initialize the page
+    initializePage();
+  </script>
+</body>
+</html>
