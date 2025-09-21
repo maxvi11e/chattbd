@@ -434,6 +434,7 @@
               <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
               <div id="menu-${avatar.id}" class="dropdown">
                 <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
+                <button class="dropdown-item" onclick="editAvatar('${avatar.id}')">Edit</button>
                 <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
               </div>
             </div>
@@ -536,6 +537,14 @@
         // Store the selected avatar ID for future navigation
         localStorage.setItem('lastSelectedAvatar', avatarId);
         window.location.href = `chat.html?avatar=${avatarId}`;
+      };
+
+      // Edit avatar - navigate to edit page
+      window.editAvatar = function(avatarId) {
+        // Remember selection for chat icon and other pages
+        localStorage.setItem('lastSelectedAvatar', avatarId);
+        localStorage.setItem('lastGeneratedAvatar', avatarId);
+        window.location.href = `edit.html?avatar=${avatarId}`;
       };
 
       // Avatar management functions
