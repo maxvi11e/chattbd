@@ -37,3 +37,4 @@ build/
 
 # Vercel
 .vercel
+vercel.json
