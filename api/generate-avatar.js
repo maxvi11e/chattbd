@@ -30,20 +30,29 @@ export default async function handler(req, res) {
   const styleKey = (styleChoice || '').trim() || 'default';
   const resolvedStyle = (styleMap[styleKey] || '').trim() || defaultStyle;
 
-    // Build enhanced prompt with quiz-driven vibe
+    // Build enhanced prompt with quiz-driven vibe, generalized from references
     let enhancedPrompt = `${resolvedStyle}`;
-    enhancedPrompt += ` Persona: ${prompt.trim()}`;
-    
-    const vibeParts = [];
-    if (band && band.trim()) vibeParts.push(`inspired by the vibe of ${band.trim()}`);
-    if (bookFilm && bookFilm.trim()) vibeParts.push(`echoes of ${bookFilm.trim()}`);
-    if (animal && animal.trim()) vibeParts.push(`subtle traits of a ${animal.trim()}`);
-    if (vibeParts.length) enhancedPrompt += `, with ${vibeParts.join(', ')}.`;
+    enhancedPrompt += ` Persona: ${prompt.trim()}.`;
+
+    // Generalization guidelines to avoid specific IP
+    enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text. Create an original, novel character that only captures the abstract vibe of the references. Combine influences subtly.`;
+
+    // Provide references as inputs for abstraction (quoted but to be generalized)
+    const references = [];
+    if (band && band.trim()) references.push(`Band reference: "${band.trim()}"`);
+    if (bookFilm && bookFilm.trim()) references.push(`Book/film reference: "${bookFilm.trim()}"`);
+    if (animal && animal.trim()) references.push(`Animal inspiration: "${animal.trim()}"`);
+    if (references.length) {
+      enhancedPrompt += ` References (for abstraction only): ${references.join('; ')}.`;
+    }
 
     // Legacy optional personality details
     if (personalityPrompt && personalityPrompt.trim()) {
       enhancedPrompt += ` Additional personality notes: ${personalityPrompt.trim()}.`;
     }
+
+    // Output restrictions to reinforce safety
+    enhancedPrompt += ` Output restrictions: no text overlays, no brand logos, no direct likenesses of real people or copyrighted characters.`;
 
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
