@@ -371,8 +371,20 @@
         }
         let pending;
         try { pending = JSON.parse(pendingRaw); } catch { pending = null; }
-        if (!pending?.prompt) {
-          showError('Invalid create payload.');
+        // Allow options-only payloads (prompt may be empty)
+        const hasAny = !!(pending && (
+          (pending.prompt && String(pending.prompt).trim()) ||
+          (pending.archetype && String(pending.archetype).trim()) ||
+          (pending.vibe && String(pending.vibe).trim()) ||
+          (pending.setting && String(pending.setting).trim()) ||
+          (Array.isArray(pending.colors) && pending.colors.length) ||
+          (pending.traits && typeof pending.traits === 'object') ||
+          (pending.personalityPrompt && String(pending.personalityPrompt).trim()) ||
+          (pending.artStyleCustom && String(pending.artStyleCustom).trim()) ||
+          (pending.styleChoice && String(pending.styleChoice).trim())
+        ));
+        if (!hasAny) {
+          showError('Invalid create payload. Please choose options or enter a prompt.');
           setTimeout(()=>{ window.location.href='create.html'; }, 1500);
           return;
         }
@@ -412,7 +424,12 @@
 
           // Upload and save to DB
           const { data: { user } } = await supabase.auth.getUser();
-          const finalBotName = json.botName || pending.botName || pending.prompt;
+          const finalBotName = (
+            (json.botName && String(json.botName).trim()) ||
+            (pending.prompt && String(pending.prompt).trim()) ||
+            (pending.archetype && String(pending.archetype).trim()) ||
+            'New Avatar'
+          );
           const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${finalBotName}.png` });
       const { data: avatarData, error: avatarError } = await supabase
             .from('avatars')
