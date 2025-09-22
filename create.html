@@ -257,13 +257,7 @@
             </div>
           </div>
 
-          <!-- Band / BookFilm -->
-          <label class="heroInput" aria-label="Pick a great band" style="flex: none;">
-            <input id="quizBand" type="text" placeholder="Pick a great band (optional)" />
-          </label>
-          <label class="heroInput" aria-label="Choose a great book or film" style="flex: none;">
-            <input id="quizBookFilm" type="text" placeholder="Choose a great book / film (optional)" />
-          </label>
+          <!-- Band / BookFilm removed -->
 
           <!-- Personality Traits -->
           <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
@@ -469,8 +463,7 @@
         const vibe = (document.getElementById('vibe')?.value || '').trim();
         const setting = (document.getElementById('setting')?.value || '').trim();
         const colors = Array.from(document.querySelectorAll('#colorsGroup input[type="checkbox"]:checked')).map(cb=>cb.value);
-        const band = (document.getElementById('quizBand')?.value || '').trim();
-        const bookFilm = (document.getElementById('quizBookFilm')?.value || '').trim();
+  // band/book removed
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
         const traits = {
@@ -484,7 +477,6 @@
           prompt: p, 
           archetype, vibe, setting, colors,
           styleChoice, artStyleCustom,
-          band, bookFilm,
           traits
         };
         try {
@@ -507,7 +499,6 @@
               prompt: p,
               archetype, vibe, setting, colors,
               styleChoice, artStyleCustom,
-              band, bookFilm,
               traits
             })
           });

@@ -12,8 +12,8 @@ export default async function handler(req, res) {
       prompt, 
       // legacy fields (botName, artStyle, personalityPrompt) may still come from old clients
       botName, artStyle, personalityPrompt,
-      // previous quiz fields
-      band, bookFilm, animal, styleChoice, artStyleCustom,
+  // previous quiz fields (band/book removed)
+  animal, styleChoice, artStyleCustom,
       // new refined quiz fields
       archetype, vibe, setting, colors, traits
     } = req.body || {};
@@ -88,10 +88,7 @@ export default async function handler(req, res) {
     enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text. Create an original, novel character that only captures the abstract vibe of the references. Combine influences subtly.`;
 
     // Provide references as inputs for abstraction (quoted but to be generalized)
-  const references = [];
-    if (band && band.trim()) references.push(`Band reference: "${band.trim()}"`);
-    if (bookFilm && bookFilm.trim()) references.push(`Book/film reference: "${bookFilm.trim()}"`);
-    if (references.length) enhancedPrompt += ` References (for abstraction only): ${references.join('; ')}.`;
+  // references removed (band/book)
 
     // Legacy optional personality details
     if (personalityPrompt && personalityPrompt.trim()) {
@@ -141,9 +138,8 @@ export default async function handler(req, res) {
       cost_estimate: "TBD",
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
-      has_quiz_band: !!(band && band.trim()),
-      has_quiz_bookFilm: !!(bookFilm && bookFilm.trim()),
       has_quiz_animal: !!(animal && animal.trim()),
+  // band/book removed
       has_archetype: !!(archetype && String(archetype).trim()),
       has_vibe: !!(vibe && String(vibe).trim()),
       has_setting: !!(setting && String(setting).trim()),
@@ -166,8 +162,6 @@ export default async function handler(req, res) {
         personalityPrompt: personalityPrompt || null,
         // echo quiz fields for traits persistence
         traits: { 
-          band: band || null, 
-          bookFilm: bookFilm || null, 
           animal: animal || null,
           archetype: archetype || null,
           vibe: vibe || null,
@@ -186,8 +180,6 @@ export default async function handler(req, res) {
         artStyleCustom: artStyleCustom || null,
         personalityPrompt: personalityPrompt || null,
         traits: { 
-          band: band || null, 
-          bookFilm: bookFilm || null, 
           animal: animal || null,
           archetype: archetype || null,
           vibe: vibe || null,
