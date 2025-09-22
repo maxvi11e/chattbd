@@ -44,9 +44,13 @@
     .page-icon{height:40px; width:auto;}
     .page-title{font-size:32px; font-weight:600; margin:0;}
 
-    /* Bot Preview */
-    .bot-preview{display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom:40px;}
-    .bot-image{width:300px; height:300px; border-radius:var(--radius-lg); object-fit:cover; border:2px solid var(--stroke);}
+  /* Bot Preview */
+  .bot-preview{display:flex; flex-direction:column; align-items:center; gap:24px; margin-bottom:40px;}
+  .bot-frame{width:300px; height:300px; border-radius:var(--radius-lg); border:2px solid var(--stroke); background:#000; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;}
+  .bot-image{width:100%; height:100%; border-radius:var(--radius-lg); object-fit:cover; display:none;}
+  .bot-image.visible{display:block;}
+  .frame-spinner{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+  .frame-spinner.hidden{display:none;}
     .bot-name{font-size:24px; font-weight:600; text-align:center;}
 
     /* Action Buttons */
@@ -84,7 +88,7 @@
       width:100%;
       max-width:600px;
       padding:32px;
-      border:1px solid var(--stroke);
+      border:0px solid var(--stroke);
       border-radius:var(--radius-lg);
       background:rgba(255,255,255,0.05);
     }
@@ -94,7 +98,7 @@
     .form-label{font-size:16px; font-weight:600; color:var(--ink);}
     .form-input{
       padding:12px 16px;
-      border:1px solid var(--stroke);
+      border:0px solid var(--stroke);
       border-radius:var(--radius-md);
       background:transparent;
       color:var(--ink);
@@ -177,7 +181,7 @@
     /* Responsive Design */
     @media (max-width: 768px) {
       .main-content{padding:16px;}
-      .bot-image{width:250px; height:250px;}
+  .bot-frame{width:250px; height:250px;}
       .action-buttons{flex-direction:column; align-items:center;}
       .action-btn{width:200px;}
       .form-buttons{flex-direction:column;}
@@ -223,7 +227,10 @@
 
       <!-- Bot Preview -->
       <div id="botPreview" class="bot-preview">
-        <img id="botImage" src="" alt="Generated Bot" class="bot-image" />
+        <div class="bot-frame">
+          <div id="frameSpinner" class="frame-spinner"><div class="spinner"></div></div>
+          <img id="botImage" src="" alt="Generated Bot" class="bot-image" />
+        </div>
         <h2 id="botName" class="bot-name">Loading...</h2>
       </div>
 
@@ -248,7 +255,7 @@
       <!-- Loading State -->
       <div id="loadingState" class="loading hidden">
         <div class="spinner"></div>
-        <p>Regenerating your bot...</p>
+        <p id="loadingText">Working...</p>
       </div>
     </div>
   </div>
@@ -313,7 +320,8 @@
   let wasEditFormVisible = false;
 
     // DOM elements
-    const botImage = document.getElementById('botImage');
+  const botImage = document.getElementById('botImage');
+  const frameSpinner = document.getElementById('frameSpinner');
     const botName = document.getElementById('botName');
     const editBtn = document.getElementById('editBtn');
     const confirmBtn = document.getElementById('confirmBtn');
@@ -338,7 +346,11 @@
   // Ensure controls are wired regardless of flow
   setupEventListeners();
 
-      // Get bot data from URL parameters or localStorage
+  // Prepare initial frame state
+  frameSpinner.classList.remove('hidden');
+  botImage.classList.remove('visible');
+
+  // Get bot data from URL parameters or localStorage
       const urlParams = new URLSearchParams(window.location.search);
       const isNewFlow = urlParams.get('new') === '1';
       const botId = urlParams.get('avatar') || localStorage.getItem('lastGeneratedAvatar');
@@ -368,6 +380,8 @@
   // Enter loading state like regenerate
   setLoadingText('Generating your bot...');
   setLoadingState(true);
+  frameSpinner.classList.remove('hidden');
+  botImage.classList.remove('visible');
         editForm.classList.remove('visible');
         actionButtons.style.display = 'none';
 
@@ -492,9 +506,21 @@
 
     // Display bot information
     function displayBot(bot) {
-      botImage.src = bot.image_url;
-      botImage.alt = bot.name;
+      // Show spinner in frame until the image loads
+      botImage.classList.remove('visible');
+      frameSpinner.classList.remove('hidden');
       botName.textContent = bot.name;
+      botImage.alt = bot.name;
+      botImage.onload = () => {
+        botImage.classList.add('visible');
+        frameSpinner.classList.add('hidden');
+      };
+      botImage.onerror = () => {
+        // Keep spinner to avoid ugly broken image icon
+        frameSpinner.classList.remove('hidden');
+        botImage.classList.remove('visible');
+      };
+      botImage.src = bot.image_url;
     }
 
     // Setup event listeners
@@ -581,8 +607,10 @@
       isRegenerating = true;
 
       try {
-        // Show loading state
-        setLoadingState(true);
+  // Show loading state and keep frame spinner centered
+  setLoadingState(true);
+  frameSpinner.classList.remove('hidden');
+  botImage.classList.remove('visible');
         hideError();
 
         // Check freemium limits
@@ -621,7 +649,7 @@
           return;
         }
 
-        // Update the bot image and data
+  // Update the bot image and data
         await updateBotImage(result);
         hideEditForm();
         
@@ -678,12 +706,14 @@
       if (loading) {
         // Remember whether the edit form was visible before loading
         wasEditFormVisible = editForm.classList.contains('visible');
-        loadingState.classList.remove('hidden');
+  loadingState.classList.remove('hidden');
+  frameSpinner.classList.remove('hidden');
+  botImage.classList.remove('visible');
         editForm.classList.remove('visible');
         actionButtons.style.display = 'none';
       } else {
         loadingState.classList.add('hidden');
-        if (wasEditFormVisible) {
+  if (wasEditFormVisible) {
           editForm.classList.add('visible');
         } else {
           editForm.classList.remove('visible');
@@ -693,7 +723,7 @@
     }
 
     function setLoadingText(text) {
-      const p = document.querySelector('#loadingState p');
+      const p = document.getElementById('loadingText');
       if (p) p.textContent = text;
     }
 
