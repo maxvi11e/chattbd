@@ -317,10 +317,18 @@
         const artStyle = document.getElementById('artStyle').value.trim();
         const personalityPrompt = document.getElementById('personalityPrompt').value.trim();
 
-        // Disable form while processing
-        persona.disabled = true;
-        startBtn.disabled = true;
-        startBtn.innerHTML = loader();
+        // Immediately route to edit page and let it handle generation + save with a loading spinner
+        const payload = { prompt: p, botName, artStyle, personalityPrompt };
+        try {
+          localStorage.setItem('pendingCreate', JSON.stringify(payload));
+        } catch(_) {}
+        window.location.href = 'edit.html?new=1';
+        return;
+
+  // (Unreached due to early return) Disable form while processing
+  persona.disabled = true;
+  startBtn.disabled = true;
+  startBtn.innerHTML = loader();
 
         try {
           // ===== Generate avatar via API =====

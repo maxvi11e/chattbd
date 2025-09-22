@@ -310,6 +310,7 @@
     // Global variables
     let currentBot = null;
     let isRegenerating = false;
+  let wasEditFormVisible = false;
 
     // DOM elements
     const botImage = document.getElementById('botImage');
@@ -332,11 +333,14 @@
       // Small delay to ensure session is available after redirect
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      const isAuthenticated = await checkAuthAndRedirect();
-      if (!isAuthenticated) return;
+  const isAuthenticated = await checkAuthAndRedirect();
+  if (!isAuthenticated) return;
+  // Ensure controls are wired regardless of flow
+  setupEventListeners();
 
       // Get bot data from URL parameters or localStorage
       const urlParams = new URLSearchParams(window.location.search);
+      const isNewFlow = urlParams.get('new') === '1';
       const botId = urlParams.get('avatar') || localStorage.getItem('lastGeneratedAvatar');
       
       console.log('🔍 Looking for bot ID:', {
@@ -344,7 +348,95 @@
         fromStorage: localStorage.getItem('lastGeneratedAvatar'),
         finalBotId: botId
       });
-      
+
+      if (isNewFlow) {
+        // Handle create page fast-redirect: show loading and generate, then save and load
+        const pendingRaw = localStorage.getItem('pendingCreate');
+        if (!pendingRaw) {
+          showError('No create payload found. Please try again.');
+          setTimeout(()=>{ window.location.href='create.html'; }, 1500);
+          return;
+        }
+        let pending;
+        try { pending = JSON.parse(pendingRaw); } catch { pending = null; }
+        if (!pending?.prompt) {
+          showError('Invalid create payload.');
+          setTimeout(()=>{ window.location.href='create.html'; }, 1500);
+          return;
+        }
+
+  // Enter loading state like regenerate
+  setLoadingText('Generating your bot...');
+  setLoadingState(true);
+        editForm.classList.remove('visible');
+        actionButtons.style.display = 'none';
+
+        try {
+          // Check freemium limits
+          if (window.FreemiumUtils) {
+            const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+            if (!canCreateResult.canCreate) {
+              const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+              await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+              setLoadingState(false);
+              return;
+            }
+          }
+
+          // Generate avatar via existing API
+          const res = await fetch('/api/generate-avatar', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify(pending)
+          });
+          const json = await res.json().catch(()=>({}));
+          if (!res.ok || !json?.dataUrl) {
+            showError(json?.error || 'Failed to generate avatar.');
+            setLoadingState(false);
+            return;
+          }
+
+          // Upload and save to DB
+          const { data: { user } } = await supabase.auth.getUser();
+          const finalBotName = json.botName || pending.botName || pending.prompt;
+          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${finalBotName}.png` });
+          const { data: avatarData, error: avatarError } = await supabase
+            .from('avatars')
+            .insert({
+              user_id: user.id,
+              name: finalBotName,
+              image_url: url,
+              traits: {
+                original_prompt: pending.prompt,
+                art_style: json.artStyle || pending.artStyle,
+                personality_prompt: json.personalityPrompt || pending.personalityPrompt
+              },
+            })
+            .select()
+            .single();
+          if (avatarError) throw avatarError;
+
+          // Display and store
+          currentBot = avatarData;
+          displayBot(currentBot);
+          localStorage.setItem('lastSelectedAvatar', currentBot.id);
+          localStorage.setItem('lastGeneratedAvatar', currentBot.id);
+
+          // Exit loading, show actions (keep edit form hidden)
+          setLoadingState(false);
+          hideEditForm();
+          return;
+        } catch (e) {
+          console.error('Create-in-edit flow failed:', e);
+          showError('Avatar creation failed. Please try again.');
+          setLoadingState(false);
+          return;
+        } finally {
+          // Clear one-time payload
+          try { localStorage.removeItem('pendingCreate'); } catch {}
+        }
+      }
+
       if (!botId) {
         console.error('❌ No bot ID found');
         showError('No bot found. Please create a bot first.');
@@ -354,8 +446,7 @@
         return;
       }
 
-      await loadBot(botId);
-      setupEventListeners();
+  await loadBot(botId);
     }
 
     // Load bot data
@@ -585,13 +676,25 @@
     // Utility functions
     function setLoadingState(loading) {
       if (loading) {
+        // Remember whether the edit form was visible before loading
+        wasEditFormVisible = editForm.classList.contains('visible');
         loadingState.classList.remove('hidden');
-        editForm.style.display = 'none';
+        editForm.classList.remove('visible');
         actionButtons.style.display = 'none';
       } else {
         loadingState.classList.add('hidden');
-        editForm.classList.add('visible');
+        if (wasEditFormVisible) {
+          editForm.classList.add('visible');
+        } else {
+          editForm.classList.remove('visible');
+          actionButtons.style.display = 'flex';
+        }
       }
+    }
+
+    function setLoadingText(text) {
+      const p = document.querySelector('#loadingState p');
+      if (p) p.textContent = text;
     }
 
     function showError(message) {
@@ -618,7 +721,16 @@
 
     async function uploadAvatarImage({ dataUrl, userId, fileName = "avatar.png" }) {
       try {
-        const blob = dataUrlToBlob(dataUrl);
+        let blob;
+        if (/^data:.*;base64,/.test(dataUrl)) {
+          blob = dataUrlToBlob(dataUrl);
+        } else if (typeof dataUrl === 'string' && dataUrl.startsWith('http')) {
+          const resp = await fetch(dataUrl);
+          if (!resp.ok) throw new Error('Failed to fetch image from URL');
+          blob = await resp.blob();
+        } else {
+          throw new Error('Unsupported image format');
+        }
         const path = `${userId}/${crypto.randomUUID()}-${fileName}`;
         
         const { error: upErr } = await supabase.storage.from("avatars")
