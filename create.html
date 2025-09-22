@@ -144,21 +144,29 @@
         <!-- Mode Chooser -->
         <div id="modeChooser" style="display:flex; justify-content:center; gap:16px; margin-top:16px;">
           <button id="modeOptionsBtn" 
-                  style="padding:14px 18px; border:2px solid var(--stroke); background:transparent; color:var(--ink); border-radius:var(--radius-md); font-size:16px; cursor:pointer;">
+                  style="padding:14px 22px; border:0; background:#fff; color:#000; border-radius:999px; font-size:16px; cursor:pointer; font-weight:600;">
             Create from options
           </button>
           <button id="modePromptBtn" 
-                  style="padding:14px 18px; border:2px solid var(--stroke); background:transparent; color:var(--ink); border-radius:var(--radius-md); font-size:16px; cursor:pointer;">
+                  style="padding:14px 22px; border:0; background:#fff; color:#000; border-radius:999px; font-size:16px; cursor:pointer; font-weight:600;">
             I know exactly what I want
           </button>
         </div>
 
         <!-- Back buttons for each mode -->
         <div id="backPrompt" style="display:none; justify-content:center; margin-top:12px;">
-          <button id="backFromPrompt" style="padding:8px 14px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:10px; font-size:14px; cursor:pointer;">← Back</button>
+          <button id="backFromPrompt" class="circleBtn" title="Back" style="background:#fff; border-color:#fff;">
+            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="10,12 16,6 16,18" fill="#000"/>
+            </svg>
+          </button>
         </div>
         <div id="backOptions" style="display:none; justify-content:center; margin-top:12px;">
-          <button id="backFromOptions" style="padding:8px 14px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:10px; font-size:14px; cursor:pointer;">← Back</button>
+          <button id="backFromOptions" class="circleBtn" title="Back" style="background:#fff; border-color:#fff;">
+            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="10,12 16,6 16,18" fill="#000"/>
+            </svg>
+          </button>
         </div>
         
         <!-- Advanced Options Panel (Expanded Quiz) -->
@@ -297,6 +305,11 @@
               <span style="width:90px; font-size:12px; color:#a8a8a8;">Fierce</span>
             </div>
           </div>
+
+          <!-- Additional Details -->
+          <label class="heroInput" aria-label="Additional details" style="flex: none;">
+            <input id="additionalDetails" type="text" placeholder="Add additional details about personality, appearance, or behavior (optional)" />
+          </label>
         </div>
         
         <!-- Dynamic Start Button Container (when advanced panel is open) -->
@@ -499,8 +512,9 @@
       })();
 
       async function start(){
-        const p = persona.value.trim(); 
-        if(!p) return;
+        const p = persona.value.trim();
+        const isOptionsMode = advancedPanel.style.display === 'flex';
+        if (!p && !isOptionsMode) return;
 
         // Check if user can create a new bot (freemium limits)
         if (!window.FreemiumUtils) {
@@ -537,7 +551,8 @@
           prompt: p, 
           archetype, vibe, setting, colors,
           styleChoice, artStyleCustom,
-          traits
+          traits,
+          personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
@@ -559,7 +574,8 @@
               prompt: p,
               archetype, vibe, setting, colors,
               styleChoice, artStyleCustom,
-              traits
+              traits,
+              personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
             })
           });
 

@@ -17,9 +17,7 @@ export default async function handler(req, res) {
       // new refined quiz fields
       archetype, vibe, setting, colors, traits
     } = req.body || {};
-    if (!prompt) {
-      return res.status(400).json({ error: "Missing prompt" });
-    }
+  // Persona prompt is optional (options mode may omit it)
 
     // Map style choice to concrete style descriptor
     const defaultStyle = `Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.`;
@@ -68,7 +66,11 @@ export default async function handler(req, res) {
     const subject = (animal && animal.trim()) || (archetype && archetype.trim()) || 'abstract humanoid silhouette';
     enhancedPrompt += ` Primary subject and silhouette: ${subject}-inspired character; posture and presence reflect a ${subject} archetype.`;
     
-    enhancedPrompt += ` Persona/theme: ${prompt.trim()}.`;
+    if (prompt && String(prompt).trim()) {
+      enhancedPrompt += ` Persona/theme: ${String(prompt).trim()}.`;
+    } else {
+      enhancedPrompt += ` Persona/theme: original, distinctive character.`;
+    }
     if (vibe && String(vibe).trim()) {
       enhancedPrompt += ` Overall atmosphere and emotional tone: ${String(vibe).trim()}.`;
     }
@@ -90,9 +92,9 @@ export default async function handler(req, res) {
     // Provide references as inputs for abstraction (quoted but to be generalized)
   // references removed (band/book)
 
-    // Legacy optional personality details
-    if (personalityPrompt && personalityPrompt.trim()) {
-      enhancedPrompt += ` Additional personality notes: ${personalityPrompt.trim()}.`;
+    // Additional details
+    if (personalityPrompt && String(personalityPrompt).trim()) {
+      enhancedPrompt += ` Additional details: ${String(personalityPrompt).trim()}.`;
     }
 
     // Output restrictions to reinforce safety
