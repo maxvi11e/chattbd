@@ -32,7 +32,11 @@ export default async function handler(req, res) {
 
     // Build enhanced prompt with quiz-driven vibe, generalized from references
     let enhancedPrompt = `${resolvedStyle}`;
-    enhancedPrompt += ` Persona: ${prompt.trim()}.`;
+     if (animal && animal.trim()) {
+       const a = animal.trim();
+       enhancedPrompt += ` Primary subject and silhouette: ${a}-inspired character; the overall shape, posture, and presence should reflect a ${a} (anthropomorphic is acceptable).`;
+     }
+     enhancedPrompt += ` Persona/theme: ${prompt.trim()}.`;
 
     // Generalization guidelines to avoid specific IP
     enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text. Create an original, novel character that only captures the abstract vibe of the references. Combine influences subtly.`;
@@ -41,10 +45,7 @@ export default async function handler(req, res) {
     const references = [];
     if (band && band.trim()) references.push(`Band reference: "${band.trim()}"`);
     if (bookFilm && bookFilm.trim()) references.push(`Book/film reference: "${bookFilm.trim()}"`);
-    if (animal && animal.trim()) references.push(`Animal inspiration: "${animal.trim()}"`);
-    if (references.length) {
-      enhancedPrompt += ` References (for abstraction only): ${references.join('; ')}.`;
-    }
+    if (references.length) enhancedPrompt += ` References (for abstraction only): ${references.join('; ')}.`;
 
     // Legacy optional personality details
     if (personalityPrompt && personalityPrompt.trim()) {
