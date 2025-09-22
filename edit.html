@@ -422,13 +422,21 @@
               image_url: url,
               traits: {
                 original_prompt: pending.prompt,
-        art_style: json.artStyle || null,
-        style_choice: json.styleChoice || pending.styleChoice || 'default',
-        art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
-        band: (json.traits?.band) || pending.band || null,
-        book_film: (json.traits?.bookFilm) || pending.bookFilm || null,
-        animal: (json.traits?.animal) || pending.animal || null,
-        personality_prompt: json.personalityPrompt || null
+                art_style: json.artStyle || null,
+                style_choice: json.styleChoice || pending.styleChoice || 'default',
+                art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
+                // new quiz traits
+                archetype: (json.traits?.archetype) || pending.archetype || null,
+                vibe: (json.traits?.vibe) || pending.vibe || null,
+                setting: (json.traits?.setting) || pending.setting || null,
+                colors: (json.traits?.colors) || pending.colors || [],
+                // legacy/compat
+                band: (json.traits?.band) || pending.band || null,
+                book_film: (json.traits?.bookFilm) || pending.bookFilm || null,
+                animal: (json.traits?.animal) || pending.animal || null,
+                // sliders raw values (optional)
+                persona_traits: (json.traits?.sliders) || pending.traits || null,
+                personality_prompt: json.personalityPrompt || null
               },
             })
             .select()

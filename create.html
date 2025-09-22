@@ -148,24 +148,71 @@
           </button>
         </div>
         
-        <!-- Advanced Options Panel (Quiz) -->
+        <!-- Advanced Options Panel (Expanded Quiz) -->
         <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
-          <!-- Pick a great band -->
-          <label class="heroInput" aria-label="Pick a great band" style="flex: none;">
-            <input id="quizBand" type="text" placeholder="Pick a great band" />
-          </label>
+          <!-- Archetype -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="">Archetype (optional)</option>
+                <option>Animal</option>
+                <option>Mythical</option>
+                <option>Machine</option>
+                <option>Elemental</option>
+                <option>Abstract</option>
+              </select>
+            </div>
+          </div>
 
-          <!-- Choose a great book / film -->
-          <label class="heroInput" aria-label="Choose a great book or film" style="flex: none;">
-            <input id="quizBookFilm" type="text" placeholder="Choose a great book / film" />
-          </label>
+          <!-- Vibe / Mood -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="vibe" aria-label="Vibe / Mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="">Vibe / Mood (optional)</option>
+                <option>mysterious</option>
+                <option>radiant</option>
+                <option>calm</option>
+                <option>fierce</option>
+                <option>playful</option>
+                <option>dramatic</option>
+                <option>cosmic</option>
+                <option>serene</option>
+              </select>
+            </div>
+          </div>
 
-          <!-- Name an awesome animal -->
-          <label class="heroInput" aria-label="Name an awesome animal" style="flex: none;">
-            <input id="quizAnimal" type="text" placeholder="Name an awesome animal" />
-          </label>
+          <!-- Era / Setting -->
+          <div style="display:flex; gap:8px; align-items:center;">
+            <div style="flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="setting" aria-label="Era / Setting" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="">Era / Setting (optional)</option>
+                <option>futuristic</option>
+                <option>cyberpunk</option>
+                <option>medieval</option>
+                <option>post-apocalyptic</option>
+                <option>forest</option>
+                <option>underwater</option>
+                <option>space</option>
+              </select>
+            </div>
+          </div>
 
-          <!-- Specify the art style (multiple choice) -->
+          <!-- Color Palette (multi-select up to 3) -->
+          <div id="colorsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:14px; color:#a8a8a8;">Color Palette (pick up to 3)</div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="neutral tones"> <span>neutral tones</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="vibrant neon"> <span>vibrant neon</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="pastel"> <span>pastel</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="monochrome"> <span>monochrome</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="warm earth tones"> <span>warm earth tones</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="cool blues"> <span>cool blues</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="sunset gradient"> <span>sunset gradient</span></label>
+              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="forest greens"> <span>forest greens</span></label>
+            </div>
+          </div>
+
+          <!-- Style Choice -->
           <div id="styleChoiceGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
             <div style="font-size:14px; color:#a8a8a8;">Specify the art style</div>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
@@ -181,6 +228,22 @@
               <span>simplified vector</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="fantasy concept art" />
+              <span>fantasy concept art</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="anime illustration" />
+              <span>anime illustration</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="pixel art" />
+              <span>pixel art</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="children's book" />
+              <span>children’s book</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input id="styleChoiceCustom" type="radio" name="styleChoice" value="custom" />
               <span>another style</span>
             </label>
@@ -191,6 +254,34 @@
             </div>
             <div style="font-size:12px; color:#8a8a8a; line-height:1.4;">
               a. default avatar art (Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.)
+            </div>
+          </div>
+
+          <!-- Band / BookFilm -->
+          <label class="heroInput" aria-label="Pick a great band" style="flex: none;">
+            <input id="quizBand" type="text" placeholder="Pick a great band (optional)" />
+          </label>
+          <label class="heroInput" aria-label="Choose a great book or film" style="flex: none;">
+            <input id="quizBookFilm" type="text" placeholder="Choose a great book / film (optional)" />
+          </label>
+
+          <!-- Personality Traits -->
+          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:14px; color:#a8a8a8;">Personality Traits</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;"/>
+              <span style="width:90px; font-size:12px; color:#a8a8a8;">Playful</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Introvert</span>
+              <input id="traitIntroExtro" type="range" min="0" max="100" value="50" style="flex:1;"/>
+              <span style="width:90px; font-size:12px; color:#a8a8a8;">Extrovert</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Gentle</span>
+              <input id="traitGentleFierce" type="range" min="0" max="100" value="50" style="flex:1;"/>
+              <span style="width:90px; font-size:12px; color:#a8a8a8;">Fierce</span>
             </div>
           </div>
         </div>
@@ -340,6 +431,21 @@
         });
       })();
 
+      // Limit color selections to 3
+      (function initColorsLimit(){
+        const group = document.getElementById('colorsGroup');
+        if (!group) return;
+        const checkboxes = Array.from(group.querySelectorAll('input[type="checkbox"]'));
+        checkboxes.forEach(cb=>{
+          cb.addEventListener('change', ()=>{
+            const selected = checkboxes.filter(c=>c.checked);
+            if (selected.length > 3) {
+              cb.checked = false;
+            }
+          });
+        });
+      })();
+
       async function start(){
         const p = persona.value.trim(); 
         if(!p) return;
@@ -359,14 +465,28 @@
         }
 
   // Get values from advanced panel (quiz)
-  const band = (document.getElementById('quizBand')?.value || '').trim();
-  const bookFilm = (document.getElementById('quizBookFilm')?.value || '').trim();
-  const animal = (document.getElementById('quizAnimal')?.value || '').trim();
+        const archetype = (document.getElementById('archetype')?.value || '').trim();
+        const vibe = (document.getElementById('vibe')?.value || '').trim();
+        const setting = (document.getElementById('setting')?.value || '').trim();
+        const colors = Array.from(document.querySelectorAll('#colorsGroup input[type="checkbox"]:checked')).map(cb=>cb.value);
+        const band = (document.getElementById('quizBand')?.value || '').trim();
+        const bookFilm = (document.getElementById('quizBookFilm')?.value || '').trim();
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
+        const traits = {
+          seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value || 50),
+          introExtro: Number(document.getElementById('traitIntroExtro')?.value || 50),
+          gentleFierce: Number(document.getElementById('traitGentleFierce')?.value || 50)
+        };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
-  const payload = { prompt: p, band, bookFilm, animal, styleChoice, artStyleCustom };
+        const payload = { 
+          prompt: p, 
+          archetype, vibe, setting, colors,
+          styleChoice, artStyleCustom,
+          band, bookFilm,
+          traits
+        };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
         } catch(_) {}
@@ -385,11 +505,10 @@
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ 
               prompt: p,
-              band,
-              bookFilm,
-              animal,
-              styleChoice,
-              artStyleCustom
+              archetype, vibe, setting, colors,
+              styleChoice, artStyleCustom,
+              band, bookFilm,
+              traits
             })
           });
 

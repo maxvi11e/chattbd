@@ -12,8 +12,10 @@ export default async function handler(req, res) {
       prompt, 
       // legacy fields (botName, artStyle, personalityPrompt) may still come from old clients
       botName, artStyle, personalityPrompt,
-      // new quiz fields
-      band, bookFilm, animal, styleChoice, artStyleCustom
+      // previous quiz fields
+      band, bookFilm, animal, styleChoice, artStyleCustom,
+      // new refined quiz fields
+      archetype, vibe, setting, colors, traits
     } = req.body || {};
     if (!prompt) {
       return res.status(400).json({ error: "Missing prompt" });
@@ -25,24 +27,68 @@ export default async function handler(req, res) {
       default: defaultStyle,
       realistic: `Square portrait avatar, photorealistic, cinematic soft light, shallow depth of field, detailed skin and fabric, centered composition.`,
       vector: `Square portrait avatar, simplified vector illustration, flat colors, clean geometric shapes, minimal shading, centered composition.`,
+      // new styles
+      'fantasy concept art': `Square portrait avatar, high-fantasy concept art, painterly detail, dramatic rim light, volumetric fog, epic mood, centered composition.`,
+      'anime illustration': `Square portrait avatar, anime character illustration, clean line art, cel shading, expressive eyes, vibrant palette, centered composition.`,
+      'pixel art': `Square portrait avatar, crisp pixel-art aesthetic, limited palette, blocky shapes, retro game style, centered composition.`,
+      "children's book": `Square portrait avatar, children's book illustration, soft textures, friendly shapes, warm inviting colors, centered composition.`,
       custom: (artStyleCustom || artStyle || '').trim()
     };
   const styleKey = (styleChoice || '').trim() || 'default';
   const resolvedStyle = (styleMap[styleKey] || '').trim() || defaultStyle;
 
+    // Normalize colors: accept array or comma-separated string; cap at 3
+    let colorList = [];
+    if (Array.isArray(colors)) {
+      colorList = colors.map(c => String(c).trim()).filter(Boolean);
+    } else if (typeof colors === 'string') {
+      colorList = colors.split(',').map(c => c.trim()).filter(Boolean);
+    }
+    colorList = [...new Set(colorList)].slice(0, 3);
+
+    // Map traits sliders to adjectives
+    const sliderToWord = (val, left, right) => {
+      const n = Number(val);
+      if (!Number.isFinite(n)) return null;
+      if (n <= 40) return left;
+      if (n >= 60) return right;
+      return 'balanced';
+    };
+    const traitWords = [];
+    if (traits && typeof traits === 'object') {
+      const t1 = sliderToWord(traits.seriousPlayful, 'serious', 'playful');
+      const t2 = sliderToWord(traits.introExtro, 'introverted', 'extroverted');
+      const t3 = sliderToWord(traits.gentleFierce, 'gentle', 'fierce');
+      [t1, t2, t3].forEach(w => { if (w && w !== 'balanced') traitWords.push(w); });
+    }
+
     // Build enhanced prompt with quiz-driven vibe, generalized from references
     let enhancedPrompt = `${resolvedStyle}`;
-     if (animal && animal.trim()) {
-       const a = animal.trim();
-       enhancedPrompt += ` Primary subject and silhouette: ${a}-inspired character; the overall shape, posture, and presence should reflect a ${a} (anthropomorphic is acceptable).`;
-     }
-     enhancedPrompt += ` Persona/theme: ${prompt.trim()}.`;
+    // Primary subject: animal takes precedence for backwards compatibility, else archetype, else default
+    const subject = (animal && animal.trim()) || (archetype && archetype.trim()) || 'abstract humanoid silhouette';
+    enhancedPrompt += ` Primary subject and silhouette: ${subject}-inspired character; posture and presence reflect a ${subject} archetype.`;
+    
+    enhancedPrompt += ` Persona/theme: ${prompt.trim()}.`;
+    if (vibe && String(vibe).trim()) {
+      enhancedPrompt += ` Overall atmosphere and emotional tone: ${String(vibe).trim()}.`;
+    }
+    if (setting && String(setting).trim()) {
+      enhancedPrompt += ` Era and setting influences: ${String(setting).trim()}.`;
+    }
+    if (colorList.length) {
+      enhancedPrompt += ` Color scheme emphasis: ${colorList.join(', ')}.`;
+    } else {
+      enhancedPrompt += ` Color scheme emphasis: neutral tones.`;
+    }
+    if (traitWords.length) {
+      enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
+    }
 
     // Generalization guidelines to avoid specific IP
     enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text. Create an original, novel character that only captures the abstract vibe of the references. Combine influences subtly.`;
 
     // Provide references as inputs for abstraction (quoted but to be generalized)
-    const references = [];
+  const references = [];
     if (band && band.trim()) references.push(`Band reference: "${band.trim()}"`);
     if (bookFilm && bookFilm.trim()) references.push(`Book/film reference: "${bookFilm.trim()}"`);
     if (references.length) enhancedPrompt += ` References (for abstraction only): ${references.join('; ')}.`;
@@ -98,6 +144,11 @@ export default async function handler(req, res) {
       has_quiz_band: !!(band && band.trim()),
       has_quiz_bookFilm: !!(bookFilm && bookFilm.trim()),
       has_quiz_animal: !!(animal && animal.trim()),
+      has_archetype: !!(archetype && String(archetype).trim()),
+      has_vibe: !!(vibe && String(vibe).trim()),
+      has_setting: !!(setting && String(setting).trim()),
+      colors_count: colorList.length,
+      has_traits: !!(traits && typeof traits === 'object'),
       style_choice: styleKey,
       style_resolved_custom: styleKey === 'custom' && !!((artStyleCustom || artStyle || '').trim()),
       has_personality_prompt: !!(personalityPrompt && personalityPrompt.trim()),
@@ -114,7 +165,16 @@ export default async function handler(req, res) {
         artStyleCustom: artStyleCustom || null,
         personalityPrompt: personalityPrompt || null,
         // echo quiz fields for traits persistence
-        traits: { band: band || null, bookFilm: bookFilm || null, animal: animal || null }
+        traits: { 
+          band: band || null, 
+          bookFilm: bookFilm || null, 
+          animal: animal || null,
+          archetype: archetype || null,
+          vibe: vibe || null,
+          setting: setting || null,
+          colors: colorList,
+          sliders: traits || null
+        }
       });
     }
     if (url) {
@@ -125,7 +185,16 @@ export default async function handler(req, res) {
         artStyle: resolvedStyle,
         artStyleCustom: artStyleCustom || null,
         personalityPrompt: personalityPrompt || null,
-        traits: { band: band || null, bookFilm: bookFilm || null, animal: animal || null }
+        traits: { 
+          band: band || null, 
+          bookFilm: bookFilm || null, 
+          animal: animal || null,
+          archetype: archetype || null,
+          vibe: vibe || null,
+          setting: setting || null,
+          colors: colorList,
+          sliders: traits || null
+        }
       });
     }
 
