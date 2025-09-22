@@ -414,7 +414,7 @@
           const { data: { user } } = await supabase.auth.getUser();
           const finalBotName = json.botName || pending.botName || pending.prompt;
           const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${finalBotName}.png` });
-          const { data: avatarData, error: avatarError } = await supabase
+      const { data: avatarData, error: avatarError } = await supabase
             .from('avatars')
             .insert({
               user_id: user.id,
@@ -422,8 +422,13 @@
               image_url: url,
               traits: {
                 original_prompt: pending.prompt,
-                art_style: json.artStyle || pending.artStyle,
-                personality_prompt: json.personalityPrompt || pending.personalityPrompt
+        art_style: json.artStyle || null,
+        style_choice: json.styleChoice || pending.styleChoice || 'default',
+        art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
+        band: (json.traits?.band) || pending.band || null,
+        book_film: (json.traits?.bookFilm) || pending.bookFilm || null,
+        animal: (json.traits?.animal) || pending.animal || null,
+        personality_prompt: json.personalityPrompt || null
               },
             })
             .select()

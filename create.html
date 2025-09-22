@@ -148,19 +148,51 @@
           </button>
         </div>
         
-        <!-- Advanced Options Panel -->
-        <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column;">
-          <label class="heroInput" aria-label="Bot name" style="margin-bottom: 16px; flex: none;">
-            <input id="botName" type="text" placeholder="Give the bot a name" />
+        <!-- Advanced Options Panel (Quiz) -->
+        <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
+          <!-- Pick a great band -->
+          <label class="heroInput" aria-label="Pick a great band" style="flex: none;">
+            <input id="quizBand" type="text" placeholder="Pick a great band" />
           </label>
-          
-          <label class="heroInput" aria-label="Art style" style="margin-bottom: 16px; flex: none;">
-            <input id="artStyle" type="text" placeholder="Specify an art style" />
+
+          <!-- Choose a great book / film -->
+          <label class="heroInput" aria-label="Choose a great book or film" style="flex: none;">
+            <input id="quizBookFilm" type="text" placeholder="Choose a great book / film" />
           </label>
-          
-          <label class="heroInput" aria-label="Personality prompt" style="flex: none;">
-            <input id="personalityPrompt" type="text" placeholder="Add personality details" />
+
+          <!-- Name an awesome animal -->
+          <label class="heroInput" aria-label="Name an awesome animal" style="flex: none;">
+            <input id="quizAnimal" type="text" placeholder="Name an awesome animal" />
           </label>
+
+          <!-- Specify the art style (multiple choice) -->
+          <div id="styleChoiceGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="font-size:14px; color:#a8a8a8;">Specify the art style</div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="default" checked />
+              <span>default avatar art</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="realistic" />
+              <span>realistic</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="vector" />
+              <span>simplified vector</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input id="styleChoiceCustom" type="radio" name="styleChoice" value="custom" />
+              <span>another style</span>
+            </label>
+            <div id="customStyleRow" style="display:none; margin-top:4px;">
+              <label class="heroInput" aria-label="Custom art style" style="flex:1;">
+                <input id="artStyleCustom" type="text" placeholder="Type the art style" />
+              </label>
+            </div>
+            <div style="font-size:12px; color:#8a8a8a; line-height:1.4;">
+              a. default avatar art (Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.)
+            </div>
+          </div>
         </div>
         
         <!-- Dynamic Start Button Container (when advanced panel is open) -->
@@ -294,6 +326,20 @@
         }
       });
 
+      // Handle art style custom input visibility
+      (function initStyleChoiceUI(){
+        const radios = Array.from(document.querySelectorAll('input[name="styleChoice"]'));
+        const customRow = document.getElementById('customStyleRow');
+        const customInput = document.getElementById('artStyleCustom');
+        radios.forEach(r=>{
+          r.addEventListener('change', ()=>{
+            const isCustom = document.querySelector('input[name="styleChoice"]:checked')?.value === 'custom';
+            customRow.style.display = isCustom ? 'block' : 'none';
+            if (isCustom) customInput?.focus();
+          });
+        });
+      })();
+
       async function start(){
         const p = persona.value.trim(); 
         if(!p) return;
@@ -312,13 +358,15 @@
           }
         }
 
-        // Get values from advanced panel
-        const botName = document.getElementById('botName').value.trim();
-        const artStyle = document.getElementById('artStyle').value.trim();
-        const personalityPrompt = document.getElementById('personalityPrompt').value.trim();
+  // Get values from advanced panel (quiz)
+  const band = (document.getElementById('quizBand')?.value || '').trim();
+  const bookFilm = (document.getElementById('quizBookFilm')?.value || '').trim();
+  const animal = (document.getElementById('quizAnimal')?.value || '').trim();
+  const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
+  const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
-        const payload = { prompt: p, botName, artStyle, personalityPrompt };
+  const payload = { prompt: p, band, bookFilm, animal, styleChoice, artStyleCustom };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
         } catch(_) {}
@@ -337,9 +385,11 @@
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ 
               prompt: p,
-              botName: botName,
-              artStyle: artStyle,
-              personalityPrompt: personalityPrompt
+              band,
+              bookFilm,
+              animal,
+              styleChoice,
+              artStyleCustom
             })
           });
 
