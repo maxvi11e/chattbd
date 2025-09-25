@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       const t1 = sliderToWord(traits.seriousPlayful, 'serious', 'playful');
       const t2 = sliderToWord(traits.succinctChatty, 'succinct', 'chatty');
       const t3 = sliderToWord(traits.rationalIntuitive, 'rational', 'intuitive');
-      const t4 = sliderToWord(traits.conservativeLiberal, 'conservative', 'liberal');
+      const t4 = sliderToWord(traits.conservativeLiberal, 'conservative', 'progressive');
       [t1, t2, t3, t4].forEach(w => { if (w && w !== 'balanced') traitWords.push(w); });
     }
 
