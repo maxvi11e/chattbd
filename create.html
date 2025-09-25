@@ -173,22 +173,22 @@
             <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
-              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
               <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
-              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
               <span style="width:110px; font-size:12px; color:#a8a8a8;">Talkative</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
-              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
               <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
-              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <input id="traitConservativeLiberal" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
               <span style="width:110px; font-size:12px; color:#a8a8a8;">Progressive</span>
             </div>
           </div>
@@ -223,73 +223,39 @@
 
           <!-- Primary Use removed -->
                     <!-- Style Choice -->
-          <div id="styleChoiceGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-size:14px; color:#a8a8a8;">Choose an art style</div>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="default" checked />
-              <span>Default avatar art</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="realistic" />
-              <span>Realistic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="vector" />
-              <span>Simplified vector</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="impressionistic" />
-              <span>Impressionistic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input id="styleChoiceCustom" type="radio" name="styleChoice" value="custom" />
-              <span>Another style (user entry)</span>
-            </label>
+          <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px;">
+            <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="default">choose art style - default avatar</option>
+                <option value="realistic">Realistic</option>
+                <option value="vector">Simplified vector</option>
+                <option value="impressionistic">Impressionistic</option>
+                <option value="custom">Another style (user entry)</option>
+              </select>
+            </div>
             <div id="customStyleRow" style="display:none; margin-top:4px;">
               <label class="heroInput" aria-label="Custom art style" style="flex:1;">
                 <input id="artStyleCustom" type="text" placeholder="Type the art style" />
               </label>
             </div>
-            <div style="font-size:12px; color:#8a8a8a; line-height:1.4;">
-              a. default avatar art (Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.)
-            </div>
+            
           </div>
 
                     <!-- Vibe / Mood -->
-          <div id="vibeGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-            <div style="font-size:14px; color:#a8a8a8;">Pick a vibe / mood</div>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="radiant" />
-              <span>Radiant</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="calming" />
-              <span>Calming</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="dramatic" />
-              <span>Dramatic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="serene" />
-              <span>Serene</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="mysterious" />
-              <span>Mysterious</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="energetic" />
-              <span>Energetic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="dreamlike" />
-              <span>Dreamlike</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input id="vibeChoiceCustom" type="radio" name="vibeChoice" value="custom" />
-              <span>Another (user entry)</span>
-            </label>
+          <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+            <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="">pick a vibe / mood for the artwork</option>
+                <option value="radiant">Radiant</option>
+                <option value="calming">Calming</option>
+                <option value="dramatic">Dramatic</option>
+                <option value="serene">Serene</option>
+                <option value="mysterious">Mysterious</option>
+                <option value="energetic">Energetic</option>
+                <option value="dreamlike">Dreamlike</option>
+                <option value="custom">Another (user entry)</option>
+              </select>
+            </div>
             <div id="customVibeRow" style="display:none; margin-top:4px;">
               <label class="heroInput" aria-label="Custom vibe" style="flex:1;">
                 <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" />
@@ -481,21 +447,22 @@
           archetypeSel.value = randPick(archetypes);
           dispatch(archetypeSel, 'change');
         }
-        // Sliders
-        const s1 = document.getElementById('traitSeriousPlayful');
-        const s2 = document.getElementById('traitSuccinctChatty');
-        const s3 = document.getElementById('traitRationalIntuitive');
-        [s1,s2,s3].forEach(s=>{ if(s){ s.value = String(randInt(10,90)); dispatch(s,'input'); }});
-        // Vibe
-        const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
-        const vibe = randPick(vibes);
-        const vibeRadio = document.querySelector(`input[name="vibeChoice"][value="${vibe}"]`);
-        if (vibeRadio){ vibeRadio.checked = true; dispatch(vibeRadio,'change'); }
-        // Style choice
-        const styles = ['default','realistic','vector','impressionistic'];
-        let style = randPick(styles);
-        const styleRadio = document.querySelector(`input[name="styleChoice"][value="${style}"]`);
-        if (styleRadio){ styleRadio.checked = true; dispatch(styleRadio,'change'); }
+  // Sliders (1-10 notched)
+  const s1 = document.getElementById('traitSeriousPlayful');
+  const s2 = document.getElementById('traitSuccinctChatty');
+  const s3 = document.getElementById('traitRationalIntuitive');
+  const s4 = document.getElementById('traitConservativeLiberal');
+  [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
+  // Vibe (select)
+  const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
+  const vibe = randPick(vibes);
+  const vibeSelect = document.getElementById('vibeChoice');
+  if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
+  // Style choice (select)
+  const styles = ['default','realistic','vector','impressionistic'];
+  let style = randPick(styles);
+  const styleSelect = document.getElementById('styleChoice');
+  if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
         // Detail level
         const detail = document.getElementById('detailLevel');
         if (detail){ detail.value = String(randInt(3,9)); dispatch(detail,'input'); }
@@ -529,32 +496,33 @@
       backFromPrompt.addEventListener('click', backToChooser);
       backFromOptions.addEventListener('click', backToChooser);
 
-      // Handle art style custom input visibility
+      // Handle art style custom input visibility (select)
       (function initStyleChoiceUI(){
-        const radios = Array.from(document.querySelectorAll('input[name="styleChoice"]'));
+        const sel = document.getElementById('styleChoice');
         const customRow = document.getElementById('customStyleRow');
         const customInput = document.getElementById('artStyleCustom');
-        radios.forEach(r=>{
-          r.addEventListener('change', ()=>{
-            const isCustom = document.querySelector('input[name="styleChoice"]:checked')?.value === 'custom';
-            customRow.style.display = isCustom ? 'block' : 'none';
-            if (isCustom) customInput?.focus();
-          });
-        });
-      })();
-
-      // Handle vibe custom input visibility
-      (function initVibeChoiceUI(){
-        const radios = Array.from(document.querySelectorAll('input[name="vibeChoice"]'));
-        const customRow = document.getElementById('customVibeRow');
-        const customInput = document.getElementById('vibeCustom');
+        if (!sel) return;
         const toggle = ()=>{
-          const sel = document.querySelector('input[name="vibeChoice"]:checked');
-          const isCustom = sel && sel.value === 'custom';
+          const isCustom = sel.value === 'custom';
           customRow.style.display = isCustom ? 'block' : 'none';
           if (isCustom) customInput?.focus();
         };
-        radios.forEach(r=> r.addEventListener('change', toggle));
+        sel.addEventListener('change', toggle);
+        toggle();
+      })();
+
+      // Handle vibe custom input visibility (select)
+      (function initVibeChoiceUI(){
+        const sel = document.getElementById('vibeChoice');
+        const customRow = document.getElementById('customVibeRow');
+        const customInput = document.getElementById('vibeCustom');
+        if (!sel) return;
+        const toggle = ()=>{
+          const isCustom = sel.value === 'custom';
+          customRow.style.display = isCustom ? 'block' : 'none';
+          if (isCustom) customInput?.focus();
+        };
+        sel.addEventListener('change', toggle);
         toggle();
       })();
 
@@ -572,11 +540,13 @@
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
 
         function currentSliderValues(){
+          const val = (id)=> document.getElementById(id)?.value;
+          const scale10To100 = (n)=> Math.round(((Number(n||5) - 1) / 9) * 100);
           return {
-            seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value||50),
-            succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value||50),
-            rationalIntuitive: Number(document.getElementById('traitRationalIntuitive')?.value||50),
-            conservativeLiberal: Number(document.getElementById('traitConservativeLiberal')?.value||50)
+            seriousPlayful: scale10To100(val('traitSeriousPlayful')),
+            succinctChatty: scale10To100(val('traitSuccinctChatty')),
+            rationalIntuitive: scale10To100(val('traitRationalIntuitive')),
+            conservativeLiberal: scale10To100(val('traitConservativeLiberal')),
           };
         }
 
@@ -702,18 +672,23 @@
   const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
   // band/book removed
   // Vibe / Mood
-  const vibeSel = document.querySelector('input[name="vibeChoice"]:checked');
-  const vibeChoice = vibeSel ? vibeSel.value : '';
+  const vibeSelectEl = document.getElementById('vibeChoice');
+  const vibeChoice = vibeSelectEl ? vibeSelectEl.value : '';
   const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
   const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
-  const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
+  const styleChoice = document.getElementById('styleChoice')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
   const detailLevel = Number(document.getElementById('detailLevel')?.value || 6);
+        function scale10To100(v){
+          const n = Number(v || 5);
+          // Map 1..10 -> 0..100 in 10 steps (1->0, 10->100)
+          return Math.round(((n - 1) / 9) * 100);
+        }
         const traits = {
-          seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value || 50),
-          succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value || 50),
-          rationalIntuitive: Number(document.getElementById('traitRationalIntuitive')?.value || 50),
-          conservativeLiberal: Number(document.getElementById('traitConservativeLiberal')?.value || 50)
+          seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
+          succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
+          rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
+          conservativeLiberal: scale10To100(document.getElementById('traitConservativeLiberal')?.value)
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
