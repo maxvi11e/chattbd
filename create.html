@@ -171,7 +171,31 @@
         
     <!-- Advanced Options Panel (Final Simplified Quiz) -->
   <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
-          <!-- Archetype -->
+          <!-- Personality Sliders FIRST -->
+          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
+              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
+              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
+              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
+            </div>
+          </div>
+          <!-- Archetype (SECOND) -->
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
@@ -190,6 +214,21 @@
               <label class="heroInput" aria-label="Custom archetype" style="flex:1;">
                 <input id="archetypeCustom" type="text" placeholder="Type the archetype (e.g., phoenix, clockwork automaton, sand elemental)" />
               </label>
+            </div>
+            <!-- Persona Suggestion (after choosing category) -->
+            <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+              <button id="generateSuggestionBtn" style="padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a specific persona</button>
+              <div id="suggestionResult" style="display:none; border:1px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255,255,255,0.05);">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                  <strong id="suggestionName"></strong>
+                  <div style="display:flex; gap:6px;">
+                    <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:20px; cursor:pointer;">Another</button>
+                    <button id="useSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#fff; color:#000; border-radius:20px; cursor:pointer;">Use</button>
+                  </div>
+                </div>
+                <div id="suggestionDesc" style="margin-top:6px; color:#cfcfcf;"></div>
+              </div>
+              <input type="hidden" id="archetypeSpecific" />
             </div>
           </div>
 
@@ -247,30 +286,6 @@
 
           <!-- Band / BookFilm removed -->
 
-          <!-- Personality Traits (Refined) -->
-          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
-            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
-              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
-              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
-              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
-              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
-            </div>
-          </div>
 
           <!-- Additional Details -->
           <label class="heroInput" aria-label="Additional details" style="flex: none;">
@@ -452,12 +467,142 @@
         const sel = document.getElementById('archetype');
         const row = document.getElementById('archetypeCustomRow');
         const input = document.getElementById('archetypeCustom');
-        if (!sel || !row) return;
+        const genBtn = document.getElementById('generateSuggestionBtn');
+        const suggestionBox = document.getElementById('suggestionResult');
+        const suggestionNameEl = document.getElementById('suggestionName');
+        const suggestionDescEl = document.getElementById('suggestionDesc');
+        const tryAnother = document.getElementById('tryAnotherSuggestion');
+        const useBtn = document.getElementById('useSuggestion');
+        const archetypeSpecificInput = document.getElementById('archetypeSpecific');
+
+        function currentSliderValues(){
+          return {
+            seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value||50),
+            succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value||50),
+            rationalIntuitive: Number(document.getElementById('traitRationalIntuitive')?.value||50),
+            conservativeLiberal: Number(document.getElementById('traitConservativeLiberal')?.value||50)
+          };
+        }
+
+        function pickWeighted(list){
+          return list[Math.floor(Math.random()*list.length)];
+        }
+
+        function generateSuggestion(category){
+          const t = currentSliderValues();
+          const playful = t.seriousPlayful;
+            const chatty = t.succinctChatty;
+            const intuitive = t.rationalIntuitive;
+            const liberal = t.conservativeLiberal;
+          let pool = [];
+          switch(category){
+            case 'Animal':
+              if (playful>60 && chatty>55) pool.push(['Otter','A lively, social otter avatar that radiates playful curiosity.']);
+              if (intuitive>60) pool.push(['Fox','A clever, intuitive fox with bright attentive eyes.']);
+              if (playful<40 && rationalIntuitive<50) pool.push(['Owl','A calm, observant owl focused and thoughtful.']);
+              pool.push(['Cat','A balanced feline presence—curious yet composed.']);
+              pool.push(['Dolphin','An energetic, intelligent dolphin with friendly expressive traits.']);
+              break;
+            case 'Plant':
+              if (intuitive>60) pool.push(['Willow Spirit','A graceful willow spirit with flowing fronds.']);
+              if (playful>55) pool.push(['Vine Sprite','A springy vine sprite twisting into whimsical shapes.']);
+              pool.push(['Cactus Guardian','A resilient cactus guardian with subtle blossoms.']);
+              pool.push(['Bloom Elemental','A radiant bloom elemental in mid-flower.']);
+              break;
+            case 'Robot':
+              if (chatty>60) pool.push(['Companion Drone','A personable hovering companion drone with expressive lights.']);
+              if (rationalIntuitive<50) pool.push(['Logic Core','A sleek analytical chassis with geometric accents.']);
+              pool.push(['Artisan Automaton','A crafted automaton with warm brass inlays.']);
+              pool.push(['Adaptive Unit','A modular adaptive unit mid-transformation.']);
+              break;
+            case 'Alien':
+              if (intuitive>60) pool.push(['Lumina','A bioluminescent alien empath with soft radiant patterns.']);
+              if (playful>55) pool.push(['Ziggle','A buoyant alien trickster with elastic limbs.']);
+              pool.push(['Void Walker','A serene void walker outlined by cosmic haze.']);
+              pool.push(['Aether Scout','A crystal-eyed scout scanning gently.']);
+              break;
+            case 'Fantasy':
+              if (playful>60) pool.push(['Sprite Bard','A musical sprite bard mid-lilt.']);
+              if (intuitive>60) pool.push(['Runeseer','A mystic runeseer with floating sigils.']);
+              pool.push(['Arcane Familiar','A hovering arcane familiar trailing sparks.']);
+              pool.push(['Crystal Warden','A stoic crystal warden with refracted aura.']);
+              break;
+            case 'Abstract':
+              if (intuitive>60) pool.push(['Aurora Flow','A flowing aurora ribbon coalescing into a face.']);
+              if (playful>55) pool.push(['Prism Jester','A prismatic shifting jester form.']);
+              pool.push(['Glyph Construct','Interlocking glyph shapes forming a sentient pattern.']);
+              pool.push(['Echo Silhouette','A layered echo of translucent forms.']);
+              break;
+            case 'Basic / Realistic':
+              if (playful>60) pool.push(['Energetic Friend','A bright, upbeat human with open expression.']);
+              if (seriousPlayful<40) pool.push(['Calm Analyst','A thoughtful human with composed posture.']);
+              pool.push(['Creative Thinker','A casual modern persona with subtle flair.']);
+              pool.push(['Curious Collaborator','Attentive, friendly, leaning forward slightly.']);
+              break;
+            default:
+              pool.push(['Original Concept','A novel undefined concept shaped by personality balance.']);
+          }
+          if (!pool.length) pool.push(['Original Concept','A novel undefined concept shaped by personality balance.']);
+          return pickWeighted(pool);
+        }
+
+        function updateGenerateState(){
+          const val = sel.value;
+          if (!genBtn) return;
+          if (val && val !== 'custom'){
+            genBtn.disabled = false;
+            genBtn.style.opacity = '1';
+          } else {
+            genBtn.disabled = true;
+            genBtn.style.opacity = '0.6';
+          }
+        }
+
+        if (genBtn){
+          genBtn.addEventListener('click', ()=>{
+            const category = sel.value;
+            if (!category || category==='custom') return;
+            genBtn.textContent = 'Generating...';
+            genBtn.disabled = true;
+            setTimeout(()=>{
+              const [name, desc] = generateSuggestion(category);
+              suggestionNameEl.textContent = name;
+              suggestionDescEl.textContent = desc;
+              suggestionBox.style.display = 'block';
+              archetypeSpecificInput.value = name;
+              genBtn.textContent = 'Generate a specific persona';
+              genBtn.disabled = false;
+            }, 300 + Math.random()*400);
+          });
+        }
+        tryAnother?.addEventListener('click', ()=>{
+          const category = sel.value;
+          if (!category || category==='custom') return;
+          const [name, desc] = generateSuggestion(category);
+          suggestionNameEl.textContent = name;
+          suggestionDescEl.textContent = desc;
+          archetypeSpecificInput.value = name;
+        });
+        useBtn?.addEventListener('click', ()=>{
+          // copy suggestion into custom field if custom selected else store hidden
+          const name = suggestionNameEl.textContent.trim();
+          archetypeSpecificInput.value = name;
+          useBtn.textContent = 'Selected';
+          setTimeout(()=>{ useBtn.textContent = 'Use'; }, 1200);
+        });
+
         const toggle = ()=>{
           const isCustom = sel.value === 'custom';
           row.style.display = isCustom ? 'block' : 'none';
           if (isCustom) input?.focus();
+          updateGenerateState();
+          if (!isCustom){
+            // reset suggestion UI when category changes
+            suggestionBox.style.display = 'none';
+            document.getElementById('archetypeSpecific').value = '';
+          }
         };
+        if (!sel || !row) return;
         sel.addEventListener('change', toggle);
         toggle();
       })();
@@ -503,6 +648,7 @@
   const primaryUseValue = (document.getElementById('primaryUse')?.value || '').trim();
   const primaryUseCustom = (document.getElementById('primaryUseCustom')?.value || '').trim();
   const primaryUse = (primaryUseValue === 'custom') ? primaryUseCustom : primaryUseValue;
+  const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
   // band/book removed
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
@@ -516,7 +662,7 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const payload = { 
           prompt: p, 
-          archetype, primaryUse,
+          archetype, archetypeSpecific, primaryUse,
           styleChoice, artStyleCustom,
           traits,
           personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
