@@ -426,8 +426,8 @@ function getPlanDetails(planId) {
     },
     'starter': {
       name: 'Starter Plan',
-      description: 'Great for small projects and personal use',
-      price_cents: 500,
+      description: 'Great for small projects and personal use (temporary promo)',
+      price_cents: 50, // TEMPORARY: reduced to $0.50 one-time
       billing_interval: 'one_time',
       bot_limit: 4
     },
