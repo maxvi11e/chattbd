@@ -434,7 +434,7 @@ function getPlanDetails(planId) {
     'unlimited': {
       name: 'Unlimited Plan',
       description: 'Create unlimited bots',
-      price_cents: 900,
+      price_cents: 50,
       billing_interval: 'monthly',
       bot_limit: null
     }
