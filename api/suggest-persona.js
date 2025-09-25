@@ -12,6 +12,12 @@ export default async function handler(req) {
   try {
     const body = await req.json();
     const { archetypeCategory, sliders = {}, userText } = body || {};
+    console.log('[suggest-persona] incoming', {
+      archetypeCategory,
+      sliders,
+      userText: userText || null,
+      timestamp: new Date().toISOString()
+    });
     if (!archetypeCategory) {
       return new Response(JSON.stringify({ error: 'Missing archetypeCategory' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }
@@ -31,7 +37,7 @@ export default async function handler(req) {
     if (s.rationalIntuitive >= 65) flavor.push('intuitive'); else if (s.rationalIntuitive <= 35) flavor.push('analytical');
     if (s.conservativeLiberal >= 65) flavor.push('progressive outlook'); else if (s.conservativeLiberal <= 35) flavor.push('tradition-minded');
 
-    const system = `You generate a single concise persona concept (name + one-sentence evocative description) for an avatar creation flow.
+    const system = `You generate a single concise persona concept (name + one-sentence broad description) for an avatar creation flow.
 Output STRICT JSON with keys: name, description, reasoning.
 Do NOT include any line breaks or backticks.
 Rules:

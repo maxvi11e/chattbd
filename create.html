@@ -500,15 +500,18 @@
         async function generateSuggestion(category){
           try {
             const sliders = currentSliderValues();
+            const payload = { archetypeCategory: category, sliders };
+            console.log('[suggest-persona] sending', payload);
             const resp = await fetch('/api/suggest-persona', {
               method:'POST',
               headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({ archetypeCategory: category, sliders })
+              body: JSON.stringify(payload)
             });
             if(!resp.ok){
               throw new Error('Suggest API failed');
             }
             const json = await resp.json();
+            console.log('[suggest-persona] received', json);
             return [json.name, json.description];
           } catch(e){
             console.error('Suggestion error', e);
