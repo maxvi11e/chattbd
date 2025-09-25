@@ -112,6 +112,11 @@ export default async function handler(req, res) {
     // Output restrictions to reinforce safety
     enhancedPrompt += ` Output restrictions: no text overlays, no brand logos, no direct likenesses of real people or copyrighted characters.`;
 
+    // Normalize image quality to match provider options
+    const qRaw = (process.env.IMAGE_QUALITY || 'medium').toLowerCase().trim();
+    const qMap = { standard: 'medium', hd: 'high' };
+    const qualitySetting = qMap[qRaw] || (['low','medium','high'].includes(qRaw) ? qRaw : 'medium');
+
     const r = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
@@ -123,7 +128,7 @@ export default async function handler(req, res) {
         prompt: enhancedPrompt,
         size: "512x512",   // ✅ valid size
         n: 1,
-  quality: "standard"
+  quality: qualitySetting
       }),
     });
 
@@ -148,7 +153,7 @@ export default async function handler(req, res) {
     console.log(`✅ Image generated successfully:`, {
       model: "gpt-image-1",
       size: "512x512",
-      quality: "standard",
+      quality: qualitySetting,
       cost_estimate: "TBD",
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
