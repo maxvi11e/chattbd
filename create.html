@@ -175,13 +175,15 @@
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Archetype (optional)</option>
+                <option value="">Choose an archetype (optional)</option>
+                <option>Basic / Realistic</option>
                 <option>Animal</option>
-                <option>Mythical</option>
-                <option>Machine</option>
-                <option>Elemental</option>
+                <option>Plant</option>
+                <option>Robot</option>
+                <option>Alien</option>
+                <option>Fantasy</option>
                 <option>Abstract</option>
-                <option value="custom">choose my own/ get specific</option>
+                <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
             <div id="archetypeCustomRow" style="display:none; width:100%; margin-top:8px;">
@@ -195,16 +197,12 @@
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="primaryUse" aria-label="Primary use" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Primary use / role (optional)</option>
-                <option>general companion</option>
-                <option>study helper</option>
-                <option>creative brainstorming</option>
-                <option>emotional support</option>
-                <option>fitness motivator</option>
-                <option>coding assistant</option>
-                <option>storyteller</option>
-                <option>language tutor</option>
-                <option value="custom">custom / get specific</option>
+                <option value="">What will you mainly use the bot for? (optional)</option>
+                <option>Search and information retrieval</option>
+                <option>Projects and Ideation</option>
+                <option>Personal development</option>
+                <option>Conversation and companionship</option>
+                <option value="custom">Other (user entry)</option>
               </select>
             </div>
             <div id="primaryUseCustomRow" style="display:none; width:100%; margin-top:8px;">
@@ -216,42 +214,26 @@
 
           <!-- Style Choice -->
           <div id="styleChoiceGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-size:14px; color:#a8a8a8;">Specify the art style</div>
+            <div style="font-size:14px; color:#a8a8a8;">Choose an art style</div>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="default" checked />
-              <span>default avatar art</span>
+              <span>Default avatar art</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="realistic" />
-              <span>realistic</span>
+              <span>Realistic</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="vector" />
-              <span>simplified vector</span>
+              <span>Simplified vector</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="impressionistic" />
-              <span>impressionistic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="fantasy concept art" />
-              <span>fantasy concept art</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="anime illustration" />
-              <span>anime illustration</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="pixel art" />
-              <span>pixel art</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="styleChoice" value="children's book" />
-              <span>children’s book</span>
+              <span>Impressionistic</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input id="styleChoiceCustom" type="radio" name="styleChoice" value="custom" />
-              <span>another style</span>
+              <span>Another style (user entry)</span>
             </label>
             <div id="customStyleRow" style="display:none; margin-top:4px;">
               <label class="heroInput" aria-label="Custom art style" style="flex:1;">
