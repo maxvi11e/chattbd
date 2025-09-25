@@ -171,9 +171,9 @@
         
     <!-- Advanced Options Panel (Final Simplified Quiz) -->
   <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
-          <!-- Archetype (SECOND) -->
+          <!-- Archetype -->
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
-            <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+            <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose an archetype (optional)</option>
                 <option>Basic / Realistic</option>
@@ -186,6 +186,31 @@
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
+                      <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
+              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Talkative</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
+              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
+              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
+            </div>
+          </div>
+
+
             <div id="archetypeCustomRow" style="display:none; width:100%; margin-top:8px;">
               <label class="heroInput" aria-label="Custom archetype" style="flex:1;">
                 <input id="archetypeCustom" type="text" placeholder="Type the archetype (e.g., phoenix, clockwork automaton, sand elemental)" />
@@ -193,8 +218,10 @@
             </div>
             <!-- Persona Suggestion (after choosing category) -->
             <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-              <button id="generateSuggestionBtn" style="padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a specific persona</button>
-              <div id="suggestionResult" style="display:none; border:1px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255,255,255,0.05);">
+              <div style="display:flex; justify-content:center;">
+                <button id="generateSuggestionBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion</button>
+              </div>
+              <div id="suggestionResult" style="display:none; border:0px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255,255,255,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                   <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:var(--ink); border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
@@ -212,31 +239,9 @@
                 </label>
               </div>
             </div>
-          </div>
 
-          <!-- Personality Sliders SECOND -->
-          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
-            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
-              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
-              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
-              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
-              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
-            </div>
+          <!-- Personality Sliders (right after archetype) -->
+
           </div>
 
           <!-- Primary Use / Purpose -->
