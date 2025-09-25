@@ -222,69 +222,75 @@
           </div>
 
           <!-- Primary Use removed -->
-                    <!-- Style Choice -->
-          <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px;">
-            <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="default">choose art style - default avatar</option>
-                <option value="realistic">Realistic</option>
-                <option value="vector">Simplified vector</option>
-                <option value="impressionistic">Impressionistic</option>
-                <option value="custom">Another style (user entry)</option>
-              </select>
             </div>
-            <div id="customStyleRow" style="display:none; margin-top:4px;">
-              <label class="heroInput" aria-label="Custom art style" style="flex:1;">
-                <input id="artStyleCustom" type="text" placeholder="Type the art style" />
-              </label>
+            <!-- Art settings toggle -->
+            <div style="width:100%; display:flex; justify-content:center;">
+              <button id="toggleArtSettingsBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer;">art settings</button>
             </div>
+
+            <!-- Art Settings Container (collapsed by default) -->
+            <div id="artSettingsContainer" style="display:none; flex-direction:column; gap:8px; width:100%;">
+                      <!-- Style Choice -->
+            <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+                <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                  <option value="default">choose art style - default avatar</option>
+                  <option value="realistic">Realistic</option>
+                  <option value="vector">Simplified vector</option>
+                  <option value="impressionistic">Impressionistic</option>
+                  <option value="custom">Another style (user entry)</option>
+                </select>
+              </div>
+              <div id="customStyleRow" style="display:none; margin-top:4px;">
+                <label class="heroInput" aria-label="Custom art style" style="flex:1;">
+                  <input id="artStyleCustom" type="text" placeholder="Type the art style" />
+                </label>
+              </div>
             
-          </div>
+            </div>
 
-                    <!-- Vibe / Mood -->
-          <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-            <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">pick a vibe / mood for the artwork</option>
-                <option value="radiant">Radiant</option>
-                <option value="calming">Calming</option>
-                <option value="dramatic">Dramatic</option>
-                <option value="serene">Serene</option>
-                <option value="mysterious">Mysterious</option>
-                <option value="energetic">Energetic</option>
-                <option value="dreamlike">Dreamlike</option>
-                <option value="custom">Another (user entry)</option>
-              </select>
+            <!-- Vibe / Mood -->
+            <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+                <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                  <option value="">pick a vibe / mood for the artwork</option>
+                  <option value="radiant">Radiant</option>
+                  <option value="calming">Calming</option>
+                  <option value="dramatic">Dramatic</option>
+                  <option value="serene">Serene</option>
+                  <option value="mysterious">Mysterious</option>
+                  <option value="energetic">Energetic</option>
+                  <option value="dreamlike">Dreamlike</option>
+                  <option value="custom">Another (user entry)</option>
+                </select>
+              </div>
+              <div id="customVibeRow" style="display:none; margin-top:4px;">
+                <label class="heroInput" aria-label="Custom vibe" style="flex:1;">
+                  <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" />
+                </label>
+              </div>
             </div>
-            <div id="customVibeRow" style="display:none; margin-top:4px;">
-              <label class="heroInput" aria-label="Custom vibe" style="flex:1;">
-                <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" />
-              </label>
-            </div>
-          </div>
 
-          <!-- Detail Level -->
-          <div id="detailGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-            <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
-              <span>Detail level</span>
-              <span style="font-size:12px; color:#8a8a8a;">1 = low, 10 = very detailed</span>
+            <!-- Detail Level -->
+            <div id="detailGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+              <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
+                <span>Detail level</span>
+                <span style="font-size:12px; color:#8a8a8a;">1 = low, 10 = very detailed</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="width:24px; text-align:right; font-size:12px; color:#a8a8a8;">1</span>
+                <input id="detailLevel" type="range" min="1" max="10" step="1" value="6" style="flex:1;" />
+                <span style="width:24px; font-size:12px; color:#a8a8a8;">10</span>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-              <span style="width:24px; text-align:right; font-size:12px; color:#a8a8a8;">1</span>
-              <input id="detailLevel" type="range" min="1" max="10" step="1" value="6" style="flex:1;" />
-              <span style="width:24px; font-size:12px; color:#a8a8a8;">10</span>
             </div>
-          </div>
 
 
 
           <!-- Band / BookFilm removed -->
 
 
-          <!-- Additional Details -->
-          <label class="heroInput" aria-label="Additional details" style="flex: none;">
-            <input id="additionalDetails" type="text" placeholder="Add additional details about personality, appearance, or behavior (optional)" />
-          </label>
+          <!-- Additional Details removed -->
         </div>
         
         <!-- Dynamic Start Button Container (when advanced panel is open) -->
@@ -366,6 +372,8 @@
   const backOptions = document.getElementById('backOptions');
   const backFromPrompt = document.getElementById('backFromPrompt');
   const backFromOptions = document.getElementById('backFromOptions');
+  const artSettings = document.getElementById('artSettingsContainer');
+  const toggleArtSettingsBtn = document.getElementById('toggleArtSettingsBtn');
 
       // Sign out handler (optional if logout button exists)
       if (logoutBtn) {
@@ -432,6 +440,15 @@
       }
       modeOptionsBtn.addEventListener('click', showOptionsMode);
       modePromptBtn.addEventListener('click', showPromptMode);
+
+      // Art settings toggle (default minimized)
+      if (toggleArtSettingsBtn && artSettings){
+        artSettings.style.display = 'none';
+        toggleArtSettingsBtn.addEventListener('click', ()=>{
+          const isHidden = artSettings.style.display === 'none';
+          artSettings.style.display = isHidden ? 'flex' : 'none';
+        });
+      }
 
       // --- Randomize All ---
       function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
@@ -700,7 +717,7 @@
           styleChoice, artStyleCustom,
           detailLevel,
           traits,
-          personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
+          personalityPrompt: ''
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
