@@ -226,7 +226,6 @@
                   <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:var(--ink); border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
                     <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:20px; cursor:pointer;">Another</button>
-                    <button id="useSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#fff; color:#000; border-radius:20px; cursor:pointer;">Apply</button>
                   </div>
                 </div>
                 <textarea id="suggestionDesc" placeholder="Short persona description" style="margin-top:6px; width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;"></textarea>
@@ -484,12 +483,9 @@
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
         const tryAnother = document.getElementById('tryAnotherSuggestion');
-        const useBtn = document.getElementById('useSuggestion');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
-  const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
-  const botNameInput = document.getElementById('botNameInput');
-
-        function currentSliderValues(){
+        const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
+        const botNameInput = document.getElementById('botNameInput');        function currentSliderValues(){
           return {
             seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value||50),
             succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value||50),
@@ -524,6 +520,17 @@
           }
         }
 
+        });
+
+        // Auto-apply when user edits suggestion fields
+        suggestionNameEl?.addEventListener('input', ()=>{
+          archetypeSpecificInput.value = suggestionNameEl.value;
+          if (!botNameInput.value) botNameInput.value = suggestionNameEl.value;
+        });
+        suggestionDescEl?.addEventListener('input', ()=>{
+          archetypeSpecificDesc.value = suggestionDescEl.value;
+        });
+
         function updateGenerateState(){
           const val = sel.value;
           if (!genBtn) return;
@@ -546,6 +553,7 @@
               suggestionNameEl.value = name;
               suggestionDescEl.value = desc;
               suggestionBox.style.display = 'block';
+              // Automatically apply suggestion
               archetypeSpecificInput.value = name;
               archetypeSpecificDesc.value = desc;
               if (!botNameInput.value) botNameInput.value = name;
@@ -560,20 +568,11 @@
           const [name, desc] = await generateSuggestion(category);
           suggestionNameEl.value = name;
           suggestionDescEl.value = desc;
+          // Automatically apply new suggestion
           archetypeSpecificInput.value = name;
           archetypeSpecificDesc.value = desc;
           if (!botNameInput.value) botNameInput.value = name;
           tryAnother.textContent = 'Another';
-        });
-        useBtn?.addEventListener('click', ()=>{
-          // copy suggestion into custom field if custom selected else store hidden
-          const name = (suggestionNameEl.value||'').trim();
-          const desc = (suggestionDescEl.value||'').trim();
-          archetypeSpecificInput.value = name;
-          archetypeSpecificDesc.value = desc;
-          if (!botNameInput.value) botNameInput.value = name;
-          useBtn.textContent = 'Selected';
-          setTimeout(()=>{ useBtn.textContent = 'Use'; }, 1200);
         });
 
         const toggle = ()=>{
