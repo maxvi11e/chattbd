@@ -11,11 +11,11 @@ export default async function handler(req, res) {
     const { 
       prompt, 
       // legacy fields (botName, artStyle, personalityPrompt) may still come from old clients
-      botName, artStyle, personalityPrompt,
+  botName, artStyle, personalityPrompt,
       // legacy animal still accepted for backwards compat
       animal, styleChoice, artStyleCustom,
   // final simplified quiz fields
-  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits
+  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits, vibe
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -88,6 +88,9 @@ export default async function handler(req, res) {
     }
     if (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) {
       enhancedPrompt += ` Persona detail hint: ${String(archetypeSpecificDesc).trim()}.`;
+    }
+    if (vibe && String(vibe).trim()) {
+      enhancedPrompt += ` Overall vibe/mood: ${String(vibe).trim()}.`;
     }
     if (traitWords.length) {
       enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
@@ -173,6 +176,7 @@ export default async function handler(req, res) {
           archetype: archetype || null,
           archetype_specific: archetypeSpecific || null,
           primary_use: primaryUse || null,
+          vibe: vibe || null,
           personality_words: traitWords,
           sliders_raw: traits || null
         },
@@ -192,6 +196,7 @@ export default async function handler(req, res) {
           archetype: archetype || null,
           archetype_specific: archetypeSpecific || null,
           primary_use: primaryUse || null,
+          vibe: vibe || null,
           personality_words: traitWords,
           sliders_raw: traits || null
         },

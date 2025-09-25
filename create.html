@@ -175,7 +175,7 @@
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Choose an archetype (optional)</option>
+                <option value="">Choose a base archetype</option>
                 <option>Basic / Realistic</option>
                 <option>Animal</option>
                 <option>Plant</option>
@@ -228,7 +228,7 @@
                     <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:20px; cursor:pointer;">Another</button>
                   </div>
                 </div>
-                <textarea id="suggestionDesc" placeholder="Short persona description" style="margin-top:6px; width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;"></textarea>
+                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="margin-top:6px; width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
@@ -253,6 +253,48 @@
             <div id="primaryUseCustomRow" style="display:none; width:100%; margin-top:8px;">
               <label class="heroInput" aria-label="Custom primary use" style="flex:1;">
                 <input id="primaryUseCustom" type="text" placeholder="Describe the primary use or role (e.g., travel planner, gardening coach)" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Vibe / Mood -->
+          <div id="vibeGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+            <div style="font-size:14px; color:#a8a8a8;">Pick a vibe / mood</div>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="radiant" />
+              <span>Radiant</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="calming" />
+              <span>Calming</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="dramatic" />
+              <span>Dramatic</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="serene" />
+              <span>Serene</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="mysterious" />
+              <span>Mysterious</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="energetic" />
+              <span>Energetic</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="vibeChoice" value="dreamlike" />
+              <span>Dreamlike</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input id="vibeChoiceCustom" type="radio" name="vibeChoice" value="custom" />
+              <span>Another (user entry)</span>
+            </label>
+            <div id="customVibeRow" style="display:none; margin-top:4px;">
+              <label class="heroInput" aria-label="Custom vibe" style="flex:1;">
+                <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" />
               </label>
             </div>
           </div>
@@ -468,6 +510,21 @@
         });
       })();
 
+      // Handle vibe custom input visibility
+      (function initVibeChoiceUI(){
+        const radios = Array.from(document.querySelectorAll('input[name="vibeChoice"]'));
+        const customRow = document.getElementById('customVibeRow');
+        const customInput = document.getElementById('vibeCustom');
+        const toggle = ()=>{
+          const sel = document.querySelector('input[name="vibeChoice"]:checked');
+          const isCustom = sel && sel.value === 'custom';
+          customRow.style.display = isCustom ? 'block' : 'none';
+          if (isCustom) customInput?.focus();
+        };
+        radios.forEach(r=> r.addEventListener('change', toggle));
+        toggle();
+      })();
+
       // Show custom archetype field when selected
       (function initArchetypeCustomUI(){
         const sel = document.getElementById('archetype');
@@ -627,6 +684,11 @@
   const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
   const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
   // band/book removed
+  // Vibe / Mood
+  const vibeSel = document.querySelector('input[name="vibeChoice"]:checked');
+  const vibeChoice = vibeSel ? vibeSel.value : '';
+  const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
+  const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
         const traits = {
@@ -641,6 +703,7 @@
           prompt: p, 
           botName: archetypeSpecific || undefined,
           archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse,
+          vibe,
           styleChoice, artStyleCustom,
           traits,
           personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
