@@ -121,9 +121,9 @@ export default async function handler(req, res) {
   body: JSON.stringify({
         model: "gpt-image-1",
         prompt: enhancedPrompt,
-        size: "1024x1024",   // ✅ valid size
+        size: "512x512",   // ✅ valid size
         n: 1,
-        quality: "high"
+  quality: "standard"
       }),
     });
 
@@ -147,8 +147,8 @@ export default async function handler(req, res) {
     const duration = Date.now() - startTime;
     console.log(`✅ Image generated successfully:`, {
       model: "gpt-image-1",
-      size: "1024x1024",
-      quality: "high",
+      size: "512x512",
+      quality: "standard",
       cost_estimate: "TBD",
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
