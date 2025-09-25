@@ -169,7 +169,7 @@
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
-                      <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+                      <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
             <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
@@ -564,6 +564,7 @@
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
+      const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const tryAnother = document.getElementById('tryAnotherSuggestion');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
@@ -670,6 +671,8 @@
           row.style.display = isCustom ? 'block' : 'none';
           if (isCustom) input?.focus();
           updateGenerateState();
+          // Show sliders only when a base archetype is set (any non-empty selection)
+          if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
           if (!isCustom){
             // reset suggestion UI when category changes
             suggestionBox.style.display = 'none';
