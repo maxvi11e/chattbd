@@ -169,7 +169,7 @@
           </button>
         </div>
         
-        <!-- Advanced Options Panel (Expanded Quiz) -->
+    <!-- Advanced Options Panel (Final Simplified Quiz) -->
   <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
           <!-- Archetype -->
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
@@ -191,51 +191,26 @@
             </div>
           </div>
 
-          <!-- Vibe / Mood -->
-          <div style="display:flex; gap:8px; align-items:center;">
-            <div style="flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="vibe" aria-label="Vibe / Mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Vibe / Mood (optional)</option>
-                <option>mysterious</option>
-                <option>radiant</option>
-                <option>calm</option>
-                <option>fierce</option>
-                <option>playful</option>
-                <option>dramatic</option>
-                <option>cosmic</option>
-                <option>serene</option>
+          <!-- Primary Use / Purpose -->
+          <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
+            <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <select id="primaryUse" aria-label="Primary use" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                <option value="">Primary use / role (optional)</option>
+                <option>general companion</option>
+                <option>study helper</option>
+                <option>creative brainstorming</option>
+                <option>emotional support</option>
+                <option>fitness motivator</option>
+                <option>coding assistant</option>
+                <option>storyteller</option>
+                <option>language tutor</option>
+                <option value="custom">custom / get specific</option>
               </select>
             </div>
-          </div>
-
-          <!-- Era / Setting -->
-          <div style="display:flex; gap:8px; align-items:center;">
-            <div style="flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="setting" aria-label="Era / Setting" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Era / Setting (optional)</option>
-                <option>futuristic</option>
-                <option>cyberpunk</option>
-                <option>medieval</option>
-                <option>post-apocalyptic</option>
-                <option>forest</option>
-                <option>underwater</option>
-                <option>space</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Color Palette (multi-select up to 3) -->
-          <div id="colorsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
-            <div style="font-size:14px; color:#a8a8a8;">Color Palette (pick up to 3)</div>
-            <div style="display:flex; flex-wrap:wrap; gap:10px;">
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="neutral tones"> <span>neutral tones</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="vibrant neon"> <span>vibrant neon</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="pastel"> <span>pastel</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="monochrome"> <span>monochrome</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="warm earth tones"> <span>warm earth tones</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="cool blues"> <span>cool blues</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="sunset gradient"> <span>sunset gradient</span></label>
-              <label style="display:flex; align-items:center; gap:6px;"><input type="checkbox" value="forest greens"> <span>forest greens</span></label>
+            <div id="primaryUseCustomRow" style="display:none; width:100%; margin-top:8px;">
+              <label class="heroInput" aria-label="Custom primary use" style="flex:1;">
+                <input id="primaryUseCustom" type="text" placeholder="Describe the primary use or role (e.g., travel planner, gardening coach)" />
+              </label>
             </div>
           </div>
 
@@ -253,6 +228,10 @@
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="vector" />
               <span>simplified vector</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="radio" name="styleChoice" value="impressionistic" />
+              <span>impressionistic</span>
             </label>
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
               <input type="radio" name="styleChoice" value="fantasy concept art" />
@@ -286,23 +265,28 @@
 
           <!-- Band / BookFilm removed -->
 
-          <!-- Personality Traits -->
+          <!-- Personality Traits (Refined) -->
           <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
-            <div style="font-size:14px; color:#a8a8a8;">Personality Traits</div>
+            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
-              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;"/>
-              <span style="width:90px; font-size:12px; color:#a8a8a8;">Playful</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Introvert</span>
-              <input id="traitIntroExtro" type="range" min="0" max="100" value="50" style="flex:1;"/>
-              <span style="width:90px; font-size:12px; color:#a8a8a8;">Extrovert</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
+              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:90px; text-align:right; font-size:12px; color:#a8a8a8;">Gentle</span>
-              <input id="traitGentleFierce" type="range" min="0" max="100" value="50" style="flex:1;"/>
-              <span style="width:90px; font-size:12px; color:#a8a8a8;">Fierce</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
+              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
+              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
             </div>
           </div>
 
@@ -496,19 +480,19 @@
         toggle();
       })();
 
-      // Limit color selections to 3
-      (function initColorsLimit(){
-        const group = document.getElementById('colorsGroup');
-        if (!group) return;
-        const checkboxes = Array.from(group.querySelectorAll('input[type="checkbox"]'));
-        checkboxes.forEach(cb=>{
-          cb.addEventListener('change', ()=>{
-            const selected = checkboxes.filter(c=>c.checked);
-            if (selected.length > 3) {
-              cb.checked = false;
-            }
-          });
-        });
+      // Show custom primary use field when selected
+      (function initPrimaryUseCustomUI(){
+        const sel = document.getElementById('primaryUse');
+        const row = document.getElementById('primaryUseCustomRow');
+        const input = document.getElementById('primaryUseCustom');
+        if (!sel || !row) return;
+        const toggle = () => {
+          const isCustom = sel.value === 'custom';
+          row.style.display = isCustom ? 'block' : 'none';
+          if (isCustom) input?.focus();
+        };
+        sel.addEventListener('change', toggle);
+        toggle();
       })();
 
       async function start(){
@@ -534,22 +518,23 @@
   const archetypeValue = (document.getElementById('archetype')?.value || '').trim();
   const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
   const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
-        const vibe = (document.getElementById('vibe')?.value || '').trim();
-        const setting = (document.getElementById('setting')?.value || '').trim();
-        const colors = Array.from(document.querySelectorAll('#colorsGroup input[type="checkbox"]:checked')).map(cb=>cb.value);
+  const primaryUseValue = (document.getElementById('primaryUse')?.value || '').trim();
+  const primaryUseCustom = (document.getElementById('primaryUseCustom')?.value || '').trim();
+  const primaryUse = (primaryUseValue === 'custom') ? primaryUseCustom : primaryUseValue;
   // band/book removed
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
         const traits = {
           seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value || 50),
-          introExtro: Number(document.getElementById('traitIntroExtro')?.value || 50),
-          gentleFierce: Number(document.getElementById('traitGentleFierce')?.value || 50)
+          succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value || 50),
+          rationalIntuitive: Number(document.getElementById('traitRationalIntuitive')?.value || 50),
+          conservativeLiberal: Number(document.getElementById('traitConservativeLiberal')?.value || 50)
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const payload = { 
           prompt: p, 
-          archetype, vibe, setting, colors,
+          archetype, primaryUse,
           styleChoice, artStyleCustom,
           traits,
           personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()

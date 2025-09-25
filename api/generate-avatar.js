@@ -12,10 +12,10 @@ export default async function handler(req, res) {
       prompt, 
       // legacy fields (botName, artStyle, personalityPrompt) may still come from old clients
       botName, artStyle, personalityPrompt,
-  // previous quiz fields (band/book removed)
-  animal, styleChoice, artStyleCustom,
-      // new refined quiz fields
-      archetype, vibe, setting, colors, traits
+      // legacy animal still accepted for backwards compat
+      animal, styleChoice, artStyleCustom,
+      // final simplified quiz fields
+      archetype, primaryUse, traits
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       default: defaultStyle,
       realistic: `Square portrait avatar, photorealistic, cinematic soft light, shallow depth of field, detailed skin and fabric, centered composition.`,
       vector: `Square portrait avatar, simplified vector illustration, flat colors, clean geometric shapes, minimal shading, centered composition.`,
-      // new styles
+      impressionistic: `Square portrait avatar, impressionistic brush strokes, luminous color blending, soft atmospheric edges, painterly texture, centered composition.`,
       'fantasy concept art': `Square portrait avatar, high-fantasy concept art, painterly detail, dramatic rim light, volumetric fog, epic mood, centered composition.`,
       'anime illustration': `Square portrait avatar, anime character illustration, clean line art, cel shading, expressive eyes, vibrant palette, centered composition.`,
       'pixel art': `Square portrait avatar, crisp pixel-art aesthetic, limited palette, blocky shapes, retro game style, centered composition.`,
@@ -35,14 +35,7 @@ export default async function handler(req, res) {
   const styleKey = (styleChoice || '').trim() || 'default';
   const resolvedStyle = (styleMap[styleKey] || '').trim() || defaultStyle;
 
-    // Normalize colors: accept array or comma-separated string; cap at 3
-    let colorList = [];
-    if (Array.isArray(colors)) {
-      colorList = colors.map(c => String(c).trim()).filter(Boolean);
-    } else if (typeof colors === 'string') {
-      colorList = colors.split(',').map(c => c.trim()).filter(Boolean);
-    }
-    colorList = [...new Set(colorList)].slice(0, 3);
+  // Colors removed in simplified schema
 
     // Map traits sliders to adjectives
     const sliderToWord = (val, left, right) => {
@@ -55,9 +48,10 @@ export default async function handler(req, res) {
     const traitWords = [];
     if (traits && typeof traits === 'object') {
       const t1 = sliderToWord(traits.seriousPlayful, 'serious', 'playful');
-      const t2 = sliderToWord(traits.introExtro, 'introverted', 'extroverted');
-      const t3 = sliderToWord(traits.gentleFierce, 'gentle', 'fierce');
-      [t1, t2, t3].forEach(w => { if (w && w !== 'balanced') traitWords.push(w); });
+      const t2 = sliderToWord(traits.succinctChatty, 'succinct', 'chatty');
+      const t3 = sliderToWord(traits.rationalIntuitive, 'rational', 'intuitive');
+      const t4 = sliderToWord(traits.conservativeLiberal, 'conservative', 'liberal');
+      [t1, t2, t3, t4].forEach(w => { if (w && w !== 'balanced') traitWords.push(w); });
     }
 
     // Build enhanced prompt with quiz-driven vibe, generalized from references
@@ -71,16 +65,8 @@ export default async function handler(req, res) {
     } else {
       enhancedPrompt += ` Persona/theme: original, distinctive character.`;
     }
-    if (vibe && String(vibe).trim()) {
-      enhancedPrompt += ` Overall atmosphere and emotional tone: ${String(vibe).trim()}.`;
-    }
-    if (setting && String(setting).trim()) {
-      enhancedPrompt += ` Era and setting influences: ${String(setting).trim()}.`;
-    }
-    if (colorList.length) {
-      enhancedPrompt += ` Color scheme emphasis: ${colorList.join(', ')}.`;
-    } else {
-      enhancedPrompt += ` Color scheme emphasis: neutral tones.`;
+    if (primaryUse && String(primaryUse).trim()) {
+      enhancedPrompt += ` Intended primary use / role: ${String(primaryUse).trim()}.`;
     }
     if (traitWords.length) {
       enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
@@ -141,11 +127,8 @@ export default async function handler(req, res) {
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
       has_quiz_animal: !!(animal && animal.trim()),
-  // band/book removed
       has_archetype: !!(archetype && String(archetype).trim()),
-      has_vibe: !!(vibe && String(vibe).trim()),
-      has_setting: !!(setting && String(setting).trim()),
-      colors_count: colorList.length,
+      has_primary_use: !!(primaryUse && String(primaryUse).trim()),
       has_traits: !!(traits && typeof traits === 'object'),
       style_choice: styleKey,
       style_resolved_custom: styleKey === 'custom' && !!((artStyleCustom || artStyle || '').trim()),
@@ -166,11 +149,11 @@ export default async function handler(req, res) {
         traits: { 
           animal: animal || null,
           archetype: archetype || null,
-          vibe: vibe || null,
-          setting: setting || null,
-          colors: colorList,
-          sliders: traits || null
-        }
+          primary_use: primaryUse || null,
+          personality_words: traitWords,
+          sliders_raw: traits || null
+        },
+        promptUsed: enhancedPrompt
       });
     }
     if (url) {
@@ -184,11 +167,11 @@ export default async function handler(req, res) {
         traits: { 
           animal: animal || null,
           archetype: archetype || null,
-          vibe: vibe || null,
-          setting: setting || null,
-          colors: colorList,
-          sliders: traits || null
-        }
+          primary_use: primaryUse || null,
+          personality_words: traitWords,
+          sliders_raw: traits || null
+        },
+        promptUsed: enhancedPrompt
       });
     }
 
