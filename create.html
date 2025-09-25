@@ -115,6 +115,9 @@
         <a href="billing.html" class="nav-icon" title="Billing & Subscription">
           <img src="images/gear_icon.png" alt="Billing" style="width:32px; height:32px;">
         </a>
+        <button id="randomizeBtn" class="logout-btn" title="Randomize all fields">
+          <img src="images/wand_icon.png" alt="Randomize" />
+        </button>
         <button id="logoutBtn" class="logout-btn" title="Sign out">
           <img src="images/logout_icon.png" alt="Sign out" />
         </button>
@@ -238,67 +241,7 @@
 
           </div>
 
-          <!-- Primary Use / Purpose -->
-          <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
-            <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="primaryUse" aria-label="Primary use" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">What will you mainly use the bot for? (optional)</option>
-                <option>Search and information retrieval</option>
-                <option>Projects and Ideation</option>
-                <option>Personal development</option>
-                <option>Conversation and companionship</option>
-                <option value="custom">Other (user entry)</option>
-              </select>
-            </div>
-            <div id="primaryUseCustomRow" style="display:none; width:100%; margin-top:8px;">
-              <label class="heroInput" aria-label="Custom primary use" style="flex:1;">
-                <input id="primaryUseCustom" type="text" placeholder="Describe the primary use or role (e.g., travel planner, gardening coach)" />
-              </label>
-            </div>
-          </div>
-
-          <!-- Vibe / Mood -->
-          <div id="vibeGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-            <div style="font-size:14px; color:#a8a8a8;">Pick a vibe / mood</div>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="radiant" />
-              <span>Radiant</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="calming" />
-              <span>Calming</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="dramatic" />
-              <span>Dramatic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="serene" />
-              <span>Serene</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="mysterious" />
-              <span>Mysterious</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="energetic" />
-              <span>Energetic</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input type="radio" name="vibeChoice" value="dreamlike" />
-              <span>Dreamlike</span>
-            </label>
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-              <input id="vibeChoiceCustom" type="radio" name="vibeChoice" value="custom" />
-              <span>Another (user entry)</span>
-            </label>
-            <div id="customVibeRow" style="display:none; margin-top:4px;">
-              <label class="heroInput" aria-label="Custom vibe" style="flex:1;">
-                <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" />
-              </label>
-            </div>
-          </div>
-
+          <!-- Primary Use removed -->
                     <!-- Style Choice -->
           <div id="styleChoiceGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px;">
             <div style="font-size:14px; color:#a8a8a8;">Choose an art style</div>
@@ -464,6 +407,7 @@
       const persona = document.getElementById('persona');
       const startBtn = document.getElementById('startBtn');
       const logoutBtn = document.getElementById('logoutBtn');
+  const randomizeBtn = document.getElementById('randomizeBtn');
   const advancedPanel = document.getElementById('advancedPanel');
   const modeChooser = document.getElementById('modeChooser');
   const modeOptionsBtn = document.getElementById('modeOptionsBtn');
@@ -537,6 +481,53 @@
       }
       modeOptionsBtn.addEventListener('click', showOptionsMode);
       modePromptBtn.addEventListener('click', showPromptMode);
+
+      // --- Randomize All ---
+      function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+      function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+      function dispatch(el, type){ if(!el) return; const ev = new Event(type, {bubbles:true}); el.dispatchEvent(ev); }
+      async function randomizeAll(){
+        // Ensure options mode is visible
+        showOptionsMode();
+        // Archetype
+        const archetypes = ['Basic / Realistic','Animal','Plant','Robot','Alien','Fantasy','Abstract'];
+        const archetypeSel = document.getElementById('archetype');
+        if (archetypeSel){
+          archetypeSel.value = randPick(archetypes);
+          dispatch(archetypeSel, 'change');
+        }
+        // Sliders
+        const s1 = document.getElementById('traitSeriousPlayful');
+        const s2 = document.getElementById('traitSuccinctChatty');
+        const s3 = document.getElementById('traitRationalIntuitive');
+        [s1,s2,s3].forEach(s=>{ if(s){ s.value = String(randInt(10,90)); dispatch(s,'input'); }});
+        // Vibe
+        const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
+        const vibe = randPick(vibes);
+        const vibeRadio = document.querySelector(`input[name="vibeChoice"][value="${vibe}"]`);
+        if (vibeRadio){ vibeRadio.checked = true; dispatch(vibeRadio,'change'); }
+        // Style choice
+        const styles = ['default','realistic','vector','impressionistic'];
+        let style = randPick(styles);
+        const styleRadio = document.querySelector(`input[name="styleChoice"][value="${style}"]`);
+        if (styleRadio){ styleRadio.checked = true; dispatch(styleRadio,'change'); }
+        // Detail level
+        const detail = document.getElementById('detailLevel');
+        if (detail){ detail.value = String(randInt(3,9)); dispatch(detail,'input'); }
+        // Additional details (optional small prompt)
+        const extras = [
+          'warm lighting, soft textures',
+          'sleek silhouette, clean lines',
+          'mystic aura, subtle glow',
+          'playful expression, friendly vibe'
+        ];
+        const add = document.getElementById('additionalDetails');
+        if (add){ add.value = randPick(extras); dispatch(add,'input'); }
+        // Trigger AI suggestion for persona (if available for selected archetype)
+        const genBtn = document.getElementById('generateSuggestionBtn');
+        if (genBtn && !genBtn.disabled){ genBtn.click(); }
+      }
+      randomizeBtn?.addEventListener('click', randomizeAll);
 
       function backToChooser(){
         // Hide both modes
@@ -697,20 +688,7 @@
         toggle();
       })();
 
-      // Show custom primary use field when selected
-      (function initPrimaryUseCustomUI(){
-        const sel = document.getElementById('primaryUse');
-        const row = document.getElementById('primaryUseCustomRow');
-        const input = document.getElementById('primaryUseCustom');
-        if (!sel || !row) return;
-        const toggle = () => {
-          const isCustom = sel.value === 'custom';
-          row.style.display = isCustom ? 'block' : 'none';
-          if (isCustom) input?.focus();
-        };
-        sel.addEventListener('change', toggle);
-        toggle();
-      })();
+  // Primary Use removed
 
       async function start(){
         const p = persona.value.trim();
@@ -735,9 +713,6 @@
   const archetypeValue = (document.getElementById('archetype')?.value || '').trim();
   const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
   const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
-  const primaryUseValue = (document.getElementById('primaryUse')?.value || '').trim();
-  const primaryUseCustom = (document.getElementById('primaryUseCustom')?.value || '').trim();
-  const primaryUse = (primaryUseValue === 'custom') ? primaryUseCustom : primaryUseValue;
   const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
   const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
   // band/book removed
@@ -760,7 +735,7 @@
         const payload = { 
           prompt: p, 
           botName: archetypeSpecific || undefined,
-          archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse,
+          archetype, archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,
           detailLevel,

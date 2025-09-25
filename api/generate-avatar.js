@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       // legacy animal still accepted for backwards compat
       animal, styleChoice, artStyleCustom,
   // final simplified quiz fields
-  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits, vibe, detailLevel
+  archetype, archetypeSpecific, archetypeSpecificDesc, traits, vibe, detailLevel
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -83,9 +83,7 @@ export default async function handler(req, res) {
     } else {
       enhancedPrompt += ` Persona/theme: original, distinctive character.`;
     }
-    if (primaryUse && String(primaryUse).trim()) {
-      enhancedPrompt += ` Intended primary use / role: ${String(primaryUse).trim()}.`;
-    }
+  // primary use removed
     if (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) {
       enhancedPrompt += ` Persona detail hint: ${String(archetypeSpecificDesc).trim()}.`;
     }
@@ -157,7 +155,7 @@ export default async function handler(req, res) {
       has_quiz_animal: !!(animal && animal.trim()),
   has_archetype: !!(archetype && String(archetype).trim()),
   has_archetype_specific: !!(archetypeSpecific && String(archetypeSpecific).trim()),
-      has_primary_use: !!(primaryUse && String(primaryUse).trim()),
+  has_primary_use: false,
       has_traits: !!(traits && typeof traits === 'object'),
       style_choice: styleKey,
       style_resolved_custom: styleKey === 'custom' && !!((artStyleCustom || artStyle || '').trim()),
@@ -179,7 +177,7 @@ export default async function handler(req, res) {
           animal: animal || null,
           archetype: archetype || null,
           archetype_specific: archetypeSpecific || null,
-          primary_use: primaryUse || null,
+          primary_use: null,
           vibe: vibe || null,
           personality_words: traitWords,
           detail_level: Number.isFinite(Number(detailLevel)) ? Math.min(10, Math.max(1, Number(detailLevel))) : null,
@@ -200,7 +198,7 @@ export default async function handler(req, res) {
           animal: animal || null,
           archetype: archetype || null,
           archetype_specific: archetypeSpecific || null,
-          primary_use: primaryUse || null,
+          primary_use: null,
           vibe: vibe || null,
           personality_words: traitWords,
           detail_level: Number.isFinite(Number(detailLevel)) ? Math.min(10, Math.max(1, Number(detailLevel))) : null,
