@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       // legacy animal still accepted for backwards compat
       animal, styleChoice, artStyleCustom,
   // final simplified quiz fields
-  archetype, archetypeSpecific, primaryUse, traits
+  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -85,6 +85,9 @@ export default async function handler(req, res) {
     }
     if (primaryUse && String(primaryUse).trim()) {
       enhancedPrompt += ` Intended primary use / role: ${String(primaryUse).trim()}.`;
+    }
+    if (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) {
+      enhancedPrompt += ` Persona detail hint: ${String(archetypeSpecificDesc).trim()}.`;
     }
     if (traitWords.length) {
       enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;

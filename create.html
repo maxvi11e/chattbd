@@ -171,30 +171,6 @@
         
     <!-- Advanced Options Panel (Final Simplified Quiz) -->
   <div id="advancedPanel" style="display: none; margin-top: 16px; flex-direction: column; gap: 12px;">
-          <!-- Personality Sliders FIRST -->
-          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
-            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
-              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
-              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
-              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
-              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
-            </div>
-          </div>
           <!-- Archetype (SECOND) -->
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
@@ -220,15 +196,46 @@
               <button id="generateSuggestionBtn" style="padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a specific persona</button>
               <div id="suggestionResult" style="display:none; border:1px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255,255,255,0.05);">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
-                  <strong id="suggestionName"></strong>
+                  <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:var(--ink); border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
                     <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:20px; cursor:pointer;">Another</button>
-                    <button id="useSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#fff; color:#000; border-radius:20px; cursor:pointer;">Use</button>
+                    <button id="useSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#fff; color:#000; border-radius:20px; cursor:pointer;">Apply</button>
                   </div>
                 </div>
-                <div id="suggestionDesc" style="margin-top:6px; color:#cfcfcf;"></div>
+                <textarea id="suggestionDesc" placeholder="Short persona description" style="margin-top:6px; width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
+              <input type="hidden" id="archetypeSpecificDesc" />
+              <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
+                <label class="heroInput" aria-label="Bot name" style="flex:1;">
+                  <input id="botNameInput" type="text" placeholder="Name your bot (optional)" />
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personality Sliders SECOND -->
+          <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <input id="traitSeriousPlayful" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
+              <input id="traitSuccinctChatty" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Chatty</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
+              <input id="traitRationalIntuitive" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
+              <input id="traitConservativeLiberal" type="range" min="0" max="100" value="50" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#a8a8a8;">Liberal</span>
             </div>
           </div>
 
@@ -467,13 +474,15 @@
         const sel = document.getElementById('archetype');
         const row = document.getElementById('archetypeCustomRow');
         const input = document.getElementById('archetypeCustom');
-        const genBtn = document.getElementById('generateSuggestionBtn');
-        const suggestionBox = document.getElementById('suggestionResult');
-        const suggestionNameEl = document.getElementById('suggestionName');
-        const suggestionDescEl = document.getElementById('suggestionDesc');
+  const genBtn = document.getElementById('generateSuggestionBtn');
+  const suggestionBox = document.getElementById('suggestionResult');
+  const suggestionNameEl = document.getElementById('suggestionName');
+  const suggestionDescEl = document.getElementById('suggestionDesc');
         const tryAnother = document.getElementById('tryAnotherSuggestion');
         const useBtn = document.getElementById('useSuggestion');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
+  const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
+  const botNameInput = document.getElementById('botNameInput');
 
         function currentSliderValues(){
           return {
@@ -526,10 +535,12 @@
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
             const [name, desc] = await generateSuggestion(category);
-              suggestionNameEl.textContent = name;
-              suggestionDescEl.textContent = desc;
+              suggestionNameEl.value = name;
+              suggestionDescEl.value = desc;
               suggestionBox.style.display = 'block';
               archetypeSpecificInput.value = name;
+              archetypeSpecificDesc.value = desc;
+              if (!botNameInput.value) botNameInput.value = name;
               genBtn.textContent = 'Generate a specific persona';
               genBtn.disabled = false;
           });
@@ -539,15 +550,20 @@
           if (!category || category==='custom') return;
           tryAnother.textContent = '...';
           const [name, desc] = await generateSuggestion(category);
-          suggestionNameEl.textContent = name;
-          suggestionDescEl.textContent = desc;
+          suggestionNameEl.value = name;
+          suggestionDescEl.value = desc;
           archetypeSpecificInput.value = name;
+          archetypeSpecificDesc.value = desc;
+          if (!botNameInput.value) botNameInput.value = name;
           tryAnother.textContent = 'Another';
         });
         useBtn?.addEventListener('click', ()=>{
           // copy suggestion into custom field if custom selected else store hidden
-          const name = suggestionNameEl.textContent.trim();
+          const name = (suggestionNameEl.value||'').trim();
+          const desc = (suggestionDescEl.value||'').trim();
           archetypeSpecificInput.value = name;
+          archetypeSpecificDesc.value = desc;
+          if (!botNameInput.value) botNameInput.value = name;
           useBtn.textContent = 'Selected';
           setTimeout(()=>{ useBtn.textContent = 'Use'; }, 1200);
         });
@@ -561,6 +577,8 @@
             // reset suggestion UI when category changes
             suggestionBox.style.display = 'none';
             document.getElementById('archetypeSpecific').value = '';
+            document.getElementById('archetypeSpecificDesc').value = '';
+            if (botNameInput) botNameInput.value = '';
           }
         };
         if (!sel || !row) return;
@@ -610,6 +628,8 @@
   const primaryUseCustom = (document.getElementById('primaryUseCustom')?.value || '').trim();
   const primaryUse = (primaryUseValue === 'custom') ? primaryUseCustom : primaryUseValue;
   const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
+  const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
+  const preferredBotName = (document.getElementById('botNameInput')?.value || '').trim();
   // band/book removed
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
@@ -623,7 +643,8 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const payload = { 
           prompt: p, 
-          archetype, archetypeSpecific, primaryUse,
+          botName: preferredBotName || undefined,
+          archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse,
           styleChoice, artStyleCustom,
           traits,
           personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
