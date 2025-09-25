@@ -14,8 +14,8 @@ export default async function handler(req, res) {
       botName, artStyle, personalityPrompt,
       // legacy animal still accepted for backwards compat
       animal, styleChoice, artStyleCustom,
-      // final simplified quiz fields
-      archetype, primaryUse, traits
+  // final simplified quiz fields
+  archetype, archetypeSpecific, primaryUse, traits
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -56,9 +56,27 @@ export default async function handler(req, res) {
 
     // Build enhanced prompt with quiz-driven vibe, generalized from references
     let enhancedPrompt = `${resolvedStyle}`;
-    // Primary subject: animal takes precedence for backwards compatibility, else archetype, else default
-    const subject = (animal && animal.trim()) || (archetype && archetype.trim()) || 'abstract humanoid silhouette';
-    enhancedPrompt += ` Primary subject and silhouette: ${subject}-inspired character; posture and presence reflect a ${subject} archetype.`;
+    // Primary subject selection hierarchy:
+    // 1. animal (legacy)
+    // 2. archetypeSpecific (model-suggested specific persona)
+    // 3. archetype (broad category)
+    // 4. fallback abstract form
+    const subjectAnimal = animal && animal.trim();
+    const subjectSpecific = archetypeSpecific && String(archetypeSpecific).trim();
+    const subjectBroad = archetype && String(archetype).trim();
+    let subjectLine;
+    if (subjectAnimal) {
+      subjectLine = `Primary subject and silhouette: ${subjectAnimal}-inspired character; posture and presence reflect a ${subjectAnimal} archetype.`;
+    } else if (subjectSpecific && subjectBroad) {
+      subjectLine = `Primary subject and silhouette: ${subjectSpecific} concept within the ${subjectBroad} archetype category; posture and presence reflect ${subjectSpecific} motifs.`;
+    } else if (subjectSpecific) {
+      subjectLine = `Primary subject and silhouette: ${subjectSpecific} persona concept; posture and presence emphasize its defining motifs.`;
+    } else if (subjectBroad) {
+      subjectLine = `Primary subject and silhouette: ${subjectBroad}-inspired character; posture and presence reflect a ${subjectBroad} archetype.`;
+    } else {
+      subjectLine = `Primary subject and silhouette: abstract humanoid silhouette emphasizing iconic readable shape.`;
+    }
+    enhancedPrompt += ` ${subjectLine}`;
     
     if (prompt && String(prompt).trim()) {
       enhancedPrompt += ` Persona/theme: ${String(prompt).trim()}.`;
@@ -127,7 +145,8 @@ export default async function handler(req, res) {
       duration_ms: duration,
       prompt_length: enhancedPrompt.length,
       has_quiz_animal: !!(animal && animal.trim()),
-      has_archetype: !!(archetype && String(archetype).trim()),
+  has_archetype: !!(archetype && String(archetype).trim()),
+  has_archetype_specific: !!(archetypeSpecific && String(archetypeSpecific).trim()),
       has_primary_use: !!(primaryUse && String(primaryUse).trim()),
       has_traits: !!(traits && typeof traits === 'object'),
       style_choice: styleKey,
@@ -149,6 +168,7 @@ export default async function handler(req, res) {
         traits: { 
           animal: animal || null,
           archetype: archetype || null,
+          archetype_specific: archetypeSpecific || null,
           primary_use: primaryUse || null,
           personality_words: traitWords,
           sliders_raw: traits || null
@@ -167,6 +187,7 @@ export default async function handler(req, res) {
         traits: { 
           animal: animal || null,
           archetype: archetype || null,
+          archetype_specific: archetypeSpecific || null,
           primary_use: primaryUse || null,
           personality_words: traitWords,
           sliders_raw: traits || null

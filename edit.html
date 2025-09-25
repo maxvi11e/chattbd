@@ -444,6 +444,8 @@
                 art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
                 // new quiz traits
                 archetype: (json.traits?.archetype) || pending.archetype || null,
+                archetype_specific: (json.traits?.archetype_specific) || pending.archetypeSpecific || null,
+                // deprecated fields retained for backward compatibility
                 vibe: (json.traits?.vibe) || pending.vibe || null,
                 setting: (json.traits?.setting) || pending.setting || null,
                 colors: (json.traits?.colors) || pending.colors || [],
