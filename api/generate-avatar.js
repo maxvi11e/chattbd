@@ -126,7 +126,7 @@ export default async function handler(req, res) {
   body: JSON.stringify({
         model: "gpt-image-1",
         prompt: enhancedPrompt,
-        size: "512x512",   // ✅ valid size
+  size: "1024x1024",   // square avatar; supported values: 1024x1024, 1024x1536, 1536x1024, auto
         n: 1,
   quality: qualitySetting
       }),
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
     const duration = Date.now() - startTime;
     console.log(`✅ Image generated successfully:`, {
       model: "gpt-image-1",
-      size: "512x512",
+  size: "1024x1024",
       quality: qualitySetting,
       cost_estimate: "TBD",
       duration_ms: duration,
