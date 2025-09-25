@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       // legacy animal still accepted for backwards compat
       animal, styleChoice, artStyleCustom,
   // final simplified quiz fields
-  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits, vibe
+  archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse, traits, vibe, detailLevel
     } = req.body || {};
   // Persona prompt is optional (options mode may omit it)
 
@@ -91,6 +91,10 @@ export default async function handler(req, res) {
     }
     if (vibe && String(vibe).trim()) {
       enhancedPrompt += ` Overall vibe/mood: ${String(vibe).trim()}.`;
+    }
+    if (Number.isFinite(Number(detailLevel))) {
+      const dl = Math.min(10, Math.max(1, Number(detailLevel)));
+      enhancedPrompt += ` Detail level: ${dl}/10.`;
     }
     if (traitWords.length) {
       enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
@@ -178,6 +182,7 @@ export default async function handler(req, res) {
           primary_use: primaryUse || null,
           vibe: vibe || null,
           personality_words: traitWords,
+          detail_level: Number.isFinite(Number(detailLevel)) ? Math.min(10, Math.max(1, Number(detailLevel))) : null,
           sliders_raw: traits || null
         },
         promptUsed: enhancedPrompt
@@ -198,6 +203,7 @@ export default async function handler(req, res) {
           primary_use: primaryUse || null,
           vibe: vibe || null,
           personality_words: traitWords,
+          detail_level: Number.isFinite(Number(detailLevel)) ? Math.min(10, Math.max(1, Number(detailLevel))) : null,
           sliders_raw: traits || null
         },
         promptUsed: enhancedPrompt
