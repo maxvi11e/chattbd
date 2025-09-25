@@ -221,7 +221,7 @@
               <div style="display:flex; justify-content:center;">
                 <button id="generateSuggestionBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion</button>
               </div>
-              <div id="suggestionResult" style="display:none; border:0px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255,255,255,0.05);">
+              <div id="suggestionResult" style="display:none; border:0px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0);">
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
                   <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:var(--ink); border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
@@ -232,11 +232,6 @@
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
-              <div style="display:flex; gap:8px; align-items:center; margin-top:4px;">
-                <label class="heroInput" aria-label="Bot name" style="flex:1;">
-                  <input id="botNameInput" type="text" placeholder="Name your bot (optional)" />
-                </label>
-              </div>
             </div>
 
           <!-- Personality Sliders (right after archetype) -->
@@ -485,7 +480,8 @@
         const tryAnother = document.getElementById('tryAnotherSuggestion');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
-        const botNameInput = document.getElementById('botNameInput');        function currentSliderValues(){
+
+        function currentSliderValues(){
           return {
             seriousPlayful: Number(document.getElementById('traitSeriousPlayful')?.value||50),
             succinctChatty: Number(document.getElementById('traitSuccinctChatty')?.value||50),
@@ -523,7 +519,6 @@
         // Auto-apply when user edits suggestion fields
         suggestionNameEl?.addEventListener('input', ()=>{
           archetypeSpecificInput.value = suggestionNameEl.value;
-          if (!botNameInput.value) botNameInput.value = suggestionNameEl.value;
         });
         suggestionDescEl?.addEventListener('input', ()=>{
           archetypeSpecificDesc.value = suggestionDescEl.value;
@@ -554,7 +549,6 @@
               // Automatically apply suggestion
               archetypeSpecificInput.value = name;
               archetypeSpecificDesc.value = desc;
-              if (!botNameInput.value) botNameInput.value = name;
               genBtn.textContent = 'Generate a specific persona';
               genBtn.disabled = false;
           });
@@ -569,7 +563,6 @@
           // Automatically apply new suggestion
           archetypeSpecificInput.value = name;
           archetypeSpecificDesc.value = desc;
-          if (!botNameInput.value) botNameInput.value = name;
           tryAnother.textContent = 'Another';
         });
 
@@ -583,7 +576,6 @@
             suggestionBox.style.display = 'none';
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
-            if (botNameInput) botNameInput.value = '';
           }
         };
         if (!sel || !row) return;
@@ -634,7 +626,6 @@
   const primaryUse = (primaryUseValue === 'custom') ? primaryUseCustom : primaryUseValue;
   const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
   const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
-  const preferredBotName = (document.getElementById('botNameInput')?.value || '').trim();
   // band/book removed
   const styleChoice = document.querySelector('input[name="styleChoice"]:checked')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
@@ -648,7 +639,7 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const payload = { 
           prompt: p, 
-          botName: preferredBotName || undefined,
+          botName: archetypeSpecific || undefined,
           archetype, archetypeSpecific, archetypeSpecificDesc, primaryUse,
           styleChoice, artStyleCustom,
           traits,
