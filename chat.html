@@ -1343,35 +1343,24 @@
           });
           const { text:fullResp, error:respErr } = await res.json();
           removeLoading(loadingId);
-          if(respErr || !fullResp){
-            add('from-bot','No response.');
-            return;
-          }
-          const finalText = (fullResp || '').trim();
-          add('from-bot','');
-          const logEl = document.getElementById('log');
-          const msgNodes = logEl.querySelectorAll('.from-bot');
-          const lastNode = msgNodes[msgNodes.length-1];
-          let bubble = lastNode ? lastNode.querySelector('.bubble') : null;
-          if(!bubble){
-            add('from-bot','');
-            const retryNodes = logEl.querySelectorAll('.from-bot');
-            bubble = retryNodes[retryNodes.length-1]?.querySelector('.bubble') || null;
-          }
-          if(!bubble){
-            // Fallback: just append full text plainly
-            add('from-bot', finalText);
-          } else {
-            let i=0;
-            const speed = 18; // ms per char
-            const animate = ()=>{
-              if(!bubble) return;
-              bubble.textContent = finalText.slice(0,i);
-              log.scrollTop = log.scrollHeight;
-              if(i < finalText.length){ i++; requestAnimationFrame(animate); }
-            };
-            requestAnimationFrame(animate);
-          }
+          const finalText = (respErr || !fullResp ? 'No response.' : fullResp).trim();
+          // Create a single bot row and animate
+          const row = document.createElement('div');
+          row.className = 'row';
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble from-bot';
+          bubble.textContent = '';
+          row.appendChild(bubble);
+          log.appendChild(row);
+          setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
+          let i=0;
+          const speed = 18;
+          const animate = ()=>{
+            bubble.textContent = finalText.slice(0,i);
+            log.scrollTop = log.scrollHeight;
+            if(i < finalText.length){ i++; requestAnimationFrame(animate); }
+          };
+          requestAnimationFrame(animate);
           convo.push({ role:'assistant', content: finalText });
           const { error: aiMsgError } = await supabase
             .from('messages')
