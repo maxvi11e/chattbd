@@ -210,11 +210,7 @@
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose a base archetype</option>
                 <option>Human</option>
-                <option>Animal</option>
-                <option>Plant</option>
-                <option>Robot</option>
-                <option>Alien</option>
-                <option>Fantasy</option>
+                <option>Sci-Fi / Fantasy</option>
                 <option>Abstract</option>
                 <option value="custom">Choose my own / get specific</option>
               </select>
@@ -519,7 +515,7 @@
         // Ensure options mode is visible
         showOptionsMode();
         // Archetype
-        const archetypes = ['Basic / Realistic','Animal','Plant','Robot','Alien','Fantasy','Abstract'];
+  const archetypes = ['Human','Sci-Fi / Fantasy','Abstract'];
         const archetypeSel = document.getElementById('archetype');
         if (archetypeSel){
           archetypeSel.value = randPick(archetypes);
