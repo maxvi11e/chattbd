@@ -1349,17 +1349,29 @@
           }
           const finalText = (fullResp || '').trim();
           add('from-bot','');
-          const msgNodes = document.getElementById('log').querySelectorAll('.from-bot');
+          const logEl = document.getElementById('log');
+          const msgNodes = logEl.querySelectorAll('.from-bot');
           const lastNode = msgNodes[msgNodes.length-1];
-          const bubble = lastNode.querySelector('.bubble');
-          let i=0;
-          const speed = 18; // ms per char
-          function step(){
-            bubble.textContent = finalText.slice(0,i);
-            log.scrollTop = log.scrollHeight;
-            if(i < finalText.length){ i++; requestAnimationFrame(step); }
+          let bubble = lastNode ? lastNode.querySelector('.bubble') : null;
+          if(!bubble){
+            add('from-bot','');
+            const retryNodes = logEl.querySelectorAll('.from-bot');
+            bubble = retryNodes[retryNodes.length-1]?.querySelector('.bubble') || null;
           }
-          requestAnimationFrame(step);
+          if(!bubble){
+            // Fallback: just append full text plainly
+            add('from-bot', finalText);
+          } else {
+            let i=0;
+            const speed = 18; // ms per char
+            const animate = ()=>{
+              if(!bubble) return;
+              bubble.textContent = finalText.slice(0,i);
+              log.scrollTop = log.scrollHeight;
+              if(i < finalText.length){ i++; requestAnimationFrame(animate); }
+            };
+            requestAnimationFrame(animate);
+          }
           convo.push({ role:'assistant', content: finalText });
           const { error: aiMsgError } = await supabase
             .from('messages')
