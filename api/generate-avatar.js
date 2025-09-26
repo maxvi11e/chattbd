@@ -54,8 +54,8 @@ export default async function handler(req, res) {
       [t1, t2, t3, t4].forEach(w => { if (w && w !== 'balanced') traitWords.push(w); });
     }
 
-    // Build enhanced prompt with quiz-driven vibe, generalized from references
-    let enhancedPrompt = `${resolvedStyle}`;
+  // Build enhanced prompt with quiz-driven vibe, generalized from references
+  let enhancedPrompt = `${resolvedStyle}`;
     // Primary subject selection hierarchy:
     // 1. animal (legacy)
     // 2. archetypeSpecific (model-suggested specific persona)
@@ -64,6 +64,11 @@ export default async function handler(req, res) {
     const subjectAnimal = animal && animal.trim();
     const subjectSpecific = archetypeSpecific && String(archetypeSpecific).trim();
     const subjectBroad = archetype && String(archetype).trim();
+    const isAbstractMode = subjectBroad && subjectBroad.toLowerCase() === 'abstract' && !subjectSpecific && !subjectAnimal;
+    if (isAbstractMode) {
+      // Replace the resolved style with a non-figurative abstract framing to avoid humanoid bias.
+      enhancedPrompt = `Square abstract generative composition, non-figurative, no faces, no characters, rich texture subtle depth, clean negative space balance.`;
+    }
     let subjectLine;
     if (subjectAnimal) {
       subjectLine = `Primary subject and silhouette: ${subjectAnimal}-inspired character; posture and presence reflect a ${subjectAnimal} archetype.`;
@@ -128,12 +133,16 @@ export default async function handler(req, res) {
     } else {
       subjectLine = `Primary subject: minimal abstract composition with balanced negative space; no figurative or humanoid elements.`;
     }
-    enhancedPrompt += ` ${subjectLine}`;
+  enhancedPrompt += ` ${subjectLine}`;
     
-    if (prompt && String(prompt).trim()) {
-      enhancedPrompt += ` Persona/theme: ${String(prompt).trim()}.`;
-    } else {
-      enhancedPrompt += ` Persona/theme: original, distinctive character.`;
+    if (!isAbstractMode) {
+      if (prompt && String(prompt).trim()) {
+        enhancedPrompt += ` Persona/theme: ${String(prompt).trim()}.`;
+      } else {
+        enhancedPrompt += ` Persona/theme: original, distinctive character.`;
+      }
+    } else if (prompt && String(prompt).trim()) {
+      enhancedPrompt += ` Conceptual prompt influence (abstract reinterpretation): ${String(prompt).trim()}; reinterpret purely as color, light, pattern, motion; no figurative depiction.`;
     }
   // primary use removed
     if (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) {
@@ -147,11 +156,21 @@ export default async function handler(req, res) {
       enhancedPrompt += ` Detail level: ${dl}/10.`;
     }
     if (traitWords.length) {
-      enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
+      if (isAbstractMode) {
+    enhancedPrompt += ` Composition qualities derived from personality sliders: ${traitWords.join(', ')} (mapped to palette contrast, rhythm, geometric vs fluid balance, pattern complexity).`;
+      } else {
+        enhancedPrompt += ` Persona traits: ${traitWords.join(', ')}.`;
+      }
     }
 
     // Generalization guidelines to avoid specific IP
-    enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text. Create an original, novel character that only captures the abstract vibe of the references. Combine influences subtly.`;
+  enhancedPrompt += ` Guidelines: Translate any named bands, books, films, or brands into generic themes, moods, genres, and eras. Do not depict or name specific copyrighted characters, actors, logos, titles, or text.${isAbstractMode ? ' Absolutely no faces, heads, bodies, limbs, eyes, hands, creatures, characters, silhouettes, anatomy, portrait framing, or figurative suggestion; keep strictly non-figurative and non-iconic.' : ' Create an original, novel character that only captures the abstract vibe of the references.'} Combine influences subtly.`;
+
+    if (isAbstractMode) {
+      enhancedPrompt += ` Negative constraints: exclude (face, head, body, limb, hand, eye, mouth, creature, animal, person, human, character, silhouette). Focus on interplay of color fields, gradients, evolving shapes, spatial tension, emergent pattern, subtle texture layering. Emphasize non-representational modern abstract design.`;
+      // Last-pass sanitation: soften any leftover 'character' tokens inadvertently inserted earlier
+      enhancedPrompt = enhancedPrompt.replace(/character/gi, 'composition');
+    }
 
     // Provide references as inputs for abstraction (quoted but to be generalized)
   // references removed (band/book)
