@@ -234,9 +234,9 @@
               <span style="width:110px; font-size:12px; color:#ffffff;">Intuitive</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Conservative</span>
-              <input id="traitConservativeLiberal" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#ffffff;">Progressive</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Practical</span>
+              <input id="traitPracticalImaginative" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
+              <span style="width:110px; font-size:12px; color:#ffffff;">Imaginative</span>
             </div>
           </div>
 
@@ -525,7 +525,7 @@
   const s1 = document.getElementById('traitSeriousPlayful');
   const s2 = document.getElementById('traitSuccinctChatty');
   const s3 = document.getElementById('traitRationalIntuitive');
-  const s4 = document.getElementById('traitConservativeLiberal');
+  const s4 = document.getElementById('traitPracticalImaginative');
   [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
   // Vibe (select)
   const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
@@ -609,7 +609,7 @@
             seriousPlayful: scale10To100(val('traitSeriousPlayful')),
             succinctChatty: scale10To100(val('traitSuccinctChatty')),
             rationalIntuitive: scale10To100(val('traitRationalIntuitive')),
-            conservativeLiberal: scale10To100(val('traitConservativeLiberal')),
+            practicalImaginative: scale10To100(val('traitPracticalImaginative')),
           };
         }
 
@@ -848,7 +848,7 @@
           seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
           succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
           rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
-          conservativeLiberal: scale10To100(document.getElementById('traitConservativeLiberal')?.value)
+          practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner

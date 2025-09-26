@@ -9,7 +9,7 @@ export default async function handler(req, res){
     const {
       botName,
       archetype, archetypeSpecific, archetypeSpecificDesc,
-      traits, // { seriousPlayful, succinctChatty, rationalIntuitive, conservativeLiberal }
+  traits, // { seriousPlayful, succinctChatty, rationalIntuitive, practicalImaginative }
       vibe, detailLevel, styleChoice, prompt,
       // legacy tolerated but ignored
       artStyleCustom
@@ -26,7 +26,7 @@ export default async function handler(req, res){
       const t1 = sliderWord(traits.seriousPlayful,'serious','playful');
       const t2 = sliderWord(traits.succinctChatty,'succinct','chatty');
       const t3 = sliderWord(traits.rationalIntuitive,'rational','intuitive');
-      const t4 = sliderWord(traits.conservativeLiberal,'conservative','progressive');
+  const t4 = sliderWord(traits.practicalImaginative,'practical','imaginative');
       ;[t1,t2,t3,t4].forEach(w=>{ if(w && w!=='balanced') traitWords.push(w); });
     }
 
@@ -57,7 +57,7 @@ export default async function handler(req, res){
         sp: Number(traits?.seriousPlayful),
         sc: Number(traits?.succinctChatty),
         ri: Number(traits?.rationalIntuitive),
-        cl: Number(traits?.conservativeLiberal)
+  cl: Number(traits?.practicalImaginative)
       };
       const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=3) return 'low'; if(n>=8) return 'high'; return 'mid'; };
       const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };

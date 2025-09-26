@@ -1,6 +1,6 @@
 // api/suggest-abstract.js
 // Returns an abstract digital organism suggestion derived from slider inputs.
-// Expected POST JSON: { sliders: { seriousPlayful, succinctChatty, rationalIntuitive, conservativeLiberal }, vibe?, detailLevel? }
+// Expected POST JSON: { sliders: { seriousPlayful, succinctChatty, rationalIntuitive, practicalImaginative }, vibe?, detailLevel? }
 
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -12,7 +12,7 @@ export default async function handler(req, res){
       sp: norm(sliders.seriousPlayful),
       sc: norm(sliders.succinctChatty),
       ri: norm(sliders.rationalIntuitive),
-      cl: norm(sliders.conservativeLiberal)
+  cl: norm(sliders.practicalImaginative)
     };
 
     // Buckets
@@ -40,7 +40,7 @@ export default async function handler(req, res){
     const vibeLine = vibe ? ` Ambient mood hint: ${String(vibe).trim()}.` : '';
     const detailLine = Number.isFinite(Number(detailLevel)) ? ` Detail richness target: ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
-    const description = `Self-contained abstract digital organism; ${palette}; ${logic}; ${density}; ${symmetry}; emits subtle pulsing core luminescence; no figurative anatomy.${vibeLine}${detailLine}`;
+    const description = `Self-contained abstract digital entity; ${palette}; ${logic}; ${density}; ${symmetry}; emits subtle pulsing core luminescence; no figurative anatomy.${vibeLine}${detailLine}`;
 
     return res.status(200).json({ name, description });
   } catch (e) {
