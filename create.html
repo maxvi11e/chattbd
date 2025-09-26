@@ -124,6 +124,21 @@
       100%{ box-shadow: 0 0 0 rgba(255,0,128,0); }
     }
 
+    /* Regenerate button animation (match standard hover scale/translate) */
+    #tryAnotherSuggestion{
+      transition: transform 0.15s ease-in-out, box-shadow 0.25s ease;
+      will-change: transform;
+    }
+    #tryAnotherSuggestion:hover{
+      background:rgba(255, 255, 255, 0.182);
+      transform:translateY(-2px);
+      box-shadow:0 2px 6px rgba(255,255,255,0.15);
+    }
+    #tryAnotherSuggestion:active{
+      transform:translateY(0);
+      box-shadow:none;
+    }
+
     /* Field heading labels */
     .field-heading{
       color:#a8a8a8;
@@ -243,13 +258,14 @@
               <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin:0;">
-                  <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;" />
+                  <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:46px; box-sizing:border-box;" />
                   <div style="display:flex; gap:6px;">
-                    <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:20px; cursor:pointer;">Regenerate</button>
+                    <button id="tryAnotherSuggestion" style="height:46px; padding:0 16px; font-size:14px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:24.5px; cursor:pointer; display:flex; align-items:center;">Regenerate</button>
                   </div>
                 </div>
                 <div class="field-heading">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; display:block; margin-top:6px;"></textarea>
+                <!-- Multiline auto-resizing textarea styled like chat composer -->
+                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="3" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; overflow:hidden; min-height:86px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
@@ -631,9 +647,17 @@
         suggestionNameEl?.addEventListener('input', ()=>{
           archetypeSpecificInput.value = suggestionNameEl.value;
         });
+        function autosizeSuggestionDesc(){
+          if (!suggestionDescEl) return;
+          suggestionDescEl.style.height = 'auto';
+            suggestionDescEl.style.height = suggestionDescEl.scrollHeight + 'px';
+        }
         suggestionDescEl?.addEventListener('input', ()=>{
           archetypeSpecificDesc.value = suggestionDescEl.value;
+          autosizeSuggestionDesc();
         });
+        // Initial autosize (in case prefilled)
+        autosizeSuggestionDesc();
 
         function updateGenerateState(){
           const val = sel.value;
@@ -656,6 +680,7 @@
             const [name, desc] = await generateSuggestion(category);
               suggestionNameEl.value = name;
               suggestionDescEl.value = desc;
+              autosizeSuggestionDesc();
               suggestionBox.style.display = 'block';
               // If randomize flow, auto-open Art Settings and keep the button hidden
               if (randomizeFlow) {
@@ -704,6 +729,7 @@
           const [name, desc] = await generateSuggestion(category);
           suggestionNameEl.value = name;
           suggestionDescEl.value = desc;
+          autosizeSuggestionDesc();
           // Keep focus on the name field on regenerate
           if (suggestionNameEl) {
             requestAnimationFrame(() => {
