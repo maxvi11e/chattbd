@@ -1342,25 +1342,38 @@
             })
           });
           const { text:fullResp, error:respErr } = await res.json();
-          removeLoading(loadingId);
           const finalText = (respErr || !fullResp ? 'No response.' : fullResp).trim();
-          // Create a single bot row and animate
-          const row = document.createElement('div');
-          row.className = 'row';
-          const bubble = document.createElement('div');
-          bubble.className = 'bubble from-bot';
-          bubble.textContent = '';
-          row.appendChild(bubble);
-          log.appendChild(row);
+          // Reuse loading row instead of creating a second placeholder
+          let loadingRow = document.getElementById(loadingId);
+          let bubble;
+          if(loadingRow){
+            bubble = loadingRow.querySelector('.bubble');
+            // Clean the loading bubble
+            if(bubble){
+              bubble.classList.remove('loading-message');
+              bubble.textContent = '';
+            }
+            loadingRow.removeAttribute('id'); // prevent accidental future removal
+          } else {
+            // Fallback if loading row missing
+            const row = document.createElement('div');
+            row.className = 'row';
+            bubble = document.createElement('div');
+            bubble.className = 'bubble from-bot';
+            row.appendChild(bubble);
+            log.appendChild(row);
+          }
           setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
+          // Animate text typing
           let i=0;
           const speed = 18;
           const animate = ()=>{
+            if(!bubble) return;
             bubble.textContent = finalText.slice(0,i);
             log.scrollTop = log.scrollHeight;
             if(i < finalText.length){ i++; requestAnimationFrame(animate); }
           };
-          requestAnimationFrame(animate);
+          animate();
           convo.push({ role:'assistant', content: finalText });
           const { error: aiMsgError } = await supabase
             .from('messages')
