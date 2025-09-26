@@ -7,6 +7,7 @@ export default async function handler(req, res){
   const startTime = Date.now();
   try {
     const {
+      botName,
       archetype, archetypeSpecific, archetypeSpecificDesc,
       traits, // { seriousPlayful, succinctChatty, rationalIntuitive, conservativeLiberal }
       vibe, detailLevel, styleChoice, prompt,
@@ -158,6 +159,7 @@ export default async function handler(req, res){
     });
 
     const responseBase = {
+      botName: botName ? String(botName).trim() : (archetypeSpecific || null),
       styleChoice: isAbstract ? null : styleKey,
       archetype: broad,
       archetype_specific: archetypeSpecific || null,

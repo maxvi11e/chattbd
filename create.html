@@ -854,7 +854,7 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const payload = { 
           prompt: p, 
-          botName: archetypeSpecific || undefined,
+          botName: (archetypeSpecific || archetype || 'New Avatar'),
           archetype, archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,
