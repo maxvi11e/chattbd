@@ -110,6 +110,7 @@
       animation: neonGlow 3.2s ease-in-out infinite;
       will-change: box-shadow;
       transition: transform 0.15s ease-in-out;
+  margin-bottom:20px;
     }
     #startBtn:hover{ transform: translateY(-1px); }
     @keyframes neonGlow{
@@ -174,33 +175,13 @@
           </button>
         </div>
 
-        <!-- Mode Chooser -->
-        <div id="modeChooser" style="display:flex; justify-content:center; gap:16px; margin-top:16px;">
-          <button id="modeOptionsBtn" 
-                  style="padding:14px 22px; border:0; background:#fff; color:#000; border-radius:999px; font-size:16px; cursor:pointer; font-weight:600;">
-            Create from options
-          </button>
-          <button id="modePromptBtn" 
-                  style="padding:14px 22px; border:0; background:#fff; color:#000; border-radius:999px; font-size:16px; cursor:pointer; font-weight:600;">
-            I know exactly what I want
-          </button>
-        </div>
-
-        <!-- Back buttons for each mode -->
-        <div id="backPrompt" style="display:none; justify-content:center; margin-top:12px;">
-          <button id="backFromPrompt" class="circleBtn" title="Back" style="background:#fff; border-color:#fff;">
-            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <polygon points="10,12 16,6 16,18" fill="#000"/>
-            </svg>
-          </button>
-        </div>
-  <div id="backOptions" style="display:none; justify-content:center; margin-top:12px;"></div>
+        
         
     <!-- Advanced Options Panel (Final Simplified Quiz) -->
   <div id="advancedPanel" style="display: none; margin-top: 0px; flex-direction: column; gap: 12px;">
           <!-- Actions (Back left, Randomize right) -->
           <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-            <button id="backFromOptions" title="Back" aria-label="Back" style="background:transparent; border:none; padding:0; display:flex; align-items:center; justify-content:center;">
+            <button id="backToLibrary" title="Back to library" aria-label="Back to library" style="background:transparent; border:none; padding:0; display:flex; align-items:center; justify-content:center;" onclick="window.location.href='index.html'">
               <img src="images/back_icon.png" alt="Back" class="nav-icon" />
             </button>
             <button id="randomizeBtn" title="Randomize all fields" style="background:transparent; border:none; padding:0; display:flex; align-items:center; justify-content:center;">
@@ -424,14 +405,9 @@
   const logoutBtn = document.getElementById('logoutBtn');
   const randomizeBtn = document.getElementById('randomizeBtn');
   const advancedPanel = document.getElementById('advancedPanel');
-  const modeChooser = document.getElementById('modeChooser');
-  const modeOptionsBtn = document.getElementById('modeOptionsBtn');
-  const modePromptBtn = document.getElementById('modePromptBtn');
+  // Mode chooser removed; always show options flow
   const inputContainer = document.querySelector('.input-container');
-  const backPrompt = document.getElementById('backPrompt');
-  const backOptions = document.getElementById('backOptions');
-  const backFromPrompt = document.getElementById('backFromPrompt');
-  const backFromOptions = document.getElementById('backFromOptions');
+  // Back buttons removed
   const artSettings = document.getElementById('artSettingsContainer');
   const toggleArtSettingsBtn = document.getElementById('toggleArtSettingsBtn');
   // Track if user has triggered (clicked) Art Settings at least once in this flow
@@ -482,40 +458,22 @@
       persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
       startBtn.addEventListener('click', start);
       
-      // Mode switching: Options vs Prompt
+      // Always show options mode on init
       function showOptionsMode(){
-        modeChooser.style.display = 'none';
         advancedPanel.style.display = 'flex';
         document.getElementById('dynamicStartContainer').style.display = 'flex';
         document.getElementById('dynamicStartContainer').appendChild(startBtn);
         inputContainer.style.display = 'none';
-        backOptions.style.display = 'flex';
-        backPrompt.style.display = 'none';
-  // Hide art settings button on entering options mode until suggestion is generated
-  const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
-  if (artSettingsBtn) artSettingsBtn.style.display = 'none';
-  // Hide start button until a suggestion is generated
-  if (startBtn) startBtn.style.display = 'none';
+        // Hide art settings button on entering options mode until suggestion is generated
+        const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
+        if (artSettingsBtn) artSettingsBtn.style.display = 'none';
+        // Hide start button until a suggestion is generated
+        if (startBtn) startBtn.style.display = 'none';
       }
-      function showPromptMode(){
-        modeChooser.style.display = 'none';
-        advancedPanel.style.display = 'none';
-        document.getElementById('dynamicStartContainer').style.display = 'none';
-        inputContainer.style.display = 'flex';
-        inputContainer.appendChild(startBtn);
-        persona.focus();
-        backPrompt.style.display = 'flex';
-        backOptions.style.display = 'none';
-  // Hide art settings button when leaving options mode
-  const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
-  if (artSettingsBtn) artSettingsBtn.style.display = 'none';
-  // Hide start button in prompt mode (until suggestion is generated)
-  if (startBtn) startBtn.style.display = 'none';
-      }
-      modeOptionsBtn.addEventListener('click', showOptionsMode);
-      modePromptBtn.addEventListener('click', showPromptMode);
+      // Immediately enter options mode
+      showOptionsMode();
 
-      // Art settings: one-way expand. Hide the button after first click; no collapse behavior.
+    // Art settings: one-way expand. Hide the button after first click; no collapse behavior.
       if (toggleArtSettingsBtn && artSettings){
         // Start hidden
         artSettings.style.display = 'none';
@@ -526,9 +484,12 @@
           artSettingsTriggered = true;
           toggleArtSettingsBtn.style.display = 'none';
           // If a suggestion exists, allow Start button to appear now
-          const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
-          const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
-          if ((suggestionVisible || suggestedName) && startBtn) startBtn.style.display = 'flex';
+      const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
+      const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
+      const archetypeSel = document.getElementById('archetype');
+      const isCustomSelected = archetypeSel && archetypeSel.value === 'custom';
+      // Allow proceeding in custom path after opening Art Settings
+      if ((suggestionVisible || suggestedName || isCustomSelected) && startBtn) startBtn.style.display = 'flex';
         });
       }
 
@@ -582,20 +543,7 @@
       }
       randomizeBtn?.addEventListener('click', randomizeAll);
 
-      function backToChooser(){
-        // Hide both modes
-        advancedPanel.style.display = 'none';
-        document.getElementById('dynamicStartContainer').style.display = 'none';
-        inputContainer.style.display = 'none';
-        backPrompt.style.display = 'none';
-        backOptions.style.display = 'none';
-        // Show chooser
-        modeChooser.style.display = 'flex';
-        // Park the start button with the input container by default
-        inputContainer.appendChild(startBtn);
-      }
-      backFromPrompt.addEventListener('click', backToChooser);
-      backFromOptions.addEventListener('click', backToChooser);
+  // Back navigation removed
 
       // Handle art style custom input visibility (select)
       (function initStyleChoiceUI(){
@@ -627,7 +575,7 @@
         toggle();
       })();
 
-      // Show custom archetype field when selected
+  // Show custom archetype field when selected
       (function initArchetypeCustomUI(){
         const sel = document.getElementById('archetype');
         const row = document.getElementById('archetypeCustomRow');
@@ -804,6 +752,24 @@
                 genBtn.style.display = 'inline-block';
               } else {
                 genBtn.style.display = 'none';
+              }
+            }
+          } else {
+            // Custom path: hide suggestion UI and show the Edit Art Style button so user can continue
+            if (suggestionBox) suggestionBox.style.display = 'none';
+            if (genBtn) genBtn.style.display = 'none';
+            // Clear any prior suggestion values
+            if (archetypeSpecificInput) archetypeSpecificInput.value = '';
+            if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
+            // Show the Edit Art Style button only if settings are not already open
+            if (artSettingsBtn) {
+              if (artSettings && artSettings.style.display !== 'none') {
+                artSettingsBtn.style.display = 'none';
+                // If settings are already open in custom mode, allow Start
+                if (startBtn) startBtn.style.display = 'flex';
+              } else {
+                artSettingsBtn.style.display = 'inline-block';
+                if (startBtn) startBtn.style.display = 'none';
               }
             }
           }
