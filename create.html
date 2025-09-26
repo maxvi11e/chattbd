@@ -204,14 +204,14 @@
               <div style="display:flex; justify-content:center;">
                 <button id="generateSuggestionBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion</button>
               </div>
-              <div id="suggestionResult" style="display:none; border:0px solid var(--stroke); border-radius:14px; padding:12px; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0);">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:395px; margin:0 auto;">
+              <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin:0;">
                   <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:var(--ink); border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
-                    <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:20px; cursor:pointer;">Another</button>
+                    <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:20px; cursor:pointer;">Regenerate</button>
                   </div>
                 </div>
-                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="width:395px; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; display:block; margin:6px auto 0 auto;"></textarea>
+                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; display:block; margin-top:6px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
@@ -225,14 +225,14 @@
             </div>
             <!-- Art settings toggle -->
             <div style="width:100%; display:flex; justify-content:center;">
-              <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; border:1px solid var(--stroke); background:transparent; color:var(--ink); border-radius:800px; font-size:14px; cursor:pointer;">art settings</button>
+              <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">art settings</button>
             </div>
 
             <!-- Art Settings Container (collapsed by default) -->
             <div id="artSettingsContainer" style="display:none; flex-direction:column; gap:8px; width:100%; align-items:center;">
                       <!-- Style Choice -->
-            <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center; margin:0 auto;">
+              <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0; height:46.4px; display:flex; align-items:center;">
                 <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="default">choose art style - default avatar</option>
                   <option value="realistic">Realistic</option>
@@ -241,7 +241,7 @@
                   <option value="custom">Another style (user entry)</option>
                 </select>
               </div>
-              <div id="customStyleRow" style="display:none; margin-top:4px; width:395px; margin-left:auto; margin-right:auto;">
+              <div id="customStyleRow" style="display:none; width:395px;">
                 <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
                   <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
                 </label>
@@ -250,8 +250,8 @@
             </div>
 
             <!-- Vibe / Mood -->
-            <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; margin-top:8px; align-items:center; width:100%;">
-              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center; margin:0 auto;">
+            <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="">pick a vibe / mood for the artwork</option>
                   <option value="radiant">Radiant</option>
@@ -264,7 +264,7 @@
                   <option value="custom">Another (user entry)</option>
                 </select>
               </div>
-              <div id="customVibeRow" style="display:none; margin-top:4px; width:395px; margin-left:auto; margin-right:auto;">
+              <div id="customVibeRow" style="display:none; width:395px;">
                 <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
                   <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
                 </label>
@@ -272,7 +272,7 @@
             </div>
 
             <!-- Detail Level -->
-            <div id="detailGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:8px; margin-top:8px; width:395px; margin-left:auto; margin-right:auto;">
+            <div id="detailGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; width:395px;">
               <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
                 <span>Detail level</span>
                 <span style="font-size:12px; color:#8a8a8a;">1 = low, 10 = very detailed</span>
@@ -374,6 +374,8 @@
   const backFromOptions = document.getElementById('backFromOptions');
   const artSettings = document.getElementById('artSettingsContainer');
   const toggleArtSettingsBtn = document.getElementById('toggleArtSettingsBtn');
+  // Track if user has triggered (clicked) Art Settings at least once in this flow
+  let artSettingsTriggered = false;
 
       // Sign out handler (optional if logout button exists)
       if (logoutBtn) {
@@ -459,6 +461,13 @@
         toggleArtSettingsBtn.addEventListener('click', ()=>{
           const isHidden = artSettings.style.display === 'none';
           artSettings.style.display = isHidden ? 'flex' : 'none';
+          artSettingsTriggered = true;
+          // If opening settings and a suggestion exists, allow Start button to appear now
+          if (!isHidden) {
+            const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
+            const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
+            if ((suggestionVisible || suggestedName) && startBtn) startBtn.style.display = 'flex';
+          }
         });
       }
 
@@ -646,8 +655,14 @@
               genBtn.textContent = 'Generate a specific persona';
               genBtn.disabled = false;
               genBtn.style.display = 'none';
-              // Show the start/create button now that a suggestion exists
-              if (startBtn) startBtn.style.display = 'flex';
+              // Show the start/create button only after Art Settings has been triggered and is open
+              if (startBtn) {
+                if (artSettingsTriggered && artSettings && artSettings.style.display !== 'none') {
+                  startBtn.style.display = 'flex';
+                } else {
+                  startBtn.style.display = 'none';
+                }
+              }
           });
         }
         tryAnother?.addEventListener('click', async ()=>{
@@ -684,6 +699,8 @@
             if (typeof artSettings !== 'undefined' && artSettings) {
               artSettings.style.display = 'none';
             }
+            // Require user to re-trigger Art Settings after changing archetype
+            artSettingsTriggered = false;
             // Hide start button again until next suggestion
             if (startBtn) startBtn.style.display = 'none';
             // Restore the generate button visibility for non-custom selections
