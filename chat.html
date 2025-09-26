@@ -43,10 +43,10 @@
     .resize-handle.resizing{background:rgba(255,255,255,0.2);}
     
     /* Sidebar Toggle Button */
-    .sidebar-toggle{position:fixed; top:50px; left:260px; width:32px; height:32px; background:#fff; border:none; border-radius:8px; color:#000; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; z-index:1000; transition:left 0.3s ease;}
-    .sidebar-toggle:hover{background:#fff;}
-    .sidebar-toggle:active{background:#fff;}
-    .sidebar-toggle:focus{background:#fff; outline:none;}
+  .sidebar-toggle{position:fixed; top:50px; left:260px; width:32px; height:32px; background:transparent; border:none; border-radius:8px; color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:30px; font-weight:bold; z-index:1000; transition:left 0.3s ease;}
+  .sidebar-toggle:hover{background:transparent;}
+  .sidebar-toggle:active{background:transparent;}
+  .sidebar-toggle:focus{background:transparent; outline:none;}
     .sidebar.collapsed + .main-chat .sidebar-toggle{left:0; border-radius:8px;}
     .sidebar.resizing + .main-chat .sidebar-toggle{transition:none;}
     
@@ -98,8 +98,10 @@
     .main-chat{flex:1; display:flex; flex-direction:column; position:relative;}
     .chat{position:relative; padding:10px 22px 32px; max-width:1200px; margin:0 auto; flex:1; width:100%;}
 
-    .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
-    .column:has(.avatar-section.minimized){align-items:flex-start;}
+  .column{display:flex; flex-direction:column; align-items:center; gap:18px;}
+  .column:has(.avatar-section.minimized){align-items:flex-start;}
+  /* Keep left alignment while expanding to avoid early jump */
+  .column:has(.avatar-section.expanding){align-items:flex-start;}
 
     .avatar-section {
       display: flex;
@@ -109,16 +111,24 @@
       transition: all 0.3s ease;
     }
 
-    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: all 0.3s ease; transform-origin: center center;}
+  /* TEMP: slow transitions to inspect animation */
+  .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: transform 2s ease, width 0.9s ease, height 0.9s ease; transform-origin: center center; will-change: transform, width, height;}
+  /* Prepare inner avatar image for idle movement */
+  .avatarFrame > img{will-change: transform;}
+  @media (prefers-reduced-motion: reduce){
+    .avatarFrame > img{transition:none !important; transform:none !important}
+  }
     
-    /* Minimized avatar state */
-    .avatar-section.minimized{align-items: flex-start;}
-    .avatar-section.minimized .avatarFrame{width:100px; height:100px; cursor:pointer; transform-origin: left center;}
+  /* Minimized avatar state */
+  .avatar-section.minimized{align-items: flex-start;}
+  .avatar-section.minimized .avatarFrame{width:100px; height:100px; cursor:pointer; transform-origin: left bottom; transform: translate(-12px, 10px);}    
+  /* Collapsing (animating to minimized) - keep column centered until complete */
+  .avatar-section.collapsing .avatarFrame{width:100px; height:100px; cursor:pointer; transform-origin: left bottom; transform: translate(-12px, 10px);}    
     
     /* Expanding from minimized - scale from left center initially, then return to center */
-    .avatar-section.expanding{align-items: center;}
-    .avatar-section.expanding .avatarFrame{transform-origin: left center;}
-    .avatar-section.minimized .avatarFrame:hover{transform:scale(1.1);}
+  .avatar-section.expanding{align-items: center;}
+  .avatar-section.expanding .avatarFrame{transform-origin: right top; transform: translate(8px, -6px);}
+  .avatar-section.minimized .avatarFrame:hover{transform: translate(-12px, 10px) scale(1.06);}    
     
     /* Minimize button */
     .minimize-btn{position:absolute; top:8px; left:8px; background:rgba(0,0,0,0.8); border:none; color:var(--ink); cursor:pointer; padding:6px; border-radius:6px; font-size:12px; opacity:1; transition:all 0.3s ease; width:24px; height:24px; display:flex; align-items:center; justify-content:center; z-index:10;}
@@ -128,7 +138,8 @@
     .avatar-section.minimized .minimize-btn{left:auto; right:8px;}
     
     .pane{position:relative; width:100%; max-width:760px;}
-    .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.3s ease;}
+  /* TEMP: slow transitions to inspect animation */
+  .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.9s ease;}
     .scroller.expanded{max-height:500px;}
     .scroller::-webkit-scrollbar{width:12px}
     .scroller::-webkit-scrollbar-track{background:transparent}
@@ -142,7 +153,7 @@
     .from-bot{margin-right:auto; border-top-left-radius:8px}
 
     .composerWrap{position:relative; margin-top:20px; margin-bottom:10px; width:100%; max-width:735.36px; margin-left:auto; margin-right:auto; display:flex; align-items:center; gap:11.2px; z-index:3}
-    .composer{flex:1; border:1px solid var(--stroke); border-radius:800px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; min-height:46.4px; max-height:200px; overflow-y:auto;}
+  .composer{flex:1; border:1px solid var(--stroke); border-radius:24.5px; padding:11.2px 14.4px; display:flex; align-items:center; gap:8px; background:#000; min-height:46.4px; max-height:200px; overflow-y:auto;}
     .composer textarea{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:17.6px; resize:none; font-family:inherit; line-height:1.4; min-height:22px; padding:0;}
     .composer textarea::placeholder { color:#a8a8a8; opacity:1; }
     .sendBtn .circleBtn{width:40px; height:40px}
@@ -235,7 +246,13 @@
     <!-- Main Chat Area -->
     <div class="main-chat">
       <!-- Sidebar Toggle Button -->
-      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">‹</button>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3" y="6" width="18" height="2" fill="#ffffff"/>
+          <rect x="3" y="11" width="18" height="2" fill="#ffffff"/>
+          <rect x="3" y="16" width="18" height="2" fill="#ffffff"/>
+        </svg>
+      </button>
       
       <section class="screen chat">
         <div class="column">
@@ -372,7 +389,7 @@
           const savedWidth = localStorage.getItem('sidebarWidth') || '300';
           sidebar.style.width = `${savedWidth}px`;
           setTogglePosition(parseInt(savedWidth));
-          sidebarToggle.innerHTML = '‹';
+          // Keep hamburger icon; update title only
           sidebarToggle.title = 'Collapse sidebar';
         } else {
           // Collapse sidebar
@@ -380,7 +397,7 @@
           // Override inline width with 0 for collapse
           sidebar.style.width = '0px';
           sidebarToggle.style.left = '0px';
-          sidebarToggle.innerHTML = '›';
+          // Keep hamburger icon; update title only
           sidebarToggle.title = 'Expand sidebar';
         }
       });
@@ -461,7 +478,7 @@
           sidebar.classList.add('collapsed');
           sidebar.style.width = '0px';
           sidebarToggle.style.left = '0px';
-          sidebarToggle.innerHTML = '›';
+          // Keep hamburger icon; update title only
           sidebarToggle.title = 'Expand sidebar';
         }
       }
@@ -896,10 +913,14 @@
           
           // Display avatar
           console.log('Loading avatar image:', avatarData.image_url);
+          // Stop any prior idle animation before swapping content
+          try { stopIdleWiggle(); } catch(e) {}
           if (avatarData.image_url && avatarData.image_url.trim()) {
             const img = new Image();
             img.onload = () => {
               console.log('Avatar image loaded successfully');
+              // Replace content
+              try { stopIdleWiggle(); } catch(e) {}
               avatar.innerHTML = '';
               img.style.width = '100%';
               img.style.height = '100%';
@@ -909,16 +930,22 @@
               
               // Add minimize button
               addMinimizeButton();
+              // Start subtle idle animation
+              try { startIdleWiggle(); } catch(e) {}
             };
             img.onerror = (e) => {
               console.error('Avatar image failed to load:', e);
+              try { stopIdleWiggle(); } catch(e) {}
               avatar.innerHTML = fallbackAvatar();
+              try { startIdleWiggle(); } catch(e) {}
             };
             img.src = avatarData.image_url;
             img.alt = avatarData.name;
           } else {
             console.log('No avatar image URL, using fallback');
+            try { stopIdleWiggle(); } catch(e) {}
             avatar.innerHTML = fallbackAvatar();
+            try { startIdleWiggle(); } catch(e) {}
             
             // Add minimize button to fallback avatar too
             addMinimizeButton();
@@ -1130,10 +1157,71 @@
                    style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
       }
 
-      // Avatar minimize functionality
-      let isMinimized = false;
-      const avatarSection = document.querySelector('.avatar-section');
-      const scroller = document.getElementById('log');
+      // Utility: get transform transition duration (ms) for avatar frame
+      function getTransformTransitionMs(){
+        try{
+          const el = document.getElementById('avatar');
+          const cs = getComputedStyle(el);
+          const props = cs.transitionProperty.split(',').map(s=>s.trim());
+          const durs  = cs.transitionDuration.split(',').map(s=>s.trim());
+          const delays = cs.transitionDelay.split(',').map(s=>s.trim());
+          const parseTime = (t)=> t.endsWith('ms') ? parseFloat(t) : parseFloat(t)*1000;
+          const idx = props.findIndex(p => p === 'transform');
+          if (idx !== -1) {
+            const dur = parseTime(durs[Math.min(idx, durs.length-1)] || '0s');
+            const del = parseTime(delays[Math.min(idx, delays.length-1)] || '0s');
+            return Math.max(0, dur + del);
+          }
+          // Fallback to the first duration if transform not explicitly listed
+          const dur = parseTime(durs[0] || '0.9s');
+          const del = parseTime(delays[0] || '0s');
+          return Math.max(0, dur + del);
+        }catch(e){
+          return 900; // safe default
+        }
+      }
+
+      // Subtle idle animation helpers
+      function stopIdleWiggle(){
+        if (avatar._idleWiggleTimer) {
+          clearTimeout(avatar._idleWiggleTimer);
+          avatar._idleWiggleTimer = null;
+        }
+        if (avatar._idleWiggleImg) {
+          try {
+            avatar._idleWiggleImg.style.transition = '';
+            avatar._idleWiggleImg.style.transform = '';
+          } catch(e){}
+          avatar._idleWiggleImg = null;
+        }
+      }
+
+      function startIdleWiggle(){
+        const mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (mq && mq.matches) return;
+        const img = avatar.querySelector('img');
+        if (!img) return;
+        avatar._idleWiggleImg = img;
+        const rand = (min, max) => Math.random() * (max - min) + min;
+        const step = () => {
+          const duration = rand(7, 12);
+          const delay = rand(3, 9);
+          const tx = rand(-1.5, 1.5);
+          const ty = rand(-1.5, 1.5);
+          const s  = 1 + rand(-0.006, 0.01);
+          img.style.transition = `transform ${duration}s ease-in-out`;
+          img.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+          avatar._idleWiggleTimer = setTimeout(step, (duration + delay) * 1000);
+        };
+        const initialDelay = Math.random() * 4000;
+        avatar._idleWiggleTimer = setTimeout(step, initialDelay);
+      }
+
+  // Avatar minimize functionality
+  let isMinimized = false;
+  const avatarSection = document.querySelector('.avatar-section');
+  const scroller = document.getElementById('log');
+  let expandClickHandler = null; // stable reference for minimized->expand click
 
       function addMinimizeButton() {
         // Remove existing minimize button if any
@@ -1158,44 +1246,60 @@
         const minimizeBtn = avatar.querySelector('.minimize-btn');
         
         if (isMinimized) {
-          // Minimize avatar and expand chat
+          // Minimize avatar: animate first without left-align, then commit
           console.log('Minimizing avatar...'); // Debug log
-          avatarSection.classList.add('minimized');
-          scroller.classList.add('expanded');
-          if (minimizeBtn) {
-            minimizeBtn.innerHTML = '+';
-            minimizeBtn.title = 'Expand avatar';
-          }
+          // Start collapsing animation (keeps column centered)
+          try { stopIdleWiggle(); } catch(e) {}
+          avatarSection.classList.add('collapsing');
           
-          // Make minimized avatar clickable to expand
-          avatar.style.cursor = 'pointer';
-          avatar.addEventListener('click', function(e) {
-            if (e.target !== minimizeBtn) {
-              toggleMinimize();
+          // After animation completes (transform), set minimized state and align left
+          const delayMs = getTransformTransitionMs();
+          setTimeout(() => {
+            avatarSection.classList.remove('collapsing');
+            avatarSection.classList.add('minimized');
+            scroller.classList.add('expanded');
+            if (minimizeBtn) {
+              minimizeBtn.innerHTML = '+';
+              minimizeBtn.title = 'Expand avatar';
             }
-          });
+            // Make minimized avatar clickable to expand (use stable handler)
+            if (!expandClickHandler) {
+              expandClickHandler = function(e){
+                if (e.target.closest && e.target.closest('.minimize-btn')) return;
+                toggleMinimize();
+              };
+            }
+            avatar.style.cursor = 'pointer';
+            avatar.addEventListener('click', expandClickHandler);
+            try { startIdleWiggle(); } catch(e) {}
+          }, delayMs);
         } else {
           // Expand avatar and reduce chat space
           console.log('Expanding avatar...'); // Debug log
           
           // Add expanding class for smooth animation from left to center
+          try { stopIdleWiggle(); } catch(e) {}
           avatarSection.classList.add('expanding');
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
           
-          // Remove expanding class after animation completes
+          // Remove expanding class after animation completes (match slowed CSS duration)
           setTimeout(() => {
             avatarSection.classList.remove('expanding');
-          }, 300); // Match the CSS transition duration
+            try { startIdleWiggle(); } catch(e) {}
+          }, 900);
           
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '−';
             minimizeBtn.title = 'Minimize avatar';
           }
           
-          // Remove click handler from avatar
+          // Remove minimized click handler from avatar
           avatar.style.cursor = 'default';
-          avatar.removeEventListener('click', toggleMinimize);
+          if (expandClickHandler) {
+            avatar.removeEventListener('click', expandClickHandler);
+            expandClickHandler = null;
+          }
         }
       }
 
