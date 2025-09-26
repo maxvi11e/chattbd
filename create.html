@@ -115,11 +115,11 @@
       align-self:center;
     }
     .field-heading img.icon{
-      width:14px;
-      height:14px;
-      opacity:0.7;
-      filter: invert(1);
+      width:18px;
+      height:18px;
+      opacity:0.95;
       display:inline-block;
+      vertical-align:middle;
     }
   </style>
 </head>
@@ -233,14 +233,14 @@
                 <button id="generateSuggestionBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion</button>
               </div>
               <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
-                <div class="field-heading"><img class="icon" src="images/pencil_icon.png" alt="edit" /> Name</div>
+                <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin:0;">
                   <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px;" />
                   <div style="display:flex; gap:6px;">
                     <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:20px; cursor:pointer;">Regenerate</button>
                   </div>
                 </div>
-                <div class="field-heading" style="margin-top:6px;"><img class="icon" src="images/pencil_icon.png" alt="edit" /> Define appearance and behavoir</div>
+                <div class="field-heading" style="margin-top:6px;">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; display:block; margin-top:6px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
@@ -409,6 +409,8 @@
   const toggleArtSettingsBtn = document.getElementById('toggleArtSettingsBtn');
   // Track if user has triggered (clicked) Art Settings at least once in this flow
   let artSettingsTriggered = false;
+  // Track when randomize flow should auto-open art settings after suggestion
+  let randomizeFlow = false;
 
       // Sign out handler (optional if logout button exists)
       if (logoutBtn) {
@@ -508,6 +510,8 @@
       function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
       function dispatch(el, type){ if(!el) return; const ev = new Event(type, {bubbles:true}); el.dispatchEvent(ev); }
       async function randomizeAll(){
+  // Mark that we should auto-open art settings after suggestion returns
+  randomizeFlow = true;
         // Ensure options mode is visible
         showOptionsMode();
         // Archetype
@@ -678,6 +682,19 @@
               suggestionNameEl.value = name;
               suggestionDescEl.value = desc;
               suggestionBox.style.display = 'block';
+              // If randomize flow, auto-open Art Settings and keep the button hidden
+              if (randomizeFlow) {
+                if (artSettings) artSettings.style.display = 'flex';
+                artSettingsTriggered = true;
+                if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
+              }
+              // Focus the name field when it appears
+              if (suggestionNameEl) {
+                requestAnimationFrame(() => {
+                  suggestionNameEl.focus();
+                  try { suggestionNameEl.setSelectionRange(suggestionNameEl.value.length, suggestionNameEl.value.length); } catch {}
+                });
+              }
               // Reveal art settings button only if settings are not already open
               if (artSettingsBtn) {
                 if (artSettings && artSettings.style.display !== 'none') {
@@ -701,6 +718,8 @@
                   startBtn.style.display = 'none';
                 }
               }
+              // Reset randomize flow flag now that we've handled it
+              randomizeFlow = false;
           });
         }
         tryAnother?.addEventListener('click', async ()=>{
@@ -710,6 +729,13 @@
           const [name, desc] = await generateSuggestion(category);
           suggestionNameEl.value = name;
           suggestionDescEl.value = desc;
+          // Keep focus on the name field on regenerate
+          if (suggestionNameEl) {
+            requestAnimationFrame(() => {
+              suggestionNameEl.focus();
+              try { suggestionNameEl.setSelectionRange(suggestionNameEl.value.length, suggestionNameEl.value.length); } catch {}
+            });
+          }
           // Automatically apply new suggestion
           archetypeSpecificInput.value = name;
           archetypeSpecificDesc.value = desc;
