@@ -169,27 +169,27 @@
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
-                      <div id="traitsGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
-            <div style="font-size:14px; color:#a8a8a8;">Personality Sliders</div>
+                      <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
+            <!-- <div style="font-size:14px; color:#ffffff;">Personality Sliders</div> -->
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Serious</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Serious</span>
               <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Playful</span>
+              <span style="width:110px; font-size:12px; color:#ffffff;">Playful</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Succinct</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Succinct</span>
               <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Talkative</span>
+              <span style="width:110px; font-size:12px; color:#ffffff;">Talkative</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Rational</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Rational</span>
               <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Intuitive</span>
+              <span style="width:110px; font-size:12px; color:#ffffff;">Intuitive</span>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#a8a8a8;">Conservative</span>
+              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Conservative</span>
               <input id="traitConservativeLiberal" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#a8a8a8;">Progressive</span>
+              <span style="width:110px; font-size:12px; color:#ffffff;">Progressive</span>
             </div>
           </div>
 
@@ -225,7 +225,7 @@
             </div>
             <!-- Art settings toggle -->
             <div style="width:100%; display:flex; justify-content:center;">
-              <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">art settings</button>
+              <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">Edit Art Style</button>
             </div>
 
             <!-- Art Settings Container (collapsed by default) -->
@@ -453,21 +453,20 @@
       modeOptionsBtn.addEventListener('click', showOptionsMode);
       modePromptBtn.addEventListener('click', showPromptMode);
 
-      // Art settings toggle (default minimized)
+      // Art settings: one-way expand. Hide the button after first click; no collapse behavior.
       if (toggleArtSettingsBtn && artSettings){
         // Start hidden
         artSettings.style.display = 'none';
         toggleArtSettingsBtn.style.display = 'none';
         toggleArtSettingsBtn.addEventListener('click', ()=>{
-          const isHidden = artSettings.style.display === 'none';
-          artSettings.style.display = isHidden ? 'flex' : 'none';
+          // Open settings and remove the button to avoid blank space
+          artSettings.style.display = 'flex';
           artSettingsTriggered = true;
-          // If opening settings and a suggestion exists, allow Start button to appear now
-          if (!isHidden) {
-            const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
-            const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
-            if ((suggestionVisible || suggestedName) && startBtn) startBtn.style.display = 'flex';
-          }
+          toggleArtSettingsBtn.style.display = 'none';
+          // If a suggestion exists, allow Start button to appear now
+          const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
+          const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
+          if ((suggestionVisible || suggestedName) && startBtn) startBtn.style.display = 'flex';
         });
       }
 
@@ -646,8 +645,14 @@
               suggestionNameEl.value = name;
               suggestionDescEl.value = desc;
               suggestionBox.style.display = 'block';
-              // Reveal art settings when suggestion shows
-              if (artSettingsBtn) artSettingsBtn.style.display = 'inline-block';
+              // Reveal art settings button only if settings are not already open
+              if (artSettingsBtn) {
+                if (artSettings && artSettings.style.display !== 'none') {
+                  artSettingsBtn.style.display = 'none';
+                } else {
+                  artSettingsBtn.style.display = 'inline-block';
+                }
+              }
               // Automatically apply suggestion
               archetypeSpecificInput.value = name;
               archetypeSpecificDesc.value = desc;
@@ -676,8 +681,10 @@
           archetypeSpecificInput.value = name;
           archetypeSpecificDesc.value = desc;
           tryAnother.textContent = 'Regenerate';
-          // Keep art settings visible with the suggestion panel
-          if (artSettingsBtn) artSettingsBtn.style.display = 'inline-block';
+          // If art settings are not yet open, ensure the button is visible; otherwise keep it hidden
+          if (artSettings && artSettings.style.display === 'none' && artSettingsBtn) {
+            artSettingsBtn.style.display = 'inline-block';
+          }
         });
 
         const toggle = ()=>{
