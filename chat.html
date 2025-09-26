@@ -1328,107 +1328,43 @@
             });
           if (msgError) console.error('Error saving message:', msgError);
 
-          // Stream AI response with timeout & fallback
-          const controller = new AbortController();
-          const timeoutId = setTimeout(()=>controller.abort(), 60000); // 60s hard timeout
-          let res;
-          try {
-            res = await fetch('/api/chat', {
-              method:'POST',
-              headers:{ 'Content-Type':'application/json', 'Accept':'text/event-stream' },
-              body: JSON.stringify({ 
-                persona: currentAvatar.name, 
-                message: t, 
-                history: convo.slice(-10),
-                temperature: 0.85,
-                presencePenalty: 0.45,
-                frequencyPenalty: 0.35,
-                stream: true
-              }),
-              signal: controller.signal
-            });
-          } catch(fetchErr){
-            removeLoading(loadingId);
-            add('from-bot', 'Connection error.');
-            return;
-          }
-          if(!res.ok || !res.body){
-            removeLoading(loadingId);
-            add('from-bot', 'Response error');
-            return;
-          }
+          // Non-stream fetch + typewriter simulation (fallback while real streaming debug)
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              message: t, 
+              history: convo.slice(-10),
+              temperature: 0.85,
+              presencePenalty: 0.45,
+              frequencyPenalty: 0.35
+            })
+          });
+          const { text:fullResp, error:respErr } = await res.json();
           removeLoading(loadingId);
+          if(respErr || !fullResp){
+            add('from-bot','No response.');
+            return;
+          }
+          const finalText = (fullResp || '').trim();
           add('from-bot','');
-          const messageNodes = document.getElementById('log').querySelectorAll('.from-bot');
-          const liveNode = messageNodes[messageNodes.length-1];
-            const bubble = liveNode.querySelector('.bubble');
-          const reader = res.body.getReader();
-          const decoder = new TextDecoder();
-          let buffer = '';
-          let full = '';
-          let receivedAny = false;
-          const safetyTimer = setTimeout(()=>{
-            if(!receivedAny){ bubble.textContent = 'Still thinking...'; }
-          }, 5000);
-          const earlyFallbackTimer = setTimeout(()=>{
-            if(!receivedAny){
-              controller.abort();
-            }
-          }, 3000);
-          while(true){
-            let chunk;
-            try { chunk = await reader.read(); } catch(streamErr){ break; }
-            const {done, value} = chunk || {};
-            if(done) break;
-            buffer += decoder.decode(value, {stream:true});
-            const parts = buffer.split('\n\n');
-            buffer = parts.pop();
-            for(const part of parts){
-              if(!part.startsWith('data:')) continue;
-              const payload = part.replace(/^data:\s*/,'').trim();
-              if(payload === '[DONE]') { buffer=''; break; }
-              try {
-                const json = JSON.parse(payload);
-                const delta = json.delta;
-                if(delta){
-                  if(!receivedAny){ receivedAny = true; clearTimeout(safetyTimer); }
-                  full += delta;
-                  bubble.textContent = full;
-                  log.scrollTop = log.scrollHeight;
-                }
-              } catch(_e) {}
-            }
+          const msgNodes = document.getElementById('log').querySelectorAll('.from-bot');
+          const lastNode = msgNodes[msgNodes.length-1];
+          const bubble = lastNode.querySelector('.bubble');
+          let i=0;
+          const speed = 18; // ms per char
+          function step(){
+            bubble.textContent = finalText.slice(0,i);
+            log.scrollTop = log.scrollHeight;
+            if(i < finalText.length){ i++; requestAnimationFrame(step); }
           }
-          clearTimeout(safetyTimer);
-          clearTimeout(earlyFallbackTimer);
-          clearTimeout(timeoutId);
-          full = full.trim();
-          if(full){
-            convo.push({ role:'assistant', content: full });
-            const { error: aiMsgError } = await supabase
-              .from('messages')
-              .insert({ conversation_id: currentConversationId, role: 'assistant', text: full });
-            if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
-          } else if(!receivedAny) {
-            // Fallback non-stream attempt
-            bubble.textContent = 'Retrying...';
-            try {
-              const fallbackRes = await fetch('/api/chat', {
-                method:'POST',
-                headers:{ 'Content-Type':'application/json' },
-                body: JSON.stringify({ persona: currentAvatar.name, message: t, history: convo.slice(-10), temperature:0.85, presencePenalty:0.45, frequencyPenalty:0.35 })
-              });
-              const fbJson = await fallbackRes.json();
-              const fbText = (fbJson.text || '').trim();
-              if(fbText){
-                bubble.textContent = fbText;
-                convo.push({ role:'assistant', content: fbText });
-                await supabase.from('messages').insert({ conversation_id: currentConversationId, role: 'assistant', text: fbText });
-              } else {
-                bubble.textContent = 'No response.';
-              }
-            } catch(_e){ bubble.textContent = 'Failed retry.'; }
-          }
+          requestAnimationFrame(step);
+          convo.push({ role:'assistant', content: finalText });
+          const { error: aiMsgError } = await supabase
+            .from('messages')
+            .insert({ conversation_id: currentConversationId, role: 'assistant', text: finalText });
+          if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
           
           // Generate smart title after first exchange
           await generateAndUpdateTitle();
