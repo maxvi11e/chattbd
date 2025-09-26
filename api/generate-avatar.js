@@ -52,49 +52,72 @@ export default async function handler(req, res){
     let finalPrompt;
 
     if (isAbstract) {
-      // Abstract path: single cohesive "digital organism" emblem derived from sliders
+      // Abstract path: single cohesive "digital organism" emblem derived from sliders (now simplified / less busy)
       const raw = {
         sp: Number(traits?.seriousPlayful),
         sc: Number(traits?.succinctChatty),
         ri: Number(traits?.rationalIntuitive),
-  cl: Number(traits?.practicalImaginative)
+        cl: Number(traits?.practicalImaginative)
       };
       const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=3) return 'low'; if(n>=8) return 'high'; return 'mid'; };
       const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
 
-      const chroma = b.sp==='low' ? 'subtle desaturated deep cool palette with ember accents' : b.sp==='high' ? 'vivid luminous spectral palette (teals, ambers, magentas)' : 'balanced luminous cyan–amber bi-tone palette';
-      const structureCore = b.ri==='low' ? 'precise concentric rings, modular lattice nodes' : b.ri==='high' ? 'fluid swirling energy filaments, diffused plasma shells' : 'hybrid semi-geometric arcs interwoven with soft flux ribbons';
-      const density = b.sc==='low' ? 'minimal interior voids and clean negative space corridors' : b.sc==='high' ? 'dense mesh of micro-connective spark lines and particulate clusters' : 'layered medium complexity strata';
-      const symmetry = b.cl==='low' ? 'stable bilateral symmetry with quiet axial equilibrium' : b.cl==='high' ? 'dynamic off-center growth asymmetry and motion vector bias' : 'gentle quasi-radial balance';
+      // Palette: restrict to 2-3 harmonics for recognizability
+      const chroma = b.sp==='low'
+        ? 'two-tone deep indigo + ember accent palette'
+        : b.sp==='high'
+          ? 'tight triad luminous cyan, amber, magenta'
+          : 'balanced dual cyan–amber glow';
+
+      // Core structure simplified (macro forms not many permutations)
+      const structureCore = b.ri==='low'
+        ? 'macro concentric ring core with sparse lattice spokes'
+        : b.ri==='high'
+          ? 'macro swirling vortex core with soft plasma veil'
+          : 'macro hybrid ring + spiral core';
+
+      // Density: only escalate fine detail when chatty is high; else keep minimal/medium
+      const density = b.sc==='low'
+        ? 'minimal internal micro-detail; large negative space cavities'
+        : b.sc==='high'
+          ? 'moderate (not dense) micro-filaments around core, avoid clutter'
+          : 'controlled medium layering';
+
+      const symmetry = b.cl==='low'
+        ? 'stable near-bilateral balance'
+        : b.cl==='high'
+          ? 'slight asymmetry with directional energy bias (avoid chaotic scatter)'
+          : 'soft quasi-radial equilibrium';
 
       const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
       const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
 
-      const organismDescriptor = 'single self-contained luminous abstract digital organism core, perceived as an emergent intelligence node';
-      const containment = 'centered, crisp silhouettable perimeter (no figurative anatomy), soft volumetric inner glow, subtle depth parallax';
-      const exclusions = 'exclude faces, eyes, heads, bodies, limbs, creatures, icons, logos, text, letters, recognizable symbols';
-      const detailLine = dl ? `Micro-detail intensity target: ${dl}/10.` : '';
-      const conceptLine = concept ? `Concept influence (fully abstracted): ${concept}; translate into energy topology only.` : '';
+      const organismDescriptor = 'single luminous abstract digital organism core (recognizable emblem), tightly cropped close-up';
+      const containment = 'centered macro form, clear outer contour, gentle inner volumetric glow, shallow depth layering';
+      const exclusions = 'exclude faces, eyes, heads, bodies, limbs, creatures, icons, logos, letters, text, recognizable symbols';
+      const detailLine = dl ? `Micro-detail ceiling: ${dl}/10 (respect minimalism).` : '';
+      const conceptLine = concept ? `Concept hint (abstracted): ${concept}; reinterpret ONLY as energy topology (no figurative shapes).` : '';
 
-      // Map traitWords into organism metaphors
-      const traitEnergy = traitWords.length ? `Express traits as modulation of energy flow and topology: ${traitWords.join(', ')}.` : '';
+      const traitEnergy = traitWords.length ? `Translate traits into modulation of glow rhythm + structural tension: ${traitWords.join(', ')}.` : '';
 
       finalPrompt = [
-        'Square dark backdrop for contrast.',
+        'Square dark neutral backdrop for contrast.',
         organismDescriptor + ',',
         chroma + ',',
         structureCore + ',',
         density + ',',
         symmetry + ',',
         containment + '.',
+        'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
+        'Focus on 1 coherent central entity; avoid multiple competing motifs.',
         traitEnergy,
         conceptLine,
         vibePhrase,
         detailLine,
-        'Surface qualities: layered translucent plasma membranes, procedural node clusters, subtle particle drift, coherent core nucleus.',
-        'Behavior suggestion (visual only): faint pulsing, rotational micro-parallax, data-like flicker strands.',
+        'Surface: smooth energy membranes, sparse node sparks (<= 12), subtle particle halo, crisp readable silhouette.',
+        'Behavior suggestion (implied only): faint pulse + slow rotational parallax; no extra UI widgets.',
         `Hard constraints: ${exclusions}. No humanoid suggestion.`,
-        'Do not resemble any specific cinematic interface; keep original and novel.'
+        'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
       ].filter(Boolean).join(' ');
     } else { // Humanoid path
       const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;
