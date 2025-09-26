@@ -268,6 +268,9 @@
               <button id="discussTopicBtn" style="background:#222; color:#fff; border:1px solid var(--stroke); border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
                 <span>Discuss topic</span>
               </button>
+              <button id="learnSubjectBtn" style="background:#222; color:#fff; border:1px solid var(--stroke); border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <span>Learn about a subject</span>
+              </button>
             </div>
             <!-- Bottom composer -->
             <div class="composerWrap">
@@ -1135,6 +1138,62 @@
           }
         } catch(e){
           console.error('DiscussTopic failed', e);
+        }
+      });
+
+      const learnSubjectBtn = document.getElementById('learnSubjectBtn');
+      learnSubjectBtn?.addEventListener('click', async ()=>{
+        if(!currentAvatar) return;
+        try {
+          const traits = currentAvatar?.traits || {};
+          const raw = traits.personality_words || [];
+          const sliders = traits.persona_traits || traits.sliders_raw || traits.sliders || {};
+          const s = {
+            seriousPlayful: sliders.seriousPlayful ?? null,
+            succinctChatty: sliders.succinctChatty ?? null,
+            rationalIntuitive: sliders.rationalIntuitive ?? null,
+            practicalImaginative: sliders.practicalImaginative ?? null
+          };
+          const flavor = [];
+          const bucket = (v, low, high)=>{ if(v==null) return; if(v<=35) flavor.push(low); else if(v>=65) flavor.push(high); };
+          bucket(s.seriousPlayful,'serious','playful');
+          bucket(s.succinctChatty,'succinct','chatty');
+          bucket(s.rationalIntuitive,'rational','intuitive');
+          bucket(s.practicalImaginative,'practical','imaginative');
+          raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
+
+          const instruction = `Select one specific subject aligned with these traits: ${flavor.join(', ') || 'balanced'}. It must not be overly broad (avoid just 'science' or 'art') nor obscure jargon. Produce a single compact plain text mini learning card with no list formatting or bullets. Format exactly: 'Subject: <name>. Fact. Fact. Fact.' (3-5 concise factual sentences total). Each fact should be accurate, concrete, interesting; if playful/imaginative you may include one creative analogy; if serious/practical include one applied or impact-oriented fact. No questions, no filler, no self references, no dashes, no numbering, no asterisks.`;
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+          });
+          const { text } = await res.json();
+          let facts = (text || '').trim();
+          // Defensive cleanup if model still outputs bullets or newlines
+          facts = facts
+            .replace(/^\s*[-*+]\s*/gm,'') // remove bullet markers
+            .replace(/\n+/g,' ')          // collapse newlines
+            .replace(/\s{2,}/g,' ')       // collapse extra spaces
+            .trim();
+          if(facts){
+            add('from-bot', facts);
+            convo.push({ role:'assistant', content: facts });
+            if(!currentConversationId){
+              const { data: convoData } = await supabase
+                .from('conversations')
+                .insert({ avatar_id: currentAvatar.id, title: `Conversation with ${currentAvatar.name}` })
+                .select()
+                .single();
+              currentConversationId = convoData?.id || currentConversationId;
+              loadConversationHistory();
+            }
+            if(currentConversationId){
+              await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: facts });
+            }
+          }
+        } catch(e){
+          console.error('LearnSubject failed', e);
         }
       });
 
