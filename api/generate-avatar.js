@@ -62,6 +62,28 @@ export default async function handler(req, res){
       const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=3) return 'low'; if(n>=8) return 'high'; return 'mid'; };
       const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
 
+      // Extreme minimal mode: when succinctChatty, rationalIntuitive & practicalImaginative are all low
+      // we intentionally produce a radically simplified geometric emblem to widen range at low slider values.
+      const extremeMinimal = b.sc==='low' && b.ri==='low' && b.cl==='low';
+      if (extremeMinimal) {
+        const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
+        const conceptLine = concept ? `Optional thematic hint (abstracted strictly as geometry): ${concept}.` : '';
+        const traitEnergy = traitWords.length ? `If traits supplied (${traitWords.join(', ')}), map ONLY to proportion (not ornament).` : '';
+        // Override detail level to very low ceiling (1-2) regardless of user high detail request to preserve simplicity.
+        finalPrompt = [
+          'Square canvas. Ultra-minimal abstract geometric emblem. Black or deep neutral background.',
+          'Use at most TWO primitive shapes (e.g., circle + vertical bar, ring + dot, square + diagonal).',
+          'Flat or near-flat shading, crisp edges, generous negative space (>70%).',
+          'Palette: strict two-tone (e.g., charcoal + single accent such as ember, cyan, or amber). No gradients unless a single subtle radial glow inside one shape.',
+          'No texture, no particles, no filaments, no noise, no complexity, no pseudo-3D extrusion.',
+          'Composition: centered, stable axial balance, perfectly readable at small size.',
+          'Avoid any suggestion of eyes, faces, organisms, UI widgets, logos or letters.',
+          traitEnergy,
+          conceptLine,
+          'Hard constraint: do NOT introduce extra decorative micro elements. Absolutely minimal.'
+        ].filter(Boolean).join(' ');
+      } else {
+
       // Palette: restrict to 2-3 harmonics for recognizability
       const chroma = b.sp==='low'
         ? 'two-tone deep indigo + ember accent palette'
@@ -119,6 +141,7 @@ export default async function handler(req, res){
         `Hard constraints: ${exclusions}. No humanoid suggestion.`,
         'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
       ].filter(Boolean).join(' ');
+  }
     } else { // Humanoid path
       const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;
       const broadLower = broad.toLowerCase();
