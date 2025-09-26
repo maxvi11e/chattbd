@@ -617,12 +617,14 @@
           return list[Math.floor(Math.random()*list.length)];
         }
 
-        async function generateSuggestion(category){
+    async function generateSuggestion(category){
           try {
             const sliders = currentSliderValues();
-            const payload = { archetypeCategory: category, sliders };
-            console.log('[suggest-persona] sending', payload);
-            const resp = await fetch('/api/suggest-persona', {
+      const isAbstract = category && category.toLowerCase() === 'abstract';
+      const payload = isAbstract ? { sliders } : { archetypeCategory: category, sliders };
+      console.log(isAbstract ? '[suggest-abstract] sending' : '[suggest-persona] sending', payload);
+      const endpoint = isAbstract ? '/api/suggest-abstract' : '/api/suggest-persona';
+      const resp = await fetch(endpoint, {
               method:'POST',
               headers:{'Content-Type':'application/json'},
               body: JSON.stringify(payload)
@@ -631,8 +633,8 @@
               throw new Error('Suggest API failed');
             }
             const json = await resp.json();
-            console.log('[suggest-persona] received', json);
-            return [json.name, json.description];
+      console.log(isAbstract ? '[suggest-abstract] received' : '[suggest-persona] received', json);
+      return [json.name, json.description];
           } catch(e){
             console.error('Suggestion error', e);
             return ['Original Concept','A novel undefined concept shaped by personality balance.'];
