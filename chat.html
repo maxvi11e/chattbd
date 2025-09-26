@@ -112,7 +112,7 @@
     }
 
   /* TEMP: slow transitions to inspect animation */
-  .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: transform 2s ease, width 0.9s ease, height 0.9s ease; transform-origin: center center; will-change: transform, width, height;}
+    .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease; transform-origin: center center; will-change: transform, width, height;}
   /* Prepare inner avatar image for idle movement */
   .avatarFrame > img{will-change: transform;}
   @media (prefers-reduced-motion: reduce){
@@ -139,7 +139,7 @@
     
     .pane{position:relative; width:100%; max-width:760px;}
   /* TEMP: slow transitions to inspect animation */
-  .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.9s ease;}
+    .scroller{max-height:270px; overflow:auto; padding:0 0 0 0; transition: max-height 0.3s ease;}
     .scroller.expanded{max-height:500px;}
     .scroller::-webkit-scrollbar{width:12px}
     .scroller::-webkit-scrollbar-track{background:transparent}
@@ -1173,11 +1173,11 @@
             return Math.max(0, dur + del);
           }
           // Fallback to the first duration if transform not explicitly listed
-          const dur = parseTime(durs[0] || '0.9s');
+          const dur = parseTime(durs[0] || '0.3s');
           const del = parseTime(delays[0] || '0s');
           return Math.max(0, dur + del);
         }catch(e){
-          return 900; // safe default
+          return 300; // safe default
         }
       }
 
@@ -1204,11 +1204,11 @@
         avatar._idleWiggleImg = img;
         const rand = (min, max) => Math.random() * (max - min) + min;
         const step = () => {
-          const duration = rand(7, 12);
-          const delay = rand(3, 9);
-          const tx = rand(-1.5, 1.5);
-          const ty = rand(-1.5, 1.5);
-          const s  = 1 + rand(-0.006, 0.01);
+          const duration = rand(4.5, 7.5); // a bit faster
+          const delay = rand(1.5, 3.5);   // slightly more frequent
+          const tx = rand(-1.8, 1.8);     // tiny bit more travel
+          const ty = rand(-1.8, 1.8);
+          const s  = 1 + rand(-0.008, 0.012); // still very subtle
           img.style.transition = `transform ${duration}s ease-in-out`;
           img.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
           avatar._idleWiggleTimer = setTimeout(step, (duration + delay) * 1000);
@@ -1283,11 +1283,11 @@
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
           
-          // Remove expanding class after animation completes (match slowed CSS duration)
+          // Remove expanding class after animation completes
           setTimeout(() => {
             avatarSection.classList.remove('expanding');
             try { startIdleWiggle(); } catch(e) {}
-          }, 900);
+          }, getTransformTransitionMs());
           
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '−';
