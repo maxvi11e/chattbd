@@ -1328,35 +1328,62 @@
             });
           if (msgError) console.error('Error saving message:', msgError);
 
-          // Get AI response
+          // Stream AI response
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ 
               persona: currentAvatar.name, 
               message: t, 
-              history: convo.slice(-10) // Send last 10 messages for context
+              history: convo.slice(-10),
+              temperature: 0.85,
+              presencePenalty: 0.45,
+              frequencyPenalty: 0.35,
+              stream: true
             })
           });
-          
-          const { text, error } = await res.json();
-          if (error || !text) throw new Error(error || 'No response');
-          
-          // Remove loading indicator
+          if(!res.ok || !res.body){
+            removeLoading(loadingId);
+            add('from-bot', 'Response error');
+            return;
+          }
           removeLoading(loadingId);
-          
-          // Save AI response
-          const { error: aiMsgError } = await supabase
-            .from('messages')
-            .insert({
-              conversation_id: currentConversationId,
-              role: 'assistant',
-              text: text
-            });
-          if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
-
-          add('from-bot', text);
-          convo.push({ role:'assistant', content:text });
+          add('from-bot','');
+          const messageNodes = document.getElementById('log').querySelectorAll('.from-bot');
+          const liveNode = messageNodes[messageNodes.length-1];
+          const bubble = liveNode.querySelector('.bubble');
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          let full = '';
+          while(true){
+            const {done, value} = await reader.read();
+            if(done) break;
+            buffer += decoder.decode(value, {stream:true});
+            const parts = buffer.split('\n\n');
+            buffer = parts.pop();
+            for(const part of parts){
+              if(!part.startsWith('data:')) continue;
+              const payload = part.replace(/^data:\s*/,'').trim();
+              if(payload === '[DONE]') { buffer=''; break; }
+              try {
+                const json = JSON.parse(payload);
+                if(json.delta){
+                  full += json.delta;
+                  bubble.textContent = full;
+                  log.scrollTop = log.scrollHeight;
+                }
+              } catch(_e) {}
+            }
+          }
+          full = full.trim();
+          if(full){
+            convo.push({ role:'assistant', content: full });
+            const { error: aiMsgError } = await supabase
+              .from('messages')
+              .insert({ conversation_id: currentConversationId, role: 'assistant', text: full });
+            if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
+          }
           
           // Generate smart title after first exchange
           await generateAndUpdateTitle();
