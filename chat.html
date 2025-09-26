@@ -1089,7 +1089,7 @@
           // Ensure it ends with punctuation for polish
           if(q && !/[.!?]$/.test(q)) q += '?';
           if(q){
-            add('from-bot', q);
+            typewriterBot(q);
             convo.push({ role:'assistant', content:q });
             // store for novelty
             const updated = [...recent, q].slice(-12);
@@ -1157,7 +1157,7 @@
           const { text } = await res.json();
           let topic = cleanTrailing((text || '').trim());
           if(topic){
-            add('from-bot', topic);
+            typewriterBot(topic);
             convo.push({ role:'assistant', content: topic });
             const updatedTopics = [...topicRecent, topic].slice(-10);
             localStorage.setItem(topicKey, JSON.stringify(updatedTopics));
@@ -1254,7 +1254,7 @@
             } catch(_e) { /* ignore retry errors */ }
           }
           if(facts){
-            add('from-bot', facts);
+            typewriterBot(facts);
             convo.push({ role:'assistant', content: facts });
             const updatedLearn = [...learnRecent, facts].slice(-10);
             localStorage.setItem(learnKey, JSON.stringify(updatedLearn));
@@ -1399,6 +1399,25 @@
         row.appendChild(b); 
         log.appendChild(row);
         setTimeout(()=>{ log.scrollTop = log.scrollHeight; }, 0);
+      }
+
+      function typewriterBot(text){
+        const row = document.createElement('div');
+        row.className = 'row';
+        const b = document.createElement('div');
+        b.className = 'bubble from-bot';
+        b.textContent = '';
+        row.appendChild(b);
+        log.appendChild(row);
+        setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
+        let i=0; const finalText = (text||'').trim();
+        const speed = 18;
+        const animate=()=>{
+          b.textContent = finalText.slice(0,i);
+          log.scrollTop = log.scrollHeight;
+          if(i < finalText.length){ i++; requestAnimationFrame(animate); }
+        };
+        requestAnimationFrame(animate);
       }
 
       function addLoading(id) {
