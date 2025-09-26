@@ -1328,20 +1328,30 @@
             });
           if (msgError) console.error('Error saving message:', msgError);
 
-          // Stream AI response
-          const res = await fetch('/api/chat', {
-            method:'POST',
-            headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ 
-              persona: currentAvatar.name, 
-              message: t, 
-              history: convo.slice(-10),
-              temperature: 0.85,
-              presencePenalty: 0.45,
-              frequencyPenalty: 0.35,
-              stream: true
-            })
-          });
+          // Stream AI response with timeout & fallback
+          const controller = new AbortController();
+          const timeoutId = setTimeout(()=>controller.abort(), 60000); // 60s hard timeout
+          let res;
+          try {
+            res = await fetch('/api/chat', {
+              method:'POST',
+              headers:{ 'Content-Type':'application/json' },
+              body: JSON.stringify({ 
+                persona: currentAvatar.name, 
+                message: t, 
+                history: convo.slice(-10),
+                temperature: 0.85,
+                presencePenalty: 0.45,
+                frequencyPenalty: 0.35,
+                stream: true
+              }),
+              signal: controller.signal
+            });
+          } catch(fetchErr){
+            removeLoading(loadingId);
+            add('from-bot', 'Connection error.');
+            return;
+          }
           if(!res.ok || !res.body){
             removeLoading(loadingId);
             add('from-bot', 'Response error');
@@ -1351,13 +1361,19 @@
           add('from-bot','');
           const messageNodes = document.getElementById('log').querySelectorAll('.from-bot');
           const liveNode = messageNodes[messageNodes.length-1];
-          const bubble = liveNode.querySelector('.bubble');
+            const bubble = liveNode.querySelector('.bubble');
           const reader = res.body.getReader();
           const decoder = new TextDecoder();
           let buffer = '';
           let full = '';
+          let receivedAny = false;
+          const safetyTimer = setTimeout(()=>{
+            if(!receivedAny){ bubble.textContent = 'Still thinking...'; }
+          }, 5000);
           while(true){
-            const {done, value} = await reader.read();
+            let chunk;
+            try { chunk = await reader.read(); } catch(streamErr){ break; }
+            const {done, value} = chunk || {};
             if(done) break;
             buffer += decoder.decode(value, {stream:true});
             const parts = buffer.split('\n\n');
@@ -1368,14 +1384,18 @@
               if(payload === '[DONE]') { buffer=''; break; }
               try {
                 const json = JSON.parse(payload);
-                if(json.delta){
-                  full += json.delta;
+                const delta = json.delta;
+                if(delta){
+                  if(!receivedAny){ receivedAny = true; clearTimeout(safetyTimer); }
+                  full += delta;
                   bubble.textContent = full;
                   log.scrollTop = log.scrollHeight;
                 }
               } catch(_e) {}
             }
           }
+          clearTimeout(safetyTimer);
+          clearTimeout(timeoutId);
           full = full.trim();
           if(full){
             convo.push({ role:'assistant', content: full });
@@ -1383,6 +1403,25 @@
               .from('messages')
               .insert({ conversation_id: currentConversationId, role: 'assistant', text: full });
             if (aiMsgError) console.error('Error saving AI message:', aiMsgError);
+          } else if(!receivedAny) {
+            // Fallback non-stream attempt
+            bubble.textContent = 'Retrying...';
+            try {
+              const fallbackRes = await fetch('/api/chat', {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json' },
+                body: JSON.stringify({ persona: currentAvatar.name, message: t, history: convo.slice(-10), temperature:0.85, presencePenalty:0.45, frequencyPenalty:0.35 })
+              });
+              const fbJson = await fallbackRes.json();
+              const fbText = (fbJson.text || '').trim();
+              if(fbText){
+                bubble.textContent = fbText;
+                convo.push({ role:'assistant', content: fbText });
+                await supabase.from('messages').insert({ conversation_id: currentConversationId, role: 'assistant', text: fbText });
+              } else {
+                bubble.textContent = 'No response.';
+              }
+            } catch(_e){ bubble.textContent = 'Failed retry.'; }
           }
           
           // Generate smart title after first exchange
