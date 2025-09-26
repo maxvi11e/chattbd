@@ -51,22 +51,49 @@ export default async function handler(req, res){
     let finalPrompt;
 
     if (isAbstract) {
-      // Abstract path: interpret sliders into composition attributes
-      const s = {
-        tone: traitWords.includes('serious') ? 'muted restrained tone' : traitWords.includes('playful') ? 'vivid energetic chroma' : 'balanced chroma',
-        density: traitWords.includes('succinct') ? 'spacious negative space' : traitWords.includes('chatty') ? 'intricate layered micro-patterns' : 'moderate layered forms',
-        logic: traitWords.includes('rational') ? 'structured geometric segmentation' : traitWords.includes('intuitive') ? 'fluid organic gradients' : 'hybrid semi-geometric flow',
-        social: traitWords.includes('conservative') ? 'symmetry and calm axial balance' : traitWords.includes('progressive') ? 'dynamic asymmetry and motion cues' : 'soft radial balance'
+      // Abstract path: single cohesive "digital organism" emblem derived from sliders
+      const raw = {
+        sp: Number(traits?.seriousPlayful),
+        sc: Number(traits?.succinctChatty),
+        ri: Number(traits?.rationalIntuitive),
+        cl: Number(traits?.conservativeLiberal)
       };
-      const vibePhrase = vibe ? `Ambient mood: ${String(vibe).trim()}.` : '';
+      const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=3) return 'low'; if(n>=8) return 'high'; return 'mid'; };
+      const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
+
+      const chroma = b.sp==='low' ? 'subtle desaturated deep cool palette with ember accents' : b.sp==='high' ? 'vivid luminous spectral palette (teals, ambers, magentas)' : 'balanced luminous cyan–amber bi-tone palette';
+      const structureCore = b.ri==='low' ? 'precise concentric rings, modular lattice nodes' : b.ri==='high' ? 'fluid swirling energy filaments, diffused plasma shells' : 'hybrid semi-geometric arcs interwoven with soft flux ribbons';
+      const density = b.sc==='low' ? 'minimal interior voids and clean negative space corridors' : b.sc==='high' ? 'dense mesh of micro-connective spark lines and particulate clusters' : 'layered medium complexity strata';
+      const symmetry = b.cl==='low' ? 'stable bilateral symmetry with quiet axial equilibrium' : b.cl==='high' ? 'dynamic off-center growth asymmetry and motion vector bias' : 'gentle quasi-radial balance';
+
+      const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
       const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
+
+      const organismDescriptor = 'single self-contained luminous abstract digital organism core, perceived as an emergent intelligence node';
+      const containment = 'centered, crisp silhouettable perimeter (no figurative anatomy), soft volumetric inner glow, subtle depth parallax';
+      const exclusions = 'exclude faces, eyes, heads, bodies, limbs, creatures, icons, logos, text, letters, recognizable symbols';
+      const detailLine = dl ? `Micro-detail intensity target: ${dl}/10.` : '';
+      const conceptLine = concept ? `Concept influence (fully abstracted): ${concept}; translate into energy topology only.` : '';
+
+      // Map traitWords into organism metaphors
+      const traitEnergy = traitWords.length ? `Express traits as modulation of energy flow and topology: ${traitWords.join(', ')}.` : '';
+
       finalPrompt = [
-        'Square abstract non-figurative composition, no faces, no bodies, no characters, no creatures, no silhouettes.',
-        s.tone + ';', s.density + ';', s.logic + ';', s.social + ';',
-        concept ? `Concept influence (purely abstracted): ${concept}; reinterpret only as color, pattern, motion.` : '',
+        'Square dark backdrop for contrast.',
+        organismDescriptor + ',',
+        chroma + ',',
+        structureCore + ',',
+        density + ',',
+        symmetry + ',',
+        containment + '.',
+        traitEnergy,
+        conceptLine,
         vibePhrase,
-        dl ? `Detail richness: ${dl}/10.` : '',
-        'Focus on interplay of color fields, gradients, emergent shapes, subtle layered texture. Absolutely exclude any figurative, anatomical, or icon-like suggestions.'
+        detailLine,
+        'Surface qualities: layered translucent plasma membranes, procedural node clusters, subtle particle drift, coherent core nucleus.',
+        'Behavior suggestion (visual only): faint pulsing, rotational micro-parallax, data-like flicker strands.',
+        `Hard constraints: ${exclusions}. No humanoid suggestion.`,
+        'Do not resemble any specific cinematic interface; keep original and novel.'
       ].filter(Boolean).join(' ');
     } else { // Humanoid path
       const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;
