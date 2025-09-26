@@ -113,11 +113,7 @@
 
   /* TEMP: slow transitions to inspect animation */
     .avatarFrame{width:333px; height:333px; border-radius:24px; overflow:hidden; background:#1c1c1c; display:grid; place-items:center; position:relative; transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease; transform-origin: center center; will-change: transform, width, height;}
-  /* Prepare inner avatar image for idle movement */
-  .avatarFrame > img{will-change: transform;}
-  @media (prefers-reduced-motion: reduce){
-    .avatarFrame > img{transition:none !important; transform:none !important}
-  }
+  /* Idle wiggle removed */
     
   /* Minimized avatar state */
   .avatar-section.minimized{align-items: flex-start;}
@@ -913,14 +909,12 @@
           
           // Display avatar
           console.log('Loading avatar image:', avatarData.image_url);
-          // Stop any prior idle animation before swapping content
-          try { stopIdleWiggle(); } catch(e) {}
+      // Idle wiggle removed
           if (avatarData.image_url && avatarData.image_url.trim()) {
             const img = new Image();
             img.onload = () => {
               console.log('Avatar image loaded successfully');
-              // Replace content
-              try { stopIdleWiggle(); } catch(e) {}
+        // Replace content
               avatar.innerHTML = '';
               img.style.width = '100%';
               img.style.height = '100%';
@@ -930,22 +924,17 @@
               
               // Add minimize button
               addMinimizeButton();
-              // Start subtle idle animation
-              try { startIdleWiggle(); } catch(e) {}
+        // Idle wiggle removed
             };
             img.onerror = (e) => {
               console.error('Avatar image failed to load:', e);
-              try { stopIdleWiggle(); } catch(e) {}
               avatar.innerHTML = fallbackAvatar();
-              try { startIdleWiggle(); } catch(e) {}
             };
             img.src = avatarData.image_url;
             img.alt = avatarData.name;
           } else {
             console.log('No avatar image URL, using fallback');
-            try { stopIdleWiggle(); } catch(e) {}
             avatar.innerHTML = fallbackAvatar();
-            try { startIdleWiggle(); } catch(e) {}
             
             // Add minimize button to fallback avatar too
             addMinimizeButton();
@@ -1181,41 +1170,7 @@
         }
       }
 
-      // Subtle idle animation helpers
-      function stopIdleWiggle(){
-        if (avatar._idleWiggleTimer) {
-          clearTimeout(avatar._idleWiggleTimer);
-          avatar._idleWiggleTimer = null;
-        }
-        if (avatar._idleWiggleImg) {
-          try {
-            avatar._idleWiggleImg.style.transition = '';
-            avatar._idleWiggleImg.style.transform = '';
-          } catch(e){}
-          avatar._idleWiggleImg = null;
-        }
-      }
-
-      function startIdleWiggle(){
-        const mq = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (mq && mq.matches) return;
-        const img = avatar.querySelector('img');
-        if (!img) return;
-        avatar._idleWiggleImg = img;
-        const rand = (min, max) => Math.random() * (max - min) + min;
-        const step = () => {
-          const duration = rand(4.5, 7.5); // a bit faster
-          const delay = rand(1.5, 3.5);   // slightly more frequent
-          const tx = rand(-1.8, 1.8);     // tiny bit more travel
-          const ty = rand(-1.8, 1.8);
-          const s  = 1 + rand(-0.008, 0.012); // still very subtle
-          img.style.transition = `transform ${duration}s ease-in-out`;
-          img.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
-          avatar._idleWiggleTimer = setTimeout(step, (duration + delay) * 1000);
-        };
-        const initialDelay = Math.random() * 4000;
-        avatar._idleWiggleTimer = setTimeout(step, initialDelay);
-      }
+  // Idle wiggle removed
 
   // Avatar minimize functionality
   let isMinimized = false;
@@ -1249,7 +1204,6 @@
           // Minimize avatar: animate first without left-align, then commit
           console.log('Minimizing avatar...'); // Debug log
           // Start collapsing animation (keeps column centered)
-          try { stopIdleWiggle(); } catch(e) {}
           avatarSection.classList.add('collapsing');
           
           // After animation completes (transform), set minimized state and align left
@@ -1271,14 +1225,12 @@
             }
             avatar.style.cursor = 'pointer';
             avatar.addEventListener('click', expandClickHandler);
-            try { startIdleWiggle(); } catch(e) {}
           }, delayMs);
         } else {
           // Expand avatar and reduce chat space
           console.log('Expanding avatar...'); // Debug log
           
           // Add expanding class for smooth animation from left to center
-          try { stopIdleWiggle(); } catch(e) {}
           avatarSection.classList.add('expanding');
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
@@ -1286,7 +1238,6 @@
           // Remove expanding class after animation completes
           setTimeout(() => {
             avatarSection.classList.remove('expanding');
-            try { startIdleWiggle(); } catch(e) {}
           }, getTransformTransitionMs());
           
           if (minimizeBtn) {
