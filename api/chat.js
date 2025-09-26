@@ -3,7 +3,7 @@ export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
   try {
-    const { persona, message, history } = await req.json();
+  const { persona, message, history, temperature, presencePenalty, frequencyPenalty } = await req.json();
 
     if (!message || !persona) {
       return new Response(JSON.stringify({ error: 'Missing persona or message' }), {
@@ -15,7 +15,7 @@ export default async function handler(req) {
     const sys = `You are the persona described by the user: "${persona}". 
 Respond concisely and stay in character. Never break persona.`;
 
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+  const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -23,7 +23,9 @@ Respond concisely and stay in character. Never break persona.`;
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        temperature: 0.7,
+    temperature: typeof temperature === 'number' ? temperature : 0.85,
+    presence_penalty: typeof presencePenalty === 'number' ? presencePenalty : 0.3,
+    frequency_penalty: typeof frequencyPenalty === 'number' ? frequencyPenalty : 0.2,
         messages: [
           { role: 'system', content: sys },
           ...(Array.isArray(history) ? history : []),

@@ -915,6 +915,9 @@
           }
 
           currentAvatar = avatarData;
+
+          // Isolate novelty memory per avatar (nothing to clear here unless switching from prior avatar handled externally)
+          // Optionally we could namespace by avatar so no action required; leaving placeholder if future cleanup needed.
           
           // Load conversation history now that we have the avatar
           loadConversationHistory();
@@ -1058,19 +1061,26 @@
             bucket(s.practicalImaginative,'practical','imaginative');
           raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
 
-          const instruction = `You are helping drive an engaging conversation. Based on these persona traits: ${flavor.join(', ') || 'balanced'}, craft ONE short, natural, open-ended question for the user. If traits lean serious/practical, focus on goals, challenges, or work progress. If playful/imaginative, ask something fun, creative, or speculative. Avoid yes/no questions. Output ONLY the question text.`;
+          const recentKey = `askq_recent_${currentAvatar.id}`;
+          // Load recent memory (persisted across sessions)
+          const recent = JSON.parse(localStorage.getItem(recentKey) || '[]').slice(-8);
+          const variationTag = Math.random().toString(36).slice(2,8);
+          const instruction = `You are helping drive an engaging conversation. Persona traits: ${flavor.join(', ') || 'balanced'}. Craft ONE short, natural, open-ended question. Vary wording each time even for similar themes. DO NOT repeat or closely paraphrase any of these recent lines: ${recent.join(' | ') || '(none)'}. If traits lean serious/practical, focus on goals, challenges, or progress. If playful/imaginative, ask something creative or speculative. Avoid yes/no questions and leading phrases like 'Here's a question:'. Output ONLY the question text. Random tag ${variationTag}.`;
 
           // Call chat API with empty history (or last assistant message for style?)
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.95, presencePenalty: 0.6, frequencyPenalty: 0.4 })
           });
           const { text } = await res.json();
           const q = (text || '').trim();
           if(q){
             add('from-bot', q);
             convo.push({ role:'assistant', content:q });
+            // store for novelty
+            const updated = [...recent, q].slice(-12);
+            localStorage.setItem(recentKey, JSON.stringify(updated));
             // Optionally auto-generate conversation record if none exists yet
             if(!currentConversationId){
               const { data: convoData } = await supabase
@@ -1112,17 +1122,22 @@
           bucket(s.practicalImaginative,'practical','imaginative');
           raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
 
-          const instruction = `You are assisting with an engaging chat. Based on these persona traits: ${flavor.join(', ') || 'balanced'}, propose ONE short topic the user and the bot could discuss now. Provide 2-3 concise sentences: first sentence introduces the topic, second invites the user's angle or experience. If traits lean serious/practical: prefer productivity, problem-solving, learning, real-world challenges. If playful/imaginative: prefer creative, speculative, light, or exploratory themes. Avoid niche jargon, keep accessible. Output ONLY the two or three sentences.`;
+          const topicKey = `topic_recent_${currentAvatar.id}`;
+          const topicRecent = JSON.parse(localStorage.getItem(topicKey) || '[]').slice(-6);
+          const topicTag = Math.random().toString(36).slice(2,8);
+          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Suggest ONE short discussion topic in 2 sentences (optionally 3 if needed for clarity). First sentence: hook + topic. Second (or third) sentence: invite user's perspective. Must not repeat or closely paraphrase: ${topicRecent.join(' | ') || '(none)'}. If serious/practical: productivity, problem-solving, learning, real challenges. If playful/imaginative: creative, speculative, exploratory. Avoid niche jargon. Output ONLY the sentences. Tag ${topicTag}.`;
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.9, presencePenalty: 0.5, frequencyPenalty: 0.35 })
           });
           const { text } = await res.json();
           const topic = (text || '').trim();
           if(topic){
             add('from-bot', topic);
             convo.push({ role:'assistant', content: topic });
+            const updatedTopics = [...topicRecent, topic].slice(-10);
+            localStorage.setItem(topicKey, JSON.stringify(updatedTopics));
             if(!currentConversationId){
               const { data: convoData } = await supabase
                 .from('conversations')
@@ -1162,11 +1177,14 @@
           bucket(s.practicalImaginative,'practical','imaginative');
           raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
 
-          const instruction = `Select one specific subject aligned with these traits: ${flavor.join(', ') || 'balanced'}. It must not be overly broad (avoid just 'science' or 'art') nor obscure jargon. Produce a single compact plain text mini learning card with no list formatting or bullets. Format exactly: 'Subject: <name>. Fact. Fact. Fact.' (3-5 concise factual sentences total). Each fact should be accurate, concrete, interesting; if playful/imaginative you may include one creative analogy; if serious/practical include one applied or impact-oriented fact. No questions, no filler, no self references, no dashes, no numbering, no asterisks.`;
+          const learnKey = `learn_recent_${currentAvatar.id}`;
+          const learnRecent = JSON.parse(localStorage.getItem(learnKey) || '[]').slice(-6);
+          const learnTag = Math.random().toString(36).slice(2,8);
+          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Choose ONE specific subject (not overly broad, not obscure). Provide plain text: 'Subject: <name>. Fact. Fact. Fact.' using 3-5 crisp factual sentences. Must not repeat or closely paraphrase: ${learnRecent.join(' | ') || '(none)'}. Variation tag ${learnTag}. Each fact should be accurate, concrete, interesting; playful/imaginative may have one analogy; serious/practical include one applied/impact fact. No questions, filler, dashes, bullets, numbering, or self reference.`;
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.92, presencePenalty: 0.55, frequencyPenalty: 0.4 })
           });
           const { text } = await res.json();
           let facts = (text || '').trim();
@@ -1179,6 +1197,8 @@
           if(facts){
             add('from-bot', facts);
             convo.push({ role:'assistant', content: facts });
+            const updatedLearn = [...learnRecent, facts].slice(-10);
+            localStorage.setItem(learnKey, JSON.stringify(updatedLearn));
             if(!currentConversationId){
               const { data: convoData } = await supabase
                 .from('conversations')
