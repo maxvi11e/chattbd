@@ -1335,7 +1335,7 @@
           try {
             res = await fetch('/api/chat', {
               method:'POST',
-              headers:{ 'Content-Type':'application/json' },
+              headers:{ 'Content-Type':'application/json', 'Accept':'text/event-stream' },
               body: JSON.stringify({ 
                 persona: currentAvatar.name, 
                 message: t, 
@@ -1370,6 +1370,11 @@
           const safetyTimer = setTimeout(()=>{
             if(!receivedAny){ bubble.textContent = 'Still thinking...'; }
           }, 5000);
+          const earlyFallbackTimer = setTimeout(()=>{
+            if(!receivedAny){
+              controller.abort();
+            }
+          }, 3000);
           while(true){
             let chunk;
             try { chunk = await reader.read(); } catch(streamErr){ break; }
@@ -1395,6 +1400,7 @@
             }
           }
           clearTimeout(safetyTimer);
+          clearTimeout(earlyFallbackTimer);
           clearTimeout(timeoutId);
           full = full.trim();
           if(full){
