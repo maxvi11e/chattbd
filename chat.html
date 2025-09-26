@@ -260,6 +260,12 @@
           <div class="pane" style="position:relative;">
             <div id="log" class="scroller" role="log" aria-live="polite"></div>
             
+            <!-- Personality prompt action -->
+            <div id="askQuestionBar" style="display:flex; justify-content:flex-end; margin:8px 0 4px;">
+              <button id="askQuestionBtn" style="background:#222; color:#fff; border:1px solid var(--stroke); border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <span>Ask question</span>
+              </button>
+            </div>
             <!-- Bottom composer -->
             <div class="composerWrap">
               <label class="composer">
@@ -1021,6 +1027,63 @@
         // Allow Shift+Enter for new lines
       });
       send.addEventListener('click', doSend);
+
+      // Ask Question (personality-aware) button logic
+      const askQuestionBtn = document.getElementById('askQuestionBtn');
+      askQuestionBtn?.addEventListener('click', async ()=>{
+        if(!currentAvatar){ return; }
+        try {
+          // Derive lightweight personality summary
+          const traits = currentAvatar?.traits || {};
+          const raw = traits.personality_words || [];
+          const sliders = traits.persona_traits || traits.sliders_raw || traits.sliders || {};
+          // Map known slider fields if present
+          const s = {
+            seriousPlayful: sliders.seriousPlayful ?? sliders.serious_playful ?? null,
+            succinctChatty: sliders.succinctChatty ?? sliders.succinct_chatty ?? null,
+            rationalIntuitive: sliders.rationalIntuitive ?? sliders.rational_intuitive ?? null,
+            practicalImaginative: sliders.practicalImaginative ?? sliders.practical_imaginative ?? null
+          };
+          const flavor = [];
+          const bucket = (v, low, high)=>{ if(v==null) return; if(v<=35) flavor.push(low); else if(v>=65) flavor.push(high); };
+          bucket(s.seriousPlayful,'serious','playful');
+            bucket(s.succinctChatty,'succinct','chatty');
+            bucket(s.rationalIntuitive,'rational','intuitive');
+            bucket(s.practicalImaginative,'practical','imaginative');
+          raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
+
+          const instruction = `You are helping drive an engaging conversation. Based on these persona traits: ${flavor.join(', ') || 'balanced'}, craft ONE short, natural, open-ended question for the user. If traits lean serious/practical, focus on goals, challenges, or work progress. If playful/imaginative, ask something fun, creative, or speculative. Avoid yes/no questions. Output ONLY the question text.`;
+
+          // Call chat API with empty history (or last assistant message for style?)
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+          });
+          const { text } = await res.json();
+          const q = (text || '').trim();
+          if(q){
+            add('from-bot', q);
+            convo.push({ role:'assistant', content:q });
+            // Optionally auto-generate conversation record if none exists yet
+            if(!currentConversationId){
+              const { data: convoData } = await supabase
+                .from('conversations')
+                .insert({ avatar_id: currentAvatar.id, title: `Conversation with ${currentAvatar.name}` })
+                .select()
+                .single();
+              currentConversationId = convoData?.id || currentConversationId;
+              loadConversationHistory();
+            }
+            // Save message
+            if(currentConversationId){
+              await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text:q });
+            }
+          }
+        } catch(e){
+          console.error('AskQuestion failed', e);
+        }
+      });
 
       async function doSend(){
         const t = ask.value.trim(); 
