@@ -104,7 +104,7 @@
       align-self:flex-start;
       width:100%;
       font-size:14px;
-      margin:4px 0;
+  margin:12px 0 2px 0;
   display:flex;
   align-items:center;
   gap:6px;
@@ -196,7 +196,7 @@
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
-            <div id="personalityHeading" class="field-heading" style="margin-top:6px;">Define Personality with sliders</div>
+            <div id="personalityHeading" class="field-heading">Define Personality with sliders</div>
                       <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
             <!-- <div style="font-size:14px; color:#ffffff;">Personality Sliders</div> -->
             <div style="display:flex; align-items:center; gap:8px;">
@@ -240,7 +240,7 @@
                     <button id="tryAnotherSuggestion" style="padding:4px 10px; font-size:12px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:20px; cursor:pointer;">Regenerate</button>
                   </div>
                 </div>
-                <div class="field-heading" style="margin-top:6px;">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+                <div class="field-heading">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" style="width:100%; min-height:56px; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:8px; padding:6px 8px; box-sizing:border-box; font-family: Arial, Helvetica, sans-serif; display:block; margin-top:6px;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
@@ -263,7 +263,7 @@
                       <!-- Style Choice -->
               <div class="field-heading">Choose art style</div>
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0; height:46.4px; display:flex; align-items:center;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="default">default avatar</option>
                   <option value="realistic">Realistic</option>
@@ -283,7 +283,7 @@
             <!-- Vibe / Mood -->
             <div class="field-heading">Select art vibe / mood</div>
             <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0; height:46.4px; display:flex; align-items:center;">
+              <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="">pick a vibe / mood for the artwork</option>
                   <option value="radiant">Radiant</option>
@@ -305,11 +305,11 @@
 
             <!-- Detail Level -->
             <div class="field-heading">Choose the level of detail</div>
-            <div id="detailGroup" style="border:1px solid var(--stroke); border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; width:395px;">
-              <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
+            <div id="detailGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; width:395px;">
+              <!-- <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
                 <span>Detail level</span>
                 <span style="font-size:12px; color:#8a8a8a;">1 = low, 10 = very detailed</span>
-              </div>
+              </div> -->
               <div style="display:flex; align-items:center; gap:12px;">
                 <span style="width:24px; text-align:right; font-size:12px; color:#a8a8a8;">1</span>
                 <input id="detailLevel" type="range" min="1" max="10" step="1" value="6" style="flex:1;" />
