@@ -67,6 +67,58 @@ export default async function handler(req, res) {
     let subjectLine;
     if (subjectAnimal) {
       subjectLine = `Primary subject and silhouette: ${subjectAnimal}-inspired character; posture and presence reflect a ${subjectAnimal} archetype.`;
+    } else if (subjectBroad && subjectBroad.toLowerCase() === 'abstract' && !subjectSpecific) {
+      // Abstract mode: produce a purely non-figurative description derived from sliders
+      const s1 = Number(traits?.seriousPlayful);
+      const s2 = Number(traits?.succinctChatty);
+      const s3 = Number(traits?.rationalIntuitive);
+      const s4 = Number(traits?.conservativeLiberal);
+
+      // Helper to map a 1-10 scale into low/mid/high buckets
+      const bucket = (v) => {
+        if (!Number.isFinite(v)) return 'mid';
+        if (v <= 3) return 'low';
+        if (v >= 8) return 'high';
+        return 'mid';
+      };
+      const b1 = bucket(s1); // serious vs playful
+      const b2 = bucket(s2); // succinct vs chatty (density)
+      const b3 = bucket(s3); // rational vs intuitive (geometry vs organic)
+      const b4 = bucket(s4); // conservative vs liberal (order vs dynamic)
+
+      // Color palette influenced mostly by serious/playful + vibe
+      let palette;
+      if (b1 === 'low') palette = 'muted deep blues and slate grays';
+      else if (b1 === 'high') palette = 'vibrant oranges, pinks, and electric yellows';
+      else palette = 'balanced teal and soft amber accents';
+      if (vibe) {
+        const vLower = String(vibe).toLowerCase();
+        if (vLower.includes('calm') || vLower.includes('serene')) palette = 'hushed cool pastels (soft aqua, lavender, misty white)';
+        else if (vLower.includes('myster')) palette = 'deep indigos, violets, and subtle iridescent glows';
+        else if (vLower.includes('energetic') || vLower.includes('radiant')) palette = 'high-contrast neons over dark charcoal field';
+        else if (vLower.includes('dream')) palette = 'diffused pearlescent gradients with opalescent transitions';
+        else if (vLower.includes('dramatic')) palette = 'bold chiaroscuro contrasts: obsidian blacks, molten gold highlights';
+      }
+
+      // Shape language (geometry vs organic)
+      let shapes;
+      if (b3 === 'low') shapes = 'precise layered geometric planes and concentric arcs';
+      else if (b3 === 'high') shapes = 'flowing organic wisps and amorphous gradient clouds';
+      else shapes = 'hybrid semi-geometric looping ribbons';
+
+      // Pattern density (succinct/chatty)
+      let density;
+      if (b2 === 'low') density = 'minimal open negative space';
+      else if (b2 === 'high') density = 'intricate interlaced micro-pattern filaments';
+      else density = 'moderate layered translucent strata';
+
+      // Structural order (conservative/liberal)
+      let structure;
+      if (b4 === 'low') structure = 'subtle axial symmetry anchoring the composition';
+      else if (b4 === 'high') structure = 'dynamic asymmetry with directional motion cues';
+      else structure = 'soft radial balance without strict symmetry';
+
+      subjectLine = `Primary subject: purely abstract color-field and pattern composition; ${palette}; ${shapes}; ${density}; ${structure}; no figurative, humanoid, animal, or character elements.`;
     } else if (subjectSpecific && subjectBroad) {
       subjectLine = `Primary subject and silhouette: ${subjectSpecific} concept within the ${subjectBroad} archetype category; posture and presence reflect ${subjectSpecific} motifs.`;
     } else if (subjectSpecific) {
@@ -74,7 +126,7 @@ export default async function handler(req, res) {
     } else if (subjectBroad) {
       subjectLine = `Primary subject and silhouette: ${subjectBroad}-inspired character; posture and presence reflect a ${subjectBroad} archetype.`;
     } else {
-      subjectLine = `Primary subject and silhouette: abstract humanoid silhouette emphasizing iconic readable shape.`;
+      subjectLine = `Primary subject: minimal abstract composition with balanced negative space; no figurative or humanoid elements.`;
     }
     enhancedPrompt += ` ${subjectLine}`;
     
