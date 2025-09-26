@@ -1102,7 +1102,7 @@
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              loadConversationHistory();
+              // Removed refresh to preserve typewriter animation
             }
             // Save message
             if(currentConversationId){
@@ -1168,7 +1168,7 @@
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              loadConversationHistory();
+              // Removed refresh to preserve typewriter animation
             }
             if(currentConversationId){
               await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: topic });
@@ -1269,7 +1269,7 @@
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              loadConversationHistory();
+              // Removed refresh to preserve typewriter animation
             }
             if(currentConversationId){
               await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: facts });
