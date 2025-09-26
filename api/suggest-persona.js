@@ -1,6 +1,6 @@
 // /api/suggest-persona.js
 // Generates a specific persona suggestion given an archetype category and personality slider values.
-// Expected POST JSON body: { archetypeCategory: string, sliders: { seriousPlayful, succinctChatty, rationalIntuitive }, userText?: string }
+// Expected POST JSON body: { archetypeCategory: string, sliders: { seriousPlayful, succinctChatty, rationalIntuitive, conservativeLiberal }, userText?: string }
 // Returns: { name: string, description: string, reasoning?: string }
 
 export const config = { runtime: 'edge' };
@@ -26,7 +26,8 @@ export default async function handler(req) {
     const s = {
       seriousPlayful: clamp(sliders.seriousPlayful),
       succinctChatty: clamp(sliders.succinctChatty),
-      rationalIntuitive: clamp(sliders.rationalIntuitive)
+      rationalIntuitive: clamp(sliders.rationalIntuitive),
+      conservativeLiberal: clamp(sliders.conservativeLiberal)
     };
 
     // Lightweight descriptor phrases derived from sliders (not 1:1, just flavor hints)
@@ -34,6 +35,7 @@ export default async function handler(req) {
     if (s.seriousPlayful >= 65) flavor.push('highly playful'); else if (s.seriousPlayful <= 35) flavor.push('reserved');
     if (s.succinctChatty >= 65) flavor.push('very talkative'); else if (s.succinctChatty <= 35) flavor.push('succinct');
     if (s.rationalIntuitive >= 65) flavor.push('intuitive'); else if (s.rationalIntuitive <= 35) flavor.push('analytical');
+    if (s.conservativeLiberal >= 65) flavor.push('progressive outlook'); else if (s.conservativeLiberal <= 35) flavor.push('tradition-minded');
 
     const system = `You generate a single concise persona concept (name + one-sentence broad description) for an avatar creation flow.
 Output STRICT JSON with keys: name, description, reasoning.
