@@ -261,9 +261,12 @@
             <div id="log" class="scroller" role="log" aria-live="polite"></div>
             
             <!-- Personality prompt action -->
-            <div id="askQuestionBar" style="display:flex; justify-content:flex-end; margin:8px 0 4px;">
+            <div id="askQuestionBar" style="display:flex; justify-content:flex-end; gap:8px; margin:8px 0 4px; flex-wrap:wrap;">
               <button id="askQuestionBtn" style="background:#222; color:#fff; border:1px solid var(--stroke); border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
                 <span>Ask question</span>
+              </button>
+              <button id="discussTopicBtn" style="background:#222; color:#fff; border:1px solid var(--stroke); border-radius:20px; padding:6px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                <span>Discuss topic</span>
               </button>
             </div>
             <!-- Bottom composer -->
@@ -1082,6 +1085,56 @@
           }
         } catch(e){
           console.error('AskQuestion failed', e);
+        }
+      });
+
+      const discussTopicBtn = document.getElementById('discussTopicBtn');
+      discussTopicBtn?.addEventListener('click', async ()=>{
+        if(!currentAvatar) return;
+        try {
+          const traits = currentAvatar?.traits || {};
+          const raw = traits.personality_words || [];
+          const sliders = traits.persona_traits || traits.sliders_raw || traits.sliders || {};
+          const s = {
+            seriousPlayful: sliders.seriousPlayful ?? null,
+            succinctChatty: sliders.succinctChatty ?? null,
+            rationalIntuitive: sliders.rationalIntuitive ?? null,
+            practicalImaginative: sliders.practicalImaginative ?? null
+          };
+          const flavor = [];
+          const bucket = (v, low, high)=>{ if(v==null) return; if(v<=35) flavor.push(low); else if(v>=65) flavor.push(high); };
+          bucket(s.seriousPlayful,'serious','playful');
+          bucket(s.succinctChatty,'succinct','chatty');
+          bucket(s.rationalIntuitive,'rational','intuitive');
+          bucket(s.practicalImaginative,'practical','imaginative');
+          raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
+
+          const instruction = `You are assisting with an engaging chat. Based on these persona traits: ${flavor.join(', ') || 'balanced'}, propose ONE short topic the user and the bot could discuss now. Provide 2-3 concise sentences: first sentence introduces the topic, second invites the user's angle or experience. If traits lean serious/practical: prefer productivity, problem-solving, learning, real-world challenges. If playful/imaginative: prefer creative, speculative, light, or exploratory themes. Avoid niche jargon, keep accessible. Output ONLY the two or three sentences.`;
+          const res = await fetch('/api/chat', {
+            method:'POST',
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [] })
+          });
+          const { text } = await res.json();
+          const topic = (text || '').trim();
+          if(topic){
+            add('from-bot', topic);
+            convo.push({ role:'assistant', content: topic });
+            if(!currentConversationId){
+              const { data: convoData } = await supabase
+                .from('conversations')
+                .insert({ avatar_id: currentAvatar.id, title: `Conversation with ${currentAvatar.name}` })
+                .select()
+                .single();
+              currentConversationId = convoData?.id || currentConversationId;
+              loadConversationHistory();
+            }
+            if(currentConversationId){
+              await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: topic });
+            }
+          }
+        } catch(e){
+          console.error('DiscussTopic failed', e);
         }
       });
 
