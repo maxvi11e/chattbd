@@ -1042,6 +1042,15 @@
       askQuestionBtn?.addEventListener('click', async ()=>{
         if(!currentAvatar){ return; }
         try {
+          const cleanTrailing = (s)=>{
+            if(!s) return s;
+            let out = s.trim();
+            // Remove previously appended random token patterns (space + 5-10 mixed alphanum with at least one digit)
+            out = out.replace(/\s+[a-z0-9]*\d[a-z0-9]{3,8}$/i,'');
+            // If still ends with a bare code chunk without vowel and no punctuation, strip it
+            out = out.replace(/\s+[bcdfghjklmnpqrstvwxyz0-9]{5,10}$/i,'');
+            return out.trim();
+          };
           // Derive lightweight personality summary
           const traits = currentAvatar?.traits || {};
           const raw = traits.personality_words || [];
@@ -1063,7 +1072,11 @@
 
           const recentKey = `askq_recent_${currentAvatar.id}`;
           const recent = JSON.parse(localStorage.getItem(recentKey) || '[]').slice(-8);
-          const instruction = `You are helping drive an engaging conversation. Persona traits: ${flavor.join(', ') || 'balanced'}. Craft ONE short, natural, open-ended question. Vary wording each time even for similar themes. DO NOT repeat or closely paraphrase any of these recent lines: ${recent.join(' | ') || '(none)'}. If traits lean serious/practical, focus on goals, challenges, or progress. If playful/imaginative, ask something creative or speculative. Avoid yes/no questions and leading phrases like 'Here's a question:'. Output ONLY the question text.`;
+          const sanitizedRecent = recent.map(cleanTrailing);
+          if(JSON.stringify(sanitizedRecent) !== JSON.stringify(recent)){
+            localStorage.setItem(recentKey, JSON.stringify(sanitizedRecent));
+          }
+          const instruction = `You are helping drive an engaging conversation. Persona traits: ${flavor.join(', ') || 'balanced'}. Craft ONE short, natural, open-ended question. Vary wording each time even for similar themes. DO NOT repeat or closely paraphrase any of these recent lines: ${sanitizedRecent.join(' | ') || '(none)'}. If traits lean serious/practical, focus on goals, challenges, or progress. If playful/imaginative, ask something creative or speculative. Avoid yes/no questions and leading phrases like 'Here's a question:'. Output ONLY the question text.`;
 
           // Call chat API with empty history (or last assistant message for style?)
           const res = await fetch('/api/chat', {
@@ -1072,9 +1085,9 @@
             body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.95, presencePenalty: 0.6, frequencyPenalty: 0.4 })
           });
           const { text } = await res.json();
-          let q = (text || '').trim();
-          // Strip any stray trailing random token (legacy) like ' c12ost'
-          q = q.replace(/\s*[a-z0-9]{5,8}$/i, (m)=> m.trim().match(/[aeiou]/i) ? m : '').trim();
+          let q = cleanTrailing((text || '').trim());
+          // Ensure it ends with punctuation for polish
+          if(q && !/[.!?]$/.test(q)) q += '?';
           if(q){
             add('from-bot', q);
             convo.push({ role:'assistant', content:q });
@@ -1124,15 +1137,25 @@
 
           const topicKey = `topic_recent_${currentAvatar.id}`;
           const topicRecent = JSON.parse(localStorage.getItem(topicKey) || '[]').slice(-6);
-          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Suggest ONE short discussion topic in 2 sentences (optionally 3 if needed for clarity). First sentence: hook + topic. Second (or third) sentence: invite user's perspective. Must not repeat or closely paraphrase: ${topicRecent.join(' | ') || '(none)'}. If serious/practical: productivity, problem-solving, learning, real challenges. If playful/imaginative: creative, speculative, exploratory. Avoid niche jargon. Output ONLY the sentences.`;
+          const cleanTrailing = (s)=>{
+            if(!s) return s;
+            let out = s.trim();
+            out = out.replace(/\s+[a-z0-9]*\d[a-z0-9]{3,8}$/i,'');
+            out = out.replace(/\s+[bcdfghjklmnpqrstvwxyz0-9]{5,10}$/i,'');
+            return out.trim();
+          };
+          const sanitizedTopicRecent = topicRecent.map(cleanTrailing);
+          if(JSON.stringify(sanitizedTopicRecent) !== JSON.stringify(topicRecent)){
+            localStorage.setItem(topicKey, JSON.stringify(sanitizedTopicRecent));
+          }
+          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Suggest ONE short discussion topic in 2 sentences (optionally 3 if needed for clarity). First sentence: hook + topic. Second (or third) sentence: invite user's perspective. Must not repeat or closely paraphrase: ${sanitizedTopicRecent.join(' | ') || '(none)'}. If serious/practical: productivity, problem-solving, learning, real challenges. If playful/imaginative: creative, speculative, exploratory. Avoid niche jargon. Output ONLY the sentences.`;
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.9, presencePenalty: 0.5, frequencyPenalty: 0.35 })
           });
           const { text } = await res.json();
-          let topic = (text || '').trim();
-          topic = topic.replace(/\s*[a-z0-9]{5,8}$/i, (m)=> m.trim().match(/[aeiou]/i) ? m : '').trim();
+          let topic = cleanTrailing((text || '').trim());
           if(topic){
             add('from-bot', topic);
             convo.push({ role:'assistant', content: topic });
@@ -1178,27 +1201,67 @@
           raw.forEach(w=>{ if(!flavor.includes(w)) flavor.push(w); });
 
           const learnKey = `learn_recent_${currentAvatar.id}`;
+          const learnSubjectsKey = `learn_subjects_${currentAvatar.id}`;
           const learnRecent = JSON.parse(localStorage.getItem(learnKey) || '[]').slice(-6);
-          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Choose ONE specific subject (not overly broad, not obscure). Provide plain text: 'Subject: <name>. Fact. Fact. Fact.' using 3-5 crisp factual sentences. Must not repeat or closely paraphrase: ${learnRecent.join(' | ') || '(none)'}. Each fact should be accurate, concrete, interesting; playful/imaginative may have one analogy; serious/practical include one applied/impact fact. No questions, filler, dashes, bullets, numbering, or self reference.`;
+          const learnedSubjects = JSON.parse(localStorage.getItem(learnSubjectsKey) || '[]').slice(-20);
+          const cleanTrailing = (s)=>{
+            if(!s) return s;
+            let out = s.trim();
+            out = out.replace(/\s+[a-z0-9]*\d[a-z0-9]{3,8}$/i,'');
+            out = out.replace(/\s+[bcdfghjklmnpqrstvwxyz0-9]{5,10}$/i,'');
+            return out.trim();
+          };
+          const sanitizedLearnRecent = learnRecent.map(cleanTrailing);
+          if(JSON.stringify(sanitizedLearnRecent) !== JSON.stringify(learnRecent)){
+            localStorage.setItem(learnKey, JSON.stringify(sanitizedLearnRecent));
+          }
+          const avoidSubjects = learnedSubjects.length ? ` Avoid these subjects already covered: ${learnedSubjects.join(', ')}.` : '';
+          const instruction = `Persona traits: ${flavor.join(', ') || 'balanced'}. Choose ONE specific subject (not overly broad like 'science' or 'history', not obscure jargon).${avoidSubjects} Provide plain text: 'Subject: <name>. Fact. Fact. Fact.' using 3-5 crisp factual sentences. Must not repeat or closely paraphrase: ${sanitizedLearnRecent.join(' | ') || '(none)'}. Each fact should be accurate, concrete, interesting; playful/imaginative may have one analogy; serious/practical include one applied/impact fact. No questions, filler, dashes, bullets, numbering, or self reference.`;
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.92, presencePenalty: 0.55, frequencyPenalty: 0.4 })
           });
           const { text } = await res.json();
-          let facts = (text || '').trim();
-          facts = facts.replace(/\s*[a-z0-9]{5,8}$/i, (m)=> m.trim().match(/[aeiou]/i) ? m : '').trim();
+          let facts = cleanTrailing((text || '').trim());
           // Defensive cleanup if model still outputs bullets or newlines
           facts = facts
             .replace(/^\s*[-*+]\s*/gm,'') // remove bullet markers
             .replace(/\n+/g,' ')          // collapse newlines
             .replace(/\s{2,}/g,' ')       // collapse extra spaces
             .trim();
+          // Extract subject name
+          const subjectMatch = facts.match(/^[Ss]ubject:\s*([^\.]+)\./);
+          let subjectName = subjectMatch ? subjectMatch[1].trim() : null;
+          if(subjectName && learnedSubjects.map(s=>s.toLowerCase()).includes(subjectName.toLowerCase())) {
+            // Retry once forcing a new subject
+            try {
+              const retryInstruction = instruction + ` The previously generated subject '${subjectName}' was already used. Pick a DIFFERENT subject not in: ${learnedSubjects.join(', ')}.`;
+              const retryRes = await fetch('/api/chat', {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json' },
+                body: JSON.stringify({ persona: currentAvatar.name, message: retryInstruction, history: [], temperature: 0.95, presencePenalty: 0.65, frequencyPenalty: 0.55 })
+              });
+              const retryJson = await retryRes.json();
+              let retryFacts = cleanTrailing((retryJson.text || '').trim());
+              retryFacts = retryFacts.replace(/^\s*[-*+]\s*/gm,'').replace(/\n+/g,' ').replace(/\s{2,}/g,' ').trim();
+              const retrySubjectMatch = retryFacts.match(/^[Ss]ubject:\s*([^\.]+)\./);
+              const retrySubjectName = retrySubjectMatch ? retrySubjectMatch[1].trim() : null;
+              if(retrySubjectName && !learnedSubjects.map(s=>s.toLowerCase()).includes(retrySubjectName.toLowerCase())) {
+                facts = retryFacts;
+                subjectName = retrySubjectName;
+              }
+            } catch(_e) { /* ignore retry errors */ }
+          }
           if(facts){
             add('from-bot', facts);
             convo.push({ role:'assistant', content: facts });
             const updatedLearn = [...learnRecent, facts].slice(-10);
             localStorage.setItem(learnKey, JSON.stringify(updatedLearn));
+            if(subjectName){
+              const updatedSubjects = [...learnedSubjects.filter(s=>s.toLowerCase()!==subjectName.toLowerCase()), subjectName].slice(-30);
+              localStorage.setItem(learnSubjectsKey, JSON.stringify(updatedSubjects));
+            }
             if(!currentConversationId){
               const { data: convoData } = await supabase
                 .from('conversations')
