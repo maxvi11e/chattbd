@@ -110,6 +110,8 @@ export default async function handler(req, res){
           : 'Eyes indicated as almond luminous cutouts with controlled inner glow, subtle upward taper, and articulated eyelid arcs.';
 
       const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
+      const brightnessDirective = 'Brightness amplification: mimic a 100% brightness mask pass — drive filament cores to near-pure white with additive glow while preserving crisp silhouette edges and deep-black background.';
+      const glowLayering = 'Glow layering: dual-stage halo (tight inner bloom + slim outer rim light), avoid wide haze or fog.';
       const exclusions = 'exclude photographic realism, literal skin texture, text, logos, letters, recognizable symbols, additional full bodies, extra heads, overt creature anatomy';
       const detailLine = dl ? `Micro-detail ceiling: ${dl}/10 (respect minimalism).` : '';
       const conceptLine = concept ? `Concept hint (abstracted): ${concept}; reinterpret as symbolic energy motifs embedded within the facial lattice (no literal objects).` : '';
@@ -130,6 +132,8 @@ export default async function handler(req, res){
         'Facial feature spacing: maintain clear forehead, cheek, and chin zones with softly implied cheekbones; shoulders suggested via gentle downward sweep of filaments (no hands).',
         'Nose and mouth remain implied only as smooth energy gradients — do not draw explicit structures.',
         featureIntegration,
+        brightnessDirective,
+        glowLayering,
         'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
         'Focus on 1 coherent central entity; avoid multiple competing motifs.',
         traitEnergy,
@@ -138,7 +142,7 @@ export default async function handler(req, res){
         conceptLine,
         vibePhrase,
         detailLine,
-        'Surface: high-intensity smooth energy membranes, sparse node sparks (<= 12), subtle particle halo, razor-sharp contour readability.',
+        'Surface: high-intensity smooth energy membranes with additive white cores, sparse node sparks (<= 12), subtle particle halo, razor-sharp contour readability.',
         'Behavior suggestion (implied only): faint pulse + slow rotational parallax; no extra UI widgets.',
         `Hard constraints: ${exclusions}. Keep fully stylized abstract energy aesthetic (non-photorealistic).`,
         'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
