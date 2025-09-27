@@ -46,7 +46,7 @@
 
   /* Bot Preview */
   .bot-preview{display:flex; flex-direction:column; align-items:center; gap:16px; margin-bottom:0px;}
-  .bot-frame{width:300px; height:300px; border-radius:var(--radius-lg); border:2px solid var(--stroke); background:#000; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;}
+  .bot-frame{width:300px; height:300px; border-radius:var(--radius-lg); border:0px solid var(--stroke); background:#000; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;}
   .bot-image{width:100%; height:100%; border-radius:var(--radius-lg); object-fit:cover; display:none;}
   .bot-image.visible{display:block;}
   .frame-spinner{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
@@ -219,8 +219,7 @@
       <!-- Page Header -->
       <div class="page-header">
   <!-- <img src="images/creator_icon.png" alt="Edit" class="page-icon" /> -->
-        <h1 class="page-title">Edit Your Bot</h1>
-      </div>
+
 
       <!-- Error Message -->
       <div id="errorMessage" class="error-message"></div>
