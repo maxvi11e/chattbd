@@ -92,8 +92,10 @@ export default async function handler(req, res){
       const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
       const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
 
-      const organismDescriptor = 'single luminous abstract humanoid bust (head + partial shoulders) formed from energized pattern filaments, tightly cropped close-up';
+      const organismDescriptor = 'single luminous abstract humanoid bust (head + shoulders) constructed from energized pattern filaments';
       const containment = 'centered macro form, clear outer contour, gentle inner volumetric glow, shallow depth layering';
+
+      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and slight breathing room around silhouette (avoid extreme close-up).';
 
       const facePlane = b.cl === 'low'
         ? 'Face plane: shield-like geometry with disciplined bilateral symmetry and softly squared jaw taper.'
@@ -102,30 +104,17 @@ export default async function handler(req, res){
           : 'Face plane: balanced oval geometry with subtle asymmetry and tapered jaw contour.';
 
       const eyesDescriptor = b.sp === 'low'
-        ? 'Eyes indicated as narrow horizontal negative-space slits with precise edges and minimal upward tilt.'
+        ? 'Eyes indicated as narrow horizontal negative-space slits with precise edges and minimal upward tilt; emphasize focused calm gaze.'
         : b.sp === 'high'
-          ? 'Eyes indicated as luminous curved apertures with upbeat upward tilt and gentle halo flare.'
-          : 'Eyes indicated as almond luminous cutouts with controlled inner glow and slight upward taper.';
-
-      const noseDescriptor = b.ri === 'low'
-        ? 'Nasal bridge suggested via central vertical filament spine with geometric node intersections (no nostril detail).'
-        : b.ri === 'high'
-          ? 'Nasal bridge suggested through braided energy helix descending to a diffused glow node (avoid realism).'
-          : 'Nasal bridge suggested as paired parallel filaments converging into a subtle luminous node.';
-
-      const mouthDescriptor = b.sc === 'low'
-        ? 'Mouth represented by concise horizontal bar of light with tight glow falloff.'
-        : b.sc === 'high'
-          ? 'Mouth represented by open crescent filament cluster with diffused internal glow hinting at speech.'
-          : 'Mouth represented by gentle arc filament with controlled glow and defined endpoints.';
+          ? 'Eyes indicated as luminous curved apertures with upbeat upward tilt, layered halos, and animated spark accents.'
+          : 'Eyes indicated as almond luminous cutouts with controlled inner glow, subtle upward taper, and articulated eyelid arcs.';
 
       const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
-
       const exclusions = 'exclude photographic realism, literal skin texture, text, logos, letters, recognizable symbols, additional full bodies, extra heads, overt creature anatomy';
       const detailLine = dl ? `Micro-detail ceiling: ${dl}/10 (respect minimalism).` : '';
       const conceptLine = concept ? `Concept hint (abstracted): ${concept}; reinterpret as symbolic energy motifs embedded within the facial lattice (no literal objects).` : '';
 
-      const traitEnergy = traitWords.length ? `Translate traits into modulation of glow rhythm, facial tension, and filament curvature: ${traitWords.join(', ')}.` : '';
+      const traitEnergy = traitWords.length ? `Translate traits into modulation of glow rhythm, ocular energy arcs, and filament curvature: ${traitWords.join(', ')}.` : '';
 
       finalPrompt = [
         'Square dark neutral backdrop for contrast.',
@@ -135,16 +124,16 @@ export default async function handler(req, res){
         density + ',',
         symmetry + ',',
         containment + '.',
+        framing,
         facePlane,
         eyesDescriptor,
-        noseDescriptor,
-        mouthDescriptor,
         'Facial feature spacing: maintain clear forehead, cheek, and chin zones with softly implied cheekbones; shoulders suggested via gentle downward sweep of filaments (no hands).',
+        'Nose and mouth remain implied only as smooth energy gradients — do not draw explicit structures.',
         featureIntegration,
         'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
         'Focus on 1 coherent central entity; avoid multiple competing motifs.',
         traitEnergy,
-        'Facial cues must stay loose and suggestive; avoid literal pupils, nostrils, or lip texture.',
+        'Facial cues must stay loose and suggestive; avoid literal pupils, nostrils, lips, or teeth.',
         conceptLine,
         vibePhrase,
         detailLine,
