@@ -78,19 +78,20 @@ export default async function handler(req, res){
     const detailLine = Number.isFinite(Number(detailLevel)) ? ` Detail richness target: ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
     // Rewritten as an image generation style prompt forming a humanoid silhouette from the pattern components.
-    const description = [
+    const descriptionLines = [
       'Abstract humanoid silhouette (head, shoulders, upper torso) formed entirely from internal pattern energy — no realistic anatomy.',
       `Palette: ${palette}.`,
       `Internal structural logic: ${logic}.`,
-  `Spatial / particulate density: ${density}.`,
-  'Apply ~3x internal pattern / particulate density across the silhouette. Define the form clearly but avoid chaotic noise.',
+      `Spatial / particulate density: ${density}.`,
+      'Apply ~3x internal pattern / particulate density across the silhouette. Define the form clearly but avoid chaotic noise.',
       `Macro form & symmetry: ${symmetry}.`,
-      'Facial region implied and eyes defined by minimal voids',
+      'Facial region implied and eyes defined by minimal voids.',
       'Subtle pulsing core luminescence; gentle rim glow separating figure from a subdued low-noise background.',
-      'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.' ,
+      'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.',
       vibeLine.trim(),
       detailLine.trim()
-    ].filter(Boolean).join(' ');
+    ].filter(Boolean);
+    const description = descriptionLines.join('\n');
 
     return res.status(200).json({ name, description });
   } catch (e) {
