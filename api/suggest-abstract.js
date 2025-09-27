@@ -35,8 +35,8 @@ export default async function handler(req, res){
     const palette = b.sp === 'low'
       ? 'cool white/blue lines with gentle deep blue glow'
       : b.sp === 'high'
-        ? 'luminous high-chroma spectral gradients'
-        : 'restrained deep cool spectrum with ember micro-accents';
+        ? 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
+        : 'deep cool spectrum with high vibrancy accents';
 
     const logic = b.ri === 'low'
       ? 'geometric wireframe rings and grid'
@@ -65,9 +65,10 @@ export default async function handler(req, res){
       `Structure: ${logic}.`,
       `Fill: ${fill}.`,
       `Symmetry: ${symmetry}.`,
-      'Eyes: friendly rounded almond openings with soft glow; no pupils; minimal tilt.',
+      'Eyes: friendly rounded almond openings with soft glow; no pupils.',
       'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
       'Composition: medium distance with breathing room around the figure; keep all particles inside the silhouette.',
+      'add extreme brightness and luminosity to all elements',
       vibeLine,
       detailLine
     ].filter(Boolean);
