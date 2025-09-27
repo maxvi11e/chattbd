@@ -78,10 +78,10 @@ export default async function handler(req, res){
 
       // Density: only escalate fine detail when chatty is high; else keep minimal/medium
       const density = b.sc==='low'
-        ? 'minimal internal micro-detail; large negative space cavities'
+        ? 'even filament coverage with slightly wider uniform gaps; avoid large cavities'
         : b.sc==='high'
-          ? 'moderate (not dense) micro-filaments around core, avoid clutter'
-          : 'controlled medium layering';
+          ? 'near-continuous even mesh; minimize gap variance; no hotspots'
+          : 'consistent coverage with moderate gap width; maintain uniform spacing';
 
       const symmetry = b.cl==='low'
         ? 'stable near-bilateral balance'
@@ -112,6 +112,8 @@ export default async function handler(req, res){
       const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
       const brightnessDirective = 'Brightness amplification: mimic a 100% brightness mask pass — drive filament cores to near-pure white with additive glow while preserving crisp silhouette edges and deep-black background.';
       const glowLayering = 'Glow layering: dual-stage halo (tight inner bloom + slim outer rim light), avoid wide haze or fog.';
+      const uniformDensity = 'Uniform density directive: maintain even filament distribution across the entire silhouette (head, neck, shoulders). Coverage target ~88–92% with consistent gap width (±10% variance). Avoid hotspots, sparse patches, and center/edge falloff.';
+      const gapUniformity = 'Gap uniformity: keep negative channels between strands consistent (3–6 px equivalent at 1024×1024); no large cavities or noisy clusters.';
       const exclusions = 'exclude photographic realism, literal skin texture, text, logos, letters, recognizable symbols, additional full bodies, extra heads, overt creature anatomy';
       const detailLine = dl ? `Micro-detail ceiling: ${dl}/10 (respect minimalism).` : '';
       const conceptLine = concept ? `Concept hint (abstracted): ${concept}; reinterpret as symbolic energy motifs embedded within the facial lattice (no literal objects).` : '';
@@ -134,6 +136,8 @@ export default async function handler(req, res){
         featureIntegration,
         brightnessDirective,
         glowLayering,
+        uniformDensity,
+        gapUniformity,
         'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
         'Focus on 1 coherent central entity; avoid multiple competing motifs.',
         traitEnergy,
