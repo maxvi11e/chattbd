@@ -95,7 +95,7 @@ export default async function handler(req, res){
       const organismDescriptor = 'single luminous abstract humanoid bust (head + shoulders) constructed from energized pattern filaments';
       const containment = 'centered macro form, clear outer contour, gentle inner volumetric glow, shallow depth layering';
 
-      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and slight breathing room around silhouette (avoid extreme close-up).';
+      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and extra breathing room (8–12% margin) around silhouette; silhouette occupies ~85–90% of frame height (avoid extreme close-up).';
 
       const facePlane = b.cl === 'low'
         ? 'Face plane: shield-like geometry with disciplined bilateral symmetry and softly squared jaw taper.'
@@ -112,6 +112,9 @@ export default async function handler(req, res){
       const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
       const brightnessDirective = 'Brightness amplification: mimic a 100% brightness mask pass — drive filament cores to near-pure white with additive glow while preserving crisp silhouette edges and deep-black background.';
       const glowLayering = 'Glow layering: dual-stage halo (tight inner bloom + slim outer rim light), avoid wide haze or fog.';
+      const contrastDirective = 'Contrast curve: protect blacks, compress midtones, and elevate highlights to maximize separation between silhouette and background without introducing edge bloom.';
+      const backgroundDirective = 'Background separation: true black (#000) or near-black with no texture, fog, or grain; ensure clearly visible negative space outside the silhouette.';
+      const noiseSuppression = 'Noise suppression: forbid free-floating particles or stray wisps outside the silhouette; allow at most 0–3 small anchored sparks near the rim; clamp outer halo thickness to <=2px.';
       const uniformDensity = 'Uniform density directive: maintain even filament distribution across the entire silhouette (head, neck, shoulders). Coverage target ~88–92% with consistent gap width (±10% variance). Avoid hotspots, sparse patches, and center/edge falloff.';
       const gapUniformity = 'Gap uniformity: keep negative channels between strands consistent (3–6 px equivalent at 1024×1024); no large cavities or noisy clusters.';
       const exclusions = 'exclude photographic realism, literal skin texture, text, logos, letters, recognizable symbols, additional full bodies, extra heads, overt creature anatomy';
@@ -136,6 +139,9 @@ export default async function handler(req, res){
         featureIntegration,
         brightnessDirective,
         glowLayering,
+        contrastDirective,
+        backgroundDirective,
+        noiseSuppression,
         uniformDensity,
         gapUniformity,
         'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
@@ -146,7 +152,7 @@ export default async function handler(req, res){
         conceptLine,
         vibePhrase,
         detailLine,
-        'Surface: high-intensity smooth energy membranes with additive white cores, sparse node sparks (<= 12), subtle particle halo, razor-sharp contour readability.',
+        'Surface: high-intensity smooth energy membranes with additive white cores; limit node sparks to <= 10 and keep them within the silhouette; zero particles beyond contour; subtle inner halo only.',
         'Behavior suggestion (implied only): faint pulse + slow rotational parallax; no extra UI widgets.',
         `Hard constraints: ${exclusions}. Keep fully stylized abstract energy aesthetic (non-photorealistic).`,
         'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
