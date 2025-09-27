@@ -104,12 +104,13 @@ export default async function handler(req, res){
           : 'Face plane: balanced oval geometry with subtle asymmetry and tapered jaw contour.';
 
       const eyesDescriptor = b.sp === 'low'
-        ? 'Eyes indicated as narrow horizontal negative-space slits with precise edges and minimal upward tilt; emphasize focused calm gaze.'
+        ? 'Eyes indicated as soft, rounded almond openings with neutral alignment (<=2° tilt), rounded inner/outer corners, calm welcoming gaze.'
         : b.sp === 'high'
-          ? 'Eyes indicated as luminous curved apertures with upbeat upward tilt, layered halos, and animated spark accents.'
-          : 'Eyes indicated as almond luminous cutouts with controlled inner glow, subtle upward taper, and articulated eyelid arcs.';
+          ? 'Eyes indicated as warm rounded almond apertures with gentle inner glow; friendly gaze; limit upward tilt to <=5° (avoid sharp cat-eye).'
+          : 'Eyes indicated as human-friendly almond cutouts with rounded corners and controlled glow; minimal upward tilt (<=3°); avoid aggressive shapes.';
 
       const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
+      const friendlyEyes = 'Eye friendliness: shapes are rounded and human-like; avoid sharp angles or pronounced slant; emphasize soft eyelid arcs and warm glow without literal pupils.';
       const brightnessDirective = 'Brightness amplification: mimic a 100% brightness mask pass — drive filament cores to near-pure white with additive glow while preserving crisp silhouette edges and deep-black background.';
       const glowLayering = 'Glow layering: dual-stage halo (tight inner bloom + slim outer rim light), avoid wide haze or fog.';
       const contrastDirective = 'Contrast curve: protect blacks, compress midtones, and elevate highlights to maximize separation between silhouette and background without introducing edge bloom.';
@@ -137,6 +138,7 @@ export default async function handler(req, res){
         'Facial feature spacing: maintain clear forehead, cheek, and chin zones with softly implied cheekbones; shoulders suggested via gentle downward sweep of filaments (no hands).',
         'Nose and mouth remain implied only as smooth energy gradients — do not draw explicit structures.',
         featureIntegration,
+        friendlyEyes,
         brightnessDirective,
         glowLayering,
         contrastDirective,
