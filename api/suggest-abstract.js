@@ -56,13 +56,13 @@ export default async function handler(req, res){
       logic = 'modular geometric lattice and concentric data rings';
     }
 
-    // Density / internal spatial quality
+    // Density / internal spatial quality (tripled overall vs prior baseline)
     if (b.sc === 'low') {
-      density = 'no halos or sparkles; clean sparse internal space';
+      density = 'sparse minimalist pattern (≈3x prior point density while preserving broad negative space)';
     } else if (b.sc === 'high') {
-      density = 'dense micro-node mesh with particulate sparkle';
+      density = 'ultra-dense layered micro-node mesh (≈3x particles) with controlled, not noisy, particulate sparkle';
     } else { // mid
-      density = 'open internal void channels and crisp negative space halos';
+      density = 'heightened medium density (≈3x structural filaments) with retained open void channels and crisp negative space halos';
     }
 
     // Symmetry / macro form
@@ -82,9 +82,10 @@ export default async function handler(req, res){
       'Abstract humanoid silhouette (head, shoulders, upper torso) formed entirely from internal pattern energy — no realistic anatomy.',
       `Palette: ${palette}.`,
       `Internal structural logic: ${logic}.`,
-      `Spatial / particulate density: ${density}.`,
+  `Spatial / particulate density: ${density}.`,
+  'Apply ~3x internal pattern / particulate density across the silhouette relative to previous baseline while avoiding chaotic noise.',
       `Macro form & symmetry: ${symmetry}.`,
-      'Facial region implied only by minimal voids; no eyes, nose or mouth detail.',
+      'Facial region implied only by minimal voids.',
       'Subtle pulsing core luminescence; gentle rim glow separating figure from a subdued low-noise background.',
       'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.' ,
       vibeLine.trim(),
