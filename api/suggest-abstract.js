@@ -58,11 +58,11 @@ export default async function handler(req, res){
 
     // Density / internal spatial quality (tripled overall vs prior baseline)
     if (b.sc === 'low') {
-      density = 'elevated base fill (~55% coverage) cohesive mesh; limit any single void to <20% local area';
+      density = 'cohesive filament mesh (~65% coverage) thicker luminous strands (1.4× base) with limited voids (<15% area)';
     } else if (b.sc === 'high') {
-      density = 'near-solid internal fill (~95% coverage) ultra-dense layered mesh; only micro voids (<3% area) evenly distributed; controlled particulate sparkle';
+      density = 'semi-solid luminous filament mass (~95% coverage) with large thick energized strands (2.0× width), abundant cross-links, dense micro nodes (<2% void area total)';
     } else { // mid
-      density = 'high continuity mesh (~75% coverage) with minimized voids (<10% local area) and persistent filament cross-links';
+      density = 'dense interlaced mesh (~82% coverage) thickened strands (1.7×) with minimized voids (<8% local area) and continuous cross-link lattice';
     }
 
     // Symmetry / macro form
@@ -83,11 +83,14 @@ export default async function handler(req, res){
       `Palette: ${palette}.`,
       `Internal structural logic: ${logic}.`,
       `Spatial / particulate density: ${density}.`,
-      'Target ~90% interior pattern coverage at highest density; eliminate broad empty cavities; maintain crisp readable outer contour.',
+  'Target ~95% interior pattern coverage using thick energized strands (increase strand width 2.0× baseline) forming semi-solid luminous structure; eliminate broad empty cavities; maintain crisp readable outer contour.',
       'Multi-scale layering: macro silhouette + mid-frequency rib lattice + fine filament / fractal micro-mesh cross-weave.',
       'Edge definition: thin luminous perimeter trace plus subtle inner echo line reinforcing silhouette; avoid diffuse fuzzy edge bleed.',
       'Silhouette anatomy cues: clear torso taper; defined shoulder curve; coherent neck transition.',
-      'Visibility priority: strong internal luminosity with balanced contrast; reduce ethereal transparency; reinforce filled volumes.',
+  'Visibility priority: strong internal luminosity; significantly reduce transparency; reinforce filled volumes; solid bright filament cores with controlled outer chromatic fringe (avoid overbloom).',
+  'Opacity directive: minimize see-through background between primary strands; allow only narrow negative filigree channels.',
+  'Strand/point quantity: 18–24 primary axial / diagonal macro strands, 40–60 secondary cross-link filaments, ≥120 micro node points defining intersections.',
+  'Strand directive: each primary filament has a bright opaque core, softer chromatic fringe, occasional braided merges indicating energy flow thickness variation; no wispy faint vapor.',
       `Macro form & symmetry: ${symmetry}.`,
       'Depth shaping via gentle internal occlusion gradients and alternating luminous/dim bands (avoid flat wash).',
       'Include minimal voids indicating eyes (small dark ovals) without realistic facial detail.',
