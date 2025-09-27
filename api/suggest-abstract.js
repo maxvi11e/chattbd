@@ -58,11 +58,11 @@ export default async function handler(req, res){
 
     // Density / internal spatial quality (tripled overall vs prior baseline)
     if (b.sc === 'low') {
-      density = 'sparse minimalist mesh (~500 particles)';
+      density = 'increasing fill (~40% coverage) minimalist mesh; preserve some breathable gaps';
     } else if (b.sc === 'high') {
-      density = 'ultra-dense layered mesh with controlled, particulate sparkle (~3000 particles)';
+      density = 'near-solid internal fill (~90% coverage) ultra-dense layered mesh; only micro voids (<5% area) evenly distributed; controlled particulate sparkle';
     } else { // mid
-      density = 'heightened medium density (≈3x structural filaments) (1000 particles)';
+      density = 'elevated mesh (~65% coverage) with reduced large voids (<15% local area) and coherent filament continuity';
     }
 
     // Symmetry / macro form
@@ -83,11 +83,14 @@ export default async function handler(req, res){
       `Palette: ${palette}.`,
       `Internal structural logic: ${logic}.`,
       `Spatial / particulate density: ${density}.`,
-      'Apply ~3x internal pattern / particulate density across the silhouette. Define the form with increased density around edges.',
+      'Target ~90% interior pattern coverage at highest density; eliminate broad empty cavities; maintain crisp readable outer contour.',
+      'Multi-scale layering: macro silhouette + mid-frequency rib lattice + fine filament / fractal micro-mesh cross-weave.',
+      'Edge definition: thin luminous perimeter trace plus subtle inner echo line reinforcing silhouette; avoid diffuse fuzzy edge bleed.',
       `Macro form & symmetry: ${symmetry}.`,
-      'Adding glowing luminescence to internal patterns to enhance form definition and depth perception.',
-      'Include voids for eyes.',
-      'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.',
+      'Depth shaping via gentle internal occlusion gradients and alternating luminous/dim bands (avoid flat wash).',
+      'Include minimal voids indicating eyes (small dark ovals) without realistic facial detail.',
+      'Background: subdued low-noise gradient; prevent competing bright clusters to emphasize filled figure.',
+      'Negative: avoid large voids, avoid sparse speckle, avoid photographic realism, text, logos, extra limbs, duplicated figures.',
       vibeLine.trim(),
       detailLine.trim()
     ].filter(Boolean);
