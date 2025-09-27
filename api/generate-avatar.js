@@ -62,102 +62,63 @@ export default async function handler(req, res){
       const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=3) return 'low'; if(n>=8) return 'high'; return 'mid'; };
       const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
 
-      // Palette: restrict to 2-3 harmonics for recognizability
+      // Simplified slider-driven descriptors (match suggest-abstract.js)
       const chroma = b.sp==='low'
-        ? 'two-tone deep indigo + ember accent palette'
+        ? 'cool white/blue lines with gentle cyan glow'
         : b.sp==='high'
-          ? 'tight triad luminous cyan, amber, magenta'
-          : 'balanced dual cyan–amber glow';
+          ? 'bright neon cyan with warm amber highlights'
+          : 'clean cyan with subtle amber accents';
 
-      // Core structure simplified (macro forms not many permutations)
       const structureCore = b.ri==='low'
-        ? 'macro concentric ring core with sparse lattice spokes'
+        ? 'geometric wireframe rings and grid'
         : b.ri==='high'
-          ? 'macro swirling vortex core with soft plasma veil'
-          : 'macro hybrid ring + spiral core';
+          ? 'flowing energy strands and arcs'
+          : 'mesh of arcs and short lattice segments';
 
-      // Density: only escalate fine detail when chatty is high; else keep minimal/medium
-      const density = b.sc==='low'
-        ? 'even filament coverage with slightly wider uniform gaps; avoid large cavities'
+      const fillLine = b.sc==='low'
+        ? 'balanced interior with clear negative space between lines'
         : b.sc==='high'
-          ? 'near-continuous even mesh; minimize gap variance; no hotspots'
-          : 'consistent coverage with moderate gap width; maintain uniform spacing';
+          ? 'richer line work with tight spacing, but keep background visible outside the figure'
+          : 'medium density with even spacing';
 
       const symmetry = b.cl==='low'
-        ? 'stable near-bilateral balance'
+        ? 'strong bilateral symmetry'
         : b.cl==='high'
-          ? 'slight asymmetry with directional energy bias (avoid chaotic scatter)'
-          : 'soft quasi-radial equilibrium';
+          ? 'slight asymmetry for energy direction'
+          : 'near-bilateral with small variations';
 
       const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
       const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
 
-      const organismDescriptor = 'single luminous abstract humanoid bust (head + shoulders) constructed from energized pattern filaments';
-      const containment = 'centered macro form, clear outer contour, gentle inner volumetric glow, shallow depth layering';
+      const organismDescriptor = 'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background';
+      const containment = 'clear outer contour, gentle inner volumetric glow, shallow depth layering';
 
-      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and extra breathing room (8–12% margin) around silhouette; silhouette occupies ~85–90% of frame height (avoid extreme close-up).';
+      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and slight breathing room around silhouette (avoid extreme close-up).';
 
-      const facePlane = b.cl === 'low'
-        ? 'Face plane: shield-like geometry with disciplined bilateral symmetry and softly squared jaw taper.'
-        : b.cl === 'high'
-          ? 'Face plane: flowing off-axis geometry with elongated jaw taper and directional sweep; maintain readable silhouette.'
-          : 'Face plane: balanced oval geometry with subtle asymmetry and tapered jaw contour.';
+      const eyesDescriptor = 'Eyes: friendly rounded almond openings with soft glow; no pupils; minimal tilt.';
 
-      const eyesDescriptor = b.sp === 'low'
-        ? 'Eyes indicated as soft, rounded almond openings with neutral alignment (<=2° tilt), rounded inner/outer corners, calm welcoming gaze.'
-        : b.sp === 'high'
-          ? 'Eyes indicated as warm rounded almond apertures with gentle inner glow; friendly gaze; limit upward tilt to <=5° (avoid sharp cat-eye).'
-          : 'Eyes indicated as human-friendly almond cutouts with rounded corners and controlled glow; minimal upward tilt (<=3°); avoid aggressive shapes.';
+      const featureIntegration = 'No realistic anatomy; features remain abstract energy lines that fuse into the lattice.';
+      const exclusions = 'no HUD/interface, no text, no logos, no photographic realism, no extra bodies';
+      const detailLine = dl ? `Detail level ${dl}/10.` : '';
+      const conceptLine = concept ? `Theme: ${concept}.` : '';
 
-      const featureIntegration = 'Facial feature cues must remain abstract energy constructs — no realistic skin, teeth, or pupils; features merge seamlessly into the surrounding lattice.';
-      const friendlyEyes = 'Eye friendliness: shapes are rounded and human-like; avoid sharp angles or pronounced slant; emphasize soft eyelid arcs and warm glow without literal pupils.';
-      const brightnessDirective = 'Brightness amplification: mimic a 100% brightness mask pass — drive filament cores to near-pure white with additive glow while preserving crisp silhouette edges and deep-black background.';
-      const glowLayering = 'Glow layering: dual-stage halo (tight inner bloom + slim outer rim light), avoid wide haze or fog.';
-      const contrastDirective = 'Contrast curve: protect blacks, compress midtones, and elevate highlights to maximize separation between silhouette and background without introducing edge bloom.';
-      const backgroundDirective = 'Background separation: true black (#000) or near-black with no texture, fog, or grain; ensure clearly visible negative space outside the silhouette.';
-      const noiseSuppression = 'Noise suppression: forbid free-floating particles or stray wisps outside the silhouette; allow at most 0–3 small anchored sparks near the rim; clamp outer halo thickness to <=2px.';
-      const uniformDensity = 'Uniform density directive: maintain even filament distribution across the entire silhouette (head, neck, shoulders). Coverage target ~88–92% with consistent gap width (±10% variance). Avoid hotspots, sparse patches, and center/edge falloff.';
-      const gapUniformity = 'Gap uniformity: keep negative channels between strands consistent (3–6 px equivalent at 1024×1024); no large cavities or noisy clusters.';
-      const exclusions = 'exclude photographic realism, literal skin texture, text, logos, letters, recognizable symbols, additional full bodies, extra heads, overt creature anatomy';
-      const detailLine = dl ? `Micro-detail ceiling: ${dl}/10 (respect minimalism).` : '';
-      const conceptLine = concept ? `Concept hint (abstracted): ${concept}; reinterpret as symbolic energy motifs embedded within the facial lattice (no literal objects).` : '';
-
-      const traitEnergy = traitWords.length ? `Translate traits into modulation of glow rhythm, ocular energy arcs, and filament curvature: ${traitWords.join(', ')}.` : '';
+      const traitEnergy = traitWords.length ? `Traits: ${traitWords.join(', ')}.` : '';
 
       finalPrompt = [
-        'Square dark neutral backdrop for contrast.',
-        organismDescriptor + ',',
-        chroma + ',',
-        structureCore + ',',
-        density + ',',
-        symmetry + ',',
-        containment + '.',
-        framing,
-        facePlane,
+        organismDescriptor + '.',
+        `Color: ${chroma}.`,
+        `Structure: ${structureCore}.`,
+        `Fill: ${fillLine}.`,
+        `Symmetry: ${symmetry}.`,
         eyesDescriptor,
-        'Facial feature spacing: maintain clear forehead, cheek, and chin zones with softly implied cheekbones; shoulders suggested via gentle downward sweep of filaments (no hands).',
-        'Nose and mouth remain implied only as smooth energy gradients — do not draw explicit structures.',
         featureIntegration,
-        friendlyEyes,
-        brightnessDirective,
-        glowLayering,
-        contrastDirective,
-        backgroundDirective,
-        noiseSuppression,
-        uniformDensity,
-        gapUniformity,
-        'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
-        'Focus on 1 coherent central entity; avoid multiple competing motifs.',
+        'Contrast: very bright lines with crisp edges; protect blacks; background stays pure black.',
+        'Composition: medium distance with breathing room; keep all particles inside the silhouette; avoid stray noise.',
         traitEnergy,
-        'Luminosity directive: push filaments toward near-white intensity with controlled bloom, preserving crisp edges; background stays deep black for maximum contrast.',
-        'Facial cues must stay loose and suggestive; avoid literal pupils, nostrils, lips, or teeth.',
         conceptLine,
         vibePhrase,
         detailLine,
-        'Surface: high-intensity smooth energy membranes with additive white cores; limit node sparks to <= 10 and keep them within the silhouette; zero particles beyond contour; subtle inner halo only.',
-        'Behavior suggestion (implied only): faint pulse + slow rotational parallax; no extra UI widgets.',
-        `Hard constraints: ${exclusions}. Keep fully stylized abstract energy aesthetic (non-photorealistic).`,
-        'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
+        `Constraints: ${exclusions}.`
       ].filter(Boolean).join(' ');
     } else { // Humanoid path
       const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;

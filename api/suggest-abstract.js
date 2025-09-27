@@ -31,73 +31,45 @@ export default async function handler(req, res){
 
     const name = `${pick(dyn)} ${pick(cores.sp)}-${pick(cores.ri)} ${pick(mod)}`.replace(/\s+/g,' ').trim();
 
-    // Description assembly
-    // New explicit low tier inserted. Previous "low" descriptors become the mid tier.
-    // Low tier (new): user-specified minimal monochrome form.
-    // Mid tier: formerly low descriptors (restrained, lattice, open void, anchored axial).
-    // High tier: unchanged.
-    let palette, logic, density, symmetry;
+    // Simple slider-driven prompt (AI head, chest, and upper arms on pure black)
+    const palette = b.sp === 'low'
+      ? 'cool white/blue lines with gentle cyan glow'
+      : b.sp === 'high'
+        ? 'bright neon cyan with warm amber highlights'
+        : 'clean cyan with subtle amber accents';
 
-    // Palette
-    if (b.sp === 'low') {
-      palette = 'black and white';
-    } else if (b.sp === 'high') {
-      palette = 'luminous high-chroma spectral gradients';
-    } else { // mid
-      palette = 'restrained deep cool spectrum with ember micro-accents';
-    }
+    const logic = b.ri === 'low'
+      ? 'geometric wireframe rings and grid'
+      : b.ri === 'high'
+        ? 'flowing energy strands and arcs'
+        : 'mesh of arcs and short lattice segments';
 
-    // Logic / structural motif
-    if (b.ri === 'low') {
-      logic = 'solid defined glowing geometric rings';
-    } else if (b.ri === 'high') {
-      logic = 'bright energy plumes and plasma veils';
-    } else { // mid
-      logic = 'modular geometric lattice and concentric data rings';
-    }
+    const fill = b.sc === 'low'
+      ? 'balanced interior with clear negative space between lines'
+      : b.sc === 'high'
+        ? 'richer line work with tight spacing, but keep background visible outside the figure'
+        : 'medium density with even spacing';
 
-    // Density / internal spatial quality (tripled overall vs prior baseline)
-    if (b.sc === 'low') {
-      density = 'cohesive filament mesh (~65% coverage) thicker luminous strands (1.4× base) with limited voids (<15% area)';
-    } else if (b.sc === 'high') {
-      density = 'semi-solid luminous filament mass (~95% coverage) with large thick energized strands (2.0× width), abundant cross-links, dense micro nodes (<2% void area total)';
-    } else { // mid
-      density = 'dense interlaced mesh (~82% coverage) thickened strands (1.7×) with minimized voids (<8% local area) and continuous cross-link lattice';
-    }
+    const symmetry = b.cl === 'low'
+      ? 'strong bilateral symmetry'
+      : b.cl === 'high'
+        ? 'slight asymmetry for energy direction'
+        : 'near-bilateral with small variations';
 
-    // Symmetry / macro form
-    if (b.cl === 'low') {
-      symmetry = 'clearly defined symmetry on vertical axis';
-    } else if (b.cl === 'high') {
-      symmetry = 'asymmetric growth vectors and directional thrust';
-    } else { // mid
-      symmetry = 'anchored axial symmetry with calm equilibrium';
-    }
+    const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
+    const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
-    const vibeLine = vibe ? ` Ambient mood hint: ${String(vibe).trim()}.` : '';
-    const detailLine = Number.isFinite(Number(detailLevel)) ? ` Detail richness target: ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
-
-    // Rewritten as an image generation style prompt forming a humanoid silhouette from the pattern components.
     const descriptionLines = [
-      'Abstract humanoid silhouette (head, shoulders, upper torso) formed entirely from internal pattern energy — no realistic anatomy.',
-      `Palette: ${palette}.`,
-      `Internal structural logic: ${logic}.`,
-      `Spatial / particulate density: ${density}.`,
-      'Uniform density directive: maintain even filament distribution across the entire silhouette (head, neck, shoulders). Keep overall coverage ~88–92% with consistent gap width (±10% variance). Avoid hot spots and sparse patches; no center/edge falloff.',
-      'Multi-scale layering: macro silhouette + mid-frequency rib lattice + fine filament / fractal micro-mesh cross-weave.',
-      'Edge definition: thin luminous perimeter trace plus subtle inner echo line reinforcing silhouette; avoid diffuse fuzzy edge bleed.',
-      'Silhouette anatomy cues: clear torso taper; defined shoulder curve; coherent neck transition.',
-  'Visibility priority: strong internal luminosity; significantly reduce transparency; reinforce filled volumes; solid bright filament cores with controlled outer chromatic fringe (avoid overbloom).',
-  'Opacity directive: minimize see-through background between primary strands; keep gap widths uniform (3–6px equivalent at 1024×1024) across all regions.',
-  'Strand/point quantity: 18–24 primary axial/diagonal strands and 40–60 secondary cross-links, ≥120 micro nodes — distributed evenly across the silhouette.',
-  'Strand directive: each primary filament has a bright opaque core, softer chromatic fringe, occasional braided merges indicating energy flow thickness variation; no wispy faint vapor.',
-      `Macro form & symmetry: ${symmetry}.`,
-      'Depth shaping via gentle internal occlusion gradients and alternating luminous/dim bands (avoid flat wash).',
-      'Include minimal voids indicating eyes (small dark ovals) without realistic facial detail.',
-      'Background: subdued low-noise gradient; prevent competing bright clusters to emphasize filled figure.',
-      'Negative: no large hollow interior; avoid fog, haze, bloom spill, grain; avoid large voids, sparse speckle, photographic realism, text, logos, extra limbs, duplicated figures.',
-      vibeLine.trim(),
-      detailLine.trim()
+      'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.',
+      `Color: ${palette}.`,
+      `Structure: ${logic}.`,
+      `Fill: ${fill}.`,
+      `Symmetry: ${symmetry}.`,
+      'Eyes: friendly rounded almond openings with soft glow; no pupils; minimal tilt.',
+      'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
+      'Composition: medium distance with breathing room around the figure; keep all particles inside the silhouette.',
+      vibeLine,
+      detailLine
     ].filter(Boolean);
     const description = descriptionLines.join('\n');
 
