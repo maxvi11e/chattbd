@@ -59,25 +59,18 @@ export default async function handler(req, res){
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
     const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
-        const descriptionLines = [
-      'Abstract humanoid silhouette (head, shoulders, upper torso) formed entirely from internal pattern energy — no realistic anatomy.',
-      `Palette: ${palette}.`,
-      `Internal structural logic: ${logic}.`,
-      `Spatial / particulate density: ${density}.`,
-      'Uniform density directive: maintain even filament distribution across the entire silhouette (head, neck, shoulders). Keep overall coverage ~88–92% with consistent gap width (±10% variance). Avoid hot spots and sparse patches; no center/edge falloff.',
+    const descriptionLines = [
+      'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.',
+      `Color: ${palette}.`,
+      `Structure: ${logic}.`,
+      `Fill: ${fill}.`,
+      `Symmetry: ${symmetry}.`,
+      'Eyes: friendly rounded almond openings with soft glow; no pupils.',
+      'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
+      'Composition: medium distance with breathing room around the figure; keep all particles inside the silhouette.',
       'Multi-scale layering: macro silhouette + mid-frequency rib lattice + fine filament / fractal micro-mesh cross-weave.',
       'Edge definition: thin luminous perimeter trace plus subtle inner echo line reinforcing silhouette; avoid diffuse fuzzy edge bleed.',
-      'Silhouette anatomy cues: clear torso taper; defined shoulder curve; coherent neck transition.',
-  'Visibility priority: strong internal luminosity; significantly reduce transparency; reinforce filled volumes; solid bright filament cores with controlled outer chromatic fringe (avoid overbloom).',
-  'Opacity directive: minimize see-through background between primary strands; keep gap widths uniform (3–6px equivalent at 1024×1024) across all regions.',
-  'Strand/point quantity: 18–24 primary axial/diagonal strands and 40–60 secondary cross-links, ≥120 micro nodes — distributed evenly across the silhouette.',
-  'Strand directive: each primary filament has a bright opaque core, softer chromatic fringe, occasional braided merges indicating energy flow thickness variation; no wispy faint vapor.',
-      `Macro form & symmetry: ${symmetry}.`,
-      'Depth shaping via gentle internal occlusion gradients and alternating luminous/dim bands (avoid flat wash).',
-      'Include minimal voids indicating eyes (small dark ovals) without realistic facial detail.',
-      'Background: subdued low-noise gradient; prevent competing bright clusters to emphasize filled figure.',
-      'Negative: no large hollow interior; avoid fog, haze, bloom spill, grain; avoid large voids, sparse speckle, photographic realism, text, logos, extra limbs, duplicated figures.',
-      'add extereme brightness and luminosity to all elements',
+      'Extreme brightness and luminosity to all elements',
       '10x thickness and brightness for 10% of all elements',
       vibeLine,
       detailLine
