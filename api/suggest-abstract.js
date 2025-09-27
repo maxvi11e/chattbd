@@ -33,10 +33,10 @@ export default async function handler(req, res){
 
     // Simple slider-driven prompt (AI head, chest, and upper arms on pure black)
     const palette = b.sp === 'low'
-      ? 'cool white/blue lines with gentle cyan glow'
+      ? 'cool white/blue lines with gentle deep blue glow'
       : b.sp === 'high'
-        ? 'bright neon cyan with warm amber highlights'
-        : 'clean cyan with subtle amber accents';
+        ? 'luminous high-chroma spectral gradients'
+        : 'restrained deep cool spectrum with ember micro-accents';
 
     const logic = b.ri === 'low'
       ? 'geometric wireframe rings and grid'
