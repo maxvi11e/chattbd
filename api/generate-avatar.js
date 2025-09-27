@@ -133,11 +133,12 @@ export default async function handler(req, res){
         'Macro emphasis: large continuous forms > tiny fragments; avoid busy repetition; no visual noise.',
         'Focus on 1 coherent central entity; avoid multiple competing motifs.',
         traitEnergy,
+        'Luminosity directive: push filaments toward near-white intensity with controlled bloom, preserving crisp edges; background stays deep black for maximum contrast.',
         'Facial cues must stay loose and suggestive; avoid literal pupils, nostrils, lips, or teeth.',
         conceptLine,
         vibePhrase,
         detailLine,
-        'Surface: smooth energy membranes, sparse node sparks (<= 12), subtle particle halo, crisp readable silhouette.',
+        'Surface: high-intensity smooth energy membranes, sparse node sparks (<= 12), subtle particle halo, razor-sharp contour readability.',
         'Behavior suggestion (implied only): faint pulse + slow rotational parallax; no extra UI widgets.',
         `Hard constraints: ${exclusions}. Keep fully stylized abstract energy aesthetic (non-photorealistic).`,
         'Original – avoid resemblance to known movie HUDs (e.g. famous AI interfaces).'
