@@ -49,20 +49,20 @@ export default async function handler(req, res){
 
     // Logic / structural motif
     if (b.ri === 'low') {
-      logic = 'simple geometric rings';
+      logic = 'solid defined glowing geometric rings';
     } else if (b.ri === 'high') {
-      logic = 'fluid filamentary energy plumes and diffuse plasma veils';
+      logic = 'bright energy plumes and plasma veils';
     } else { // mid
       logic = 'modular geometric lattice and concentric data rings';
     }
 
     // Density / internal spatial quality (tripled overall vs prior baseline)
     if (b.sc === 'low') {
-      density = 'sparse minimalist mesh (500 particles)';
+      density = 'sparse minimalist mesh (~500 particles)';
     } else if (b.sc === 'high') {
-      density = 'ultra-dense layered micro-node mesh with controlled, not noisy, particulate sparkle (1000 particles';
+      density = 'ultra-dense layered mesh with controlled, particulate sparkle (~3000 particles)';
     } else { // mid
-      density = 'heightened medium density (≈3x structural filaments) (3000 particles)';
+      density = 'heightened medium density (≈3x structural filaments) (1000 particles)';
     }
 
     // Symmetry / macro form
@@ -85,7 +85,8 @@ export default async function handler(req, res){
       `Spatial / particulate density: ${density}.`,
       'Apply ~3x internal pattern / particulate density across the silhouette. Define the form with increased density around edges.',
       `Macro form & symmetry: ${symmetry}.`,
-      'Facial region implied and eyes defined by minimal voids.',
+      'Adding glowing luminescence to internal patterns to enhance form definition and depth perception.',
+      'Include voids for eyes.',
       'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.',
       vibeLine.trim(),
       detailLine.trim()
