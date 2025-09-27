@@ -261,7 +261,7 @@
                 </div>
                 <div class="field-heading">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
-                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; min-height:86px; white-space:pre-wrap; word-break:break-word; overflow-y:hidden;"></textarea>
+                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; max-height:none;"></textarea>
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
@@ -647,8 +647,19 @@
         });
         function autosizeSuggestionDesc(){
           if (!suggestionDescEl) return;
-          suggestionDescEl.style.height = 'auto';
-            suggestionDescEl.style.height = suggestionDescEl.scrollHeight + 'px';
+          let iterations = 0;
+          function step(){
+            if (!suggestionDescEl) return;
+            const prev = suggestionDescEl.style.height;
+            suggestionDescEl.style.height = 'auto';
+            const target = suggestionDescEl.scrollHeight + 'px';
+            suggestionDescEl.style.height = target;
+            iterations++;
+            if (iterations < 5 && prev !== target) {
+              requestAnimationFrame(step);
+            }
+          }
+          step();
         }
         suggestionDescEl?.addEventListener('input', ()=>{
           archetypeSpecificDesc.value = suggestionDescEl.value;
@@ -681,6 +692,8 @@
               const descMulti = (desc || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
+              requestAnimationFrame(()=> autosizeSuggestionDesc());
+              setTimeout(()=> autosizeSuggestionDesc(), 50);
               suggestionBox.style.display = 'block';
               // If randomize flow, auto-open Art Settings and keep the button hidden
               if (randomizeFlow) {
@@ -731,6 +744,8 @@
           const descMulti = (desc || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
           suggestionDescEl.value = descMulti;
           autosizeSuggestionDesc();
+          requestAnimationFrame(()=> autosizeSuggestionDesc());
+          setTimeout(()=> autosizeSuggestionDesc(), 50);
           // Keep focus on the name field on regenerate
           if (suggestionNameEl) {
             requestAnimationFrame(() => {
