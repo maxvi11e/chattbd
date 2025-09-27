@@ -58,16 +58,16 @@ export default async function handler(req, res){
 
     // Density / internal spatial quality (tripled overall vs prior baseline)
     if (b.sc === 'low') {
-      density = 'sparse minimalist pattern (≈3x prior point density while preserving broad negative space)';
+      density = 'sparse minimalist mesh (500 particles)';
     } else if (b.sc === 'high') {
-      density = 'ultra-dense layered micro-node mesh (≈3x particles) with controlled, not noisy, particulate sparkle';
+      density = 'ultra-dense layered micro-node mesh with controlled, not noisy, particulate sparkle (1000 particles';
     } else { // mid
-      density = 'heightened medium density (≈3x structural filaments) with retained open void channels and crisp negative space halos';
+      density = 'heightened medium density (≈3x structural filaments) (3000 particles)';
     }
 
     // Symmetry / macro form
     if (b.cl === 'low') {
-      symmetry = 'defined symmetry on vertical and horizontal axis';
+      symmetry = 'clearly defined symmetry on vertical axis';
     } else if (b.cl === 'high') {
       symmetry = 'asymmetric growth vectors and directional thrust';
     } else { // mid
@@ -83,10 +83,9 @@ export default async function handler(req, res){
       `Palette: ${palette}.`,
       `Internal structural logic: ${logic}.`,
       `Spatial / particulate density: ${density}.`,
-      'Apply ~3x internal pattern / particulate density across the silhouette. Define the form clearly but avoid chaotic noise.',
+      'Apply ~3x internal pattern / particulate density across the silhouette. Define the form with increased density around edges.',
       `Macro form & symmetry: ${symmetry}.`,
       'Facial region implied and eyes defined by minimal voids.',
-      'Subtle pulsing core luminescence; gentle rim glow separating figure from a subdued low-noise background.',
       'Avoid photographic realism, text, logos, extra limbs, clutter, duplicated figures.',
       vibeLine.trim(),
       detailLine.trim()
