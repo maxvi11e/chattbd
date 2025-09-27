@@ -69,6 +69,7 @@ export default async function handler(req, res){
       'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
       'Composition: medium distance with breathing room around the figure; keep all particles inside the silhouette.',
       'add extreme brightness and luminosity to all elements',
+      '10x thickness and brightness for 10% of all elements',
       vibeLine,
       detailLine
     ].filter(Boolean);
