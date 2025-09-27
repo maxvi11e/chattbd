@@ -1,6 +1,6 @@
 # Freemium Model Implementation Guide
 
-This guide explains how to implement the freemium model that has been built for your Build a Bot application.
+This guide explains how to implement the freemium model that has been built for your Aeaea application.
 
 ## 🎯 What's Implemented
 

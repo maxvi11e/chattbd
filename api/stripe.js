@@ -1,4 +1,4 @@
-// Stripe Integration for Build a Bot
+// Stripe Integration for Aeaea
 // This handles payment processing and webhook events
 
 import Stripe from 'stripe';

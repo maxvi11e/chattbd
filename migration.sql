@@ -1,4 +1,4 @@
--- Migration Script for Build a Bot Database Improvements
+-- Migration Script for Aeaea Database Improvements
 -- Run these commands in your Supabase SQL Editor
 
 -- 1. Add Performance Indexes

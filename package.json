@@ -1,7 +1,7 @@
 {
   "name": "build-a-bot",
   "version": "1.0.0",
-  "description": "Build a Bot - AI Chat Bot Builder",
+  "description": "Aeaea - AI Chat Bot Builder",
   "main": "index.html",
   "type": "module",
   "engines": {
