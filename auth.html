@@ -6,167 +6,154 @@
   <title>Aeaea — Sign In</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
   <style>
-    :root{
-      --bg:#000;
-      --ink:#fff;
-      --muted:#999;
-      --input-bg:#1a1a1a;
-      --input-border:#333;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%; margin:0; padding:0;}
-    body{background:var(--bg); color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
-
-    .auth-container{
-      min-height:100vh; 
-      display:flex; 
-      align-items:center; 
-      justify-content:center; 
-      padding:40px 0px;
-    }
-    
-    .auth-content{
-      display:flex; 
-      flex-direction:column; 
-      align-items:center; 
-      width:100%; 
-      max-width:280px;
-      gap:0px;
-    }
-
-    /* Logo Image! */
-    .logo-image {
-      width: 300px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    .tagline {
-      font-size: 24px;
-      color: var(--ink);
-      margin: 0 0 20px;
-      text-align: center;
-      font-weight: 400;
-    }
-
-    /* Form Sections */
-    .auth-section {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .section-divider {
-      text-align: center;
-      color: var(--ink);
-      font-size: 16px;
-      margin: 10px 0 20px 0;
-      cursor: pointer;
-      transition: opacity 0.2s ease;
-    }
-
-    .section-divider:hover {
-      opacity: 0.8;
-    }
-
-    /* Collapsible signup section */
-    .signup-section {
-      overflow: hidden;
-      transition: max-height 0.3s ease, opacity 0.3s ease;
-    }
-
-    .signup-section.collapsed {
-      max-height: 0;
-      opacity: 0;
-    }
-
-    .signup-section.expanded {
-      max-height: 300px;
-      opacity: 1;
-    }
-
-    /* Input Styling */
-    .auth-input {
-      width: 100%;
-      height: 48px;
-      background: var(--bg);
-      border: 1px solid var(--ink);
-      border-radius: 24px;
-      padding: 0 20px;
-      color: var(--ink);
-      font-size: 16px;
-      outline: none;
-      transition: border-color 0.2s ease;
-    }
-
-    .auth-input::placeholder {
-      color: var(--ink);
-      opacity: 0.7;
-    }
-
-    .auth-input:focus {
-      border-color: var(--ink);
-      box-shadow: 0 0 0 1px var(--ink);
-    }
-
-    /* Button Styling */
-    .auth-btn {
-      width: 100%;
-      height: 48px;
-      border-radius: 24px;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      border: none;
-      outline: none;
-    }
-
-    .auth-btn.primary {
-      background: var(--ink);
-      color: var(--bg);
-    }
-
-    .auth-btn.primary:hover {
-      background: #e0e0e0;
-    }
-
-    .auth-btn.secondary {
-      background: var(--ink);
-      color: var(--bg);
-    }
-
-    .auth-btn.secondary:hover {
-      background: #e0e0e0;
-    }
-
-    .auth-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    @media (max-width: 480px) {
-      .auth-content {
-        max-width: 80%;
-        gap: 30px;
-      }
-      
-      .logo-image {
-        width: 100%;
-        height: auto;
-      }
-
-      .logo-bubble {
-        font-size: 28px;
-        padding: 14px 28px;
-      }
-      
-      .tagline {
-        font-size: 20px;
-      }
-    }
-  </style>
+:root {
+  --bg:#000;
+  --ink:#fff;
+  --muted:#999;
+  --input-bg:#1a1a1a;
+  --input-border:#333;
+}
+* {
+  box-sizing:border-box;
+}
+html,body {
+  height:100%;
+  margin:0;
+  padding:0;
+}
+body {
+  background:var(--bg);
+  color:var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+.auth-container {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 0px;
+}
+.auth-content {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  max-width:280px;
+  gap:0px;
+}
+/* Logo Image! */
+.logo-image {
+  width: 300px;
+  height: auto;
+  margin-bottom: 10px;
+}
+.tagline {
+  font-size: 24px;
+  color: var(--ink);
+  margin: 0 0 30px;
+  text-align: center;
+  font-weight: 400;
+}
+/* Form Sections */
+.auth-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.section-divider {
+  text-align: center;
+  color: var(--ink);
+  font-size: 16px;
+  margin: 10px 0 20px 0;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.section-divider:hover {
+  opacity: 0.8;
+}
+/* Collapsible signup section */
+.signup-section {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+.signup-section.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+.signup-section.expanded {
+  max-height: 300px;
+  opacity: 1;
+}
+/* Input Styling */
+.auth-input {
+  width: 100%;
+  height: 48px;
+  background: var(--bg);
+  border: 1px solid var(--ink);
+  border-radius: 24px;
+  padding: 0 20px;
+  color: var(--ink);
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.auth-input::placeholder {
+  color: var(--ink);
+  opacity: 0.7;
+}
+.auth-input:focus {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+/* Button Styling */
+.auth-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+.auth-btn.primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+.auth-btn.primary:hover {
+  background: #e0e0e0;
+}
+.auth-btn.secondary {
+  background: var(--ink);
+  color: var(--bg);
+}
+.auth-btn.secondary:hover {
+  background: #e0e0e0;
+}
+.auth-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@media (max-width: 480px) {
+  .auth-content {
+    max-width: 80%;
+    gap: 30px;
+  }
+  .logo-image {
+    width: 100%;
+    height: auto;
+  }
+  .logo-bubble {
+    font-size: 28px;
+    padding: 14px 28px;
+  }
+  .tagline {
+    font-size: 20px;
+  }
+}
+</style>
 </head>
 <body>
   <div class="auth-container">
@@ -174,7 +161,7 @@
       <!-- Logo -->
       <img src="images/logo.png" alt="Aeaea Logo" class="logo-image" />
 
-      <div class="tagline">Personalizeable AI Builder</div>
+      <div class="tagline">Personal AI Agent Builder</div>
 
       <!-- Sign In Section -->
       <div class="auth-section" id="signin-section">
