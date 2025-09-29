@@ -613,9 +613,7 @@
           };
         }
 
-        function pickWeighted(list){
-          return list[Math.floor(Math.random()*list.length)];
-        }
+    let lastAbstractBackcronym = null;
 
     async function generateSuggestion(category){
           try {
@@ -634,16 +632,37 @@
             }
             const json = await resp.json();
       console.log(isAbstract ? '[suggest-abstract] received' : '[suggest-persona] received', json);
-      return [json.name, json.description];
+      const backcronym = json.backcronym || json.backronym || null;
+      const displayName = isAbstract ? (backcronym || json.name || 'Abstract Agent') : (json.name || 'New Persona');
+      if (isAbstract) {
+        lastAbstractBackcronym = displayName;
+      } else {
+        lastAbstractBackcronym = null;
+      }
+      return {
+        name: json.name || displayName,
+        description: json.description,
+        backcronym,
+        displayName
+      };
           } catch(e){
             console.error('Suggestion error', e);
-            return ['Original Concept','A novel undefined concept shaped by personality balance.'];
+      if (category && category.toLowerCase() === 'abstract') {
+        lastAbstractBackcronym = null;
+      }
+            return {
+        name: 'Original Concept',
+        description: 'A novel undefined concept shaped by personality balance.',
+        backcronym: null,
+        displayName: 'Original Concept'
+      };
           }
         }
 
         // Auto-apply when user edits suggestion fields
         suggestionNameEl?.addEventListener('input', ()=>{
           archetypeSpecificInput.value = suggestionNameEl.value;
+      lastAbstractBackcronym = suggestionNameEl.value.trim() || null;
         });
         function autosizeSuggestionDesc(){
           if (!suggestionDescEl) return;
@@ -686,10 +705,10 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const [name, desc] = await generateSuggestion(category);
-              suggestionNameEl.value = name;
+            const { displayName, description, backcronym } = await generateSuggestion(category);
+              suggestionNameEl.value = displayName;
               // Normalize any escaped newlines and carriage returns
-              const descMulti = (desc || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+              const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
               requestAnimationFrame(()=> autosizeSuggestionDesc());
@@ -717,8 +736,11 @@
                 }
               }
               // Automatically apply suggestion
-              archetypeSpecificInput.value = name;
-              archetypeSpecificDesc.value = desc;
+              archetypeSpecificInput.value = displayName;
+              archetypeSpecificDesc.value = description;
+      if (backcronym) {
+        lastAbstractBackcronym = backcronym;
+      }
               // Hide the generate button after it has been triggered
               genBtn.textContent = 'Generate a specific persona';
               genBtn.disabled = false;
@@ -739,9 +761,9 @@
           const category = sel.value;
           if (!category || category==='custom') return;
           tryAnother.textContent = '...';
-          const [name, desc] = await generateSuggestion(category);
-          suggestionNameEl.value = name;
-          const descMulti = (desc || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+          const { displayName, description, backcronym } = await generateSuggestion(category);
+          suggestionNameEl.value = displayName;
+          const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
           suggestionDescEl.value = descMulti;
           autosizeSuggestionDesc();
           requestAnimationFrame(()=> autosizeSuggestionDesc());
@@ -754,8 +776,11 @@
             });
           }
           // Automatically apply new suggestion
-          archetypeSpecificInput.value = name;
-          archetypeSpecificDesc.value = desc;
+          archetypeSpecificInput.value = displayName;
+          archetypeSpecificDesc.value = description;
+      if (backcronym) {
+        lastAbstractBackcronym = backcronym;
+      }
           tryAnother.textContent = 'Regenerate';
           // If art settings are not yet open, ensure the button is visible; otherwise keep it hidden
           if (artSettings && artSettings.style.display === 'none' && artSettingsBtn) {
@@ -870,9 +895,13 @@
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
+        const resolvedName = (archetype && archetype.toLowerCase() === 'abstract')
+          ? (lastAbstractBackcronym ? lastAbstractBackcronym.trim() : (archetypeSpecific || archetype || 'New Avatar'))
+          : (archetypeSpecific || archetype || 'New Avatar');
+
         const payload = { 
           prompt: p, 
-          botName: (archetypeSpecific || archetype || 'New Avatar'),
+          botName: resolvedName,
           archetype, archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,

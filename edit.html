@@ -742,7 +742,8 @@
             (pending.archetype && String(pending.archetype).trim()) ||
             'New Avatar'
           );
-          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${finalBotName}.png` });
+          const safeFileBase = finalBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
+          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
       const { data: avatarData, error: avatarError } = await supabase
             .from('avatars')
             .insert({

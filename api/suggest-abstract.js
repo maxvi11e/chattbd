@@ -1,6 +1,8 @@
 // api/suggest-abstract.js
-// Returns an abstract digital organism suggestion + a backronym name derived from slider inputs.
+// Returns an abstract digital organism suggestion plus a backcronym name derived from slider inputs.
 // Expected POST JSON: { sliders: { seriousPlayful, succinctChatty, rationalIntuitive, practicalImaginative }, vibe?, detailLevel? }
+
+import { generateBackcronym } from './_lib/backcronym.js';
 
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -31,52 +33,8 @@ export default async function handler(req, res){
 
     const name = `${pick(dyn)} ${pick(cores.sp)}-${pick(cores.ri)} ${pick(mod)}`.replace(/\s+/g,' ').trim();
 
-    // ---- Backronym American name generation (new logic) ----
-    const vocab = {
-      low: [
-        'Core','Node','Stable','Grid','Vector','Circuit','Assistant','Dataset','Token','Dialogue','Workflow',
-        'Centered','Harmonic','Contained','Intermediate','Median','Echo','Loop','Weave','Nexus','Classifier',
-        'Feature','Label','Batch','Epoch','Logging','Baseline','Corpus','Category','Pipeline','Session'
-      ],
-      mid: [
-        'Balanced','Nexus','Matrix','Shell','Layer','System','Model','Interface','Service','Endpoint',
-        'Pattern','Metric','Score','Benchmark','Evaluation','Precision','Recall','Throughput','Scaling',
-        'Container','Docker','API','Monitoring','Dashboard','Guardrails','Policy','Ontology','Cluster','Taxonomy'
-      ],
-      high: [
-        'Adaptive','Emergent','Evolving','Flux','Bloom','Prism','Swarm','Cluster','Quantum','Neural','Transformer',
-        'Array','Luma','Flare','Axiom','Drift','Obsidian','Stillwave','Resonance','Catalyst','Luminal',
-        'Momentum','Continuum','Radiant','Aether','Aurora','Ascend','Beacon','Parallax','Vectorial','Celestia',
-        'Alignment','Preference','Reinforcement','Feedback','Prototype','Deployment','Exploration','Conduit','Fractal','Horizon'
-      ]
-    };
-    const connectors = ['for','of','and','with','in','towards','through'];
-
-    function letterWord(letter, buckets) {
-      const keys = ['sp','ri','sc','cl'];
-      const bucketKey = pick(keys);
-      const level = buckets[bucketKey];
-      const pool = vocab[level] || vocab.mid;
-      const match = pool.find(w => w[0].toUpperCase() === letter);
-      return match || pick(pool);
-    }
-
-    const names = [
-      'JASON','AMY','BRIAN','KELLY','ERIC','MEGAN','LUKE','DAN','NICK','CHRIS','TONY','LAURA',
-      'MATT','KAREN','STEVE','DAVID','RACHEL','SEAN','MARK','KATE','JEN','ALAN','PETER','SARAH',
-      'ALEX','CASEY','JORDAN','TAYLOR','MORGAN','CAMERON','RYAN','SAM','JESS','NOAH','ETHAN','LOGAN',
-      'EMMA','OLIVIA','AVA','SOPHIA','ISABELLA','MIA','CHARLOTTE','AMELIA','HARPER','ELLA','GRACE','HANNAH'
-    ];
-    const chosen = pick(names);
-
-    const words = chosen.split('').map(letter => letterWord(letter, b));
-    const backronym = words
-      .map((w, i) => (i < words.length - 1 ? `${w} ${pick(connectors)}` : w))
-      .join(' ')
-      .replace(/\s+/g,' ')
-      .trim();
-
-    const backronymResult = `${chosen}: ${backronym}`;
+    // ---- Backcronym human-style name generation ----
+    const { label: backcronymLabel, acronym: backcronymAcronym, phrase: backcronymPhrase } = generateBackcronym(b);
 
     // ---- Description (original logic) ----
     const palette = b.sp === 'low'
@@ -123,7 +81,9 @@ export default async function handler(req, res){
 
     return res.status(200).json({ 
       name,              // abstract organism name
-      backronym: backronymResult, // new backronymized American name
+      backcronym: backcronymLabel, // new backcronymized American name
+      backcronymAcronym,
+      backcronymPhrase,
       description 
     });
   } catch (e) {
