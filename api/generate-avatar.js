@@ -2,7 +2,7 @@
 // Input (POST JSON): { archetype, archetypeSpecific?, archetypeSpecificDesc?, traits?, vibe?, detailLevel?, styleChoice?, prompt?, botName? }
 // Archetypes: "Human", "Sci-Fi / Fantasy" => humanoid path; "Abstract" => abstract path; "custom" treated like humanoid unless equals Abstract.
 
-import { generateBackcronym } from './_lib/backcronym.js';
+import { pickAbstractName } from './_lib/abstract-names.js';
 
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -53,8 +53,6 @@ export default async function handler(req, res){
     // --- Build Prompt ---
     let finalPrompt;
 
-    let abstractBackcronym = null;
-
     if (isAbstract) {
       // Abstract path: single cohesive "digital organism" emblem derived from sliders (now simplified / less busy)
       const raw = {
@@ -65,8 +63,6 @@ export default async function handler(req, res){
       };
       const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=30) return 'low'; if(n>=70) return 'high'; return 'mid'; };
       const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
-
-      abstractBackcronym = generateBackcronym(b);
 
       // Simplified slider-driven descriptors (match suggest-abstract.js)
       const chroma = b.sp==='low'
@@ -189,7 +185,8 @@ export default async function handler(req, res){
     });
 
     const providedBotName = botName ? String(botName).trim() : '';
-    const derivedAbstractName = abstractBackcronym?.label || null;
+    const autoAbstractName = isAbstract && !providedBotName ? pickAbstractName() : null;
+    const derivedAbstractName = autoAbstractName?.label || null;
     const finalBotName = providedBotName || (isAbstract ? derivedAbstractName : '') || (archetypeSpecific || '').trim();
 
     const responseBase = {

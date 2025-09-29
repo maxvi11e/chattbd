@@ -1,8 +1,8 @@
 // api/suggest-abstract.js
-// Returns an abstract digital organism suggestion plus a backcronym name derived from slider inputs.
+// Returns an abstract digital organism suggestion plus a predefined abstract agent codename.
 // Expected POST JSON: { sliders: { seriousPlayful, succinctChatty, rationalIntuitive, practicalImaginative }, vibe?, detailLevel? }
 
-import { generateBackcronym } from './_lib/backcronym.js';
+import { pickAbstractName } from './_lib/abstract-names.js';
 
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -21,20 +21,8 @@ export default async function handler(req, res){
     const bucket = (n)=> n<=30? 'low' : n>=70? 'high':'mid';
     const b = { sp: bucket(s.sp), sc: bucket(s.sc), ri: bucket(s.ri), cl: bucket(s.cl) };
 
-    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-    // ---- Abstract organism name generation (original logic) ----
-    const cores = {
-      sp: b.sp==='low'? ['Axiom','Obsidian','Stillwave'] : b.sp==='high'? ['Luma','Flare','Prism'] : ['Echo','Intermediate','Median'],
-      ri: b.ri==='low'? ['Grid','Vector','Circuit'] : b.ri==='high'? ['Flux','Drift','Bloom'] : ['Loop','Weave','Nexus']
-    };
-    const mod = b.sc==='high'? ['Array','Cluster','Swarm'] : b.sc==='low'? ['Core','Node','Singularity'] : ['Matrix','Shell','Layer'];
-    const dyn = b.cl==='high'? ['Evolving','Adaptive','Emergent'] : b.cl==='low'? ['Stable','Centered','Harmonic'] : ['Balanced','Equatorial','Contained'];
-
-    const name = `${pick(dyn)} ${pick(cores.sp)}-${pick(cores.ri)} ${pick(mod)}`.replace(/\s+/g,' ').trim();
-
-    // ---- Backcronym human-style name generation ----
-    const { label: backcronymLabel, acronym: backcronymAcronym, phrase: backcronymPhrase } = generateBackcronym(b);
+    const selectedAbstractName = pickAbstractName();
+    const name = selectedAbstractName.label;
 
     // ---- Description (original logic) ----
     const palette = b.sp === 'low'
@@ -80,10 +68,7 @@ export default async function handler(req, res){
     const description = descriptionLines.join('\n');
 
     return res.status(200).json({ 
-      name,              // abstract organism name
-      backcronym: backcronymLabel, // new backcronymized American name
-      backcronymAcronym,
-      backcronymPhrase,
+      name,              // abstract organism name (predefined codename)
       description 
     });
   } catch (e) {

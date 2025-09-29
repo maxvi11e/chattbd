@@ -367,7 +367,7 @@
     // Make supabase available globally for freemium-utils.js
     window.supabase = supabase;
 
-    let lastAbstractBackcronym = null;
+    let lastAbstractName = null;
 
     // Check auth and redirect if not authenticated
     async function checkAuthAndRedirect() {
@@ -631,28 +631,25 @@
             }
             const json = await resp.json();
       console.log(isAbstract ? '[suggest-abstract] received' : '[suggest-persona] received', json);
-      const backcronym = json.backcronym || json.backronym || null;
-      const displayName = isAbstract ? (backcronym || json.name || 'Abstract Agent') : (json.name || 'New Persona');
+      const displayName = isAbstract ? (json.name || 'Abstract Agent') : (json.name || 'New Persona');
       if (isAbstract) {
-        lastAbstractBackcronym = displayName;
+        lastAbstractName = displayName;
       } else {
-        lastAbstractBackcronym = null;
+        lastAbstractName = null;
       }
       return {
         name: json.name || displayName,
         description: json.description,
-        backcronym,
         displayName
       };
           } catch(e){
             console.error('Suggestion error', e);
       if (category && category.toLowerCase() === 'abstract') {
-        lastAbstractBackcronym = null;
+        lastAbstractName = null;
       }
             return {
         name: 'Original Concept',
         description: 'A novel undefined concept shaped by personality balance.',
-        backcronym: null,
         displayName: 'Original Concept'
       };
           }
@@ -668,7 +665,7 @@
         suggestionNameEl?.addEventListener('input', ()=>{
           autosizeSuggestionName();
           archetypeSpecificInput.value = suggestionNameEl.value;
-      lastAbstractBackcronym = suggestionNameEl.value.trim() || null;
+      lastAbstractName = suggestionNameEl.value.trim() || null;
         });
         function autosizeSuggestionDesc(){
           if (!suggestionDescEl) return;
@@ -712,7 +709,7 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const { displayName, description, backcronym } = await generateSuggestion(category);
+            const { displayName, description } = await generateSuggestion(category);
               suggestionNameEl.value = displayName;
               autosizeSuggestionName();
               // Normalize any escaped newlines and carriage returns
@@ -753,9 +750,7 @@
               // Automatically apply suggestion
               archetypeSpecificInput.value = displayName;
               archetypeSpecificDesc.value = description;
-      if (backcronym) {
-        lastAbstractBackcronym = backcronym;
-      }
+      lastAbstractName = displayName;
               // Hide the generate button after it has been triggered
               genBtn.textContent = 'Generate a specific persona';
               genBtn.disabled = false;
@@ -776,7 +771,7 @@
           const category = sel.value;
           if (!category || category==='custom') return;
           tryAnother.textContent = '...';
-          const { displayName, description, backcronym } = await generateSuggestion(category);
+          const { displayName, description } = await generateSuggestion(category);
           suggestionNameEl.value = displayName;
           autosizeSuggestionName();
           const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
@@ -801,9 +796,7 @@
           // Automatically apply new suggestion
           archetypeSpecificInput.value = displayName;
           archetypeSpecificDesc.value = description;
-      if (backcronym) {
-        lastAbstractBackcronym = backcronym;
-      }
+      lastAbstractName = displayName;
           tryAnother.textContent = 'Regenerate';
           // If art settings are not yet open, ensure the button is visible; otherwise keep it hidden
           if (artSettings && artSettings.style.display === 'none' && artSettingsBtn) {
@@ -919,7 +912,7 @@
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = (archetype && archetype.toLowerCase() === 'abstract')
-          ? (lastAbstractBackcronym ? lastAbstractBackcronym.trim() : (archetypeSpecific || archetype || 'New Avatar'))
+          ? (lastAbstractName ? lastAbstractName.trim() : (archetypeSpecific || archetype || 'New Avatar'))
           : (archetypeSpecific || archetype || 'New Avatar');
 
         const payload = { 
