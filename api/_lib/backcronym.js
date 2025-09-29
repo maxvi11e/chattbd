@@ -17,8 +17,6 @@ const VOCAB = {
   ]
 };
 
-const CONNECTORS = ['for','of','and','with','in','towards','through'];
-
 const DEFAULT_NAMES = [
   'JASON','AMY','BRIAN','KELLY','ERIC','MEGAN','LUKE','DAN','NICK','CHRIS','TONY','LAURA',
   'MATT','KAREN','STEVE','DAVID','RACHEL','SEAN','MARK','KATE','JEN','ALAN','PETER','SARAH',
@@ -49,7 +47,6 @@ export function generateBackcronym(buckets, rng) {
   const acronym = pickFrom(DEFAULT_NAMES, rngFn) || 'AEAEA';
   const words = acronym.split('').map((letter) => wordForLetter(letter, buckets, rngFn));
   const expanded = words
-    .map((word, idx) => (idx < words.length - 1 ? `${word} ${pickFrom(CONNECTORS, rngFn)}` : word))
     .join(' ')
     .replace(/\s+/g, ' ')
     .trim();

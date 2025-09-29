@@ -254,7 +254,7 @@
               <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin:0;">
-                  <input id="suggestionName" type="text" placeholder="Persona name" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:46px; box-sizing:border-box;" />
+                  <textarea id="suggestionName" placeholder="Persona name" rows="1" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden;"></textarea>
                   <div style="display:flex; gap:6px;">
                     <button id="tryAnotherSuggestion" style="height:46px; padding:0 16px; font-size:14px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:24.5px; cursor:pointer; display:flex; align-items:center;">Regenerate</button>
                   </div>
@@ -658,8 +658,15 @@
           }
         }
 
+        function autosizeSuggestionName(){
+          if (!suggestionNameEl) return;
+          suggestionNameEl.style.height = 'auto';
+          suggestionNameEl.style.height = suggestionNameEl.scrollHeight + 'px';
+        }
+
         // Auto-apply when user edits suggestion fields
         suggestionNameEl?.addEventListener('input', ()=>{
+          autosizeSuggestionName();
           archetypeSpecificInput.value = suggestionNameEl.value;
       lastAbstractBackcronym = suggestionNameEl.value.trim() || null;
         });
@@ -685,6 +692,7 @@
         });
         // Initial autosize (in case prefilled)
         autosizeSuggestionDesc();
+        autosizeSuggestionName();
 
         function updateGenerateState(){
           const val = sel.value;
@@ -706,12 +714,20 @@
             genBtn.disabled = true;
             const { displayName, description, backcronym } = await generateSuggestion(category);
               suggestionNameEl.value = displayName;
+              autosizeSuggestionName();
               // Normalize any escaped newlines and carriage returns
               const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
-              requestAnimationFrame(()=> autosizeSuggestionDesc());
-              setTimeout(()=> autosizeSuggestionDesc(), 50);
+              autosizeSuggestionName();
+              requestAnimationFrame(()=> {
+                autosizeSuggestionDesc();
+                autosizeSuggestionName();
+              });
+              setTimeout(()=> {
+                autosizeSuggestionDesc();
+                autosizeSuggestionName();
+              }, 50);
               suggestionBox.style.display = 'block';
               // If randomize flow, auto-open Art Settings and keep the button hidden
               if (randomizeFlow) {
@@ -762,11 +778,19 @@
           tryAnother.textContent = '...';
           const { displayName, description, backcronym } = await generateSuggestion(category);
           suggestionNameEl.value = displayName;
+          autosizeSuggestionName();
           const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
           suggestionDescEl.value = descMulti;
           autosizeSuggestionDesc();
-          requestAnimationFrame(()=> autosizeSuggestionDesc());
-          setTimeout(()=> autosizeSuggestionDesc(), 50);
+          autosizeSuggestionName();
+          requestAnimationFrame(()=> {
+            autosizeSuggestionDesc();
+            autosizeSuggestionName();
+          });
+          setTimeout(()=> {
+            autosizeSuggestionDesc();
+            autosizeSuggestionName();
+          }, 50);
           // Keep focus on the name field on regenerate
           if (suggestionNameEl) {
             requestAnimationFrame(() => {
