@@ -905,8 +905,11 @@
     function setupSidebarControls() {
       if (!sidebar || !sidebarToggle || !resizeHandle) return;
 
+      const EDIT_SIDEBAR_WIDTH_KEY = 'editSidebarWidth';
+      const EDIT_SIDEBAR_STATE_KEY = 'editSidebarCollapsed';
+
       const getStoredWidth = () => {
-        const stored = parseInt(localStorage.getItem('editSidebarWidth') || '', 10);
+        const stored = parseInt(localStorage.getItem(EDIT_SIDEBAR_WIDTH_KEY) || '', 10);
         return Number.isNaN(stored) ? null : stored;
       };
 
@@ -915,21 +918,34 @@
         sidebar.classList.remove('collapsed');
         sidebar.style.width = `${width}px`;
         setTogglePosition(width);
+        localStorage.setItem(EDIT_SIDEBAR_STATE_KEY, 'false');
       };
 
-      const collapseSidebar = (skipStore) => {
-        if (!skipStore) {
+      const collapseSidebar = (options = {}) => {
+        const { saveWidth = true, persistState = true } = options;
+        if (saveWidth) {
           const currentWidth = sidebar.offsetWidth;
           if (currentWidth) {
-            localStorage.setItem('editSidebarWidth', Math.round(currentWidth));
+            localStorage.setItem(EDIT_SIDEBAR_WIDTH_KEY, Math.round(currentWidth));
           }
         }
         sidebar.classList.add('collapsed');
         sidebar.style.width = '0px';
         setTogglePosition(0);
+        if (persistState) {
+          localStorage.setItem(EDIT_SIDEBAR_STATE_KEY, 'true');
+        }
       };
 
-      collapseSidebar(true);
+      const savedState = localStorage.getItem(EDIT_SIDEBAR_STATE_KEY);
+      const isMobile = window.innerWidth <= 768;
+      if (savedState === 'false' && !isMobile) {
+        expandSidebar();
+      } else if (savedState === 'true') {
+        collapseSidebar({ saveWidth: false, persistState: false });
+      } else {
+        collapseSidebar({ saveWidth: false, persistState: false });
+      }
 
       sidebarToggle.addEventListener('click', () => {
         if (sidebar.classList.contains('collapsed')) {
@@ -955,7 +971,7 @@
           let newWidth = startWidth + (e.clientX - startX);
           newWidth = Math.max(200, Math.min(newWidth, 600));
           sidebar.style.width = `${newWidth}px`;
-          localStorage.setItem('editSidebarWidth', Math.round(newWidth));
+          localStorage.setItem(EDIT_SIDEBAR_WIDTH_KEY, Math.round(newWidth));
           setTogglePosition(newWidth);
         };
 
@@ -971,6 +987,14 @@
       });
 
       window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && sidebar.classList.contains('collapsed')) {
+          const storedState = localStorage.getItem(EDIT_SIDEBAR_STATE_KEY);
+          if (storedState === 'false') {
+            expandSidebar();
+            return;
+          }
+        }
+
         const width = sidebar.classList.contains('collapsed') ? 0 : sidebar.offsetWidth;
         setTogglePosition(width);
       });

@@ -811,8 +811,11 @@ body {
         }
       }
 
+      const SIDEBAR_WIDTH_KEY = 'sidebarWidth';
+      const SIDEBAR_STATE_KEY = 'sidebarCollapsed';
+
       function getSavedSidebarWidth() {
-        const stored = parseInt(localStorage.getItem('sidebarWidth') || '', 10);
+        const stored = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
         if (Number.isNaN(stored)) return 300;
         return Math.min(Math.max(stored, 200), 600);
       }
@@ -823,19 +826,25 @@ body {
         sidebar.style.width = `${width}px`;
         setTogglePosition(width);
         sidebarToggle.title = 'Collapse sidebar';
+        localStorage.setItem(SIDEBAR_STATE_KEY, 'false');
       }
 
-      function collapseSidebar(skipStore) {
-        if (!skipStore) {
+      function collapseSidebar(options = {}) {
+        const { saveWidth = true, persistState = true } = options;
+
+        if (saveWidth) {
           const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
           if (!Number.isNaN(currentWidth) && currentWidth > 0) {
-            localStorage.setItem('sidebarWidth', String(currentWidth));
+            localStorage.setItem(SIDEBAR_WIDTH_KEY, String(currentWidth));
           }
         }
         sidebar.classList.add('collapsed');
         sidebar.style.width = '0px';
         sidebarToggle.style.left = '0px';
         sidebarToggle.title = 'Expand sidebar';
+        if (persistState) {
+          localStorage.setItem(SIDEBAR_STATE_KEY, 'true');
+        }
       }
 
       // Sidebar toggle handler
@@ -880,12 +889,12 @@ body {
         
         if (width >= minWidth && width <= maxWidth) {
           sidebar.style.width = `${width}px`;
-          
+
           // Update the sidebar toggle position
           setTogglePosition(width);
-          
+
           // Store the width preference
-          localStorage.setItem('sidebarWidth', width);
+          localStorage.setItem(SIDEBAR_WIDTH_KEY, String(width));
         }
       }
 
@@ -905,15 +914,32 @@ body {
         document.body.style.cursor = '';
       }
 
-      // Collapse sidebar on initial load
-      collapseSidebar(true);
+      // Initialize sidebar state (default collapsed if no preference saved)
+      const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
+      const isMobile = window.innerWidth <= 768;
+      if (savedSidebarState === 'false' && !isMobile) {
+        expandSidebar();
+      } else if (savedSidebarState === 'true') {
+        collapseSidebar({ saveWidth: false, persistState: false });
+      } else {
+        collapseSidebar({ saveWidth: false, persistState: false });
+      }
 
       // Reposition toggle on resize and collapse automatically on mobile
       window.addEventListener('resize', () => {
-        if (window.innerWidth <= 768) {
-          collapseSidebar(true);
+        const nowMobile = window.innerWidth <= 768;
+        const storedState = localStorage.getItem(SIDEBAR_STATE_KEY);
+
+        if (nowMobile) {
+          collapseSidebar({ saveWidth: false, persistState: false });
           return;
         }
+
+        if (storedState === 'false') {
+          expandSidebar();
+          return;
+        }
+
         if (!sidebar.classList.contains('collapsed')) {
           const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
           if (!Number.isNaN(currentWidth) && currentWidth > 0) {
