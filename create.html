@@ -463,7 +463,7 @@
         if (window.innerWidth <= 600) {
           persona.placeholder = persona.dataset.shortPlaceholder;
         } else {
-          persona.placeholder = "Describe the personality, appearance, or character of the Bot";
+          persona.placeholder = "Describe the personality, appearance, or character of the Agent";
         }
       }
       window.addEventListener('resize', updatePlaceholder);
@@ -1027,7 +1027,7 @@
           // Re-enable form
           persona.disabled = false;
           startBtn.disabled = false;
-          startBtn.innerHTML = 'Generate Bot!';
+          startBtn.innerHTML = 'Generate Agent!';
           persona.focus();
         }
       }

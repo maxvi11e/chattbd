@@ -103,10 +103,10 @@
       <div class="nav-left">
         <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo">
         <a href="index.html">
-          <img src="images/library_icon.png" alt="Bot Library" class="nav-icon" title="Bot library">
+          <img src="images/library_icon.png" alt="Agent Library" class="nav-icon" title="Agent library">
         </a>
         <a href="#" id="chatNavIcon">
-          <img src="images/chat_icon.png" alt="Chat" class="nav-icon" title="Chat with latest bot">
+          <img src="images/chat_icon.png" alt="Chat" class="nav-icon" title="Chat with latest agent">
         </a>
       </div>
       <div class="nav-right">
@@ -130,7 +130,7 @@
         <h2 class="plan-name" id="currentPlanName">Free Plan</h2>
         <div class="plan-price" id="currentPlanPrice">Free</div>
         <div class="plan-usage" id="currentPlanUsage">
-          <span id="botCount">0</span> of <span id="botLimit">1</span> bots created
+          <span id="botCount">0</span> of <span id="botLimit">1</span> agents created
         </div>
         <div class="usage-bar">
           <div class="usage-fill" id="usageFill" style="width:0%"></div>
@@ -297,7 +297,7 @@
     // Handle downgrade to free plan
     async function handleFreePlanDowngrade(plan) {
       const confirm = window.confirm(
-        `Are you sure you want to downgrade to the ${plan.name}? You'll be limited to ${plan.bot_limit} bot(s).`
+        `Are you sure you want to downgrade to the ${plan.name}? You'll be limited to ${plan.bot_limit} agent(s).`
       );
       
       if (confirm) {

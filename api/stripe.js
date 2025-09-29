@@ -419,7 +419,7 @@ function getPlanDetails(planId) {
   const plans = {
     'free': {
       name: 'Free Plan',
-      description: 'Create 1 bot for free',
+      description: 'Create 1 agent for free',
       price_cents: 0,
       billing_interval: 'one_time',
       bot_limit: 1
@@ -433,7 +433,7 @@ function getPlanDetails(planId) {
     },
     'unlimited': {
       name: 'Unlimited Plan',
-      description: 'Create unlimited bots',
+      description: 'Create unlimited agents',
       price_cents: 50,
       billing_interval: 'monthly',
       bot_limit: null

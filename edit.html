@@ -489,12 +489,12 @@
         <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" />
       </div>
       <div class="sidebar-actions">
-        <a href="index.html" class="action-btn" title="Bot library">
-          <img src="images/library_icon.png" alt="Bot Library" />
+        <a href="index.html" class="action-btn" title="Agent library">
+          <img src="images/library_icon.png" alt="Agent Library" />
           Agent Library
         </a>
-        <a href="create.html" class="action-btn" title="Create new bot">
-          <img src="images/creator_icon.png" alt="Create Bot" />
+        <a href="create.html" class="action-btn" title="Create new agent">
+          <img src="images/creator_icon.png" alt="Create Agent" />
           Create New
         </a>
         <a href="chat.html" class="action-btn" title="Go to chat">
@@ -534,7 +534,7 @@
       <div id="botPreview" class="bot-preview">
         <div class="bot-frame">
           <div id="frameSpinner" class="frame-spinner"><div class="spinner"></div></div>
-          <img id="botImage" src="" alt="Generated Bot" class="bot-image" />
+          <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
         </div>
         <h2 id="botName" class="bot-name">Loading...</h2>
       </div>
@@ -543,11 +543,11 @@
       <div id="editForm" class="edit-form">
         <div class="form-group">
           <label class="form-label">What would you like to change?</label>
-          <textarea id="editPrompt" class="form-input form-textarea" placeholder="Describe the changes you'd like to make to your bot's appearance or personality..."></textarea>
+          <textarea id="editPrompt" class="form-input form-textarea" placeholder="Describe the changes you'd like to make to your agent's appearance or personality..."></textarea>
         </div>
         <div class="form-buttons">
           <button id="cancelEdit" class="form-btn">Cancel</button>
-          <button id="regenerateBtn" class="form-btn regenerate-btn">Regenerate Bot</button>
+          <button id="regenerateBtn" class="form-btn regenerate-btn">Regenerate Agent</button>
         </div>
       </div>
 
@@ -702,7 +702,7 @@
         }
 
   // Enter loading state like regenerate
-  setLoadingText('Generating your bot...');
+  setLoadingText('Generating your agent...');
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
@@ -796,7 +796,7 @@
 
       if (!botId) {
         console.error('❌ No bot ID found');
-        showError('No bot found. Please create a bot first.');
+        showError('No agent found. Please create an agent first.');
         setTimeout(() => {
           window.location.href = 'create.html';
         }, 2000);
@@ -819,7 +819,7 @@
 
         if (error) {
           console.error('❌ Error loading bot:', error);
-          showError('Failed to load bot data. Redirecting to create page...');
+          showError('Failed to load agent data. Redirecting to create page...');
           setTimeout(() => {
             window.location.href = 'create.html';
           }, 3000);
@@ -828,7 +828,7 @@
 
         if (!bot) {
           console.error('❌ No bot found with ID:', botId);
-          showError('Bot not found. Redirecting to create page...');
+          showError('Agent not found. Redirecting to create page...');
           setTimeout(() => {
             window.location.href = 'create.html';
           }, 3000);
@@ -840,7 +840,7 @@
         displayBot(bot);
       } catch (error) {
         console.error('❌ Error in loadBot:', error);
-        showError('Failed to load bot data. Redirecting to create page...');
+        showError('Failed to load agent data. Redirecting to create page...');
         setTimeout(() => {
           window.location.href = 'create.html';
         }, 3000);
@@ -1054,7 +1054,7 @@
         
         if (!response.ok || !result.dataUrl) {
           console.error('Regeneration API error:', result);
-          const serverMsg = result?.error || 'Failed to regenerate bot. Please try again.';
+          const serverMsg = result?.error || 'Failed to regenerate agent. Please try again.';
           const serverDebug = result?.debug ? ` [${JSON.stringify(result.debug).slice(0, 300)}]` : '';
           showError(serverMsg + serverDebug);
           return;
@@ -1066,7 +1066,7 @@
         
       } catch (error) {
         console.error('Error regenerating bot:', error);
-        showError('Failed to regenerate bot. Please try again.');
+        showError('Failed to regenerate agent. Please try again.');
       } finally {
         setLoadingState(false);
         isRegenerating = false;

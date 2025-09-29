@@ -52,10 +52,15 @@ async function canUserCreateBot(supabase) {
   }
 
   let reason;
+  const limitValue = subscriptionInfo.bot_limit;
+  const limitText = typeof limitValue === 'number'
+    ? `${limitValue} ${limitValue === 1 ? 'agent' : 'agents'}`
+    : 'your current agent allowance';
+
   if (subscriptionInfo.plan_id === 'free') {
-    reason = `You've reached the limit of ${subscriptionInfo.bot_limit} bot on the free plan. Upgrade to create more bots!`;
+    reason = `You've reached the limit of ${limitText} on the free plan. Upgrade to create more agents!`;
   } else {
-    reason = `You've reached your plan limit of ${subscriptionInfo.bot_limit} bots. Upgrade to create more!`;
+    reason = `You've reached your plan limit of ${limitText}. Upgrade to create more agents!`;
   }
 
   return { canCreate: false, reason, subscriptionInfo };
@@ -136,7 +141,7 @@ function createUpgradeModal() {
         </div>
         <div class="modal-body">
           <div class="current-usage">
-            <p id="usageText">You've created <strong id="botCount">0</strong> out of <strong id="botLimit">1</strong> allowed bots.</p>
+            <p id="usageText">You've created <strong id="botCount">0</strong> out of <strong id="botLimit">1</strong> allowed agents.</p>
           </div>
           <div class="pricing-grid" id="pricingGrid">
             <!-- Plans will be inserted here -->
