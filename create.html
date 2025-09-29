@@ -367,6 +367,8 @@
     // Make supabase available globally for freemium-utils.js
     window.supabase = supabase;
 
+    let lastAbstractBackcronym = null;
+
     // Check auth and redirect if not authenticated
     async function checkAuthAndRedirect() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -612,9 +614,6 @@
             practicalImaginative: scale10To100(val('traitPracticalImaginative')),
           };
         }
-
-    let lastAbstractBackcronym = null;
-
     async function generateSuggestion(category){
           try {
             const sliders = currentSliderValues();
