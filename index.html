@@ -730,25 +730,42 @@ body {
         }
       }
 
+      function getSavedSidebarWidth() {
+        const stored = parseInt(localStorage.getItem('sidebarWidth') || '', 10);
+        return Number.isFinite(stored) ? stored : 300;
+      }
+
+      function expandSidebar() {
+        const width = getSavedSidebarWidth();
+        sidebar.classList.remove('collapsed');
+        sidebar.style.width = `${width}px`;
+        setTogglePosition(width);
+        sidebarToggle.title = 'Collapse sidebar';
+      }
+
+      function collapseSidebar(skipStore) {
+        if (!skipStore) {
+          const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+          if (!Number.isNaN(currentWidth) && currentWidth > 0) {
+            localStorage.setItem('sidebarWidth', String(currentWidth));
+          }
+        }
+        sidebar.classList.add('collapsed');
+        sidebar.style.width = '0px';
+        sidebarToggle.style.left = '0px';
+        sidebarToggle.title = 'Expand sidebar';
+      }
+
       sidebarToggle.addEventListener('click', () => {
         if (sidebar.classList.contains('collapsed')) {
-          sidebar.classList.remove('collapsed');
-          const savedWidth = localStorage.getItem('sidebarWidth') || '300';
-          sidebar.style.width = `${savedWidth}px`;
-          setTogglePosition(parseInt(savedWidth));
-          sidebarToggle.title = 'Collapse sidebar';
+          expandSidebar();
         } else {
-          sidebar.classList.add('collapsed');
-          sidebar.style.width = '0px';
-          sidebarToggle.style.left = '0px';
-          sidebarToggle.title = 'Expand sidebar';
+          collapseSidebar();
         }
       });
 
-      // Initialize toggle position
-      const initialWidth = parseInt(localStorage.getItem('sidebarWidth') || '300');
-      sidebar.style.width = `${initialWidth}px`;
-      setTogglePosition(initialWidth);
+      // Collapse sidebar on initial load
+      collapseSidebar(true);
 
       // Sidebar resize behavior (desktop only)
       function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }

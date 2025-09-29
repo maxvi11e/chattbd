@@ -811,25 +811,39 @@ body {
         }
       }
 
+      function getSavedSidebarWidth() {
+        const stored = parseInt(localStorage.getItem('sidebarWidth') || '', 10);
+        if (Number.isNaN(stored)) return 300;
+        return Math.min(Math.max(stored, 200), 600);
+      }
+
+      function expandSidebar() {
+        const width = getSavedSidebarWidth();
+        sidebar.classList.remove('collapsed');
+        sidebar.style.width = `${width}px`;
+        setTogglePosition(width);
+        sidebarToggle.title = 'Collapse sidebar';
+      }
+
+      function collapseSidebar(skipStore) {
+        if (!skipStore) {
+          const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+          if (!Number.isNaN(currentWidth) && currentWidth > 0) {
+            localStorage.setItem('sidebarWidth', String(currentWidth));
+          }
+        }
+        sidebar.classList.add('collapsed');
+        sidebar.style.width = '0px';
+        sidebarToggle.style.left = '0px';
+        sidebarToggle.title = 'Expand sidebar';
+      }
+
       // Sidebar toggle handler
       sidebarToggle.addEventListener('click', () => {
         if (sidebar.classList.contains('collapsed')) {
-          // Expand sidebar
-          sidebar.classList.remove('collapsed');
-          // Restore the saved width or default
-          const savedWidth = localStorage.getItem('sidebarWidth') || '300';
-          sidebar.style.width = `${savedWidth}px`;
-          setTogglePosition(parseInt(savedWidth));
-          // Keep hamburger icon; update title only
-          sidebarToggle.title = 'Collapse sidebar';
+          expandSidebar();
         } else {
-          // Collapse sidebar
-          sidebar.classList.add('collapsed');
-          // Override inline width with 0 for collapse
-          sidebar.style.width = '0px';
-          sidebarToggle.style.left = '0px';
-          // Keep hamburger icon; update title only
-          sidebarToggle.title = 'Expand sidebar';
+          collapseSidebar();
         }
       });
 
@@ -891,34 +905,22 @@ body {
         document.body.style.cursor = '';
       }
 
-      // Load saved sidebar width on page load
-      const savedWidth = localStorage.getItem('sidebarWidth');
-      if (savedWidth) {
-        const width = parseInt(savedWidth, 10);
-        if (width >= 200 && width <= 600) {
-          sidebar.style.width = `${width}px`;
-          setTogglePosition(width);
+      // Collapse sidebar on initial load
+      collapseSidebar(true);
+
+      // Reposition toggle on resize and collapse automatically on mobile
+      window.addEventListener('resize', () => {
+        if (window.innerWidth <= 768) {
+          collapseSidebar(true);
+          return;
         }
-      }
-
-      // Auto-collapse sidebar on mobile devices
-      function initializeMobileSidebar() {
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile && !sidebar.classList.contains('collapsed')) {
-          // Collapse sidebar on mobile
-          sidebar.classList.add('collapsed');
-          sidebar.style.width = '0px';
-          sidebarToggle.style.left = '0px';
-          // Keep hamburger icon; update title only
-          sidebarToggle.title = 'Expand sidebar';
+        if (!sidebar.classList.contains('collapsed')) {
+          const currentWidth = parseInt(window.getComputedStyle(sidebar).width, 10);
+          if (!Number.isNaN(currentWidth) && currentWidth > 0) {
+            setTogglePosition(currentWidth);
+          }
         }
-      }
-
-      // Initialize mobile sidebar state
-      initializeMobileSidebar();
-
-      // Re-check on window resize
-      window.addEventListener('resize', initializeMobileSidebar);
+      });
 
       // Simple search function
       function performSearch(searchTerm) {

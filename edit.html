@@ -910,35 +910,39 @@
         return Number.isNaN(stored) ? null : stored;
       };
 
-      const initialWidth = getStoredWidth();
-      if (initialWidth) {
-        sidebar.style.width = `${initialWidth}px`;
-      }
-      setTogglePosition(sidebar.classList.contains('collapsed') ? 0 : sidebar.offsetWidth || initialWidth || 300);
+      const expandSidebar = () => {
+        const width = getStoredWidth() || 300;
+        sidebar.classList.remove('collapsed');
+        sidebar.style.width = `${width}px`;
+        setTogglePosition(width);
+      };
 
-      sidebarToggle.addEventListener('click', () => {
-        if (sidebar.classList.contains('collapsed')) {
-          sidebar.classList.remove('collapsed');
-          const width = getStoredWidth() || 300;
-          sidebar.style.width = `${width}px`;
-          setTogglePosition(width);
-        } else {
+      const collapseSidebar = (skipStore) => {
+        if (!skipStore) {
           const currentWidth = sidebar.offsetWidth;
           if (currentWidth) {
             localStorage.setItem('editSidebarWidth', Math.round(currentWidth));
           }
-          sidebar.classList.add('collapsed');
-          setTogglePosition(0);
+        }
+        sidebar.classList.add('collapsed');
+        sidebar.style.width = '0px';
+        setTogglePosition(0);
+      };
+
+      collapseSidebar(true);
+
+      sidebarToggle.addEventListener('click', () => {
+        if (sidebar.classList.contains('collapsed')) {
+          expandSidebar();
+        } else {
+          collapseSidebar();
         }
       });
 
       resizeHandle.addEventListener('mousedown', (event) => {
         event.preventDefault();
         if (sidebar.classList.contains('collapsed')) {
-          sidebar.classList.remove('collapsed');
-          const width = getStoredWidth() || 300;
-          sidebar.style.width = `${width}px`;
-          setTogglePosition(width);
+          expandSidebar();
         }
 
         isSidebarResizing = true;
