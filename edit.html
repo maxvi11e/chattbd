@@ -241,10 +241,21 @@
   /* Bot Preview */
   .bot-preview {
     display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    gap:28px;
+    margin-bottom:0px;
+    transition:gap 0.35s ease;
+    flex-wrap:nowrap;
+  }
+  .bot-preview-main {
+    display:flex;
     flex-direction:column;
     align-items:center;
-    gap:16px;
-    margin-bottom:0px;
+    transition:transform 0.35s ease;
+  }
+  .bot-preview.personality-visible .bot-preview-main {
+    transform:translateX(-24px);
   }
   .bot-frame {
     width:400px;
@@ -373,13 +384,14 @@
     display:none;
     flex-direction:column;
     gap:12px;
-    width:100%;
-    max-width:420px;
-    margin:20px auto 0;
+    width:320px;
+    max-width:360px;
+    margin:0;
     padding:20px 18px;
     border:1px solid rgba(255,255,255,0.14);
     border-radius:var(--radius-md);
     background:rgba(255,255,255,0.04);
+    flex-shrink:0;
   }
   .personality-panel.visible {
     display:flex;
@@ -532,6 +544,21 @@
   .error-message.visible {
     display:block;
   }
+  @media (max-width: 1024px) {
+    .bot-preview {
+      flex-direction:column;
+      align-items:center;
+      gap:24px;
+    }
+    .bot-preview.personality-visible .bot-preview-main {
+      transform:none;
+    }
+    .personality-panel {
+      width:100%;
+      max-width:420px;
+      margin-top:8px;
+    }
+  }
   /* Responsive Design */
   @media (max-width: 768px) {
     .main-content {
@@ -623,13 +650,42 @@
 
       <!-- Bot Preview -->
       <div id="botPreview" class="bot-preview">
-        <div class="bot-frame">
-          <div id="frameSpinner" class="frame-spinner"><div class="spinner"></div></div>
-          <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
+        <div class="bot-preview-main">
+          <div class="bot-frame">
+            <div id="frameSpinner" class="frame-spinner"><div class="spinner"></div></div>
+            <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
+          </div>
+          <div class="agent-name-field">
+            <div class="field-heading">Agent Name <img class="icon" src="images/pencil_icon.png" alt="Edit" /></div>
+            <textarea id="agentNameInput" rows="1" placeholder="Name your agent" aria-label="Agent name" disabled spellcheck="false">Loading...</textarea>
+          </div>
         </div>
-        <div class="agent-name-field">
-          <div class="field-heading">Agent Name <img class="icon" src="images/pencil_icon.png" alt="Edit" /></div>
-          <textarea id="agentNameInput" rows="1" placeholder="Name your agent" aria-label="Agent name" disabled spellcheck="false">Loading...</textarea>
+        <div id="personalityPanel" class="personality-panel" aria-hidden="true">
+          <div class="field-heading">Define Personality with sliders</div>
+          <p class="personality-subtext">Adjust how your agent behaves. Changes are saved without regenerating art.</p>
+          <div class="personality-slider-row">
+            <span>Serious</span>
+            <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" />
+            <span>Playful</span>
+          </div>
+          <div class="personality-slider-row">
+            <span>Succinct</span>
+            <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" />
+            <span>Talkative</span>
+          </div>
+          <div class="personality-slider-row">
+            <span>Rational</span>
+            <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" />
+            <span>Intuitive</span>
+          </div>
+          <div class="personality-slider-row">
+            <span>Practical</span>
+            <input id="traitPracticalImaginative" type="range" min="1" max="10" step="1" value="5" />
+            <span>Imaginative</span>
+          </div>
+          <div class="personality-actions">
+            <button id="savePersonalityBtn" class="form-btn" disabled>Save Personality</button>
+          </div>
         </div>
       </div>
 
@@ -651,35 +707,6 @@
         <button id="editBtn" class="action-btn edit-btn">Edit with Prompt</button>
         <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Chat</button>
       </div>
-
-      <div id="personalityPanel" class="personality-panel" aria-hidden="true">
-        <div class="field-heading">Define Personality with sliders</div>
-        <p class="personality-subtext">Adjust how your agent behaves. Changes are saved without regenerating art.</p>
-        <div class="personality-slider-row">
-          <span>Serious</span>
-          <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" />
-          <span>Playful</span>
-        </div>
-        <div class="personality-slider-row">
-          <span>Succinct</span>
-          <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" />
-          <span>Talkative</span>
-        </div>
-        <div class="personality-slider-row">
-          <span>Rational</span>
-          <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" />
-          <span>Intuitive</span>
-        </div>
-        <div class="personality-slider-row">
-          <span>Practical</span>
-          <input id="traitPracticalImaginative" type="range" min="1" max="10" step="1" value="5" />
-          <span>Imaginative</span>
-        </div>
-        <div class="personality-actions">
-          <button id="savePersonalityBtn" class="form-btn" disabled>Save Personality</button>
-        </div>
-      </div>
-
       <!-- Loading State -->
       <div id="loadingState" class="loading hidden">
         <p id="loadingText">Working...</p>
@@ -757,6 +784,7 @@
   const botImage = document.getElementById('botImage');
   const frameSpinner = document.getElementById('frameSpinner');
     const agentNameInput = document.getElementById('agentNameInput');
+    const botPreview = document.getElementById('botPreview');
     const editBtn = document.getElementById('editBtn');
     const confirmBtn = document.getElementById('confirmBtn');
     const editForm = document.getElementById('editForm');
@@ -1097,11 +1125,13 @@
         personalityPanel.setAttribute('aria-hidden', 'false');
         personalityToggleBtn.setAttribute('aria-expanded', 'true');
         personalityToggleBtn.textContent = 'Hide Personality';
+        if (botPreview) botPreview.classList.add('personality-visible');
       } else {
         personalityPanel.classList.remove('visible');
         personalityPanel.setAttribute('aria-hidden', 'true');
         personalityToggleBtn.setAttribute('aria-expanded', 'false');
         personalityToggleBtn.textContent = 'Edit Personality';
+        if (botPreview) botPreview.classList.remove('personality-visible');
       }
     }
 
