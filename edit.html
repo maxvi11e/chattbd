@@ -912,6 +912,13 @@
         latestNameDraft = agentNameInput.value;
         autosizeAgentName();
         pendingNameValue = null;
+        requestAnimationFrame(() => {
+          if (!agentNameInput.disabled) {
+            agentNameInput.focus();
+            const end = agentNameInput.value.length;
+            try { agentNameInput.setSelectionRange(end, end); } catch (_) {}
+          }
+        });
       }
       botImage.alt = bot.name || 'Agent preview';
       botImage.onload = () => {
