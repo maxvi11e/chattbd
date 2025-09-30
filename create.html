@@ -125,19 +125,6 @@
     }
 
     /* Regenerate button animation (match standard hover scale/translate) */
-    #tryAnotherSuggestion{
-      transition: transform 0.15s ease-in-out, box-shadow 0.25s ease;
-      will-change: transform;
-    }
-    #tryAnotherSuggestion:hover{
-      background:rgba(255, 255, 255, 0.182);
-      transform:translateY(-2px);
-      box-shadow:0 2px 6px rgba(255,255,255,0.15);
-    }
-    #tryAnotherSuggestion:active{
-      transform:translateY(0);
-      box-shadow:none;
-    }
 
     /* Field heading labels */
     .field-heading{
@@ -222,10 +209,10 @@
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose a Base</option>
+                <option>AI Hologram</option>
                 <option>Human</option>
                 <option>Animal</option>
                 <option>Sci-Fi / Fantasy</option>
-                <option>AI Hologram</option>
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
@@ -263,17 +250,14 @@
             <!-- Persona Suggestion (after choosing category) -->
             <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
               <div style="display:flex; justify-content:center;">
-                <button id="generateSuggestionBtn" style="width:150px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion</button>
+                <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Base and Personality</button>
               </div>
               <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin:0;">
-                  <textarea id="suggestionName" placeholder="Persona name" rows="1" style="flex:1; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-                  <div style="display:flex; gap:6px;">
-                    <button id="tryAnotherSuggestion" style="height:46px; padding:0 16px; font-size:14px; border:1px solid var(--stroke); background:#000000; color:#ffffff; border-radius:24.5px; cursor:pointer; display:flex; align-items:center;">Regenerate</button>
-                  </div>
+                <div style="width:100%; margin:0;">
+                  <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
                 </div>
-                <div class="field-heading">Define appearance and behavoir <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+                <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
                 <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; max-height:none;"></textarea>
               </div>
@@ -281,7 +265,7 @@
               <input type="hidden" id="archetypeSpecificDesc" />
             </div>
 
-          <!-- Personality Sliders (right after archetype) -->
+          <!-- Personality Sliders (right after archetype) --> 
 
           </div>
 
@@ -320,7 +304,7 @@
             <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
               <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                  <option value="">Default - Soft cinematic lighting</option>
+                  <option value="">Default (Soft cinematic lighting)</option>
                   <option value="radiant">Radiant</option>
                   <option value="calming">Calming</option>
                   <option value="dramatic">Dramatic</option>
@@ -443,6 +427,31 @@
   let artSettingsTriggered = false;
   // Track when randomize flow should auto-open art settings after suggestion
   let randomizeFlow = false;
+  const AUTO_SHOW_ARCHETYPES = ['human','animal','sci-fi / fantasy'];
+  const defaultSuggestionBtnText = 'Generate a suggestion from Base + Personality';
+  const regenerateSuggestionBtnText = 'Generate another suggestion';
+
+  function shouldAutoShowArtSettings(value){
+    if (!value) return false;
+    return AUTO_SHOW_ARCHETYPES.includes(String(value).trim().toLowerCase());
+  }
+
+  function openArtSettingsPanel({ ensureStart = false } = {}){
+    if (!artSettings) return;
+    artSettings.style.display = 'flex';
+    artSettingsTriggered = true;
+    if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
+    if (ensureStart && startBtn) {
+      startBtn.style.display = 'flex';
+      startBtn.disabled = false;
+    }
+  }
+
+  function collapseArtSettingsPanel(){
+    if (!artSettings) return;
+    artSettings.style.display = 'none';
+    artSettingsTriggered = false;
+  }
 
       // Sign out handler (optional if logout button exists)
       if (logoutBtn) {
@@ -496,7 +505,8 @@
         // Hide art settings button on entering options mode until suggestion is generated
         const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         if (artSettingsBtn) artSettingsBtn.style.display = 'none';
-        // Hide start button until a suggestion is generated
+        collapseArtSettingsPanel();
+        // Hide start button until a base selection opens the fields
         if (startBtn) startBtn.style.display = 'none';
       }
       // Immediately enter options mode
@@ -633,7 +643,6 @@
   const suggestionDescEl = document.getElementById('suggestionDesc');
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
-        const tryAnother = document.getElementById('tryAnotherSuggestion');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
 
@@ -742,7 +751,7 @@
         }
 
         if (genBtn){
-          genBtn.addEventListener('click', async ()=>{
+          const handleGenerate = async ()=>{
             const category = sel.value;
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
@@ -789,10 +798,11 @@
               archetypeSpecificInput.value = displayName;
               archetypeSpecificDesc.value = description;
       lastAbstractName = displayName;
-              // Hide the generate button after it has been triggered
-              genBtn.textContent = 'Generate a specific persona';
+              // Update button label and re-enable for future regenerations
+              genBtn.textContent = regenerateSuggestionBtnText;
               genBtn.disabled = false;
-              genBtn.style.display = 'none';
+              genBtn.style.opacity = '1';
+              genBtn.style.display = 'inline-block';
               // Show the start/create button only after Art Settings has been triggered and is open
               if (startBtn) {
                 if (artSettingsTriggered && artSettings && artSettings.style.display !== 'none') {
@@ -803,79 +813,63 @@
               }
               // Reset randomize flow flag now that we've handled it
               randomizeFlow = false;
-          });
+          };
+          genBtn.addEventListener('click', handleGenerate);
         }
-        tryAnother?.addEventListener('click', async ()=>{
-          const category = sel.value;
-          if (!category || category==='custom') return;
-          tryAnother.textContent = '...';
-          const { displayName, description } = await generateSuggestion(category);
-          suggestionNameEl.value = displayName;
-          autosizeSuggestionName();
-          const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-          suggestionDescEl.value = descMulti;
-          autosizeSuggestionDesc();
-          autosizeSuggestionName();
-          requestAnimationFrame(()=> {
-            autosizeSuggestionDesc();
-            autosizeSuggestionName();
-          });
-          setTimeout(()=> {
-            autosizeSuggestionDesc();
-            autosizeSuggestionName();
-          }, 50);
-          // Keep focus on the name field on regenerate
-          if (suggestionNameEl) {
-            requestAnimationFrame(() => {
-              suggestionNameEl.focus();
-              try { suggestionNameEl.setSelectionRange(suggestionNameEl.value.length, suggestionNameEl.value.length); } catch {}
-            });
-          }
-          // Automatically apply new suggestion
-          archetypeSpecificInput.value = displayName;
-          archetypeSpecificDesc.value = description;
-      lastAbstractName = displayName;
-          tryAnother.textContent = 'Regenerate';
-          // If art settings are not yet open, ensure the button is visible; otherwise keep it hidden
-          if (artSettings && artSettings.style.display === 'none' && artSettingsBtn) {
-            artSettingsBtn.style.display = 'inline-block';
-          }
-        });
+        // Regeneration handled via generate button
 
         const toggle = ()=>{
           const val = sel.value;
           const isCustom = val === 'custom';
           const isAbstractSelection = isAbstractArchetype(val);
+          const autoShowArt = shouldAutoShowArtSettings(val);
           row.style.display = isCustom ? 'block' : 'none';
           if (isCustom) input?.focus();
           updateGenerateState();
+          if (genBtn) {
+            genBtn.textContent = defaultSuggestionBtnText;
+          }
           // Show sliders only when a base archetype is set (any non-empty selection)
           if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
           const personalityHeading = document.getElementById('personalityHeading');
           if (personalityHeading) personalityHeading.style.display = val ? 'block' : 'none';
           if (!isCustom){
             // reset suggestion UI when category changes
-            suggestionBox.style.display = 'none';
+            if (suggestionBox) {
+              suggestionBox.style.display = autoShowArt ? 'block' : 'none';
+            }
+            if (suggestionNameEl) {
+              suggestionNameEl.value = '';
+              autosizeSuggestionName();
+            }
+            if (suggestionDescEl) {
+              suggestionDescEl.value = '';
+              autosizeSuggestionDesc();
+            }
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
             if (!isAbstractSelection) {
               lastAbstractName = null;
             }
-            // Hide art settings until a suggestion is generated again
-            if (artSettingsBtn) artSettingsBtn.style.display = 'none';
-            // Collapse art settings container if it was open
-            if (typeof artSettings !== 'undefined' && artSettings) {
-              artSettings.style.display = 'none';
+            let startShouldShow = false;
+            if (isAbstractSelection) {
+              collapseArtSettingsPanel();
+              if (artSettingsBtn) artSettingsBtn.style.display = 'none';
+              if (persona) persona.value = '';
+              startShouldShow = true;
+            } else if (autoShowArt) {
+              openArtSettingsPanel({ ensureStart: true });
+              startShouldShow = true;
+            } else {
+              collapseArtSettingsPanel();
+              if (artSettingsBtn) artSettingsBtn.style.display = val ? 'inline-block' : 'none';
             }
-            // Require user to re-trigger Art Settings after changing archetype
-            artSettingsTriggered = false;
+
             if (startBtn) {
-              startBtn.style.display = isAbstractSelection ? 'flex' : 'none';
+              startBtn.style.display = startShouldShow ? 'flex' : 'none';
               startBtn.disabled = false;
             }
-            if (persona && isAbstractSelection) {
-              persona.value = '';
-            }
+
             if (genBtn) {
               if (isAbstractSelection) {
                 genBtn.style.display = 'none';
