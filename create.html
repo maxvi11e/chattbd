@@ -511,19 +511,32 @@
       // --- Randomize All ---
       function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
       function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-      function dispatch(el, type){ if(!el) return; const ev = new Event(type, {bubbles:true}); el.dispatchEvent(ev); }
+      function dispatch(el, type){
+        if(!el) return;
+        const ev = new Event(type, { bubbles: true });
+        el.dispatchEvent(ev);
+      }
+      function isAbstractArchetype(value){
+        if (!value) return false;
+        const normalized = value.trim().toLowerCase();
+        return normalized === 'abstract' || normalized === 'ai hologram';
+      }
       async function randomizeAll(){
-  // Mark that we should auto-open art settings after suggestion returns
+  // Mark that we should auto-open art settings after suggestion returns (non-hologram flows)
   randomizeFlow = true;
         // Ensure options mode is visible
         showOptionsMode();
         // Archetype
-  const archetypes = ['Human','Sci-Fi / Fantasy','Abstract'];
+  const archetypes = ['Human','Sci-Fi / Fantasy','AI Hologram'];
         const archetypeSel = document.getElementById('archetype');
+        let selectedArchetype = null;
         if (archetypeSel){
-          archetypeSel.value = randPick(archetypes);
+          selectedArchetype = randPick(archetypes);
+          archetypeSel.value = selectedArchetype;
           dispatch(archetypeSel, 'change');
         }
+  const hologramSelected = isAbstractArchetype(selectedArchetype);
+  randomizeFlow = selectedArchetype ? !hologramSelected : true;
   // Sliders (1-10 notched)
   const s1 = document.getElementById('traitSeriousPlayful');
   const s2 = document.getElementById('traitSuccinctChatty');
@@ -537,9 +550,14 @@
   if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
   // Style choice (select)
   const styles = ['default','realistic','vector','anime','impressionistic'];
-  let style = randPick(styles);
   const styleSelect = document.getElementById('styleChoice');
-  if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
+  if (!hologramSelected) {
+    const style = randPick(styles);
+    if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
+  } else if (styleSelect){
+    styleSelect.value = 'default';
+    dispatch(styleSelect,'change');
+  }
         // Detail level
         const detail = document.getElementById('detailLevel');
         if (detail){ detail.value = String(randInt(3,9)); dispatch(detail,'input'); }
@@ -618,7 +636,7 @@
     async function generateSuggestion(category){
           try {
             const sliders = currentSliderValues();
-      const isAbstract = category && category.toLowerCase() === 'abstract';
+      const isAbstract = isAbstractArchetype(category);
       const payload = isAbstract ? { sliders } : { archetypeCategory: category, sliders };
       console.log(isAbstract ? '[suggest-abstract] sending' : '[suggest-persona] sending', payload);
       const endpoint = isAbstract ? '/api/suggest-abstract' : '/api/suggest-persona';
@@ -645,7 +663,7 @@
       };
           } catch(e){
             console.error('Suggestion error', e);
-      if (category && category.toLowerCase() === 'abstract') {
+      if (isAbstractArchetype(category)) {
         lastAbstractName = null;
       }
             return {
@@ -697,7 +715,7 @@
         function updateGenerateState(){
           const val = sel.value;
           if (!genBtn) return;
-          const isAbstractSelection = val && val.toLowerCase() === 'abstract';
+          const isAbstractSelection = isAbstractArchetype(val);
           if (!val || val === 'custom' || isAbstractSelection) {
             genBtn.style.display = 'none';
             genBtn.disabled = true;
@@ -813,7 +831,7 @@
         const toggle = ()=>{
           const val = sel.value;
           const isCustom = val === 'custom';
-          const isAbstractSelection = val && val.toLowerCase() === 'abstract';
+          const isAbstractSelection = isAbstractArchetype(val);
           row.style.display = isCustom ? 'block' : 'none';
           if (isCustom) input?.focus();
           updateGenerateState();
@@ -906,9 +924,9 @@
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
         let archetypeSpecific = (archetypeSpecificInputEl?.value || '').trim();
         let archetypeSpecificDesc = (archetypeSpecificDescEl?.value || '').trim();
-        const isAbstractArchetype = (archetype || '').toLowerCase() === 'abstract';
+        const abstractSelected = isAbstractArchetype(archetype);
 
-        if (isAbstractArchetype) {
+        if (abstractSelected) {
           const fallbackName = 'Abstract Agent';
           const fallbackDesc = 'Abstract digital organism shaped by your selected personality traits.';
           const originalBtnText = startBtn?.textContent || 'Generate Agent!';
@@ -987,7 +1005,7 @@
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
-        const resolvedName = (archetype && archetype.toLowerCase() === 'abstract')
+        const resolvedName = isAbstractArchetype(archetype)
           ? (lastAbstractName ? lastAbstractName.trim() : (archetypeSpecific || archetype || 'New Avatar'))
           : (archetypeSpecific || archetype || 'New Avatar');
 
