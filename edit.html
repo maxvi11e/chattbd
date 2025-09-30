@@ -891,6 +891,10 @@
           }
 
           // Generate avatar via existing API
+          console.log('📤 Sending avatar payload', {
+            endpoint: '/api/generate-avatar',
+            payload: pending
+          });
           const res = await fetch('/api/generate-avatar', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
