@@ -655,6 +655,8 @@
           }
         }
 
+        window.fetchPersonaSuggestion = generateSuggestion;
+
         function autosizeSuggestionName(){
           if (!suggestionNameEl) return;
           suggestionNameEl.style.height = 'auto';
@@ -694,13 +696,16 @@
         function updateGenerateState(){
           const val = sel.value;
           if (!genBtn) return;
-          if (val && val !== 'custom'){
-            genBtn.disabled = false;
-            genBtn.style.opacity = '1';
-          } else {
+          const isAbstractSelection = val && val.toLowerCase() === 'abstract';
+          if (!val || val === 'custom' || isAbstractSelection) {
+            genBtn.style.display = 'none';
             genBtn.disabled = true;
             genBtn.style.opacity = '0.6';
+            return;
           }
+          genBtn.style.display = 'inline-block';
+          genBtn.disabled = false;
+          genBtn.style.opacity = '1';
         }
 
         if (genBtn){
@@ -807,6 +812,7 @@
         const toggle = ()=>{
           const val = sel.value;
           const isCustom = val === 'custom';
+          const isAbstractSelection = val && val.toLowerCase() === 'abstract';
           row.style.display = isCustom ? 'block' : 'none';
           if (isCustom) input?.focus();
           updateGenerateState();
@@ -819,6 +825,9 @@
             suggestionBox.style.display = 'none';
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
+            if (!isAbstractSelection) {
+              lastAbstractName = null;
+            }
             // Hide art settings until a suggestion is generated again
             if (artSettingsBtn) artSettingsBtn.style.display = 'none';
             // Collapse art settings container if it was open
@@ -827,11 +836,17 @@
             }
             // Require user to re-trigger Art Settings after changing archetype
             artSettingsTriggered = false;
-            // Hide start button again until next suggestion
-            if (startBtn) startBtn.style.display = 'none';
-            // Restore the generate button visibility for non-custom selections
+            if (startBtn) {
+              startBtn.style.display = isAbstractSelection ? 'flex' : 'none';
+              startBtn.disabled = false;
+            }
+            if (persona && isAbstractSelection) {
+              persona.value = '';
+            }
             if (genBtn) {
-              if (val) {
+              if (isAbstractSelection) {
+                genBtn.style.display = 'none';
+              } else if (val) {
                 genBtn.style.display = 'inline-block';
               } else {
                 genBtn.style.display = 'none';
@@ -865,30 +880,90 @@
   // Primary Use removed
 
       async function start(){
-        const p = persona.value.trim();
         const isOptionsMode = advancedPanel.style.display === 'flex';
+        let p = persona.value.trim();
         if (!p && !isOptionsMode) return;
 
-        // Check if user can create a new bot (freemium limits)
+        // Check if user can create a new agent (freemium limits)
         if (!window.FreemiumUtils) {
           console.error('FreemiumUtils not loaded - continuing without limits');
         } else {
           const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
           
           if (!canCreateResult.canCreate) {
-            // Show upgrade modal
             const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
             await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
             return;
           }
         }
 
-  // Get values from advanced panel (quiz)
-  const archetypeValue = (document.getElementById('archetype')?.value || '').trim();
-  const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
-  const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
-  const archetypeSpecific = (document.getElementById('archetypeSpecific')?.value || '').trim();
-  const archetypeSpecificDesc = (document.getElementById('archetypeSpecificDesc')?.value || '').trim();
+        // Get values from advanced panel (quiz)
+        const archetypeValue = (document.getElementById('archetype')?.value || '').trim();
+        const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
+        const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
+        const archetypeSpecificInputEl = document.getElementById('archetypeSpecific');
+        const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
+        let archetypeSpecific = (archetypeSpecificInputEl?.value || '').trim();
+        let archetypeSpecificDesc = (archetypeSpecificDescEl?.value || '').trim();
+        const isAbstractArchetype = (archetype || '').toLowerCase() === 'abstract';
+
+        if (isAbstractArchetype) {
+          const fallbackName = 'Abstract Agent';
+          const fallbackDesc = 'Abstract digital organism shaped by your selected personality traits.';
+          const originalBtnText = startBtn?.textContent || 'Generate Agent!';
+          try {
+            if (startBtn) {
+              startBtn.disabled = true;
+              startBtn.textContent = 'Generating...';
+            }
+
+            let displayName = fallbackName;
+            let description = fallbackDesc;
+            const fetchSuggestion = window.fetchPersonaSuggestion;
+            if (typeof fetchSuggestion === 'function') {
+              const suggestion = await fetchSuggestion(archetype);
+              if (suggestion?.displayName && suggestion.displayName.trim()) {
+                displayName = suggestion.displayName.trim();
+              } else if (suggestion?.name && suggestion.name.trim()) {
+                displayName = suggestion.name.trim();
+              }
+              if (suggestion?.description && suggestion.description.trim()) {
+                description = suggestion.description.replace(/\r\n?/g, '\n').trim();
+              }
+            }
+
+            if (archetypeSpecificInputEl) archetypeSpecificInputEl.value = displayName;
+            if (archetypeSpecificDescEl) archetypeSpecificDescEl.value = description;
+            archetypeSpecific = displayName;
+            archetypeSpecificDesc = description;
+            persona.value = description;
+            p = description;
+            lastAbstractName = displayName;
+          } catch (error) {
+            console.error('Abstract suggestion generation failed:', error);
+            if (!archetypeSpecific) {
+              archetypeSpecific = fallbackName;
+              if (archetypeSpecificInputEl) archetypeSpecificInputEl.value = fallbackName;
+            }
+            if (!archetypeSpecificDesc) {
+              archetypeSpecificDesc = fallbackDesc;
+              if (archetypeSpecificDescEl) archetypeSpecificDescEl.value = fallbackDesc;
+            }
+            if (!persona.value.trim()) {
+              persona.value = archetypeSpecificDesc;
+              p = archetypeSpecificDesc;
+            }
+            lastAbstractName = archetypeSpecific;
+          } finally {
+            if (startBtn) {
+              startBtn.textContent = originalBtnText;
+              startBtn.disabled = false;
+            }
+          }
+        }
+
+        if (!p && !isOptionsMode) return;
+
   // band/book removed
   // Vibe / Mood
   const vibeSelectEl = document.getElementById('vibeChoice');
