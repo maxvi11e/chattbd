@@ -288,7 +288,8 @@
                   <option value="default">Default (Modern Illustration)</option>
                   <option value="realistic">Photo Realistic</option>
                   <option value="vector">Simplified Vector</option>
-                  <option value="impressionistic">Impressionistic</option>
+                  <option value="anime">Anime</option>
+                  <option value="impressionistic">Impressionism</option>
                   <option value="custom">Another Style (Enter Your Own)</option>
                 </select>
               </div>
@@ -535,7 +536,7 @@
   const vibeSelect = document.getElementById('vibeChoice');
   if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
   // Style choice (select)
-  const styles = ['default','realistic','vector','impressionistic'];
+  const styles = ['default','realistic','vector','anime','impressionistic'];
   let style = randPick(styles);
   const styleSelect = document.getElementById('styleChoice');
   if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
