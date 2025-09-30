@@ -928,14 +928,40 @@
         }
 
         // Get values from advanced panel (quiz)
-        const archetypeValue = (document.getElementById('archetype')?.value || '').trim();
+        const archetypeSelectEl = document.getElementById('archetype');
+        const archetypeValue = (archetypeSelectEl?.value || '').trim();
         const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
         const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
         const archetypeSpecificInputEl = document.getElementById('archetypeSpecific');
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
+        const suggestionNameInput = document.getElementById('suggestionName');
+        const suggestionDescInput = document.getElementById('suggestionDesc');
+        if (suggestionNameInput && archetypeSpecificInputEl) {
+          const nameVal = suggestionNameInput.value.trim();
+          if (nameVal) {
+            archetypeSpecificInputEl.value = nameVal;
+          }
+        }
+        if (suggestionDescInput && archetypeSpecificDescEl) {
+          const descVal = suggestionDescInput.value.trim();
+          if (descVal) {
+            archetypeSpecificDescEl.value = descVal;
+          }
+        }
         let archetypeSpecific = (archetypeSpecificInputEl?.value || '').trim();
         let archetypeSpecificDesc = (archetypeSpecificDescEl?.value || '').trim();
+        if (!archetypeSpecific && suggestionNameInput) {
+          archetypeSpecific = suggestionNameInput.value.trim();
+        }
+        if (!archetypeSpecificDesc && suggestionDescInput) {
+          archetypeSpecificDesc = suggestionDescInput.value.trim();
+        }
         const abstractSelected = isAbstractArchetype(archetype);
+
+        if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
+          showError('Please describe your custom agent before generating.');
+          return;
+        }
 
         if (abstractSelected) {
           const fallbackName = 'Abstract Agent';
