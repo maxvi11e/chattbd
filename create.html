@@ -223,6 +223,7 @@
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose a Base</option>
                 <option>Human</option>
+                <option>Animal</option>
                 <option>Sci-Fi / Fantasy</option>
                 <option>AI Hologram</option>
                 <option value="custom">Choose my own / get specific</option>
@@ -540,7 +541,7 @@
         // Ensure options mode is visible
         showOptionsMode();
         // Archetype
-  const archetypes = ['Human','Sci-Fi / Fantasy','AI Hologram'];
+  const archetypes = ['Human','Animal','Sci-Fi / Fantasy','AI Hologram'];
         const archetypeSel = document.getElementById('archetype');
         let selectedArchetype = null;
         if (archetypeSel){
