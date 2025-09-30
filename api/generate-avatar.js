@@ -153,6 +153,12 @@ export default async function handler(req, res){
       quality: qualitySetting
     };
 
+    console.log('📤 Avatar generation payload', {
+      archetype: broad,
+      isAbstract,
+      body: bodyPayload
+    });
+
     const r = await fetch('https://api.openai.com/v1/images/generations', {
       method: 'POST',
       headers: {
