@@ -151,58 +151,6 @@
     display:inline-block;
     vertical-align:middle;
   }
-  .classic-prompt-block{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    align-items:center;
-    margin-bottom:16px;
-  }
-  .classic-prompt-block textarea{
-    width:100%;
-    max-width:395px;
-    min-height:90px;
-    border-radius:14px;
-    border:1px solid var(--stroke);
-    background:transparent;
-    color:var(--ink);
-    padding:12px 16px;
-    font-size:15px;
-    resize:vertical;
-    font-family:inherit;
-  }
-  .classic-prompt-block textarea:focus{
-    outline:none;
-    border-color:var(--ink);
-    box-shadow:0 0 0 1px var(--ink);
-  }
-  .classic-prompt-block button{
-    width:250px;
-    padding:12px 24px;
-    border-radius:800px;
-    border:1px solid var(--stroke);
-    background:#ffffff;
-    color:#000000;
-    font-size:14px;
-    cursor:pointer;
-    transition:transform 0.15s ease-in-out, box-shadow 0.25s ease;
-  }
-  .classic-prompt-block button:hover{
-    transform:translateY(-2px);
-    box-shadow:0 2px 6px rgba(255,255,255,0.2);
-  }
-  .classic-prompt-block button:active{
-    transform:translateY(0);
-    box-shadow:none;
-  }
-  .classic-prompt-hint{
-    font-size:12px;
-    color:#a8a8a8;
-    max-width:395px;
-    text-align:center;
-    margin:0;
-  }
     #suggestionDesc{
       scrollbar-color: transparent transparent;
     }
@@ -255,13 +203,6 @@
               <img src="images/dice_icon.png" alt="Randomize" class="nav-icon" />
             </button>
           </div>
-          <div class="classic-prompt-block">
-            <div class="field-heading" style="align-self:center; max-width:395px;">Classic Prompt Experiment</div>
-            <textarea id="classicPrompt" placeholder="Type a direct persona description to use the legacy prompt builder..."></textarea>
-            <p class="classic-prompt-hint">When filled, generation will use the original prompt style with this text.</p>
-            <button id="classicGenerateBtn" type="button">Generate Agent</button>
-          </div>
-
           <!-- Archetype -->
           <div class="field-heading">Select Base</div>
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
@@ -473,8 +414,6 @@
       // Continue with app initialization only if authenticated
 
       const persona = document.getElementById('persona');
-      const classicPromptInput = document.getElementById('classicPrompt');
-      const classicGenerateBtn = document.getElementById('classicGenerateBtn');
       const startBtn = document.getElementById('startBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const randomizeBtn = document.getElementById('randomizeBtn');
@@ -489,8 +428,6 @@
   // Track when randomize flow should auto-open art settings after suggestion
   let randomizeFlow = false;
   const AUTO_SHOW_ARCHETYPES = ['human','animal','sci-fi / fantasy'];
-  const defaultSuggestionBtnText = 'Generate a suggestion from Personality';
-  const regenerateSuggestionBtnText = 'Generate another suggestion';
 
   function shouldAutoShowArtSettings(value){
     if (!value) return false;
@@ -557,15 +494,6 @@
       persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
       startBtn.addEventListener('click', start);
 
-      classicGenerateBtn?.addEventListener('click', () => {
-        if (!classicPromptInput) return;
-        const classicPromptValue = classicPromptInput.value.trim();
-        if (!classicPromptValue) {
-          alert('Please enter a classic prompt before generating.');
-          return;
-        }
-        start();
-      });
       
       // Always show options mode on init
       function showOptionsMode(){
@@ -870,7 +798,7 @@
               archetypeSpecificDesc.value = description;
       lastAbstractName = displayName;
               // Update button label and re-enable for future regenerations
-              genBtn.textContent = regenerateSuggestionBtnText;
+              genBtn.textContent = 'Regenerate';
               genBtn.disabled = false;
               genBtn.style.opacity = '1';
               genBtn.style.display = 'inline-block';
@@ -898,7 +826,7 @@
           if (isCustom) input?.focus();
           updateGenerateState();
           if (genBtn) {
-            genBtn.textContent = defaultSuggestionBtnText;
+            genBtn.textContent = 'Generate a suggestion from Personality';
           }
           // Show sliders only when a base archetype is set (any non-empty selection)
           if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
@@ -951,22 +879,26 @@
               }
             }
           } else {
-            // Custom path: hide suggestion UI and show the Edit Art Style button so user can continue
-            if (suggestionBox) suggestionBox.style.display = 'none';
-            if (genBtn) genBtn.style.display = 'none';
-            // Clear any prior suggestion values
+            if (suggestionBox) {
+              suggestionBox.style.display = 'block';
+            }
+            if (suggestionNameEl) {
+              suggestionNameEl.value = '';
+              autosizeSuggestionName();
+            }
+            if (suggestionDescEl) {
+              suggestionDescEl.value = '';
+              autosizeSuggestionDesc();
+            }
             if (archetypeSpecificInput) archetypeSpecificInput.value = '';
             if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
-            // Show the Edit Art Style button only if settings are not already open
-            if (artSettingsBtn) {
-              if (artSettings && artSettings.style.display !== 'none') {
-                artSettingsBtn.style.display = 'none';
-                // If settings are already open in custom mode, allow Start
-                if (startBtn) startBtn.style.display = 'flex';
-              } else {
-                artSettingsBtn.style.display = 'inline-block';
-                if (startBtn) startBtn.style.display = 'none';
-              }
+            if (genBtn) {
+              genBtn.style.display = 'none';
+            }
+            openArtSettingsPanel({ ensureStart: true });
+            if (startBtn) {
+              startBtn.style.display = 'flex';
+              startBtn.disabled = false;
             }
           }
         };
@@ -1088,19 +1020,6 @@
           ? (lastAbstractName ? lastAbstractName.trim() : (archetypeSpecific || archetype || 'New Avatar'))
           : (archetypeSpecific || archetype || 'New Avatar');
 
-        const classicPromptValue = (classicPromptInput?.value || '').trim();
-        const suggestionDescEl = document.getElementById('suggestionDesc');
-        const artStyleCustomInput = document.getElementById('artStyleCustom');
-        const styleSelectEl = document.getElementById('styleChoice');
-        let classicArtStyle = '';
-        if (artStyleCustomInput && artStyleCustomInput.value.trim()) {
-          classicArtStyle = artStyleCustomInput.value.trim();
-        } else if (styleSelectEl) {
-          const selOption = styleSelectEl.options?.[styleSelectEl.selectedIndex];
-          classicArtStyle = (selOption?.text || styleSelectEl.value || '').trim();
-        }
-        const classicPersonalityPrompt = (suggestionDescEl?.value || '').trim();
-
         const payload = { 
           prompt: p, 
           botName: resolvedName,
@@ -1109,10 +1028,7 @@
           styleChoice, artStyleCustom,
           detailLevel,
           traits,
-          personalityPrompt: classicPersonalityPrompt,
-          classicPrompt: classicPromptValue,
-          classicArtStyle,
-          classicPersonalityPrompt
+          personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
