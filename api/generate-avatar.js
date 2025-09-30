@@ -37,8 +37,31 @@ export default async function handler(req, res){
       return res.status(400).json({ error: 'Missing prompt' });
     }
 
-    const finalPrompt = `${basePrompt} Persona: ${personaText}`;
-    const qualitySetting = 'medium';
+    const styleChoiceLabels = {
+      default: 'Modern illustration',
+      realistic: 'Photo realistic portrait',
+      vector: 'Simplified vector art',
+      anime: 'Anime illustration',
+      impressionistic: 'Impressionistic painting',
+      pixel: 'Pixel art',
+      custom: null
+    };
+
+    let resolvedStyle = '';
+    if (artStyleCustom && String(artStyleCustom).trim()) {
+      resolvedStyle = String(artStyleCustom).trim();
+    } else if (styleChoice && String(styleChoice).trim()) {
+      const key = String(styleChoice).trim().toLowerCase();
+      resolvedStyle = styleChoiceLabels[key] || key;
+    }
+
+    const resolvedVibe = (vibe && String(vibe).trim()) || '';
+
+    let finalPrompt = basePrompt;
+    if (resolvedStyle) finalPrompt += ` Art style: ${resolvedStyle}.`;
+    if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
+    finalPrompt += ` Persona: ${personaText}`;
+    const qualitySetting = 'high';
 
     const bodyPayload = {
       model: 'gpt-image-1',
@@ -51,6 +74,8 @@ export default async function handler(req, res){
     console.log('📤 Avatar generation payload', {
       archetype: broad || null,
       mode: useClassicFlow ? 'classic' : 'structured',
+      art_style: resolvedStyle || null,
+      vibe: resolvedVibe || null,
       body: bodyPayload
     });
 
@@ -77,6 +102,8 @@ export default async function handler(req, res){
     console.log('✅ Image generated', {
       archetype: broad || null,
       mode: useClassicFlow ? 'classic' : 'structured',
+      art_style: resolvedStyle || null,
+      vibe: resolvedVibe || null,
       quality: qualitySetting,
       duration_ms: duration,
       prompt_length: finalPrompt.length
@@ -99,7 +126,7 @@ export default async function handler(req, res){
       promptUsed: finalPrompt,
       mode: useClassicFlow ? 'classic' : 'structured',
       classic_prompt: useClassicFlow ? trimmedClassicPrompt : null,
-      classic_art_style: classicArtStyle ? String(classicArtStyle).trim() : null,
+      classic_art_style: resolvedStyle || (classicArtStyle ? String(classicArtStyle).trim() : null),
       classic_personality_prompt: (classicPersonalityPrompt && String(classicPersonalityPrompt).trim()) || (personalityPrompt && String(personalityPrompt).trim()) || null
     };
 
