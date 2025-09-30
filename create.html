@@ -177,6 +177,25 @@
     border-color:var(--ink);
     box-shadow:0 0 0 1px var(--ink);
   }
+  .classic-prompt-block button{
+    width:250px;
+    padding:12px 24px;
+    border-radius:800px;
+    border:1px solid var(--stroke);
+    background:#ffffff;
+    color:#000000;
+    font-size:14px;
+    cursor:pointer;
+    transition:transform 0.15s ease-in-out, box-shadow 0.25s ease;
+  }
+  .classic-prompt-block button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 2px 6px rgba(255,255,255,0.2);
+  }
+  .classic-prompt-block button:active{
+    transform:translateY(0);
+    box-shadow:none;
+  }
   .classic-prompt-hint{
     font-size:12px;
     color:#a8a8a8;
@@ -240,6 +259,7 @@
             <div class="field-heading" style="align-self:center; max-width:395px;">Classic Prompt Experiment</div>
             <textarea id="classicPrompt" placeholder="Type a direct persona description to use the legacy prompt builder..."></textarea>
             <p class="classic-prompt-hint">When filled, generation will use the original prompt style with this text.</p>
+            <button id="classicGenerateBtn" type="button">Generate Agent</button>
           </div>
 
           <!-- Archetype -->
@@ -454,6 +474,7 @@
 
       const persona = document.getElementById('persona');
       const classicPromptInput = document.getElementById('classicPrompt');
+      const classicGenerateBtn = document.getElementById('classicGenerateBtn');
       const startBtn = document.getElementById('startBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const randomizeBtn = document.getElementById('randomizeBtn');
@@ -535,6 +556,16 @@
 
       persona.addEventListener('keydown', e=>{ if(e.key==='Enter') start(); });
       startBtn.addEventListener('click', start);
+
+      classicGenerateBtn?.addEventListener('click', () => {
+        if (!classicPromptInput) return;
+        const classicPromptValue = classicPromptInput.value.trim();
+        if (!classicPromptValue) {
+          alert('Please enter a classic prompt before generating.');
+          return;
+        }
+        start();
+      });
       
       // Always show options mode on init
       function showOptionsMode(){
