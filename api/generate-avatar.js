@@ -33,7 +33,7 @@ export default async function handler(req, res){
     }
 
     // --- Style selection (humanoid oriented styles only applied to humanoid path) ---
-    const portraitBase = 'Square portrait, clean lighting, clear readability, subtle depth, crisp edges.';
+    const portraitBase = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
     const styleMapHumanoid = {
       default: portraitBase,
       realistic: 'Square portrait, semi-photoreal, cinematic soft key light, natural materials, subtle depth of field.',
