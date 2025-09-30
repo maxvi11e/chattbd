@@ -756,7 +756,7 @@
         }
 
   // Enter loading state like regenerate
-  setLoadingText('Generating your agent...');
+  // setLoadingText('Generating your agent...');
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
@@ -912,13 +912,6 @@
         latestNameDraft = agentNameInput.value;
         autosizeAgentName();
         pendingNameValue = null;
-        requestAnimationFrame(() => {
-          if (!agentNameInput.disabled) {
-            agentNameInput.focus();
-            const end = agentNameInput.value.length;
-            try { agentNameInput.setSelectionRange(end, end); } catch (_) {}
-          }
-        });
       }
       botImage.alt = bot.name || 'Agent preview';
       botImage.onload = () => {
