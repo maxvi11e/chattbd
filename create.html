@@ -738,7 +738,7 @@
           const val = sel.value;
           if (!genBtn) return;
           const isAbstractSelection = isAbstractArchetype(val);
-          if (!val || val === 'custom' || isAbstractSelection) {
+          if (!val || isAbstractSelection) {
             genBtn.style.display = 'none';
             genBtn.disabled = true;
             genBtn.style.opacity = '0.6';
@@ -822,8 +822,7 @@
           const isCustom = val === 'custom';
           const isAbstractSelection = isAbstractArchetype(val);
           const autoShowArt = shouldAutoShowArtSettings(val);
-          row.style.display = isCustom ? 'block' : 'none';
-          if (isCustom) input?.focus();
+          row.style.display = 'none';
           updateGenerateState();
           if (genBtn) {
             genBtn.textContent = 'Generate a suggestion from Personality';
