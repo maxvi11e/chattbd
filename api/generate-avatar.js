@@ -38,7 +38,7 @@ export default async function handler(req, res){
     }
 
     const finalPrompt = `${basePrompt} Persona: ${personaText}`;
-    const qualitySetting = 'low';
+    const qualitySetting = 'medium';
 
     const bodyPayload = {
       model: 'gpt-image-1',
