@@ -304,7 +304,7 @@
             <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
               <div style="width:395px; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                  <option value="">Default (Soft cinematic lighting)</option>
+                  <option value="">Neutral</option>
                   <option value="radiant">Radiant</option>
                   <option value="calming">Calming</option>
                   <option value="dramatic">Dramatic</option>
@@ -534,6 +534,16 @@
       // --- Randomize All ---
       function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
       function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+      function randPickWeighted(entries){
+        const total = entries.reduce((sum, entry)=> sum + entry.weight, 0);
+        if (total <= 0) return entries[entries.length - 1]?.value;
+        let r = Math.random() * total;
+        for (const entry of entries) {
+          r -= entry.weight;
+          if (r <= 0) return entry.value;
+        }
+        return entries[entries.length - 1]?.value;
+      }
       function dispatch(el, type){
         if(!el) return;
         const ev = new Event(type, { bubbles: true });
@@ -550,11 +560,16 @@
         // Ensure options mode is visible
         showOptionsMode();
         // Archetype
-  const archetypes = ['Human','Animal','Sci-Fi / Fantasy','AI Hologram'];
+  const archetypeWeights = [
+    { value: 'Human', weight: 0.2 },
+    { value: 'Animal', weight: 0.2 },
+    { value: 'Sci-Fi / Fantasy', weight: 0.2 },
+    { value: 'AI Hologram', weight: 0.4 }
+  ];
         const archetypeSel = document.getElementById('archetype');
         let selectedArchetype = null;
         if (archetypeSel){
-          selectedArchetype = randPick(archetypes);
+          selectedArchetype = randPickWeighted(archetypeWeights);
           archetypeSel.value = selectedArchetype;
           dispatch(archetypeSel, 'change');
         }
