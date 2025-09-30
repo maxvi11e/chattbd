@@ -38,7 +38,7 @@ export default async function handler(req, res){
     }
 
     const styleChoiceLabels = {
-      default: 'Modern illustration',
+      default: '',
       realistic: 'Photo realistic portrait',
       vector: 'Simplified vector art',
       anime: 'Anime illustration',
@@ -61,7 +61,7 @@ export default async function handler(req, res){
     if (resolvedStyle) finalPrompt += ` Art style: ${resolvedStyle}.`;
     if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
     finalPrompt += ` Persona: ${personaText}`;
-    const qualitySetting = 'high';
+    const qualitySetting = 'medium';
 
     const bodyPayload = {
       model: 'gpt-image-1',
