@@ -144,13 +144,46 @@
       width:395px;
       align-self:center;
     }
-    .field-heading img.icon{
-      width:18px;
-      height:18px;
-      opacity:0.95;
-      display:inline-block;
-      vertical-align:middle;
-    }
+  .field-heading img.icon{
+    width:18px;
+    height:18px;
+    opacity:0.95;
+    display:inline-block;
+    vertical-align:middle;
+  }
+  .classic-prompt-block{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .classic-prompt-block textarea{
+    width:100%;
+    max-width:395px;
+    min-height:90px;
+    border-radius:14px;
+    border:1px solid var(--stroke);
+    background:transparent;
+    color:var(--ink);
+    padding:12px 16px;
+    font-size:15px;
+    resize:vertical;
+    font-family:inherit;
+  }
+  .classic-prompt-block textarea:focus{
+    outline:none;
+    border-color:var(--ink);
+    box-shadow:0 0 0 1px var(--ink);
+  }
+  .classic-prompt-hint{
+    font-size:12px;
+    color:#a8a8a8;
+    max-width:395px;
+    text-align:center;
+    margin:0;
+  }
     #suggestionDesc{
       scrollbar-color: transparent transparent;
     }
@@ -203,16 +236,22 @@
               <img src="images/dice_icon.png" alt="Randomize" class="nav-icon" />
             </button>
           </div>
+          <div class="classic-prompt-block">
+            <div class="field-heading" style="align-self:center; max-width:395px;">Classic Prompt Experiment</div>
+            <textarea id="classicPrompt" placeholder="Type a direct persona description to use the legacy prompt builder..."></textarea>
+            <p class="classic-prompt-hint">When filled, generation will use the original prompt style with this text.</p>
+          </div>
+
           <!-- Archetype -->
           <div class="field-heading">Select Base</div>
           <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose a Base</option>
-                <option>AI Hologram</option>
                 <option>Human</option>
                 <option>Animal</option>
                 <option>Sci-Fi / Fantasy</option>
+                <option>AI Hologram</option>
                 <option value="custom">Choose my own / get specific</option>
               </select>
             </div>
@@ -250,7 +289,7 @@
             <!-- Persona Suggestion (after choosing category) -->
             <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
               <div style="display:flex; justify-content:center;">
-                <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Base and Personality</button>
+                <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
               </div>
               <div id="suggestionResult" style="display:none; width:395px; border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
@@ -414,6 +453,7 @@
       // Continue with app initialization only if authenticated
 
       const persona = document.getElementById('persona');
+      const classicPromptInput = document.getElementById('classicPrompt');
       const startBtn = document.getElementById('startBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const randomizeBtn = document.getElementById('randomizeBtn');
@@ -428,7 +468,7 @@
   // Track when randomize flow should auto-open art settings after suggestion
   let randomizeFlow = false;
   const AUTO_SHOW_ARCHETYPES = ['human','animal','sci-fi / fantasy'];
-  const defaultSuggestionBtnText = 'Generate a suggestion from Base + Personality';
+  const defaultSuggestionBtnText = 'Generate a suggestion from Personality';
   const regenerateSuggestionBtnText = 'Generate another suggestion';
 
   function shouldAutoShowArtSettings(value){
@@ -1017,6 +1057,19 @@
           ? (lastAbstractName ? lastAbstractName.trim() : (archetypeSpecific || archetype || 'New Avatar'))
           : (archetypeSpecific || archetype || 'New Avatar');
 
+        const classicPromptValue = (classicPromptInput?.value || '').trim();
+        const suggestionDescEl = document.getElementById('suggestionDesc');
+        const artStyleCustomInput = document.getElementById('artStyleCustom');
+        const styleSelectEl = document.getElementById('styleChoice');
+        let classicArtStyle = '';
+        if (artStyleCustomInput && artStyleCustomInput.value.trim()) {
+          classicArtStyle = artStyleCustomInput.value.trim();
+        } else if (styleSelectEl) {
+          const selOption = styleSelectEl.options?.[styleSelectEl.selectedIndex];
+          classicArtStyle = (selOption?.text || styleSelectEl.value || '').trim();
+        }
+        const classicPersonalityPrompt = (suggestionDescEl?.value || '').trim();
+
         const payload = { 
           prompt: p, 
           botName: resolvedName,
@@ -1025,7 +1078,10 @@
           styleChoice, artStyleCustom,
           detailLevel,
           traits,
-          personalityPrompt: ''
+          personalityPrompt: classicPersonalityPrompt,
+          classicPrompt: classicPromptValue,
+          classicArtStyle,
+          classicPersonalityPrompt
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));

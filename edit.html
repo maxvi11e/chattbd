@@ -939,7 +939,10 @@
                 animal: (json.traits?.animal) || pending.animal || null,
                 // sliders raw values (optional)
                 persona_traits: (json.traits?.sliders) || pending.traits || null,
-                personality_prompt: json.personalityPrompt || null
+                personality_prompt: json.personalityPrompt || pending.classicPersonalityPrompt || null,
+                classic_prompt: pending.classicPrompt || null,
+                classic_art_style: pending.classicArtStyle || null,
+                classic_personality_prompt: pending.classicPersonalityPrompt || null
               },
             })
             .select()

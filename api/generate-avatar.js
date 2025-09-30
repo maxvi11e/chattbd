@@ -14,11 +14,18 @@ export default async function handler(req, res){
   traits, // { seriousPlayful, succinctChatty, rationalIntuitive, practicalImaginative }
       vibe, detailLevel, styleChoice, prompt,
       // legacy tolerated but ignored
-      artStyleCustom
+      artStyleCustom,
+      classicPrompt,
+      classicArtStyle,
+      classicPersonalityPrompt,
+      personalityPrompt
     } = req.body || {};
 
+    const trimmedClassicPrompt = (classicPrompt && String(classicPrompt).trim()) || '';
+    const useClassicFlow = trimmedClassicPrompt.length > 0;
+
     const broad = (archetype || '').trim();
-    if (!broad) return res.status(400).json({ error: 'Missing archetype' });
+    if (!useClassicFlow && !broad) return res.status(400).json({ error: 'Missing archetype' });
     const isAbstract = broad.toLowerCase() === 'abstract';
 
     // --- Traits mapping (simple, neutral) ---
@@ -51,99 +58,131 @@ export default async function handler(req, res){
     const dl = Number.isFinite(Number(detailLevel)) ? Math.min(10, Math.max(1, Number(detailLevel))) : null;
 
     // --- Build Prompt ---
-    let finalPrompt;
+    let finalPrompt = '';
+    let qualitySetting = 'medium';
+    let styleChoiceForLog = null;
+    let personalityDetailsUsed = '';
+    let classicStyleForResponse = null;
 
-    if (isAbstract) {
-      // Abstract path: single cohesive "digital organism" emblem derived from sliders (now simplified / less busy)
-      const raw = {
-        sp: Number(traits?.seriousPlayful),
-        sc: Number(traits?.succinctChatty),
-        ri: Number(traits?.rationalIntuitive),
-        cl: Number(traits?.practicalImaginative)
-      };
-      const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=30) return 'low'; if(n>=70) return 'high'; return 'mid'; };
-      const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
+    if (useClassicFlow) {
+      let primaryStyle = '';
+      if (classicArtStyle && String(classicArtStyle).trim()) {
+        primaryStyle = String(classicArtStyle).trim();
+      } else if (artStyleCustom && String(artStyleCustom).trim()) {
+        primaryStyle = String(artStyleCustom).trim();
+      } else if (styleChoice && String(styleChoice).trim()) {
+        const styleChoiceLabels = {
+          default: 'Default (Modern Illustration)',
+          realistic: 'Photo Realistic',
+          vector: 'Simplified Vector',
+          anime: 'Anime',
+          impressionistic: 'Impressionism',
+          pixel: 'Pixel Art',
+          custom: 'Custom Style'
+        };
+        const normalized = String(styleChoice).trim().toLowerCase();
+        primaryStyle = styleChoiceLabels[normalized] || normalized;
+      }
 
-      // Simplified slider-driven descriptors (match suggest-abstract.js)
-      const chroma = b.sp==='low'
-        ? 'cool white/blue lines with gentle cyan glow'
-        : b.sp==='high'
-          ? 'bright neon cyan with warm amber highlights'
-          : 'clean cyan with subtle amber accents';
+      const personalityDetails = (classicPersonalityPrompt && String(classicPersonalityPrompt).trim())
+        || (personalityPrompt && String(personalityPrompt).trim())
+        || '';
+      personalityDetailsUsed = personalityDetails;
 
-      const structureCore = b.ri==='low'
-        ? 'geometric wireframe rings and grid'
-        : b.ri==='high'
-          ? 'flowing energy strands and arcs'
-          : 'mesh of arcs and short lattice segments';
+      let enhancedPrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
+      if (primaryStyle) enhancedPrompt += ` Art style: ${primaryStyle}.`;
+      enhancedPrompt += ` Persona: ${trimmedClassicPrompt}`;
+      if (personalityDetails) enhancedPrompt += ` Additional details: ${personalityDetails}`;
 
-      const fillLine = b.sc==='low'
-        ? 'balanced interior with clear negative space between lines'
-        : b.sc==='high'
-          ? 'richer line work with tight spacing, but keep background visible outside the figure'
-          : 'medium density with even spacing';
+      finalPrompt = enhancedPrompt;
+      qualitySetting = 'high';
+      styleChoiceForLog = primaryStyle || 'classic-flow';
+      classicStyleForResponse = primaryStyle || null;
+    } else {
+      if (isAbstract) {
+        const raw = {
+          sp: Number(traits?.seriousPlayful),
+          sc: Number(traits?.succinctChatty),
+          ri: Number(traits?.rationalIntuitive),
+          cl: Number(traits?.practicalImaginative)
+        };
+        const band = (n)=>{ if(!Number.isFinite(n)) return 'mid'; if(n<=30) return 'low'; if(n>=70) return 'high'; return 'mid'; };
+        const b = { sp: band(raw.sp), sc: band(raw.sc), ri: band(raw.ri), cl: band(raw.cl) };
 
-      const symmetry = b.cl==='low'
-        ? 'strong bilateral symmetry'
-        : b.cl==='high'
-          ? 'slight asymmetry for energy direction'
-          : 'near-bilateral with small variations';
+        const chroma = b.sp==='low'
+          ? 'cool white/blue lines with gentle cyan glow'
+          : b.sp==='high'
+            ? 'bright neon cyan with warm amber highlights'
+            : 'clean cyan with subtle amber accents';
 
-      const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
-      const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
+        const structureCore = b.ri==='low'
+          ? 'geometric wireframe rings and grid'
+          : b.ri==='high'
+            ? 'flowing energy strands and arcs'
+            : 'mesh of arcs and short lattice segments';
 
-      const organismDescriptor = 'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background';
-      const containment = 'clear outer contour, gentle inner volumetric glow, shallow depth layering';
+        const fillLine = b.sc==='low'
+          ? 'balanced interior with clear negative space between lines'
+          : b.sc==='high'
+            ? 'richer line work with tight spacing, but keep background visible outside the figure'
+            : 'medium density with even spacing';
 
-      const framing = 'Framing: medium-distance bust portrait with visible shoulder line and slight breathing room around silhouette (avoid extreme close-up).';
+        const symmetry = b.cl==='low'
+          ? 'strong bilateral symmetry'
+          : b.cl==='high'
+            ? 'slight asymmetry for energy direction'
+            : 'near-bilateral with small variations';
 
-      const eyesDescriptor = 'Eyes: friendly rounded almond openings with soft glow; no pupils; minimal tilt.';
+        const vibePhrase = vibe ? `Ambient mood field: ${String(vibe).trim()}.` : '';
+        const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
 
-      const featureIntegration = 'No realistic anatomy; features remain abstract energy lines that fuse into the lattice.';
-      const exclusions = 'no HUD/interface, no text, no logos, no photographic realism, no extra bodies';
-      const detailLine = dl ? `Detail level ${dl}/10.` : '';
-      const conceptLine = concept ? `Theme: ${concept}.` : '';
+        const organismDescriptor = 'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background';
+        const featureIntegration = 'No realistic anatomy; features remain abstract energy lines that fuse into the lattice.';
+        const exclusions = 'no HUD/interface, no text, no logos, no photographic realism, no extra bodies';
+        const detailLine = dl ? `Detail level ${dl}/10.` : '';
+        const conceptLine = concept ? `Theme: ${concept}.` : '';
+        const traitEnergy = traitWords.length ? `Traits: ${traitWords.join(', ')}.` : '';
 
-      const traitEnergy = traitWords.length ? `Traits: ${traitWords.join(', ')}.` : '';
+        finalPrompt = [
+          organismDescriptor + '.',
+          `Color: ${chroma}.`,
+          `Structure: ${structureCore}.`,
+          `Fill: ${fillLine}.`,
+          `Symmetry: ${symmetry}.`,
+          'Eyes: friendly rounded almond openings with soft glow; no pupils; minimal tilt.',
+          featureIntegration,
+          'Contrast: very bright lines with crisp edges; protect blacks; background stays pure black.',
+          'Composition: medium distance with breathing room; keep all particles inside the silhouette; avoid stray noise.',
+          traitEnergy,
+          conceptLine,
+          vibePhrase,
+          detailLine,
+          `Constraints: ${exclusions}.`
+        ].filter(Boolean).join(' ');
+        styleChoiceForLog = 'abstract_override';
+      } else {
+        const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;
+        const broadLower = broad.toLowerCase();
+        const categoryFlavor = broadLower.includes('sci-fi') ? 'futuristic imaginative' : 'human realistic';
+        const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
+        const traitLine = traitWords.length ? `Notable traits: ${traitWords.join(', ')}.` : '';
+        finalPrompt = [
+          humanoidStyle,
+          `Single ${categoryFlavor} persona portrait, centered, shoulders-up, clean readable silhouette.`,
+          nameOrSpecific ? `Identity seed: ${nameOrSpecific}.` : '',
+          concept ? `Concept/theme: ${concept}.` : 'Original distinctive persona.',
+          vibe ? `Overall mood: ${String(vibe).trim()}.` : '',
+          dl ? `Detail level target: ${dl}/10.` : '',
+          traitLine,
+          'Safety: do not reference real people, trademarks, logos, or copyrighted characters. Keep fully original.'
+        ].filter(Boolean).join(' ');
+        styleChoiceForLog = styleKey;
+      }
 
-      finalPrompt = [
-        organismDescriptor + '.',
-        `Color: ${chroma}.`,
-        `Structure: ${structureCore}.`,
-        `Fill: ${fillLine}.`,
-        `Symmetry: ${symmetry}.`,
-        eyesDescriptor,
-        featureIntegration,
-        'Contrast: very bright lines with crisp edges; protect blacks; background stays pure black.',
-        'Composition: medium distance with breathing room; keep all particles inside the silhouette; avoid stray noise.',
-        traitEnergy,
-        conceptLine,
-        vibePhrase,
-        detailLine,
-        `Constraints: ${exclusions}.`
-      ].filter(Boolean).join(' ');
-    } else { // Humanoid path
-      const nameOrSpecific = (archetypeSpecific && String(archetypeSpecific).trim()) || null;
-      const broadLower = broad.toLowerCase();
-      const categoryFlavor = broadLower.includes('sci-fi') ? 'futuristic imaginative' : 'human realistic';
-      const concept = (prompt && String(prompt).trim()) || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || '';
-      const traitLine = traitWords.length ? `Notable traits: ${traitWords.join(', ')}.` : '';
-      finalPrompt = [
-        humanoidStyle,
-        `Single ${categoryFlavor} persona portrait, centered, shoulders-up, clean readable silhouette.`,
-        nameOrSpecific ? `Identity seed: ${nameOrSpecific}.` : '',
-        concept ? `Concept/theme: ${concept}.` : 'Original distinctive persona.',
-        vibe ? `Overall mood: ${String(vibe).trim()}.` : '',
-        dl ? `Detail level target: ${dl}/10.` : '',
-        traitLine,
-        'Safety: do not reference real people, trademarks, logos, or copyrighted characters. Keep fully original.'
-      ].filter(Boolean).join(' ');
+      const qRaw = (process.env.IMAGE_QUALITY || 'medium').toLowerCase().trim();
+      const qMap = { standard: 'medium', hd: 'high' };
+      qualitySetting = qMap[qRaw] || (['low','medium','high'].includes(qRaw) ? qRaw : 'medium');
     }
-
-    // --- Quality Setting ---
-    const qRaw = (process.env.IMAGE_QUALITY || 'medium').toLowerCase().trim();
-    const qMap = { standard: 'medium', hd: 'high' };
-    const qualitySetting = qMap[qRaw] || (['low','medium','high'].includes(qRaw) ? qRaw : 'medium');
 
     const bodyPayload = {
       model: 'gpt-image-1',
@@ -154,8 +193,10 @@ export default async function handler(req, res){
     };
 
     console.log('📤 Avatar generation payload', {
-      archetype: broad,
+      archetype: broad || null,
+      mode: useClassicFlow ? 'classic' : (isAbstract ? 'abstract' : 'structured'),
       isAbstract,
+      style: styleChoiceForLog,
       body: bodyPayload
     });
 
@@ -180,11 +221,12 @@ export default async function handler(req, res){
 
     const duration = Date.now() - startTime;
     console.log('✅ Image generated', {
-      archetype: broad,
+      archetype: broad || null,
+      mode: useClassicFlow ? 'classic' : (isAbstract ? 'abstract' : 'structured'),
       isAbstract,
       hasSpecific: !!archetypeSpecific,
       traits_present: !!traits,
-      style_choice: isAbstract ? 'abstract_override' : styleKey,
+      style_choice: styleChoiceForLog,
       quality: qualitySetting,
       duration_ms: duration,
       prompt_length: finalPrompt.length
@@ -197,7 +239,7 @@ export default async function handler(req, res){
 
     const responseBase = {
       botName: finalBotName || null,
-      styleChoice: isAbstract ? null : styleKey,
+      styleChoice: useClassicFlow ? null : (isAbstract ? null : styleKey),
       archetype: broad,
       archetype_specific: archetypeSpecific || null,
       vibe: vibe || null,
@@ -205,7 +247,10 @@ export default async function handler(req, res){
       detail_level: dl,
       sliders_raw: traits || null,
       promptUsed: finalPrompt,
-      mode: isAbstract ? 'abstract' : 'humanoid'
+      mode: useClassicFlow ? 'classic' : (isAbstract ? 'abstract' : 'humanoid'),
+      classic_prompt: useClassicFlow ? trimmedClassicPrompt : null,
+      classic_art_style: useClassicFlow ? classicStyleForResponse : null,
+      classic_personality_prompt: useClassicFlow ? (personalityDetailsUsed || null) : null
     };
 
     if (b64) return res.status(200).json({ dataUrl: `data:image/png;base64,${b64}`, ...responseBase });
