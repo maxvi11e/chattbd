@@ -278,14 +278,60 @@
   .frame-spinner.hidden {
     display:none;
   }
-  .bot-name {
-    font-size:24px;
+  .agent-name-field {
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .field-heading {
+    color:#a8a8a8;
+    font-style:italic;
+    text-align:left;
+    align-self:flex-start;
+    width:100%;
+    max-width:400px;
+    font-size:14px;
+    margin:12px 0 2px 0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .agent-name-field .field-heading {
+    align-self:center;
+  }
+  .field-heading img.icon {
+    width:18px;
+    height:18px;
+    opacity:0.95;
+  }
+  #agentNameInput {
+    width:100%;
+    max-width:400px;
+    background:transparent;
+    border:1px solid var(--stroke);
+    color:var(--ink);
+    border-radius:24.5px;
+    padding:11px 18px;
+    font-size:20px;
     font-weight:600;
-    text-align:center;
-    white-space:nowrap;
+    line-height:1.3;
+    min-height:46px;
+    resize:none;
     overflow:hidden;
-    text-overflow:ellipsis;
-    max-width:300px;
+    text-align:center;
+    transition:border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family:inherit;
+  }
+  #agentNameInput:focus {
+    outline:none;
+    border-color:var(--ink);
+    box-shadow:0 0 0 1px var(--ink);
+  }
+  #agentNameInput[disabled] {
+    opacity:0.6;
+    cursor:not-allowed;
   }
   /* Action Buttons */
   .action-buttons {
@@ -536,7 +582,10 @@
           <div id="frameSpinner" class="frame-spinner"><div class="spinner"></div></div>
           <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
         </div>
-        <h2 id="botName" class="bot-name">Loading...</h2>
+        <div class="agent-name-field">
+          <div class="field-heading">Agent Name <img class="icon" src="images/pencil_icon.png" alt="Edit" /></div>
+          <textarea id="agentNameInput" rows="1" placeholder="Name your agent" aria-label="Agent name" disabled spellcheck="false">Loading...</textarea>
+        </div>
       </div>
 
       <!-- Edit Form -->
@@ -625,11 +674,15 @@
     let currentBot = null;
     let isRegenerating = false;
   let wasEditFormVisible = false;
+  let nameSaveTimer = null;
+  let pendingNameValue = null;
+  let latestNameDraft = '';
+  let isSavingName = false;
 
     // DOM elements
   const botImage = document.getElementById('botImage');
   const frameSpinner = document.getElementById('frameSpinner');
-    const botName = document.getElementById('botName');
+    const agentNameInput = document.getElementById('agentNameInput');
     const editBtn = document.getElementById('editBtn');
     const confirmBtn = document.getElementById('confirmBtn');
     const editForm = document.getElementById('editForm');
@@ -657,6 +710,7 @@
   // Ensure controls are wired regardless of flow
   setupEventListeners();
   setupSidebarControls();
+  setupNameField();
 
   // Prepare initial frame state
   frameSpinner.classList.remove('hidden');
@@ -852,8 +906,14 @@
       // Show spinner in frame until the image loads
       botImage.classList.remove('visible');
       frameSpinner.classList.remove('hidden');
-      botName.textContent = bot.name;
-      botImage.alt = bot.name;
+      if (agentNameInput) {
+        agentNameInput.disabled = false;
+        agentNameInput.value = bot.name || '';
+        latestNameDraft = agentNameInput.value;
+        autosizeAgentName();
+        pendingNameValue = null;
+      }
+      botImage.alt = bot.name || 'Agent preview';
       botImage.onload = () => {
         botImage.classList.add('visible');
         frameSpinner.classList.add('hidden');
@@ -998,6 +1058,102 @@
         const width = sidebar.classList.contains('collapsed') ? 0 : sidebar.offsetWidth;
         setTogglePosition(width);
       });
+    }
+
+    function autosizeAgentName() {
+      if (!agentNameInput) return;
+      agentNameInput.style.height = 'auto';
+      const newHeight = Math.max(agentNameInput.scrollHeight, 46);
+      agentNameInput.style.height = `${newHeight}px`;
+    }
+
+    function setupNameField() {
+      if (!agentNameInput) return;
+      autosizeAgentName();
+      agentNameInput.addEventListener('input', () => {
+        autosizeAgentName();
+        scheduleNameSave();
+      });
+      agentNameInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          agentNameInput.blur();
+        }
+      });
+      agentNameInput.addEventListener('blur', () => {
+        if (nameSaveTimer) {
+          clearTimeout(nameSaveTimer);
+          nameSaveTimer = null;
+        }
+        persistAgentName(agentNameInput.value.trim());
+      });
+    }
+
+    function scheduleNameSave(delay = 600) {
+      if (!agentNameInput || !currentBot) return;
+      latestNameDraft = agentNameInput.value;
+      if (nameSaveTimer) clearTimeout(nameSaveTimer);
+      nameSaveTimer = setTimeout(() => {
+        persistAgentName(latestNameDraft);
+      }, delay);
+    }
+
+    async function persistAgentName(name) {
+      if (!agentNameInput || !currentBot) return;
+      nameSaveTimer = null;
+      const trimmed = (name || '').trim();
+      if (!trimmed) {
+        showError('Agent name cannot be empty.');
+        agentNameInput.value = currentBot.name || 'Agent';
+        autosizeAgentName();
+        latestNameDraft = agentNameInput.value;
+        return;
+      }
+      if (trimmed === currentBot.name) {
+        latestNameDraft = currentBot.name || '';
+        return;
+      }
+      if (isSavingName) {
+        pendingNameValue = trimmed;
+        return;
+      }
+      isSavingName = true;
+      nameSaveTimer = null;
+
+      try {
+        const { data, error } = await supabase
+          .from('avatars')
+          .update({
+            name: trimmed,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentBot.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        currentBot = { ...currentBot, ...data };
+        agentNameInput.value = currentBot.name || '';
+        autosizeAgentName();
+        botImage.alt = currentBot.name || 'Agent preview';
+        latestNameDraft = currentBot.name || '';
+      } catch (error) {
+        console.error('Error updating agent name:', error);
+        showError('Failed to update agent name. Please try again.');
+        agentNameInput.value = currentBot?.name || '';
+        autosizeAgentName();
+        latestNameDraft = agentNameInput.value;
+      } finally {
+        isSavingName = false;
+        if (pendingNameValue && currentBot && pendingNameValue !== currentBot.name) {
+          const next = pendingNameValue;
+          pendingNameValue = null;
+          persistAgentName(next);
+        } else {
+          pendingNameValue = null;
+        }
+      }
     }
 
     function setTogglePosition(width) {
@@ -1148,6 +1304,7 @@
   loadingState.classList.remove('hidden');
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
+        if (agentNameInput) agentNameInput.disabled = true;
         editForm.classList.remove('visible');
         actionButtons.style.display = 'none';
       } else {
@@ -1158,6 +1315,7 @@
           editForm.classList.remove('visible');
           actionButtons.style.display = 'flex';
         }
+        if (agentNameInput && currentBot) agentNameInput.disabled = false;
       }
     }
 
