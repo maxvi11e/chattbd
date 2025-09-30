@@ -369,6 +369,51 @@
     background:var(--muted);
     color:var(--bg);
   }
+  .personality-panel {
+    display:none;
+    flex-direction:column;
+    gap:12px;
+    width:100%;
+    max-width:420px;
+    margin:20px auto 0;
+    padding:20px 18px;
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:var(--radius-md);
+    background:rgba(255,255,255,0.04);
+  }
+  .personality-panel.visible {
+    display:flex;
+  }
+  .personality-panel .field-heading {
+    max-width:100%;
+    justify-content:center;
+  }
+  .personality-slider-row {
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .personality-slider-row span {
+    width:110px;
+    font-size:12px;
+    color:#ffffff;
+  }
+  .personality-slider-row span:first-child {
+    text-align:right;
+  }
+  .personality-slider-row input[type="range"] {
+    flex:1;
+  }
+  .personality-actions {
+    display:flex;
+    justify-content:flex-end;
+    margin-top:8px;
+  }
+  .personality-subtext {
+    font-size:13px;
+    color:#a8a8a8;
+    text-align:center;
+  }
   /* Edit Form */
   .edit-form {
     display:none;
@@ -602,8 +647,37 @@
 
       <!-- Action Buttons -->
       <div id="actionButtons" class="action-buttons">
+        <button id="personalityToggleBtn" class="action-btn">Edit Personality</button>
         <button id="editBtn" class="action-btn edit-btn">Edit with Prompt</button>
         <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Chat</button>
+      </div>
+
+      <div id="personalityPanel" class="personality-panel" aria-hidden="true">
+        <div class="field-heading">Define Personality with sliders</div>
+        <p class="personality-subtext">Adjust how your agent behaves. Changes are saved without regenerating art.</p>
+        <div class="personality-slider-row">
+          <span>Serious</span>
+          <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" />
+          <span>Playful</span>
+        </div>
+        <div class="personality-slider-row">
+          <span>Succinct</span>
+          <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" />
+          <span>Talkative</span>
+        </div>
+        <div class="personality-slider-row">
+          <span>Rational</span>
+          <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" />
+          <span>Intuitive</span>
+        </div>
+        <div class="personality-slider-row">
+          <span>Practical</span>
+          <input id="traitPracticalImaginative" type="range" min="1" max="10" step="1" value="5" />
+          <span>Imaginative</span>
+        </div>
+        <div class="personality-actions">
+          <button id="savePersonalityBtn" class="form-btn" disabled>Save Personality</button>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -696,6 +770,18 @@
     const sidebar = document.querySelector('.sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const resizeHandle = document.getElementById('resizeHandle');
+    const personalityToggleBtn = document.getElementById('personalityToggleBtn');
+    const personalityPanel = document.getElementById('personalityPanel');
+    const savePersonalityBtn = document.getElementById('savePersonalityBtn');
+    const personalitySliderKeys = ['seriousPlayful', 'succinctChatty', 'rationalIntuitive', 'practicalImaginative'];
+    const personalitySliderElements = {
+      seriousPlayful: document.getElementById('traitSeriousPlayful'),
+      succinctChatty: document.getElementById('traitSuccinctChatty'),
+      rationalIntuitive: document.getElementById('traitRationalIntuitive'),
+      practicalImaginative: document.getElementById('traitPracticalImaginative')
+    };
+    let lastSavedPersonality = null;
+    let isSavingPersonality = false;
     let isSidebarResizing = false;
 
     // Initialize the page
@@ -711,6 +797,7 @@
   setupEventListeners();
   setupSidebarControls();
   setupNameField();
+  setupPersonalityEditor();
 
   // Prepare initial frame state
   frameSpinner.classList.remove('hidden');
@@ -924,6 +1011,7 @@
         botImage.classList.remove('visible');
       };
       botImage.src = bot.image_url;
+      populatePersonalitySliders(bot.traits);
     }
 
     // Setup event listeners
@@ -944,6 +1032,26 @@
         confirmBot();
       });
 
+      if (personalityToggleBtn) {
+        personalityToggleBtn.addEventListener('click', () => {
+          togglePersonalityPanel();
+        });
+      }
+
+      if (savePersonalityBtn) {
+        savePersonalityBtn.addEventListener('click', () => {
+          savePersonalityChanges();
+        });
+      }
+
+      personalitySliderKeys.forEach(key => {
+        const input = personalitySliderElements[key];
+        if (!input) return;
+        input.addEventListener('input', () => {
+          updatePersonalitySaveState();
+        });
+      });
+
       // Cancel edit
       cancelEdit.addEventListener('click', () => {
         hideEditForm();
@@ -960,6 +1068,182 @@
           window.location.href = 'auth.html';
         }
       });
+    }
+
+    function setupPersonalityEditor() {
+      if (!personalityPanel || !personalityToggleBtn) return;
+      setPersonalityPanelVisibility(false);
+      personalityToggleBtn.setAttribute('aria-expanded', 'false');
+      if (savePersonalityBtn && !savePersonalityBtn.dataset.defaultText) {
+        savePersonalityBtn.dataset.defaultText = savePersonalityBtn.textContent;
+      }
+      memorizePersonality(getSliderState());
+      updatePersonalitySaveState();
+    }
+
+    function togglePersonalityPanel() {
+      if (!personalityPanel) return;
+      const shouldShow = !personalityPanel.classList.contains('visible');
+      setPersonalityPanelVisibility(shouldShow);
+      if (shouldShow) {
+        populatePersonalitySliders(currentBot?.traits);
+      }
+    }
+
+    function setPersonalityPanelVisibility(show) {
+      if (!personalityPanel || !personalityToggleBtn) return;
+      if (show) {
+        personalityPanel.classList.add('visible');
+        personalityPanel.setAttribute('aria-hidden', 'false');
+        personalityToggleBtn.setAttribute('aria-expanded', 'true');
+        personalityToggleBtn.textContent = 'Hide Personality';
+      } else {
+        personalityPanel.classList.remove('visible');
+        personalityPanel.setAttribute('aria-hidden', 'true');
+        personalityToggleBtn.setAttribute('aria-expanded', 'false');
+        personalityToggleBtn.textContent = 'Edit Personality';
+      }
+    }
+
+    function populatePersonalitySliders(traits) {
+      if (!personalityPanel) return;
+      const source = extractPersonalityTraits(traits);
+      const sliderState = {};
+      personalitySliderKeys.forEach(key => {
+        const input = personalitySliderElements[key];
+        if (!input) return;
+        const storedValue = source ? source[key] : undefined;
+        const sliderValue = percentToSlider(storedValue);
+        input.value = sliderValue;
+        sliderState[key] = sliderValue;
+      });
+      memorizePersonality(sliderState);
+      updatePersonalitySaveState();
+    }
+
+    function extractPersonalityTraits(traits) {
+      if (!traits || typeof traits !== 'object') return null;
+      if (traits.persona_traits && typeof traits.persona_traits === 'object') return traits.persona_traits;
+      if (traits.sliders_raw && typeof traits.sliders_raw === 'object') return traits.sliders_raw;
+      if (traits.sliders && typeof traits.sliders === 'object') return traits.sliders;
+      return null;
+    }
+
+    function getSliderState() {
+      const state = {};
+      personalitySliderKeys.forEach(key => {
+        const input = personalitySliderElements[key];
+        if (!input) {
+          state[key] = 5;
+          return;
+        }
+        const num = Number(input.value || 5);
+        state[key] = clampSliderValue(num);
+      });
+      return state;
+    }
+
+    function memorizePersonality(values) {
+      lastSavedPersonality = {};
+      personalitySliderKeys.forEach(key => {
+        lastSavedPersonality[key] = clampSliderValue(values?.[key]);
+      });
+    }
+
+    function hasPersonalityChanges() {
+      if (!lastSavedPersonality) return true;
+      const current = getSliderState();
+      return personalitySliderKeys.some(key => current[key] !== lastSavedPersonality[key]);
+    }
+
+    function updatePersonalitySaveState() {
+      if (!savePersonalityBtn) return;
+      if (!lastSavedPersonality) {
+        savePersonalityBtn.disabled = true;
+        return;
+      }
+      const dirty = hasPersonalityChanges();
+      if (dirty && savePersonalityBtn.dataset.defaultText && savePersonalityBtn.textContent === 'Saved!') {
+        savePersonalityBtn.textContent = savePersonalityBtn.dataset.defaultText;
+      }
+      savePersonalityBtn.disabled = isSavingPersonality || !dirty;
+    }
+
+    function clampSliderValue(value) {
+      const num = Number(value);
+      if (Number.isNaN(num)) return 5;
+      return Math.max(1, Math.min(10, Math.round(num)));
+    }
+
+    function sliderToPercent(value) {
+      const slider = clampSliderValue(value);
+      return Math.round(((slider - 1) / 9) * 100);
+    }
+
+    function percentToSlider(value) {
+      if (value === undefined || value === null || value === '') return 5;
+      const num = Number(value);
+      if (Number.isNaN(num)) return 5;
+      if (num >= 1 && num <= 10) {
+        return clampSliderValue(num);
+      }
+      const clamped = Math.max(0, Math.min(100, num));
+      return clampSliderValue((clamped / 100) * 9 + 1);
+    }
+
+    async function savePersonalityChanges() {
+      if (!currentBot || isSavingPersonality || !savePersonalityBtn) return;
+      const sliderState = getSliderState();
+      const sliders = {};
+      personalitySliderKeys.forEach(key => {
+        sliders[key] = sliderToPercent(sliderState[key]);
+      });
+
+      const defaultText = savePersonalityBtn.dataset.defaultText || 'Save Personality';
+      if (!savePersonalityBtn.dataset.defaultText) {
+        savePersonalityBtn.dataset.defaultText = defaultText;
+      }
+
+      try {
+        isSavingPersonality = true;
+        savePersonalityBtn.disabled = true;
+        savePersonalityBtn.textContent = 'Saving...';
+
+        const traits = (currentBot.traits && typeof currentBot.traits === 'object')
+          ? { ...currentBot.traits }
+          : {};
+        traits.persona_traits = sliders;
+        traits.sliders = sliders;
+        traits.sliders_raw = sliders;
+
+        const { data: updatedBot, error } = await supabase
+          .from('avatars')
+          .update({
+            traits,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', currentBot.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        currentBot = updatedBot;
+        populatePersonalitySliders(updatedBot.traits);
+        savePersonalityBtn.textContent = 'Saved!';
+        setTimeout(() => {
+          if (!isSavingPersonality) {
+            savePersonalityBtn.textContent = savePersonalityBtn.dataset.defaultText || 'Save Personality';
+          }
+        }, 1500);
+      } catch (error) {
+        console.error('Error saving personality traits:', error);
+        showError('Failed to save personality changes. Please try again.');
+        savePersonalityBtn.textContent = savePersonalityBtn.dataset.defaultText || 'Save Personality';
+      } finally {
+        isSavingPersonality = false;
+        updatePersonalitySaveState();
+      }
     }
 
     function setupSidebarControls() {
