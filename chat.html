@@ -72,7 +72,7 @@ body {
   background:#000 !important;
 }
 .sidebar *::-webkit-scrollbar-thumb {
-  background:var(--stroke);
+  background:rgba(255, 255, 255, .1);
   border-radius:999px;
 }
 .sidebar *::-webkit-scrollbar-corner {
@@ -98,7 +98,7 @@ body {
 /* Sidebar Toggle Button */
 .sidebar-toggle {
   position:fixed;
-  top:50px;
+  top:12px;
   left:260px;
   width:32px;
   height:32px;
@@ -248,9 +248,9 @@ body {
   flex-wrap:nowrap;
 }
 .ask-bar-btn {
-  background:#000;
+  background:rgba(255, 255, 255, 0.1);
   color:#fff;
-  border:1px solid var(--stroke);
+  border:0px solid rgba(255, 255, 255, 0.1);
   border-radius:20px;
   padding:6px 14px;
   font-size:13px;
@@ -506,6 +506,7 @@ body {
   cursor:pointer;
   transform-origin: left bottom;
   transform:none;
+  border-radius:50%;
 }
 /* Minimize button */
 .minimize-btn {
@@ -551,7 +552,7 @@ body {
   position:relative;
 }
 .scroller.expanded {
-  max-height:470px;
+  max-height:550px;
 }
 .scroller::-webkit-scrollbar {
   width:8px;
@@ -560,7 +561,7 @@ body {
   background:transparent;
 }
 .scroller::-webkit-scrollbar-thumb {
-  background:#3a3a3a;
+  background:rgba(255, 255, 255, 0.1);
   border-radius:999px;
 }
 .scroller::before {
@@ -724,6 +725,12 @@ body {
     width:40px;
     height:40px;
     margin:4px auto 0;
+    border-radius:50%;
+  }
+  .sidebar:not(.collapsed) .avatar-section.in-sidebar .avatarFrame {
+    width:70px;
+    height:70px;
+    border-radius:50%;
   }
   .sidebar .avatar-section.in-sidebar .minimize-btn {
     left:auto;
@@ -732,6 +739,9 @@ body {
   }
   .sidebar .avatar-section.in-sidebar + .sidebar-nav {
     margin-top:12px;
+  }
+  .ask-question-bar {
+    display:none;
   }
 }
 </style>
@@ -817,7 +827,7 @@ body {
             <!-- Personality prompt action -->
             <div id="askQuestionBar" class="ask-question-bar">
               <button id="askQuestionBtn" class="ask-bar-btn">
-                <span>Ask question</span>
+                <span>Generate question</span>
               </button>
               <button id="discussTopicBtn" class="ask-bar-btn">
                 <span>Discuss topic</span>
@@ -942,13 +952,8 @@ body {
         if (!effectiveWidth || Number.isNaN(effectiveWidth)) {
           effectiveWidth = isCollapsed ? collapsedWidth : (sidebar.offsetWidth || 300);
         }
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-          sidebarToggle.style.left = `${collapsedWidth}px`;
-        } else {
-          const offset = isCollapsed ? collapsedWidth : Math.max(effectiveWidth - 40, collapsedWidth);
-          sidebarToggle.style.left = `${offset}px`;
-        }
+        const offset = isCollapsed ? collapsedWidth : Math.max(effectiveWidth - 40, collapsedWidth);
+        sidebarToggle.style.left = `${offset}px`;
       }
 
       const SIDEBAR_WIDTH_KEY = 'sidebarWidth';
