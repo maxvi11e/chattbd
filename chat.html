@@ -333,6 +333,9 @@ body {
 .conversation-item.active {
   background:rgba(255,255,255,0.15);
 }
+.sidebar.collapsed .conversation-item.active {
+  background:transparent;
+}
 /* Conversation Menu */
 .conversation-title {
   flex:1;
@@ -461,19 +464,23 @@ body {
   gap:18px;
 }
 .column:has(.avatar-section.minimized) {
+  flex-direction:row;
   align-items:flex-start;
-}
-/* Keep left alignment while expanding to avoid early jump */
-.column:has(.avatar-section.expanding) {
-  align-items:flex-start;
+  justify-content:flex-start;
+  gap:24px;
 }
 .avatar-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: center;
-  transition: all 0.3s ease;
-  
+}
+.column:has(.avatar-section.minimized) .avatar-section {
+  align-items:flex-start;
+}
+.column:has(.avatar-section.minimized) .pane {
+  flex:1;
+  width:auto;
 }
 /* TEMP: slow transitions to inspect animation */
 .avatarFrame {
@@ -486,9 +493,7 @@ body {
   display:grid;
   place-items:center;
   position:relative;
-  transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease;
   transform-origin: center center;
-  will-change: transform, width, height;
 }
 /* Idle wiggle removed */
 /* Minimized avatar state */
@@ -500,26 +505,7 @@ body {
   height:100px;
   cursor:pointer;
   transform-origin: left bottom;
-  transform: translate(0px, 10px);
-}
-/* Collapsing (animating to minimized) - keep column centered until complete */
-.avatar-section.collapsing .avatarFrame {
-  width:100px;
-  height:100px;
-  cursor:pointer;
-  transform-origin: left bottom;
-  transform: translate(0px, 10px);
-}
-/* Expanding from minimized - scale from left center initially, then return to center */
-.avatar-section.expanding {
-  align-items: center;
-}
-.avatar-section.expanding .avatarFrame {
-  transform-origin: right top;
-  transform: translate(8px, -6px);
-}
-.avatar-section.minimized .avatarFrame:hover {
-  transform: translate(8px, 10px) scale(1.06);
+  transform:none;
 }
 /* Minimize button */
 .minimize-btn {
@@ -558,14 +544,14 @@ body {
 }
 /* TEMP: slow transitions to inspect animation */
 .scroller {
-  max-height:270px;
+  max-height:240px;
   overflow:auto;
   padding:0 0 0 0;
   transition: max-height 0.3s ease;
   position:relative;
 }
 .scroller.expanded {
-  max-height:500px;
+  max-height:470px;
 }
 .scroller::-webkit-scrollbar {
   width:8px;
@@ -728,6 +714,24 @@ body {
   /* Just inside the right edge of 300px sidebar */
   .sidebar.collapsed + .main-chat .sidebar-toggle {
     left:0;
+  }
+  .sidebar .avatar-section.in-sidebar {
+    padding:8px 2px 0;
+    align-items:center;
+    gap:8px;
+  }
+  .sidebar .avatar-section.in-sidebar .avatarFrame {
+    width:40px;
+    height:40px;
+    margin:4px auto 0;
+  }
+  .sidebar .avatar-section.in-sidebar .minimize-btn {
+    left:auto;
+    right:2px;
+    top:2px;
+  }
+  .sidebar .avatar-section.in-sidebar + .sidebar-nav {
+    margin-top:12px;
   }
 }
 </style>
@@ -2041,37 +2045,50 @@ body {
                    style="width:100%;height:100%;object-fit:cover;border-radius:24px;">`;
       }
 
-      // Utility: get transform transition duration (ms) for avatar frame
-      function getTransformTransitionMs(){
-        try{
-          const el = document.getElementById('avatar');
-          const cs = getComputedStyle(el);
-          const props = cs.transitionProperty.split(',').map(s=>s.trim());
-          const durs  = cs.transitionDuration.split(',').map(s=>s.trim());
-          const delays = cs.transitionDelay.split(',').map(s=>s.trim());
-          const parseTime = (t)=> t.endsWith('ms') ? parseFloat(t) : parseFloat(t)*1000;
-          const idx = props.findIndex(p => p === 'transform');
-          if (idx !== -1) {
-            const dur = parseTime(durs[Math.min(idx, durs.length-1)] || '0s');
-            const del = parseTime(delays[Math.min(idx, delays.length-1)] || '0s');
-            return Math.max(0, dur + del);
-          }
-          // Fallback to the first duration if transform not explicitly listed
-          const dur = parseTime(durs[0] || '0.3s');
-          const del = parseTime(delays[0] || '0s');
-          return Math.max(0, dur + del);
-        }catch(e){
-          return 300; // safe default
-        }
-      }
-
   // Idle wiggle removed
 
   // Avatar minimize functionality
   let isMinimized = false;
   const avatarSection = document.querySelector('.avatar-section');
   const scroller = document.getElementById('log');
+  const sidebarNav = sidebar.querySelector('.sidebar-nav');
+  const avatarPlaceholder = document.createElement('div');
+  avatarPlaceholder.className = 'avatar-placeholder';
+  avatarPlaceholder.style.display = 'none';
+  if (avatarSection && avatarSection.parentNode) {
+    avatarSection.parentNode.insertBefore(avatarPlaceholder, avatarSection.nextSibling);
+  }
   let expandClickHandler = null; // stable reference for minimized->expand click
+
+      function isMobileLayout() {
+        return window.innerWidth <= 768;
+      }
+
+      function moveAvatarToSidebar() {
+        if (!avatarSection || !sidebar) return;
+        if (avatarSection.parentNode !== sidebar) {
+          sidebar.insertBefore(avatarSection, sidebar.firstElementChild);
+        } else if (sidebar.firstElementChild !== avatarSection) {
+          sidebar.insertBefore(avatarSection, sidebar.firstElementChild);
+        }
+        avatarSection.classList.add('in-sidebar');
+      }
+
+      function moveAvatarToColumn() {
+        if (!avatarSection || !avatarPlaceholder.parentNode) return;
+        if (avatarSection.parentNode !== avatarPlaceholder.parentNode) {
+          avatarPlaceholder.parentNode.insertBefore(avatarSection, avatarPlaceholder);
+        }
+        avatarSection.classList.remove('in-sidebar');
+      }
+
+      function updateAvatarPlacement() {
+        if (isMinimized && isMobileLayout()) {
+          moveAvatarToSidebar();
+        } else {
+          moveAvatarToColumn();
+        }
+      }
 
       function addMinimizeButton() {
         // Remove existing minimize button if any
@@ -2096,58 +2113,46 @@ body {
         const minimizeBtn = avatar.querySelector('.minimize-btn');
         
         if (isMinimized) {
-          // Minimize avatar: animate first without left-align, then commit
           console.log('Minimizing avatar...'); // Debug log
-          // Start collapsing animation (keeps column centered)
-          avatarSection.classList.add('collapsing');
-          
-          // After animation completes (transform), set minimized state and align left
-          const delayMs = getTransformTransitionMs();
-          setTimeout(() => {
-            avatarSection.classList.remove('collapsing');
-            avatarSection.classList.add('minimized');
-            scroller.classList.add('expanded');
-            if (minimizeBtn) {
-              minimizeBtn.innerHTML = '+';
-              minimizeBtn.title = 'Expand avatar';
+          avatarSection.classList.add('minimized');
+          scroller.classList.add('expanded');
+          if (minimizeBtn) {
+            minimizeBtn.innerHTML = '+';
+            minimizeBtn.title = 'Expand avatar';
+            if (isMobileLayout()) {
+              minimizeBtn.style.display = 'none';
+            } else {
+              minimizeBtn.style.display = '';
             }
-            // Make minimized avatar clickable to expand (use stable handler)
-            if (!expandClickHandler) {
-              expandClickHandler = function(e){
-                if (e.target.closest && e.target.closest('.minimize-btn')) return;
-                toggleMinimize();
-              };
-            }
-            avatar.style.cursor = 'pointer';
-            avatar.addEventListener('click', expandClickHandler);
-          }, delayMs);
+          }
+          if (!expandClickHandler) {
+            expandClickHandler = function(e){
+              if (e.target.closest && e.target.closest('.minimize-btn')) return;
+              toggleMinimize();
+            };
+          }
+          avatar.style.cursor = 'pointer';
+          avatar.addEventListener('click', expandClickHandler);
         } else {
-          // Expand avatar and reduce chat space
           console.log('Expanding avatar...'); // Debug log
-          
-          // Add expanding class for smooth animation from left to center
-          avatarSection.classList.add('expanding');
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
-          
-          // Remove expanding class after animation completes
-          setTimeout(() => {
-            avatarSection.classList.remove('expanding');
-          }, getTransformTransitionMs());
-          
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '−';
             minimizeBtn.title = 'Minimize avatar';
+            minimizeBtn.style.display = '';
           }
-          
-          // Remove minimized click handler from avatar
           avatar.style.cursor = 'default';
           if (expandClickHandler) {
             avatar.removeEventListener('click', expandClickHandler);
             expandClickHandler = null;
           }
         }
+        updateAvatarPlacement();
       }
+
+      window.addEventListener('resize', updateAvatarPlacement);
+      updateAvatarPlacement();
 
     } // End of authenticated check
   </script>
