@@ -56,8 +56,8 @@ body {
   flex-shrink:0;
 }
 .sidebar.collapsed {
-  width:30px !important;
-  min-width:30px !important;
+  width:44px !important;
+  min-width:44px !important;
   overflow:hidden;
 }
 .sidebar.resizing {
@@ -229,7 +229,7 @@ body {
   width:auto;
 }
 .sidebar.collapsed .sidebar-actions {
-  padding:12px 4px;
+  padding:12px 8px;
   align-items:center;
 }
 .sidebar.collapsed .action-btn {
@@ -653,6 +653,7 @@ body {
     const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const COLLAPSED_SIDEBAR_WIDTH = 44;
     
     // Make supabase available globally for freemium-utils.js
     window.supabase = supabase;
@@ -766,7 +767,7 @@ body {
 
       // Sidebar toggle handler (copied from chat)
       function setTogglePosition(width) {
-        const collapsedWidth = 30;
+        const collapsedWidth = COLLAPSED_SIDEBAR_WIDTH;
         const effectiveWidth = Math.max(width || 0, sidebar.classList.contains('collapsed') ? collapsedWidth : 0);
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
@@ -804,8 +805,8 @@ body {
           }
         }
         sidebar.classList.add('collapsed');
-        sidebar.style.width = '30px';
-        setTogglePosition(30);
+        sidebar.style.width = `${COLLAPSED_SIDEBAR_WIDTH}px`;
+        setTogglePosition(COLLAPSED_SIDEBAR_WIDTH);
         sidebarToggle.title = 'Expand sidebar';
 
         if (persistState) {
