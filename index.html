@@ -56,8 +56,8 @@ body {
   flex-shrink:0;
 }
 .sidebar.collapsed {
-  width:0 !important;
-  min-width:0 !important;
+  width:30px !important;
+  min-width:30px !important;
   overflow:hidden;
 }
 .sidebar.resizing {
@@ -203,6 +203,10 @@ body {
   width:16px;
   height:16px;
 }
+.action-btn .action-label {
+  display:inline-flex;
+  align-items:center;
+}
 /* Sidebar Bottom */
 .sidebar-bottom {
   padding:16px;
@@ -215,6 +219,46 @@ body {
 .sidebar-bottom .user-email {
   color:var(--muted);
   font-size:12px;
+}
+.sidebar.collapsed .sidebar-nav {
+  justify-content:center;
+  padding:14px 0 0 0;
+}
+.sidebar.collapsed .nav-logo {
+  height:28px;
+  width:auto;
+}
+.sidebar.collapsed .sidebar-actions {
+  padding:12px 4px;
+  align-items:center;
+}
+.sidebar.collapsed .action-btn {
+  justify-content:center;
+  padding:10px 0;
+  gap:0;
+}
+.sidebar.collapsed .action-btn .action-label {
+  display:none;
+}
+.sidebar.collapsed .action-btn img,
+.sidebar.collapsed .action-btn svg {
+  width:20px;
+  height:20px;
+}
+.sidebar.collapsed .sidebar-bottom {
+  padding:12px 4px;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.sidebar.collapsed .sidebar-bottom .user-email {
+  display:none;
+}
+.sidebar.collapsed .logout-btn {
+  padding:8px 0;
+}
+.sidebar.collapsed .resize-handle {
+  right:-3px;
 }
 /* Main Chat Area wrapper for dashboard */
 .main-chat {
@@ -544,15 +588,15 @@ body {
       <div class="sidebar-actions">
         <a href="index.html" class="action-btn" title="Agent library">
           <img src="images/library_icon.png" alt="Agent Library">
-          Agent Library
+          <span class="action-label">Agent Library</span>
         </a>
         <a href="create.html" class="action-btn" title="Create new Agent">
           <img src="images/creator_icon.png" alt="Create Agent">
-          Create New
+          <span class="action-label">Create New</span>
         </a>
         <a href="#" id="chatNavAction" class="action-btn" title="Chat with latest agent">
           <img src="images/chat_icon.png" alt="Chat">
-          Chat
+          <span class="action-label">Chat</span>
         </a>
       </div>
       <!-- Bottom User Section -->
@@ -722,11 +766,14 @@ body {
 
       // Sidebar toggle handler (copied from chat)
       function setTogglePosition(width) {
+        const collapsedWidth = 30;
+        const effectiveWidth = Math.max(width || 0, sidebar.classList.contains('collapsed') ? collapsedWidth : 0);
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
-          sidebarToggle.style.left = '200px';
+          sidebarToggle.style.left = `${collapsedWidth}px`;
         } else {
-          sidebarToggle.style.left = `${width - 40}px`;
+          const offset = Math.max(effectiveWidth - 40, collapsedWidth);
+          sidebarToggle.style.left = `${offset}px`;
         }
       }
 
@@ -757,8 +804,8 @@ body {
           }
         }
         sidebar.classList.add('collapsed');
-        sidebar.style.width = '0px';
-        sidebarToggle.style.left = '0px';
+        sidebar.style.width = '30px';
+        setTogglePosition(30);
         sidebarToggle.title = 'Expand sidebar';
 
         if (persistState) {
