@@ -2076,8 +2076,12 @@ body {
       function updateAvatarPlacement() {
         if (isMinimized && isMobileLayout()) {
           moveAvatarToSidebar();
+          scroller.style.maxHeight = '580px';
         } else {
           moveAvatarToColumn();
+          if (!isMinimized) {
+            scroller.style.maxHeight = '';
+          }
         }
       }
 
@@ -2107,6 +2111,9 @@ body {
           console.log('Minimizing avatar...'); // Debug log
           avatarSection.classList.add('minimized');
           scroller.classList.add('expanded');
+          if (isMobileLayout()) {
+            scroller.style.maxHeight = '580px';
+          }
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '+';
             minimizeBtn.title = 'Expand avatar';
@@ -2124,6 +2131,7 @@ body {
           console.log('Expanding avatar...'); // Debug log
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
+          scroller.style.maxHeight = '';
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '−';
             minimizeBtn.title = 'Minimize avatar';
