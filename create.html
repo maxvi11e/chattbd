@@ -87,6 +87,30 @@
     .heroInput{display:flex; align-items:center; flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
     .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
     .heroInput input::placeholder { color:#a8a8a8; opacity:1; }
+    .trait-row {
+      display:grid;
+      grid-template-columns:minmax(0, 90px) 1fr minmax(0, 90px);
+      align-items:center;
+      gap:8px;
+      width:100%;
+    }
+    .trait-row .trait-label {
+      font-size:12px;
+      color:#ffffff;
+      white-space:nowrap;
+    }
+    .trait-row .trait-label.left {
+      text-align:right;
+      justify-self:end;
+    }
+    .trait-row .trait-label.right {
+      text-align:left;
+      justify-self:start;
+    }
+    .trait-row .personality-slider {
+      width:100%;
+      min-width:0;
+    }
     /* Personality sliders use a custom track so both sides stay white */
     input[type="range"].personality-slider {
       --slider-thumb-color:#fff;
@@ -94,15 +118,14 @@
       -webkit-appearance:none;
       appearance:none;
       width:100%;
-      height:10px;
+      height:8px;
       background:#fff;
       border-radius:999px;
       outline:none;
-      touch-action:pan-y;
     }
     input[type="range"].personality-slider::-webkit-slider-runnable-track {
       background:#fff;
-      height:10px;
+      height:8px;
       border-radius:999px;
     }
     input[type="range"].personality-slider::-webkit-slider-thumb {
@@ -113,17 +136,17 @@
       border-radius:50%;
       background:var(--slider-thumb-color);
       border:none;
-      margin-top:-7px;
+      margin-top:-8px;
       cursor:pointer;
     }
     input[type="range"].personality-slider::-moz-range-track {
       background:#fff;
-      height:10px;
+      height:8px;
       border-radius:999px;
     }
     input[type="range"].personality-slider::-moz-range-progress {
       background:#fff;
-      height:10px;
+      height:8px;
       border-radius:999px;
     }
     input[type="range"].personality-slider::-moz-range-thumb {
@@ -134,6 +157,16 @@
       background:var(--slider-thumb-color);
       border:none;
       cursor:pointer;
+    }
+    @media (max-width: 540px) {
+      .trait-row {
+        grid-template-columns:minmax(0, 70px) 1fr minmax(0, 70px);
+        gap:6px;
+      }
+      .trait-row .trait-label {
+        font-size:11px;
+        white-space:normal;
+      }
     }
     .circleBtn{width:46.4px; height:46.4px; border-radius:999px; border:1px solid var(--stroke); background:transparent; display:grid; place-items:center; cursor:pointer;}
     .circleBtn:hover{background:rgba(255,255,255,0.1);}
@@ -271,27 +304,27 @@
               </select>
             </div>
             <div id="personalityHeading" class="field-heading">Define Personality with sliders</div>
-                      <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
+            <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
             <!-- <div style="font-size:14px; color:#ffffff;">Personality Sliders</div> -->
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Serious</span>
-              <input id="traitSeriousPlayful" class="personality-slider" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#ffffff;">Playful</span>
+            <div class="trait-row">
+              <span class="trait-label left">Serious</span>
+              <input id="traitSeriousPlayful" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
+              <span class="trait-label right">Playful</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Succinct</span>
-              <input id="traitSuccinctChatty" class="personality-slider" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#ffffff;">Talkative</span>
+            <div class="trait-row">
+              <span class="trait-label left">Succinct</span>
+              <input id="traitSuccinctChatty" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
+              <span class="trait-label right">Talkative</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Rational</span>
-              <input id="traitRationalIntuitive" class="personality-slider" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#ffffff;">Intuitive</span>
+            <div class="trait-row">
+              <span class="trait-label left">Rational</span>
+              <input id="traitRationalIntuitive" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
+              <span class="trait-label right">Intuitive</span>
             </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="width:110px; text-align:right; font-size:12px; color:#ffffff;">Practical</span>
-              <input id="traitPracticalImaginative" class="personality-slider" type="range" min="1" max="10" step="1" value="5" style="flex:1;" />
-              <span style="width:110px; font-size:12px; color:#ffffff;">Imaginative</span>
+            <div class="trait-row">
+              <span class="trait-label left">Practical</span>
+              <input id="traitPracticalImaginative" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
+              <span class="trait-label right">Imaginative</span>
             </div>
           </div>
 
