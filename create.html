@@ -831,10 +831,8 @@
       }
       const normalizedCategory = String(category || '').trim().toLowerCase();
       const fallbackTypeLabel = TYPE_LABELS[normalizedCategory] || DEFAULT_TYPE_LABEL;
-      const personaType = typeof json.personaType === 'string'
-        ? json.personaType
-        : (typeof json.animalType === 'string' ? json.animalType : '');
-      const personaTypeLabel = json.personaTypeLabel || (json.animalType ? TYPE_LABELS['animal'] : fallbackTypeLabel);
+      const personaType = typeof json.personaType === 'string' ? json.personaType : '';
+      const personaTypeLabel = json.personaTypeLabel || fallbackTypeLabel;
       return {
         name: json.name || displayName,
         description: json.description,

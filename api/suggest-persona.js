@@ -491,10 +491,6 @@ export default async function handler(req) {
       flavor
     };
 
-    if (normalizedCategory === 'animal') {
-      responsePayload.animalType = type;
-    }
-
     return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json' } });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message || 'Unexpected error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
