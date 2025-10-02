@@ -345,9 +345,9 @@
                 <div style="width:100%; margin:0;">
                   <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
                 </div>
-                <div class="field-heading">Animal type</div>
+                <div class="field-heading"><span id="suggestionTypeLabel">Animal type</span> <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="width:100%; margin:0;">
-                  <input id="suggestionAnimalType" type="text" placeholder="Selected animal" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" />
+                  <input id="suggestionPersonaType" type="text" placeholder="Selected type" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" />
                 </div>
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
@@ -355,7 +355,7 @@
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
-              <input type="hidden" id="suggestionAnimalTypeHidden" />
+              <input type="hidden" id="suggestionPersonaTypeHidden" />
             </div>
 
           <!-- Personality Sliders (right after archetype) --> 
@@ -508,6 +508,12 @@
   // Track when randomize flow should auto-open art settings after suggestion
   let randomizeFlow = false;
   const AUTO_SHOW_ARCHETYPES = ['human','animal','sci-fi / fantasy'];
+  const LIBRARY_ARCHETYPES = new Set(['animal','sci-fi / fantasy']);
+  const TYPE_LABELS = {
+    'animal': 'Animal type',
+    'sci-fi / fantasy': 'Character type'
+  };
+  const DEFAULT_TYPE_LABEL = 'Persona type';
 
   function shouldAutoShowArtSettings(value){
     if (!value) return false;
@@ -760,12 +766,34 @@
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
-  const suggestionAnimalTypeEl = document.getElementById('suggestionAnimalType');
-  const suggestionAnimalTypeHidden = document.getElementById('suggestionAnimalTypeHidden');
+  const suggestionPersonaTypeEl = document.getElementById('suggestionPersonaType');
+  const suggestionPersonaTypeHidden = document.getElementById('suggestionPersonaTypeHidden');
+  const suggestionTypeLabelEl = document.getElementById('suggestionTypeLabel');
+  const suggestionPersonaTypeWrapper = suggestionPersonaTypeEl?.parentElement || null;
+  const suggestionTypeHeadingEl = suggestionTypeLabelEl?.parentElement || null;
+
+  function updateTypeField(category, { label, clearValue = false } = {}) {
+    const normalized = (category || '').toLowerCase();
+    const resolvedLabel = label || TYPE_LABELS[normalized] || DEFAULT_TYPE_LABEL;
+    const isLibrary = LIBRARY_ARCHETYPES.has(normalized);
+    if (suggestionTypeLabelEl) suggestionTypeLabelEl.textContent = resolvedLabel;
+    if (suggestionTypeHeadingEl) suggestionTypeHeadingEl.style.display = isLibrary ? 'flex' : 'none';
+    if (suggestionPersonaTypeWrapper) suggestionPersonaTypeWrapper.style.display = isLibrary ? 'block' : 'none';
+    if (suggestionPersonaTypeEl) {
+      suggestionPersonaTypeEl.disabled = !isLibrary;
+      if (clearValue) suggestionPersonaTypeEl.value = '';
+      suggestionPersonaTypeEl.placeholder = `Selected ${resolvedLabel.toLowerCase()}`;
+    }
+    if (suggestionPersonaTypeHidden && clearValue) {
+      suggestionPersonaTypeHidden.value = '';
+    }
+  }
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
+
+        updateTypeField(sel?.value || '', { clearValue: true });
 
         function currentSliderValues(){
           const val = (id)=> document.getElementById(id)?.value;
@@ -800,10 +828,17 @@
       } else {
         lastAbstractName = null;
       }
+      const normalizedCategory = String(category || '').trim().toLowerCase();
+      const fallbackTypeLabel = TYPE_LABELS[normalizedCategory] || DEFAULT_TYPE_LABEL;
+      const personaType = typeof json.personaType === 'string'
+        ? json.personaType
+        : (typeof json.animalType === 'string' ? json.animalType : '');
+      const personaTypeLabel = json.personaTypeLabel || (json.animalType ? TYPE_LABELS['animal'] : fallbackTypeLabel);
       return {
         name: json.name || displayName,
         description: json.description,
-        animalType: typeof json.animalType === 'string' ? json.animalType : '',
+        personaType,
+        personaTypeLabel,
         displayName
       };
           } catch(e){
@@ -814,7 +849,8 @@
             return {
         name: 'Original Concept',
         description: 'A novel undefined concept shaped by personality balance.',
-        animalType: '',
+        personaType: '',
+        personaTypeLabel: TYPE_LABELS[String(category || '').trim().toLowerCase()] || DEFAULT_TYPE_LABEL,
         displayName: 'Original Concept'
       };
           }
@@ -854,12 +890,12 @@
           archetypeSpecificDesc.value = suggestionDescEl.value;
           autosizeSuggestionDesc();
         });
-        suggestionAnimalTypeEl?.addEventListener('input', ()=>{
-          if (suggestionAnimalTypeHidden) {
-            suggestionAnimalTypeHidden.value = suggestionAnimalTypeEl.value;
+        suggestionPersonaTypeEl?.addEventListener('input', ()=>{
+          if (suggestionPersonaTypeHidden) {
+            suggestionPersonaTypeHidden.value = suggestionPersonaTypeEl.value;
           }
           if (persona) {
-            persona.value = suggestionAnimalTypeEl.value;
+            persona.value = suggestionPersonaTypeEl.value;
           }
         });
         // Initial autosize (in case prefilled)
@@ -887,7 +923,7 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const { displayName, description, animalType } = await generateSuggestion(category);
+            const { displayName, description, personaType, personaTypeLabel } = await generateSuggestion(category);
               suggestionNameEl.value = displayName;
               autosizeSuggestionName();
               // Normalize any escaped newlines and carriage returns
@@ -895,14 +931,15 @@
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
               autosizeSuggestionName();
-              if (suggestionAnimalTypeEl) {
-                suggestionAnimalTypeEl.value = animalType || '';
+              updateTypeField(category, { label: personaTypeLabel, clearValue: !personaType });
+              if (suggestionPersonaTypeEl) {
+                suggestionPersonaTypeEl.value = personaType || '';
               }
-              if (suggestionAnimalTypeHidden) {
-                suggestionAnimalTypeHidden.value = animalType || '';
+              if (suggestionPersonaTypeHidden) {
+                suggestionPersonaTypeHidden.value = personaType || '';
               }
-              if (persona && animalType) {
-                persona.value = animalType;
+              if (persona && personaType) {
+                persona.value = personaType;
               }
               requestAnimationFrame(()=> {
                 autosizeSuggestionDesc();
@@ -963,6 +1000,12 @@
           const isCustom = val === 'custom';
           const isAbstractSelection = isAbstractArchetype(val);
           const autoShowArt = shouldAutoShowArtSettings(val);
+          const previousTypeValue = suggestionPersonaTypeHidden?.value || '';
+          updateTypeField(val, { clearValue: true });
+          const normalizedVal = String(val || '').trim().toLowerCase();
+          if (!LIBRARY_ARCHETYPES.has(normalizedVal) && persona && previousTypeValue && persona.value.trim().toLowerCase() === previousTypeValue.toLowerCase()) {
+            persona.value = '';
+          }
           row.style.display = 'none';
           updateGenerateState();
           if (genBtn) {
@@ -985,11 +1028,11 @@
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
             }
-            if (suggestionAnimalTypeEl) {
-              suggestionAnimalTypeEl.value = '';
+            if (suggestionPersonaTypeEl) {
+              suggestionPersonaTypeEl.value = '';
             }
-            if (suggestionAnimalTypeHidden) {
-              suggestionAnimalTypeHidden.value = '';
+            if (suggestionPersonaTypeHidden) {
+              suggestionPersonaTypeHidden.value = '';
             }
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
@@ -1036,11 +1079,11 @@
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
             }
-            if (suggestionAnimalTypeEl) {
-              suggestionAnimalTypeEl.value = '';
+            if (suggestionPersonaTypeEl) {
+              suggestionPersonaTypeEl.value = '';
             }
-            if (suggestionAnimalTypeHidden) {
-              suggestionAnimalTypeHidden.value = '';
+            if (suggestionPersonaTypeHidden) {
+              suggestionPersonaTypeHidden.value = '';
             }
             if (archetypeSpecificInput) archetypeSpecificInput.value = '';
             if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
@@ -1088,8 +1131,8 @@
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
         const suggestionNameInput = document.getElementById('suggestionName');
         const suggestionDescInput = document.getElementById('suggestionDesc');
-        const suggestionAnimalTypeHiddenEl = document.getElementById('suggestionAnimalTypeHidden');
-        const animalTypeValue = (suggestionAnimalTypeHiddenEl?.value || '').trim();
+        const suggestionPersonaTypeHiddenEl = document.getElementById('suggestionPersonaTypeHidden');
+        const personaTypeValue = (suggestionPersonaTypeHiddenEl?.value || '').trim();
         if (suggestionNameInput && archetypeSpecificInputEl) {
           const nameVal = suggestionNameInput.value.trim();
           if (nameVal) {
@@ -1111,9 +1154,10 @@
           archetypeSpecificDesc = suggestionDescInput.value.trim();
         }
         const abstractSelected = isAbstractArchetype(archetype);
-        if (!abstractSelected && archetypeValue && archetypeValue.toLowerCase() === 'animal' && animalTypeValue) {
-          p = animalTypeValue;
-          persona.value = animalTypeValue;
+        const libraryCategory = (archetypeValue || '').toLowerCase();
+        if (!abstractSelected && LIBRARY_ARCHETYPES.has(libraryCategory) && personaTypeValue) {
+          p = personaTypeValue;
+          persona.value = personaTypeValue;
         }
 
         if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
@@ -1210,7 +1254,7 @@
           vibe,
           styleChoice, artStyleCustom,
           traits,
-          animalType: animalTypeValue || null,
+          personaType: personaTypeValue || null,
           personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
         try {
@@ -1234,7 +1278,7 @@
               archetype, vibe, setting, colors,
               styleChoice, artStyleCustom,
               traits,
-              animalType: animalTypeValue || null,
+              personaType: personaTypeValue || null,
               personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
             })
           });

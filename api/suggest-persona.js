@@ -117,6 +117,135 @@ const animalBucketMeta = {
   }
 };
 
+const archetypeBuckets = {
+  bucket1: [
+    "Soldier",
+    "Knight",
+    "Paladin",
+    "Gladiator",
+    "Warlord",
+    "Mercenary",
+    "Assassin",
+    "Bounty Hunter",
+    "Cyborg Enforcer",
+    "Space Marine",
+    "Warrior Monk",
+    "Guard Captain",
+    "Blacksmith",
+    "Technocrat",
+    "Engineer",
+    "Strategist",
+    "Archivist",
+    "High Priest",
+    "Overlord",
+    "Necromancer"
+  ],
+  bucket2: [
+    "Ranger",
+    "Hunter",
+    "Samurai",
+    "Gunslinger",
+    "Templar",
+    "Druid",
+    "Beastmaster",
+    "Airship Captain",
+    "Starship Pilot",
+    "Battle Mage",
+    "Shaman",
+    "Alchemist",
+    "Artificer",
+    "Inquisitor",
+    "Sorcerer",
+    "Warlock",
+    "Seer",
+    "Oracle",
+    "Navigator",
+    "Technomancer"
+  ],
+  bucket3: [
+    "Adventurer",
+    "Explorer",
+    "Treasure Hunter",
+    "Bard",
+    "Healer",
+    "Cleric",
+    "Scholar",
+    "Inventor",
+    "Tinkerer",
+    "Trader",
+    "Smuggler",
+    "Diplomat",
+    "Rebel Leader",
+    "Freedom Fighter",
+    "Steampunk Inventor",
+    "Witch",
+    "Psychic",
+    "Shape-shifter",
+    "Mutant",
+    "Alien Envoy"
+  ],
+  bucket4: [
+    "Trickster",
+    "Jester",
+    "Illusionist",
+    "Elementalist",
+    "Wild Mage",
+    "Time Traveler",
+    "Chronomancer",
+    "Dreamwalker",
+    "Star Child",
+    "Celestial",
+    "Fairy",
+    "Sprite",
+    "Dryad",
+    "Djinn",
+    "Dragon Rider",
+    "Cosmic Wanderer",
+    "AI Oracle",
+    "Digital Ghost",
+    "Virtual Deity",
+    "Chaos Sorcerer"
+  ]
+};
+
+const sciFiBucketMeta = {
+  bucket1: {
+    nameAdjectives: ["Stoic", "Iron", "Resolute", "Steel"],
+    descriptors: ["disciplined", "unyielding", "strategic"],
+    fallback: "unyielding resolve"
+  },
+  bucket2: {
+    nameAdjectives: ["Valiant", "Arcane", "Crimson", "Silver"],
+    descriptors: ["charismatic", "commanding", "mystic"],
+    fallback: "arcane focus"
+  },
+  bucket3: {
+    nameAdjectives: ["Adventurous", "Curious", "Wandering", "Brave"],
+    descriptors: ["heroic", "resourceful", "open-hearted"],
+    fallback: "heroic curiosity"
+  },
+  bucket4: {
+    nameAdjectives: ["Chaotic", "Luminous", "Nebula", "Whimsical"],
+    descriptors: ["whimsical", "imaginative", "otherworldly"],
+    fallback: "cosmic whimsy"
+  }
+};
+
+const personaLibraries = {
+  'animal': {
+    typeLabel: 'Animal type',
+    buckets: animalBuckets,
+    meta: animalBucketMeta,
+    descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
+  },
+  'sci-fi / fantasy': {
+    typeLabel: 'Character type',
+    buckets: archetypeBuckets,
+    meta: sciFiBucketMeta,
+    descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
+  }
+};
+
 function randomItem(list) {
   if (!Array.isArray(list) || list.length === 0) return null;
   if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
@@ -131,15 +260,15 @@ function sliderScore(sliders) {
   return sliders.seriousPlayful + sliders.succinctChatty + sliders.rationalIntuitive + sliders.practicalImaginative;
 }
 
-function pickAnimalFromScore(score) {
+function pickTypeFromScore(score, buckets) {
   let bucketKey;
   if (score <= 100) bucketKey = 'bucket1';
   else if (score <= 200) bucketKey = 'bucket2';
   else if (score <= 300) bucketKey = 'bucket3';
   else bucketKey = 'bucket4';
 
-  const animal = randomItem(animalBuckets[bucketKey]);
-  return { animal, bucketKey };
+  const bucket = buckets[bucketKey] || [];
+  return { type: randomItem(bucket), bucketKey };
 }
 
 function sliderPhrases(sliders) {
@@ -198,12 +327,14 @@ export default async function handler(req) {
     if (s.practicalImaginative >= 65) flavor.push('imaginative'); else if (s.practicalImaginative <= 35) flavor.push('practical');
 
     const normalizedCategory = `${archetypeCategory}`.trim().toLowerCase();
-    if (normalizedCategory !== 'animal') {
+    const library = personaLibraries[normalizedCategory];
+    if (!library) {
       const placeholder = {
         name: 'Concept Coming Soon',
         description: `Persona library for ${archetypeCategory} is not configured yet.`,
         reasoning: 'Library pending configuration.',
-        animalType: null,
+        personaType: null,
+        personaTypeLabel: 'Persona type',
         sliders: s,
         archetypeCategory,
         flavor
@@ -212,31 +343,39 @@ export default async function handler(req) {
     }
 
     const totalScore = sliderScore(s);
-    const { animal, bucketKey } = pickAnimalFromScore(totalScore);
-    if (!animal) {
-      return new Response(JSON.stringify({ error: 'No animals available for selection.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    const { type, bucketKey } = pickTypeFromScore(totalScore, library.buckets);
+    if (!type) {
+      return new Response(JSON.stringify({ error: 'No entries available for selection.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const meta = animalBucketMeta[bucketKey] ?? animalBucketMeta.bucket3;
+    const meta = (library.meta && library.meta[bucketKey]) || {};
     const nameAdj = randomItem(meta.nameAdjectives) || 'Curious';
-    const name = `${nameAdj} ${animal}`.slice(0, 60);
+    const name = `${nameAdj} ${type}`.slice(0, 60);
 
     const phrases = sliderPhrases(s);
     const descriptor = randomItem(meta.descriptors) || 'balanced';
-    const descriptionTail = joinPhrases(phrases, meta.fallback);
-    const description = `A ${descriptor} ${animal.toLowerCase()} with ${descriptionTail}.`.slice(0, 200);
+    const descriptionTail = joinPhrases(phrases, meta.fallback || 'balanced energy');
+    const template = library.descriptionTemplate || (({ descriptor: d, type: t, tail }) => `A ${d} ${t.toLowerCase()} with ${tail}.`);
+    const description = (template({ descriptor, type, tail: descriptionTail }) || '').slice(0, 200);
 
-    const reasoning = `Score ${totalScore} → ${bucketKey}, selected ${animal}.`;
+    const reasoning = `Score ${totalScore} → ${bucketKey}, selected ${type}.`;
 
-    return new Response(JSON.stringify({
+    const responsePayload = {
       name,
       description,
-      animalType: animal,
+      personaType: type,
+      personaTypeLabel: library.typeLabel,
       reasoning,
       sliders: s,
       archetypeCategory,
       flavor
-    }), { headers: { 'Content-Type': 'application/json' } });
+    };
+
+    if (normalizedCategory === 'animal') {
+      responsePayload.animalType = type;
+    }
+
+    return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json' } });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message || 'Unexpected error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }

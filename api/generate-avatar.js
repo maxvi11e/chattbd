@@ -24,13 +24,15 @@ export default async function handler(req, res){
     const trimmedClassicPrompt = (classicPrompt && String(classicPrompt).trim()) || '';
     const useClassicFlow = trimmedClassicPrompt.length > 0;
 
-    const explicitAnimalType = (req.body?.animalType && String(req.body.animalType).trim()) || '';
+    const explicitPersonaType = [req.body?.personaType, req.body?.animalType]
+      .map((value) => (value && String(value).trim()) || '')
+      .find((value) => value.length > 0) || '';
     const normalizedPrompt = (prompt && String(prompt).trim()) || '';
     const broad = (archetype || '').trim();
     const isAbstract = broad.toLowerCase() === 'abstract';
 
     const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
-    const personaSeed = explicitAnimalType || normalizedPrompt;
+    const personaSeed = explicitPersonaType || normalizedPrompt;
     const personaText = useClassicFlow
       ? trimmedClassicPrompt
       : personaSeed || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || (archetypeSpecific && String(archetypeSpecific).trim()) || '';
