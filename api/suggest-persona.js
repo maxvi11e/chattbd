@@ -117,6 +117,120 @@ const animalBucketMeta = {
   }
 };
 
+const humanArchetypeBuckets = {
+  bucket1: [
+    "Monk",
+    "Zen Master",
+    "Judge",
+    "Military Officer",
+    "Engineer",
+    "Scientist",
+    "Accountant",
+    "Lawyer",
+    "Archivist",
+    "Librarian",
+    "Farmer",
+    "Surgeon",
+    "Detective",
+    "Philosopher (Analytic)",
+    "Stoic Thinker",
+    "Mathematician",
+    "Historian",
+    "Logistician",
+    "Policeman",
+    "Banker"
+  ],
+  bucket2: [
+    "Professor",
+    "Doctor",
+    "Therapist",
+    "Psychologist",
+    "Entrepreneur",
+    "Manager",
+    "Architect",
+    "Strategist",
+    "Diplomat",
+    "Coach",
+    "Politician",
+    "Priest",
+    "Community Leader",
+    "Humanitarian",
+    "Philosopher (Ethics)",
+    "Counselor",
+    "Inventor",
+    "Activist",
+    "Explorer",
+    "Journalist"
+  ],
+  bucket3: [
+    "Teacher",
+    "Writer",
+    "Poet",
+    "Artist",
+    "Musician",
+    "Chef",
+    "Traveler",
+    "Freelancer",
+    "Parent",
+    "Mentor",
+    "Neighbor",
+    "Friend",
+    "Mediator",
+    "Storyteller",
+    "Athlete",
+    "Performer",
+    "Optimist",
+    "Romantic",
+    "Dreamer",
+    "Student"
+  ],
+  bucket4: [
+    "Comedian",
+    "Visionary",
+    "Eternal Optimist",
+    "Spiritual Seeker",
+    "Mystic",
+    "Revolutionary",
+    "Inventive Hacker",
+    "Startup Founder",
+    "Philosopher (Existential)",
+    "Psychonaut",
+    "Futurist",
+    "Creative Genius",
+    "Iconoclast",
+    "Rebel",
+    "Idealist",
+    "Bohemian",
+    "Childlike Wonderer",
+    "Story Weaver",
+    "Dream Architect",
+    "Cultural Trickster"
+  ]
+};
+
+const humanBucketMeta = {
+  bucket1: {
+    nameAdjectives: ["Stoic", "Steady", "Grounded", "Resolute"],
+    descriptors: ["disciplined", "pragmatic", "composed"],
+    fallback: "stoic poise"
+  },
+  bucket2: {
+    nameAdjectives: ["Noble", "Earnest", "Trusted", "Guiding"],
+    descriptors: ["respected", "competent", "charismatic"],
+    fallback: "steady leadership"
+  },
+  bucket3: {
+    nameAdjectives: ["Friendly", "Curious", "Creative", "Warm"],
+    descriptors: ["relatable", "creative", "open-hearted"],
+    fallback: "creative warmth"
+  },
+  bucket4: {
+    nameAdjectives: ["Whimsical", "Visionary", "Radiant", "Playful"],
+    descriptors: ["imaginative", "free-spirited", "visionary"],
+    fallback: "boundless imagination"
+  }
+};
+
 const archetypeBuckets = {
   bucket1: [
     "Soldier",
@@ -236,6 +350,12 @@ const personaLibraries = {
     typeLabel: 'Animal type',
     buckets: animalBuckets,
     meta: animalBucketMeta,
+    descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
+  },
+  'human': {
+    typeLabel: 'Archetype type',
+    buckets: humanArchetypeBuckets,
+    meta: humanBucketMeta,
     descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
   },
   'sci-fi / fantasy': {
