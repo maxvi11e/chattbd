@@ -347,7 +347,7 @@
                 </div>
                 <div class="field-heading">Animal type</div>
                 <div style="width:100%; margin:0;">
-                  <input id="suggestionAnimalType" type="text" placeholder="Selected animal" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" readonly />
+                  <input id="suggestionAnimalType" type="text" placeholder="Selected animal" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" />
                 </div>
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
@@ -853,6 +853,14 @@
         suggestionDescEl?.addEventListener('input', ()=>{
           archetypeSpecificDesc.value = suggestionDescEl.value;
           autosizeSuggestionDesc();
+        });
+        suggestionAnimalTypeEl?.addEventListener('input', ()=>{
+          if (suggestionAnimalTypeHidden) {
+            suggestionAnimalTypeHidden.value = suggestionAnimalTypeEl.value;
+          }
+          if (persona) {
+            persona.value = suggestionAnimalTypeEl.value;
+          }
         });
         // Initial autosize (in case prefilled)
         autosizeSuggestionDesc();
