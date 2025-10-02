@@ -24,14 +24,16 @@ export default async function handler(req, res){
     const trimmedClassicPrompt = (classicPrompt && String(classicPrompt).trim()) || '';
     const useClassicFlow = trimmedClassicPrompt.length > 0;
 
+    const explicitAnimalType = (req.body?.animalType && String(req.body.animalType).trim()) || '';
     const normalizedPrompt = (prompt && String(prompt).trim()) || '';
     const broad = (archetype || '').trim();
     const isAbstract = broad.toLowerCase() === 'abstract';
 
     const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
+    const personaSeed = explicitAnimalType || normalizedPrompt;
     const personaText = useClassicFlow
       ? trimmedClassicPrompt
-      : normalizedPrompt || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || (archetypeSpecific && String(archetypeSpecific).trim()) || '';
+      : personaSeed || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || (archetypeSpecific && String(archetypeSpecific).trim()) || '';
 
     if (!personaText) {
       return res.status(400).json({ error: 'Missing prompt' });

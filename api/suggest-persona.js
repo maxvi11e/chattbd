@@ -203,6 +203,7 @@ export default async function handler(req) {
         name: 'Concept Coming Soon',
         description: `Persona library for ${archetypeCategory} is not configured yet.`,
         reasoning: 'Library pending configuration.',
+        animalType: null,
         sliders: s,
         archetypeCategory,
         flavor
@@ -230,6 +231,7 @@ export default async function handler(req) {
     return new Response(JSON.stringify({
       name,
       description,
+      animalType: animal,
       reasoning,
       sliders: s,
       archetypeCategory,

@@ -9,7 +9,7 @@
   /* Advanced Panel Styling - Match input-container exactly */
   #advancedPanel {
     width: 100%;
-    max-width: 395px; /* Global cap for advanced panel */
+    max-width: 480px; /* Global cap for advanced panel */
   }
   /* Ensure children don't overflow the panel width */
   #advancedPanel > * { max-width: 100%; }
@@ -21,7 +21,7 @@
   
   @media (max-width: 900px) {
     .heroInput {
-      width: min(400.69px, calc(56vw - 32px));
+      width: min(480px, calc(100vw - 32px));
     }
     /* Override responsive sizing for advanced panel inputs */
     #advancedPanel .heroInput {
@@ -159,6 +159,7 @@
       cursor:pointer;
     }
     @media (max-width: 540px) {
+      .create-form{padding:0 16px;}
       .trait-row {
         grid-template-columns:minmax(0, 70px) 1fr minmax(0, 70px);
         gap:6px;
@@ -226,9 +227,9 @@
   align-items:center;
   gap:6px;
     }
-    /* Ensure headings within Art Settings align to the 395px column */
+    /* Ensure headings within Art Settings align to the panel column */
     #artSettingsContainer .field-heading{
-      width:min(100%, 395px);
+      width:min(100%, 480px);
       align-self:center;
     }
   .field-heading img.icon{
@@ -339,10 +340,14 @@
               <div style="display:flex; justify-content:center;">
                 <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
               </div>
-              <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
+              <div id="suggestionResult" style="display:none; width:min(100%, 480px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="width:100%; margin:0;">
                   <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+                </div>
+                <div class="field-heading">Animal type</div>
+                <div style="width:100%; margin:0;">
+                  <input id="suggestionAnimalType" type="text" placeholder="Selected animal" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" readonly />
                 </div>
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
@@ -350,6 +355,7 @@
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
+              <input type="hidden" id="suggestionAnimalTypeHidden" />
             </div>
 
           <!-- Personality Sliders (right after archetype) --> 
@@ -368,7 +374,7 @@
                       <!-- Style Choice -->
               <div class="field-heading">Choose art style</div>
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <div style="width:min(100%, 480px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="default">Default (Modern Illustration)</option>
                   <option value="realistic">Photo Realistic</option>
@@ -378,7 +384,7 @@
                   <option value="custom">Another Style (Enter Your Own)</option>
                 </select>
               </div>
-              <div id="customStyleRow" style="display:none; width:min(100%, 395px);">
+              <div id="customStyleRow" style="display:none; width:min(100%, 480px);">
                 <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
                   <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
                 </label>
@@ -389,7 +395,7 @@
             <!-- Vibe / Mood -->
             <div class="field-heading">Select art vibe / mood</div>
             <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <div style="width:min(100%, 480px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value=""></option>
                   <option value="radiant">Radiant</option>
@@ -402,7 +408,7 @@
                   <option value="custom">Another (user entry)</option>
                 </select>
               </div>
-              <div id="customVibeRow" style="display:none; width:min(100%, 395px);">
+              <div id="customVibeRow" style="display:none; width:min(100%, 480px);">
                 <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
                   <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
                 </label>
@@ -754,6 +760,8 @@
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
+  const suggestionAnimalTypeEl = document.getElementById('suggestionAnimalType');
+  const suggestionAnimalTypeHidden = document.getElementById('suggestionAnimalTypeHidden');
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
@@ -795,6 +803,7 @@
       return {
         name: json.name || displayName,
         description: json.description,
+        animalType: typeof json.animalType === 'string' ? json.animalType : '',
         displayName
       };
           } catch(e){
@@ -805,6 +814,7 @@
             return {
         name: 'Original Concept',
         description: 'A novel undefined concept shaped by personality balance.',
+        animalType: '',
         displayName: 'Original Concept'
       };
           }
@@ -869,7 +879,7 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const { displayName, description } = await generateSuggestion(category);
+            const { displayName, description, animalType } = await generateSuggestion(category);
               suggestionNameEl.value = displayName;
               autosizeSuggestionName();
               // Normalize any escaped newlines and carriage returns
@@ -877,6 +887,15 @@
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
               autosizeSuggestionName();
+              if (suggestionAnimalTypeEl) {
+                suggestionAnimalTypeEl.value = animalType || '';
+              }
+              if (suggestionAnimalTypeHidden) {
+                suggestionAnimalTypeHidden.value = animalType || '';
+              }
+              if (persona && animalType) {
+                persona.value = animalType;
+              }
               requestAnimationFrame(()=> {
                 autosizeSuggestionDesc();
                 autosizeSuggestionName();
@@ -958,6 +977,12 @@
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
             }
+            if (suggestionAnimalTypeEl) {
+              suggestionAnimalTypeEl.value = '';
+            }
+            if (suggestionAnimalTypeHidden) {
+              suggestionAnimalTypeHidden.value = '';
+            }
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
             if (!isAbstractSelection) {
@@ -1002,6 +1027,12 @@
             if (suggestionDescEl) {
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
+            }
+            if (suggestionAnimalTypeEl) {
+              suggestionAnimalTypeEl.value = '';
+            }
+            if (suggestionAnimalTypeHidden) {
+              suggestionAnimalTypeHidden.value = '';
             }
             if (archetypeSpecificInput) archetypeSpecificInput.value = '';
             if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
@@ -1049,6 +1080,8 @@
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
         const suggestionNameInput = document.getElementById('suggestionName');
         const suggestionDescInput = document.getElementById('suggestionDesc');
+        const suggestionAnimalTypeHiddenEl = document.getElementById('suggestionAnimalTypeHidden');
+        const animalTypeValue = (suggestionAnimalTypeHiddenEl?.value || '').trim();
         if (suggestionNameInput && archetypeSpecificInputEl) {
           const nameVal = suggestionNameInput.value.trim();
           if (nameVal) {
@@ -1070,6 +1103,10 @@
           archetypeSpecificDesc = suggestionDescInput.value.trim();
         }
         const abstractSelected = isAbstractArchetype(archetype);
+        if (!abstractSelected && archetypeValue && archetypeValue.toLowerCase() === 'animal' && animalTypeValue) {
+          p = animalTypeValue;
+          persona.value = animalTypeValue;
+        }
 
         if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
           showError('Please describe your custom agent before generating.');
@@ -1165,6 +1202,7 @@
           vibe,
           styleChoice, artStyleCustom,
           traits,
+          animalType: animalTypeValue || null,
           personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
         try {
@@ -1188,6 +1226,7 @@
               archetype, vibe, setting, colors,
               styleChoice, artStyleCustom,
               traits,
+              animalType: animalTypeValue || null,
               personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
             })
           });
