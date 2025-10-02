@@ -177,7 +177,6 @@ export default async function handler(req) {
     console.log('[suggest-persona] incoming', {
       archetypeCategory,
       sliders,
-      userText: userText || null,
       timestamp: new Date().toISOString()
     });
     if (!archetypeCategory) {
