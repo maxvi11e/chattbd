@@ -180,7 +180,7 @@ function createUpgradeModal() {
       border-radius: var(--radius-lg, 24px);
       max-width: 600px;
       width: 100%;
-      max-height: 90vh;
+      max-height: 90dvh;
       overflow-y: auto;
     }
     
@@ -346,7 +346,7 @@ function createUpgradeModal() {
     @media (max-width: 768px) {
       .modal-content {
         margin: 20px;
-        max-height: calc(100vh - 40px);
+        max-height: calc(100dvh - 40px);
       }
       
       .pricing-grid {
