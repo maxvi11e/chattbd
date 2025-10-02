@@ -2124,11 +2124,7 @@ body {
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '+';
             minimizeBtn.title = 'Expand avatar';
-            if (isMobileLayout()) {
-              minimizeBtn.style.display = 'none';
-            } else {
-              minimizeBtn.style.display = '';
-            }
+            minimizeBtn.style.display = 'none';
           }
           if (!expandClickHandler) {
             expandClickHandler = function(e){
