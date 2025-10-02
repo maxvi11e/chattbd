@@ -750,7 +750,7 @@ body {
 <body>
   <div class="chat-container">
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar collapsed">
       <!-- Top Navigation -->
       <div class="sidebar-nav">
         <button class="sidebar-mini-toggle" id="sidebarMiniToggle" title="Expand sidebar" aria-label="Expand sidebar">
@@ -1072,15 +1072,7 @@ body {
       }
 
       // Initialize sidebar state (default collapsed if no preference saved)
-      const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
-      const isMobile = window.innerWidth <= 768;
-      if (savedSidebarState === 'false' && !isMobile) {
-        expandSidebar();
-      } else if (savedSidebarState === 'true') {
-        collapseSidebar({ saveWidth: false, persistState: false });
-      } else {
-        collapseSidebar({ saveWidth: false, persistState: false });
-      }
+      collapseSidebar({ saveWidth: false });
 
       // Reposition toggle on resize and collapse automatically on mobile
       window.addEventListener('resize', () => {
