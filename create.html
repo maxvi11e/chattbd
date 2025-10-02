@@ -328,19 +328,6 @@
               </div>
             </div>
 
-            <!-- Detail Level -->
-            <div class="field-heading">Choose the level of detail</div>
-            <div id="detailGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; width:min(100%, 395px);">
-              <!-- <div style="font-size:14px; color:#a8a8a8; display:flex; justify-content:space-between; align-items:center;">
-                <span>Detail level</span>
-                <span style="font-size:12px; color:#8a8a8a;">1 = low, 10 = very detailed</span>
-              </div> -->
-              <div style="display:flex; align-items:center; gap:12px;">
-                <span style="width:24px; text-align:right; font-size:12px; color:#a8a8a8;">1</span>
-                <input id="detailLevel" type="range" min="1" max="10" step="1" value="6" style="flex:1;" />
-                <span style="width:24px; font-size:12px; color:#a8a8a8;">10</span>
-              </div>
-            </div>
             </div>
 
 
@@ -603,8 +590,6 @@
     dispatch(styleSelect,'change');
   }
         // Detail level
-        const detail = document.getElementById('detailLevel');
-        if (detail){ detail.value = String(randInt(3,9)); dispatch(detail,'input'); }
         // Additional details (optional small prompt)
         const extras = [
           'warm lighting, soft textures',
@@ -1048,7 +1033,6 @@
   const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
   const styleChoice = document.getElementById('styleChoice')?.value || 'default';
   const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
-  const detailLevel = Number(document.getElementById('detailLevel')?.value || 6);
         function scale10To100(v){
           const n = Number(v || 5);
           // Map 1..10 -> 0..100 in 10 steps (1->0, 10->100)
@@ -1072,7 +1056,6 @@
           archetype, archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,
-          detailLevel,
           traits,
           personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
