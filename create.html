@@ -341,6 +341,10 @@
                 <button id="continueCreateBtn" style="width:200px; padding:10px 16px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Continue Creating</button>
               </div>
               <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
+                <div class="field-heading">Type <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+                <div style="width:100%; margin:0;">
+                  <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+                </div>
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="width:100%; margin:0;">
                   <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
@@ -755,6 +759,7 @@
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
+  const suggestionTypeEl = document.getElementById('suggestionType');
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
@@ -796,7 +801,8 @@
       return {
         name: json.name || displayName,
         description: json.description,
-        displayName
+        displayName,
+        typeOnly: json.personaType || json.name || displayName
       };
           } catch(e){
             console.error('Suggestion error', e);
@@ -805,8 +811,9 @@
       }
             return {
         name: 'Original Concept',
-        description: 'A novel undefined concept shaped by personality balance.',
-        displayName: 'Original Concept'
+        description: '',
+        displayName: 'Original Concept',
+        typeOnly: 'Original Concept'
       };
           }
         }
@@ -819,11 +826,24 @@
           suggestionNameEl.style.height = suggestionNameEl.scrollHeight + 'px';
         }
 
+        function autosizeSuggestionType(){
+          if (!suggestionTypeEl) return;
+          suggestionTypeEl.style.height = 'auto';
+          suggestionTypeEl.style.height = suggestionTypeEl.scrollHeight + 'px';
+        }
+
         // Auto-apply when user edits suggestion fields
         suggestionNameEl?.addEventListener('input', ()=>{
           autosizeSuggestionName();
           archetypeSpecificInput.value = suggestionNameEl.value;
       lastAbstractName = suggestionNameEl.value.trim() || null;
+        });
+        suggestionTypeEl?.addEventListener('input', ()=>{
+          autosizeSuggestionType();
+          // Keep archetypeSpecificInput synced to Type if Name is empty
+          if (!suggestionNameEl || !suggestionNameEl.value.trim()) {
+            archetypeSpecificInput.value = suggestionTypeEl.value.trim();
+          }
         });
         function autosizeSuggestionDesc(){
           if (!suggestionDescEl) return;
@@ -870,36 +890,20 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const { displayName, description } = await generateSuggestion(category);
-              suggestionNameEl.value = displayName;
-              autosizeSuggestionName();
-              // Normalize any escaped newlines and carriage returns
-              const descMulti = (description || '').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-              suggestionDescEl.value = descMulti;
-              autosizeSuggestionDesc();
-              autosizeSuggestionName();
-              requestAnimationFrame(()=> {
-                autosizeSuggestionDesc();
-                autosizeSuggestionName();
-              });
-              setTimeout(()=> {
-                autosizeSuggestionDesc();
-                autosizeSuggestionName();
-              }, 50);
+            const { displayName, description, typeOnly } = await generateSuggestion(category);
+              // Only show suggestion box and populate Type field
               suggestionBox.style.display = 'block';
+              if (suggestionTypeEl) {
+                suggestionTypeEl.value = typeOnly || displayName || '';
+                autosizeSuggestionType();
+              }
               // If randomize flow, auto-open Art Settings and keep the button hidden
               if (randomizeFlow) {
                 if (artSettings) artSettings.style.display = 'flex';
                 artSettingsTriggered = true;
                 if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
               }
-              // Focus the name field when it appears
-              if (suggestionNameEl) {
-                requestAnimationFrame(() => {
-                  suggestionNameEl.focus();
-                  try { suggestionNameEl.setSelectionRange(suggestionNameEl.value.length, suggestionNameEl.value.length); } catch {}
-                });
-              }
+              // Don't focus name field because we are not populating it yet
               // Reveal art settings button only if settings are not already open
               if (artSettingsBtn) {
                 if (artSettings && artSettings.style.display !== 'none') {
@@ -908,12 +912,12 @@
                   artSettingsBtn.style.display = 'inline-block';
                 }
               }
-              // Automatically apply suggestion
-              archetypeSpecificInput.value = displayName;
-              archetypeSpecificDesc.value = description;
-      lastAbstractName = displayName;
+              // Only store raw type as archetypeSpecific
+              archetypeSpecificInput.value = typeOnly || displayName || '';
+              archetypeSpecificDesc.value = '';
+      lastAbstractName = typeOnly || displayName || '';
               // Update button label and re-enable for future regenerations
-              genBtn.textContent = 'Regenerate';
+              genBtn.textContent = 'Suggest Another';
               genBtn.disabled = false;
               genBtn.style.opacity = '1';
               genBtn.style.display = 'inline-block';
