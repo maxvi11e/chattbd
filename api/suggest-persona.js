@@ -294,27 +294,21 @@ export default async function handler(req) {
   const isSciFi = normalizedCategory === 'sci-fi / fantasy';
   const isAnimal = normalizedCategory === 'animal';
   const meta = (!isSciFi && !isAnimal && library.meta && library.meta[bucketKey]) ? library.meta[bucketKey] : {};
-    let name;
-    let description;
-  if (isSciFi || isAnimal) {
-      // Raw archetype only
+  let name;
+    // Unified requirement: suggestion description should be null for all archetypes.
+    if (isSciFi || isAnimal) {
       name = type.slice(0, 60);
-      description = type; // simple echo of the archetype
     } else {
       const nameAdj = randomItem(meta.nameAdjectives) || 'Curious';
       name = `${nameAdj} ${type}`.slice(0, 60);
-      const phrases = sliderPhrases(s);
-      const descriptor = randomItem(meta.descriptors) || 'balanced';
-      const descriptionTail = joinPhrases(phrases, meta.fallback || 'balanced energy');
-      const template = library.descriptionTemplate || (({ descriptor: d, type: t, tail }) => `A ${d} ${t.toLowerCase()} with ${tail}.`);
-      description = (template({ descriptor, type, tail: descriptionTail }) || '').slice(0, 200);
     }
+  const description = null;
 
     const reasoning = `Score ${totalScore} → ${bucketKey}, selected ${type}.`;
 
     const responsePayload = {
       name,
-      description,
+  description, // intentionally null per requirement
       personaType: type,
       personaTypeLabel: library.typeLabel,
       reasoning,
