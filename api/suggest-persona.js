@@ -24,28 +24,7 @@ const animalBuckets = {
   ]
 };
 
-const animalBucketMeta = {
-  bucket1: {
-    nameAdjectives: ["Stoic", "Steady", "Silent", "Ancient"],
-    descriptors: ["grounded", "watchful", "patient"],
-    fallback: "steady resolve"
-  },
-  bucket2: {
-    nameAdjectives: ["Swift", "Vigorous", "Wild", "Earnest"],
-    descriptors: ["confident", "balanced", "warm"],
-    fallback: "warm focus"
-  },
-  bucket3: {
-    nameAdjectives: ["Curious", "Bright", "Lively", "Friendly"],
-    descriptors: ["curious", "sociable", "inventive"],
-    fallback: "curious balance"
-  },
-  bucket4: {
-    nameAdjectives: ["Electric", "Vivid", "Radiant", "Spark"],
-    descriptors: ["energetic", "playful", "imaginative"],
-    fallback: "playful energy"
-  }
-};
+// Removed animalBucketMeta: animal names should be raw without adjective augmentation.
 
 const humanArchetypeBuckets = {
   bucket1: [
@@ -109,12 +88,12 @@ const archetypeBuckets = {
     "Ancient Dark Lord Alien",
     "Stoic Galactic Emperor",
     "Ancient Precursor Alien",
-    "Warrior Alien",
+    "Ice Dragon",
     "Human Knight",
     "Dwarven Warrior",
     "Noble Elf Lord",
     "Terraforming Machine Robot",
-    "Technomancer",
+    "Dwarf Miner",
     "Cunning Goblin"
   ],
   bucket2: [ // 101–200: disciplined, heroic, competent
@@ -152,24 +131,24 @@ const archetypeBuckets = {
     "Cosmonaut Tinkerer",
     "Friendly Alien Companion",
     "Time Traveler",
-    "Classic Dreamer",
+    "Sasquatch",
     "Optimistic Hero",
     "Ancient Scholar Alien",
-    "Galactic Guardian",
+    "Aquatic Dragon",
     "Diplomatic Explorer",
-    "Creative Craftsman",
+    "Creative Craftsman Wizard",
     "Luminous Energy Being Alien",
     "Fluid Shapeshifter Alien"
   ],
   bucket4: [ // 301–400: mystical, chaotic, visionary
     "Chaos Sorcerer",
     "AI Oracle",
-    "Ancient Force-Wielding Sage",
-    "Ancient Dragon",
+    "Force-Wielding Sage",
+    "Playful Dragon",
     "Wise Jovial Wizard", // (works here too, but skewed mystical version)
     "Dryad",
-    "Rebellious Trickster",
-    "Celestial Child",
+    "Trickster Mystic",
+    "Celestial Architect",
     "Cosmic Wanderer",
     "Mythical Bard",
     "Illusionist",
@@ -179,42 +158,21 @@ const archetypeBuckets = {
     "Story Weaver",
     "Virtual Deity",
     "Chaos Magician ",
-    "Star Child",
+    "Celestial Star Child Fairy",
     "Playful Sprite",
-    "Trickster Jester"
+    "Companion Sprite"
   ]
 };
 
 
-const sciFiBucketMeta = {
-  bucket1: {
-    nameAdjectives: ["Stoic", "Iron", "Resolute", "Steel"],
-    descriptors: ["disciplined", "unyielding", "strategic"],
-    fallback: "unyielding resolve"
-  },
-  bucket2: {
-    nameAdjectives: ["Valiant", "Arcane", "Crimson", "Silver"],
-    descriptors: ["charismatic", "commanding", "mystic"],
-    fallback: "arcane focus"
-  },
-  bucket3: {
-    nameAdjectives: ["Adventurous", "Curious", "Wandering", "Brave"],
-    descriptors: ["heroic", "resourceful", "open-hearted"],
-    fallback: "heroic curiosity"
-  },
-  bucket4: {
-    nameAdjectives: ["Chaotic", "Luminous", "Nebula", "Whimsical"],
-    descriptors: ["whimsical", "imaginative", "otherworldly"],
-    fallback: "cosmic whimsy"
-  }
-};
+// Removed sciFiBucketMeta per requirement: sci-fi / fantasy archetype names should be raw archetype strings without adjective/descriptors augmentation.
 
 const personaLibraries = {
   'animal': {
     typeLabel: 'Animal type',
     buckets: animalBuckets,
-    meta: animalBucketMeta,
-    descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
+    meta: null,
+    descriptionTemplate: ({ type }) => `${type}`
   },
   'human': {
     typeLabel: 'Archetype type',
@@ -225,8 +183,9 @@ const personaLibraries = {
   'sci-fi / fantasy': {
     typeLabel: 'Character type',
     buckets: archetypeBuckets,
-    meta: sciFiBucketMeta,
-    descriptionTemplate: ({ descriptor, type, tail }) => `A ${descriptor} ${type.toLowerCase()} with ${tail}.`
+    meta: null, // meta intentionally null (no adjective/descriptor augmentation)
+    // Description for sci-fi / fantasy kept minimal; will be overridden downstream.
+    descriptionTemplate: ({ type }) => `${type}`
   }
 };
 
@@ -332,15 +291,24 @@ export default async function handler(req) {
       return new Response(JSON.stringify({ error: 'No entries available for selection.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
-    const meta = (library.meta && library.meta[bucketKey]) || {};
-    const nameAdj = randomItem(meta.nameAdjectives) || 'Curious';
-    const name = `${nameAdj} ${type}`.slice(0, 60);
-
-    const phrases = sliderPhrases(s);
-    const descriptor = randomItem(meta.descriptors) || 'balanced';
-    const descriptionTail = joinPhrases(phrases, meta.fallback || 'balanced energy');
-    const template = library.descriptionTemplate || (({ descriptor: d, type: t, tail }) => `A ${d} ${t.toLowerCase()} with ${tail}.`);
-    const description = (template({ descriptor, type, tail: descriptionTail }) || '').slice(0, 200);
+  const isSciFi = normalizedCategory === 'sci-fi / fantasy';
+  const isAnimal = normalizedCategory === 'animal';
+  const meta = (!isSciFi && !isAnimal && library.meta && library.meta[bucketKey]) ? library.meta[bucketKey] : {};
+    let name;
+    let description;
+  if (isSciFi || isAnimal) {
+      // Raw archetype only
+      name = type.slice(0, 60);
+      description = type; // simple echo of the archetype
+    } else {
+      const nameAdj = randomItem(meta.nameAdjectives) || 'Curious';
+      name = `${nameAdj} ${type}`.slice(0, 60);
+      const phrases = sliderPhrases(s);
+      const descriptor = randomItem(meta.descriptors) || 'balanced';
+      const descriptionTail = joinPhrases(phrases, meta.fallback || 'balanced energy');
+      const template = library.descriptionTemplate || (({ descriptor: d, type: t, tail }) => `A ${d} ${t.toLowerCase()} with ${tail}.`);
+      description = (template({ descriptor, type, tail: descriptionTail }) || '').slice(0, 200);
+    }
 
     const reasoning = `Score ${totalScore} → ${bucketKey}, selected ${type}.`;
 
