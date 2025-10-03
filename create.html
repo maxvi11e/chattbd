@@ -336,8 +336,9 @@
             </div>
             <!-- Persona Suggestion (after choosing category) -->
             <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-              <div style="display:flex; justify-content:center;">
+              <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
                 <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
+                <button id="continueCreateBtn" style="width:200px; padding:10px 16px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Continue Creating</button>
               </div>
               <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
