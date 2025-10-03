@@ -9,7 +9,7 @@
   /* Advanced Panel Styling - Match input-container exactly */
   #advancedPanel {
     width: 100%;
-    max-width: 480px; /* Global cap for advanced panel */
+    max-width: 395px; /* Global cap for advanced panel */
   }
   /* Ensure children don't overflow the panel width */
   #advancedPanel > * { max-width: 100%; }
@@ -21,7 +21,7 @@
   
   @media (max-width: 900px) {
     .heroInput {
-      width: min(480px, calc(100vw - 32px));
+      width: min(400.69px, calc(56vw - 32px));
     }
     /* Override responsive sizing for advanced panel inputs */
     #advancedPanel .heroInput {
@@ -159,7 +159,6 @@
       cursor:pointer;
     }
     @media (max-width: 540px) {
-      .create-form{padding:0 16px;}
       .trait-row {
         grid-template-columns:minmax(0, 70px) 1fr minmax(0, 70px);
         gap:6px;
@@ -227,9 +226,9 @@
   align-items:center;
   gap:6px;
     }
-    /* Ensure headings within Art Settings align to the panel column */
+    /* Ensure headings within Art Settings align to the 395px column */
     #artSettingsContainer .field-heading{
-      width:min(100%, 480px);
+      width:min(100%, 395px);
       align-self:center;
     }
   .field-heading img.icon{
@@ -340,14 +339,10 @@
               <div style="display:flex; justify-content:center;">
                 <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
               </div>
-              <div id="suggestionResult" style="display:none; width:min(100%, 480px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
+              <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
                 <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <div style="width:100%; margin:0;">
                   <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-                </div>
-                <div class="field-heading"><span id="suggestionTypeLabel">Animal type</span> <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <div style="width:100%; margin:0;">
-                  <input id="suggestionPersonaType" type="text" placeholder="Selected type" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; box-sizing:border-box;" />
                 </div>
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
@@ -355,7 +350,6 @@
               </div>
               <input type="hidden" id="archetypeSpecific" />
               <input type="hidden" id="archetypeSpecificDesc" />
-              <input type="hidden" id="suggestionPersonaTypeHidden" />
             </div>
 
           <!-- Personality Sliders (right after archetype) --> 
@@ -374,7 +368,7 @@
                       <!-- Style Choice -->
               <div class="field-heading">Choose art style</div>
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 480px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value="default">Default (Modern Illustration)</option>
                   <option value="realistic">Photo Realistic</option>
@@ -384,7 +378,7 @@
                   <option value="custom">Another Style (Enter Your Own)</option>
                 </select>
               </div>
-              <div id="customStyleRow" style="display:none; width:min(100%, 480px);">
+              <div id="customStyleRow" style="display:none; width:min(100%, 395px);">
                 <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
                   <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
                 </label>
@@ -395,7 +389,7 @@
             <!-- Vibe / Mood -->
             <div class="field-heading">Select art vibe / mood</div>
             <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 480px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                 <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                   <option value=""></option>
                   <option value="radiant">Radiant</option>
@@ -408,7 +402,7 @@
                   <option value="custom">Another (user entry)</option>
                 </select>
               </div>
-              <div id="customVibeRow" style="display:none; width:min(100%, 480px);">
+              <div id="customVibeRow" style="display:none; width:min(100%, 395px);">
                 <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
                   <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
                 </label>
@@ -508,13 +502,6 @@
   // Track when randomize flow should auto-open art settings after suggestion
   let randomizeFlow = false;
   const AUTO_SHOW_ARCHETYPES = ['human','animal','sci-fi / fantasy'];
-  const LIBRARY_ARCHETYPES = new Set(['animal','sci-fi / fantasy','human']);
-  const TYPE_LABELS = {
-    'animal': 'Animal type',
-    'human': 'Archetype type',
-    'sci-fi / fantasy': 'Character type'
-  };
-  const DEFAULT_TYPE_LABEL = 'Persona type';
 
   function shouldAutoShowArtSettings(value){
     if (!value) return false;
@@ -674,9 +661,9 @@
         showOptionsMode();
         // Archetype
   const archetypeWeights = [
-    { value: 'Human', weight: 0.2 },
-    { value: 'Animal', weight: 0.2 },
-    { value: 'Sci-Fi / Fantasy', weight: 0.2 },
+    { value: 'Human', weight: 0.1 },
+    { value: 'Animal', weight: 0.25 },
+    { value: 'Sci-Fi / Fantasy', weight: 0.25 },
     { value: 'AI Hologram', weight: 0.4 }
   ];
         const archetypeSel = document.getElementById('archetype');
@@ -767,34 +754,10 @@
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
-  const suggestionPersonaTypeEl = document.getElementById('suggestionPersonaType');
-  const suggestionPersonaTypeHidden = document.getElementById('suggestionPersonaTypeHidden');
-  const suggestionTypeLabelEl = document.getElementById('suggestionTypeLabel');
-  const suggestionPersonaTypeWrapper = suggestionPersonaTypeEl?.parentElement || null;
-  const suggestionTypeHeadingEl = suggestionTypeLabelEl?.parentElement || null;
-
-  function updateTypeField(category, { label, clearValue = false } = {}) {
-    const normalized = (category || '').toLowerCase();
-    const resolvedLabel = label || TYPE_LABELS[normalized] || DEFAULT_TYPE_LABEL;
-    const isLibrary = LIBRARY_ARCHETYPES.has(normalized);
-    if (suggestionTypeLabelEl) suggestionTypeLabelEl.textContent = resolvedLabel;
-    if (suggestionTypeHeadingEl) suggestionTypeHeadingEl.style.display = isLibrary ? 'flex' : 'none';
-    if (suggestionPersonaTypeWrapper) suggestionPersonaTypeWrapper.style.display = isLibrary ? 'block' : 'none';
-    if (suggestionPersonaTypeEl) {
-      suggestionPersonaTypeEl.disabled = !isLibrary;
-      if (clearValue) suggestionPersonaTypeEl.value = '';
-      suggestionPersonaTypeEl.placeholder = `Selected ${resolvedLabel.toLowerCase()}`;
-    }
-    if (suggestionPersonaTypeHidden && clearValue) {
-      suggestionPersonaTypeHidden.value = '';
-    }
-  }
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
-
-        updateTypeField(sel?.value || '', { clearValue: true });
 
         function currentSliderValues(){
           const val = (id)=> document.getElementById(id)?.value;
@@ -829,15 +792,9 @@
       } else {
         lastAbstractName = null;
       }
-      const normalizedCategory = String(category || '').trim().toLowerCase();
-      const fallbackTypeLabel = TYPE_LABELS[normalizedCategory] || DEFAULT_TYPE_LABEL;
-      const personaType = typeof json.personaType === 'string' ? json.personaType : '';
-      const personaTypeLabel = json.personaTypeLabel || fallbackTypeLabel;
       return {
         name: json.name || displayName,
         description: json.description,
-        personaType,
-        personaTypeLabel,
         displayName
       };
           } catch(e){
@@ -848,8 +805,6 @@
             return {
         name: 'Original Concept',
         description: 'A novel undefined concept shaped by personality balance.',
-        personaType: '',
-        personaTypeLabel: TYPE_LABELS[String(category || '').trim().toLowerCase()] || DEFAULT_TYPE_LABEL,
         displayName: 'Original Concept'
       };
           }
@@ -889,14 +844,6 @@
           archetypeSpecificDesc.value = suggestionDescEl.value;
           autosizeSuggestionDesc();
         });
-        suggestionPersonaTypeEl?.addEventListener('input', ()=>{
-          if (suggestionPersonaTypeHidden) {
-            suggestionPersonaTypeHidden.value = suggestionPersonaTypeEl.value;
-          }
-          if (persona) {
-            persona.value = suggestionPersonaTypeEl.value;
-          }
-        });
         // Initial autosize (in case prefilled)
         autosizeSuggestionDesc();
         autosizeSuggestionName();
@@ -922,7 +869,7 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            const { displayName, description, personaType, personaTypeLabel } = await generateSuggestion(category);
+            const { displayName, description } = await generateSuggestion(category);
               suggestionNameEl.value = displayName;
               autosizeSuggestionName();
               // Normalize any escaped newlines and carriage returns
@@ -930,16 +877,6 @@
               suggestionDescEl.value = descMulti;
               autosizeSuggestionDesc();
               autosizeSuggestionName();
-              updateTypeField(category, { label: personaTypeLabel, clearValue: !personaType });
-              if (suggestionPersonaTypeEl) {
-                suggestionPersonaTypeEl.value = personaType || '';
-              }
-              if (suggestionPersonaTypeHidden) {
-                suggestionPersonaTypeHidden.value = personaType || '';
-              }
-              if (persona && personaType) {
-                persona.value = personaType;
-              }
               requestAnimationFrame(()=> {
                 autosizeSuggestionDesc();
                 autosizeSuggestionName();
@@ -999,16 +936,10 @@
           const isCustom = val === 'custom';
           const isAbstractSelection = isAbstractArchetype(val);
           const autoShowArt = shouldAutoShowArtSettings(val);
-          const previousTypeValue = suggestionPersonaTypeHidden?.value || '';
-          updateTypeField(val, { clearValue: true });
-          const normalizedVal = String(val || '').trim().toLowerCase();
-          if (!LIBRARY_ARCHETYPES.has(normalizedVal) && persona && previousTypeValue && persona.value.trim().toLowerCase() === previousTypeValue.toLowerCase()) {
-            persona.value = '';
-          }
           row.style.display = 'none';
           updateGenerateState();
           if (genBtn) {
-            genBtn.textContent = 'Generate a suggestion from Personality';
+            genBtn.textContent = 'Get suggestion from Base and Personality';
           }
           // Show sliders only when a base archetype is set (any non-empty selection)
           if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
@@ -1026,12 +957,6 @@
             if (suggestionDescEl) {
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
-            }
-            if (suggestionPersonaTypeEl) {
-              suggestionPersonaTypeEl.value = '';
-            }
-            if (suggestionPersonaTypeHidden) {
-              suggestionPersonaTypeHidden.value = '';
             }
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
@@ -1077,12 +1002,6 @@
             if (suggestionDescEl) {
               suggestionDescEl.value = '';
               autosizeSuggestionDesc();
-            }
-            if (suggestionPersonaTypeEl) {
-              suggestionPersonaTypeEl.value = '';
-            }
-            if (suggestionPersonaTypeHidden) {
-              suggestionPersonaTypeHidden.value = '';
             }
             if (archetypeSpecificInput) archetypeSpecificInput.value = '';
             if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
@@ -1130,8 +1049,6 @@
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
         const suggestionNameInput = document.getElementById('suggestionName');
         const suggestionDescInput = document.getElementById('suggestionDesc');
-        const suggestionPersonaTypeHiddenEl = document.getElementById('suggestionPersonaTypeHidden');
-        const personaTypeValue = (suggestionPersonaTypeHiddenEl?.value || '').trim();
         if (suggestionNameInput && archetypeSpecificInputEl) {
           const nameVal = suggestionNameInput.value.trim();
           if (nameVal) {
@@ -1153,11 +1070,6 @@
           archetypeSpecificDesc = suggestionDescInput.value.trim();
         }
         const abstractSelected = isAbstractArchetype(archetype);
-        const libraryCategory = (archetypeValue || '').toLowerCase();
-        if (!abstractSelected && LIBRARY_ARCHETYPES.has(libraryCategory) && personaTypeValue) {
-          p = personaTypeValue;
-          persona.value = personaTypeValue;
-        }
 
         if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
           showError('Please describe your custom agent before generating.');
@@ -1253,7 +1165,6 @@
           vibe,
           styleChoice, artStyleCustom,
           traits,
-          personaType: personaTypeValue || null,
           personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
         try {
@@ -1277,7 +1188,6 @@
               archetype, vibe, setting, colors,
               styleChoice, artStyleCustom,
               traits,
-              personaType: personaTypeValue || null,
               personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
             })
           });
