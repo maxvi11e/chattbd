@@ -5,16 +5,22 @@
 
 const animalBuckets = {
   bucket1: [
-    "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Swordfish", "Condor", "Vulture", "Polar Bear", "Grizzly Bear"
+    "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
+    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Swordfish", "Condor", "Vulture", 
+    "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
-    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Okapi", "Zebra", "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle"
+    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Okapi", "Zebra", 
+    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle"
   ],
   bucket3: [
-    "Rabbit", "Guinea Pig", "Raccoon", "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Tapir", "Manatee", "Whale", "Beluga", "Octopus", "Squid", "Seal", "Sea Lion", "Walrus", "Cat", "Dog"
+    "Rabbit", "Guinea Pig", "Raccoon", "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", 
+    "Tapir", "Manatee", "Whale", "Beluga", "Octopus", "Squid", "Seal", "Sea Lion", "Walrus", "Cat", "Dog"
   ],
   bucket4: [
-    "Ferret", "River Otter", "Sea Otter", "Parrot", "Cockatoo", "Macaw", "Penguin", "Orca", "Porpoise", "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", "Macaw", "Parakeet", "Toucan"
+    "Ferret", "River Otter", "Sea Otter", "Parrot", "Cockatoo", "Macaw", "Penguin", "Orca", "Porpoise", 
+    "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
+    "Macaw", "Parakeet", "Toucan"
   ]
 };
 
@@ -43,16 +49,25 @@ const animalBucketMeta = {
 
 const humanArchetypeBuckets = {
   bucket1: [
-    "Monk", "Zen Master", "Judge", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Philosopher (Analytic)", "Stoic Thinker", "Mathematician", "Historian", "Logistician", "Policeman", "Banker"
+    "Monk", "Zen Master", "Judge", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
+    "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Philosopher (Analytic)", "Stoic Thinker", 
+    "Mathematician", "Historian", "Logistician", "Policeman", "Banker"
   ],
   bucket2: [
-    "Professor", "Doctor", "Therapist", "Psychologist", "Entrepreneur", "Manager", "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Community Leader", "Humanitarian", "Philosopher (Ethics)", "Counselor", "Inventor", "Activist", "Explorer", "Journalist"
+    "Professor", "Doctor", "Therapist", "Psychologist", "Entrepreneur", "Manager", "Architect", "Strategist", 
+    "Diplomat", "Coach", "Politician", "Priest", "Community Leader", "Humanitarian", "Philosopher (Ethics)", 
+    "Counselor", "Inventor", "Activist", "Explorer", "Journalist"
   ],
   bucket3: [
-    "Teacher", "Writer", "Poet", "Artist", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Performer", "Optimist", "Romantic", "Dreamer", "Student"
+    "Teacher", "Writer", "Poet", "Artist", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", 
+    "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Performer", "Optimist", "Romantic", 
+    "Dreamer", "Student"
   ],
   bucket4: [
-    "Comedian", "Visionary", "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", "Inventive Hacker", "Startup Founder", "Philosopher (Existential)", "Psychonaut", "Futurist", "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Childlike Wonderer", "Story Weaver", "Dream Architect", "Cultural Trickster"
+    "Comedian", "Visionary", "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
+    "Inventive Hacker", "Startup Founder", "Philosopher (Existential)", "Psychonaut", "Futurist", 
+    "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Childlike Wonderer", "Story Weaver", 
+    "Dream Architect", "Cultural Trickster"
   ]
 };
 
@@ -80,19 +95,96 @@ const humanBucketMeta = {
 };
 
 const archetypeBuckets = {
-  bucket1: [
-    "Soldier", "Knight", "Paladin", "Gladiator", "Warlord", "Mercenary", "Assassin", "Bounty Hunter", "Cyborg Enforcer", "Space Marine", "Warrior Monk", "Guard Captain", "Blacksmith", "Technocrat", "Engineer", "Strategist", "Archivist", "High Priest", "Overlord", "Necromancer"
+  bucket1: [ // 0–100: serious, rational, practical
+    "Service Android",
+    "Autonomous Factory Unit Robot",
+    "Battle Mech",
+    "Swarm Drone",
+    "Stealth Infiltrator Bot",
+    "AI Supercomputer Core Alien",
+    "Cybernetic Machine Alien",
+    "Space Marine",
+    "Necromancer",
+    "Reptilian Alien",
+    "Corrupted Dark Lord",
+    "Ruthless Galactic Emperor",
+    "Ancient Precursor Alien",
+    "Honor-Bound Warrior Alien",
+    "Loyal Human Knight",
+    "Stout Dwarven Warrior",
+    "Noble Elf Lord",
+    "Terraforming Machine Robot",
+    "Technomancer",
+    "Cunning Goblin"
   ],
-  bucket2: [
-    "Ranger", "Hunter", "Samurai", "Gunslinger", "Templar", "Druid", "Beastmaster", "Airship Captain", "Starship Pilot", "Battle Mage", "Shaman", "Alchemist", "Artificer", "Inquisitor", "Sorcerer", "Warlock", "Seer", "Oracle", "Navigator", "Technomancer"
+  bucket2: [ // 101–200: disciplined, heroic, competent
+    "Loyal Droid Companion",
+    "Noble Space Knight",
+    "Wise Mystic Mentor",
+    "Mysterious Ranger",
+    "Beastmaster",
+    "Airship Captain",
+    "Reluctant Hobbit Hero",
+    "Alien Cantina Rogue",
+    "Classic Grey Alien",
+    "Aquatic Deep-Sea Alien",
+    "Wise Old Wizard",
+    "Ent-like Forest Guardian",
+    "Dryad",
+    "Dragon Rider",
+    "Loyal Human Knight", // (appears again for thematic balance if desired)
+    "Witch",
+    "Starfighter Ace",
+    "Explorer-type Archetype Placeholder", // filler for balance
+    "Adventurer-type Archetype Placeholder",
+    "Mentor-type Archetype Placeholder"
   ],
-  bucket3: [
-    "Adventurer", "Explorer", "Treasure Hunter", "Bard", "Healer", "Cleric", "Scholar", "Inventor", "Tinkerer", "Trader", "Smuggler", "Diplomat", "Rebel Leader", "Freedom Fighter", "Steampunk Inventor", "Witch", "Psychic", "Shape-shifter", "Mutant", "Alien Envoy"
+  bucket3: [ // 201–300: curious, adventurous, balanced imagination
+    "Humanoid Companion Robot",
+    "Carebot",
+    "Alien Cantina Rogue",
+    "Rebellious Freedom Fighter",
+    "Starfighter Ace",
+    "Explorer-type Adventurer",
+    "Poetic Wanderer Placeholder",
+    "Inventor Placeholder",
+    "Psychic Placeholder",
+    "Tinkerer Placeholder",
+    "Friendly Alien Companion Placeholder",
+    "Time Traveler",
+    "Classic Dreamer Placeholder",
+    "Optimistic Hero Placeholder",
+    "Scholar-type Placeholder",
+    "Parent/Guardian Placeholder",
+    "Diplomatic Explorer Placeholder",
+    "Creative Craftsman Placeholder",
+    "Luminous Energy Being Alien",
+    "Fluid Shapeshifter Alien"
   ],
-  bucket4: [
-    "Trickster", "Jester", "Illusionist", "Elementalist", "Wild Mage", "Time Traveler", "Chronomancer", "Dreamwalker", "Star Child", "Celestial", "Fairy", "Sprite", "Dryad", "Djinn", "Dragon Rider", "Cosmic Wanderer", "AI Oracle", "Digital Ghost", "Virtual Deity", "Chaos Sorcerer"
+  bucket4: [ // 301–400: mystical, chaotic, visionary
+    "Chaos Sorcerer",
+    "AI Oracle",
+    "Ancient Force-Wielding Sage",
+    "Ancient Dragon",
+    "Wise Old Wizard", // (works here too, but skewed mystical version)
+    "Fairy/Dryad Hybrid Placeholder",
+    "Rebellious Trickster Placeholder",
+    "Celestial Child Placeholder",
+    "Cosmic Wanderer Placeholder",
+    "Mythical Bard Placeholder",
+    "Illusionist Placeholder",
+    "Dreamwalker Placeholder",
+    "Spiritual Mystic Placeholder",
+    "Arcane Genius Placeholder",
+    "Story Weaver Placeholder",
+    "Virtual Deity Placeholder",
+    "Chaos Magician Placeholder",
+    "Star Child Placeholder",
+    "Playful Sprite Placeholder",
+    "Trickster Jester Placeholder"
   ]
 };
+
 
 const sciFiBucketMeta = {
   bucket1: {
