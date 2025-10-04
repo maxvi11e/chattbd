@@ -1265,6 +1265,26 @@
           return;
         }
 
+        // Get vibe and traits early (needed for hologram generation)
+        const vibeSelectEl = document.getElementById('vibeChoice');
+        const vibeChoice = vibeSelectEl ? vibeSelectEl.value : '';
+        const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
+        const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
+        const styleChoice = document.getElementById('styleChoice')?.value || 'default';
+        const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
+        
+        function scale10To100(v){
+          const n = Number(v || 5);
+          // Map 1..10 -> 0..100 in 10 steps (1->0, 10->100)
+          return Math.round(((n - 1) / 9) * 100);
+        }
+        const traits = {
+          seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
+          succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
+          rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
+          practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
+        };
+
         // Check if hologram checkbox is selected
         const useHologram = renderAsHologramCheckbox?.checked || false;
         
@@ -1328,26 +1348,6 @@
         }
 
         if (!p && !isOptionsMode) return;
-
-  // band/book removed
-  // Vibe / Mood
-  const vibeSelectEl = document.getElementById('vibeChoice');
-  const vibeChoice = vibeSelectEl ? vibeSelectEl.value : '';
-  const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
-  const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
-  const styleChoice = document.getElementById('styleChoice')?.value || 'default';
-  const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
-        function scale10To100(v){
-          const n = Number(v || 5);
-          // Map 1..10 -> 0..100 in 10 steps (1->0, 10->100)
-          return Math.round(((n - 1) / 9) * 100);
-        }
-        const traits = {
-          seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
-          succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
-          rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
-          practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
-        };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = archetypeSpecific || archetype || 'New Avatar';
