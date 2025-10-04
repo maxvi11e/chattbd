@@ -245,12 +245,68 @@ export default async function handler(req) {
   }
   try {
     const body = await req.json();
-    const { archetypeCategory, sliders = {} } = body || {};
+    const { archetypeCategory, sliders = {}, randomArchetype } = body || {};
     console.log('[suggest-persona] incoming', {
       archetypeCategory,
+      randomArchetype,
       sliders,
       timestamp: new Date().toISOString()
     });
+    if (randomArchetype) {
+      const categoryKeys = Object.keys(personaLibraries);
+      if (!categoryKeys.length) {
+        return new Response(
+          JSON.stringify({ error: 'No persona libraries configured.' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const normalizedCategory = randomItem(categoryKeys);
+      const library = personaLibraries[normalizedCategory];
+      const bucketKeys = Object.keys(library?.buckets || {}).filter(Boolean);
+      const bucketKey = randomItem(bucketKeys);
+      const bucket = (library?.buckets?.[bucketKey] || []).filter(Boolean);
+
+      if (!bucket.length || !bucketKey) {
+        return new Response(
+          JSON.stringify({ error: 'No entries available for random selection.' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const type = randomItem(bucket);
+      if (!type) {
+        return new Response(
+          JSON.stringify({ error: 'Failed to pick random archetype.' }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const isSciFi = normalizedCategory === 'sci-fi / fantasy';
+      const isAnimal = normalizedCategory === 'animal';
+      const meta = (!isSciFi && !isAnimal && library.meta && library.meta[bucketKey]) ? library.meta[bucketKey] : {};
+
+      let name;
+      if (isSciFi || isAnimal) {
+        name = type.slice(0, 60);
+      } else {
+        const nameAdj = randomItem(meta?.nameAdjectives) || 'Curious';
+        name = `${nameAdj} ${type}`.slice(0, 60);
+      }
+
+      const responsePayload = {
+        name,
+        description: null,
+        personaType: type,
+        personaTypeLabel: library?.typeLabel || 'Persona type',
+        reasoning: `Random selection from ${normalizedCategory} (${bucketKey}).`,
+        sliders: null,
+        archetypeCategory: normalizedCategory,
+        flavor: []
+      };
+
+      return new Response(JSON.stringify(responsePayload), { headers: { 'Content-Type': 'application/json' } });
+    }
     if (!archetypeCategory) {
       return new Response(JSON.stringify({ error: 'Missing archetypeCategory' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     }

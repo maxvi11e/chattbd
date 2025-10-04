@@ -338,6 +338,7 @@
             <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
               <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
                 <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
+                <button id="addRandomSuggestionBtn" style="width:180px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Add Random</button>
                 <button id="continueCreateBtn" style="width:200px; padding:10px 16px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Continue Creating</button>
               </div>
               <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
@@ -756,6 +757,7 @@
         const row = document.getElementById('archetypeCustomRow');
         const input = document.getElementById('archetypeCustom');
   const genBtn = document.getElementById('generateSuggestionBtn');
+  const addRandomBtn = document.getElementById('addRandomSuggestionBtn');
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
@@ -764,6 +766,19 @@
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
+        const addRandomDefaultLabel = addRandomBtn?.textContent?.trim() || 'Add Random';
+
+        const hideAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'none'; };
+        const showAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'inline-block'; };
+
+        const CATEGORY_DISPLAY_BY_KEY = {
+          'human': 'Human',
+          'animal': 'Animal',
+          'sci-fi / fantasy': 'Sci-Fi / Fantasy'
+        };
+
+        const toNormalizedCategory = (value)=> (value || '').trim().toLowerCase();
+        const toDisplayCategory = (value)=> CATEGORY_DISPLAY_BY_KEY[value] || '';
 
         function currentSliderValues(){
           const val = (id)=> document.getElementById(id)?.value;
@@ -869,6 +884,46 @@
         autosizeSuggestionDesc();
         autosizeSuggestionName();
 
+        function applySuggestionResult({ typeOnly, displayName }, { autoOpenArtSettings = false } = {}) {
+          const finalValue = typeOnly || displayName || '';
+          if (suggestionBox) {
+            suggestionBox.style.display = 'block';
+          }
+          if (suggestionTypeEl) {
+            suggestionTypeEl.value = finalValue;
+            autosizeSuggestionType();
+          }
+          if (autoOpenArtSettings) {
+            if (artSettings) artSettings.style.display = 'flex';
+            artSettingsTriggered = true;
+            if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
+          }
+          if (artSettingsBtn) {
+            if (artSettings && artSettings.style.display !== 'none') {
+              artSettingsBtn.style.display = 'none';
+            } else {
+              artSettingsBtn.style.display = 'inline-block';
+            }
+          }
+          if (archetypeSpecificInput) archetypeSpecificInput.value = finalValue;
+          if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
+          lastAbstractName = finalValue;
+          if (genBtn) {
+            genBtn.textContent = 'Suggest Another';
+            genBtn.disabled = false;
+            genBtn.style.opacity = '1';
+            genBtn.style.display = 'inline-block';
+          }
+          if (startBtn) {
+            if (artSettingsTriggered && artSettings && artSettings.style.display !== 'none') {
+              startBtn.style.display = 'flex';
+            } else {
+              startBtn.style.display = 'none';
+            }
+          }
+          showAddRandom();
+        }
+
         function updateGenerateState(){
           const val = sel.value;
           if (!genBtn) return;
@@ -877,11 +932,13 @@
             genBtn.style.display = 'none';
             genBtn.disabled = true;
             genBtn.style.opacity = '0.6';
+            hideAddRandom();
             return;
           }
           genBtn.style.display = 'inline-block';
           genBtn.disabled = false;
           genBtn.style.opacity = '1';
+          hideAddRandom();
         }
 
         if (genBtn){
@@ -890,49 +947,62 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
+            hideAddRandom();
             const { displayName, description, typeOnly } = await generateSuggestion(category);
-              // Only show suggestion box and populate Type field
-              suggestionBox.style.display = 'block';
-              if (suggestionTypeEl) {
-                suggestionTypeEl.value = typeOnly || displayName || '';
-                autosizeSuggestionType();
-              }
-              // If randomize flow, auto-open Art Settings and keep the button hidden
-              if (randomizeFlow) {
-                if (artSettings) artSettings.style.display = 'flex';
-                artSettingsTriggered = true;
-                if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
-              }
-              // Don't focus name field because we are not populating it yet
-              // Reveal art settings button only if settings are not already open
-              if (artSettingsBtn) {
-                if (artSettings && artSettings.style.display !== 'none') {
-                  artSettingsBtn.style.display = 'none';
-                } else {
-                  artSettingsBtn.style.display = 'inline-block';
-                }
-              }
-              // Only store raw type as archetypeSpecific
-              archetypeSpecificInput.value = typeOnly || displayName || '';
-              archetypeSpecificDesc.value = '';
-      lastAbstractName = typeOnly || displayName || '';
-              // Update button label and re-enable for future regenerations
-              genBtn.textContent = 'Suggest Another';
-              genBtn.disabled = false;
-              genBtn.style.opacity = '1';
-              genBtn.style.display = 'inline-block';
-              // Show the start/create button only after Art Settings has been triggered and is open
-              if (startBtn) {
-                if (artSettingsTriggered && artSettings && artSettings.style.display !== 'none') {
-                  startBtn.style.display = 'flex';
-                } else {
-                  startBtn.style.display = 'none';
-                }
-              }
-              // Reset randomize flow flag now that we've handled it
-              randomizeFlow = false;
+            applySuggestionResult({ displayName, typeOnly }, { autoOpenArtSettings: randomizeFlow });
+            if (suggestionDescEl) {
+              suggestionDescEl.value = description || '';
+              autosizeSuggestionDesc();
+            }
+            if (suggestionNameEl && displayName) {
+              suggestionNameEl.value = '';
+              autosizeSuggestionName();
+            }
+            // Reset randomize flow flag now that we've handled it
+            randomizeFlow = false;
           };
           genBtn.addEventListener('click', handleGenerate);
+        }
+        if (addRandomBtn) {
+          addRandomBtn.addEventListener('click', async ()=>{
+            if (addRandomBtn.disabled) return;
+            addRandomBtn.disabled = true;
+            addRandomBtn.textContent = 'Adding...';
+            try {
+              const resp = await fetch('/api/suggest-persona', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ randomArchetype: true })
+              });
+              if (!resp.ok) {
+                throw new Error('Random suggestion request failed');
+              }
+              const payload = await resp.json();
+              const normalizedCategory = toNormalizedCategory(payload?.archetypeCategory);
+              const displayCategory = toDisplayCategory(normalizedCategory);
+              if (displayCategory && sel) {
+                sel.value = displayCategory;
+                dispatch(sel, 'change');
+              }
+              const displayName = payload?.name || payload?.personaType || 'Random Persona';
+              const typeOnly = payload?.personaType || displayName;
+              applySuggestionResult({ displayName, typeOnly });
+              if (suggestionDescEl) {
+                suggestionDescEl.value = payload?.description || '';
+                autosizeSuggestionDesc();
+              }
+              if (suggestionNameEl) {
+                suggestionNameEl.value = '';
+                autosizeSuggestionName();
+              }
+            } catch (error) {
+              console.error('Random suggestion error', error);
+            } finally {
+              addRandomBtn.textContent = addRandomDefaultLabel;
+              addRandomBtn.disabled = false;
+              showAddRandom();
+            }
+          });
         }
         // Regeneration handled via generate button
 
@@ -958,6 +1028,10 @@
             if (suggestionNameEl) {
               suggestionNameEl.value = '';
               autosizeSuggestionName();
+            }
+            if (suggestionTypeEl) {
+              suggestionTypeEl.value = '';
+              autosizeSuggestionType();
             }
             if (suggestionDescEl) {
               suggestionDescEl.value = '';
@@ -996,6 +1070,7 @@
                 genBtn.style.display = 'none';
               }
             }
+            hideAddRandom();
           } else {
             if (suggestionBox) {
               suggestionBox.style.display = 'block';
