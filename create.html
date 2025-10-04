@@ -884,8 +884,13 @@
         autosizeSuggestionDesc();
         autosizeSuggestionName();
 
-        function applySuggestionResult({ typeOnly, displayName }, { autoOpenArtSettings = false } = {}) {
-          const finalValue = typeOnly || displayName || '';
+        function applySuggestionResult({ typeOnly, displayName }, { autoOpenArtSettings = false, append = false } = {}) {
+          const incomingValue = (typeOnly || displayName || '').trim();
+          if (!incomingValue) return;
+          const existingTypeValue = suggestionTypeEl ? suggestionTypeEl.value.trim() : '';
+          const finalValue = append && existingTypeValue
+            ? `${existingTypeValue} + ${incomingValue}`
+            : incomingValue;
           if (suggestionBox) {
             suggestionBox.style.display = 'block';
           }
@@ -905,8 +910,17 @@
               artSettingsBtn.style.display = 'inline-block';
             }
           }
-          if (archetypeSpecificInput) archetypeSpecificInput.value = finalValue;
-          if (archetypeSpecificDesc) archetypeSpecificDesc.value = '';
+          if (archetypeSpecificInput) {
+            if (append && archetypeSpecificInput.value.trim()) {
+              const existing = archetypeSpecificInput.value.trim();
+              archetypeSpecificInput.value = `${existing} + ${incomingValue}`;
+            } else {
+              archetypeSpecificInput.value = finalValue;
+            }
+          }
+          if (!append && archetypeSpecificDesc) {
+            archetypeSpecificDesc.value = '';
+          }
           lastAbstractName = finalValue;
           if (genBtn) {
             genBtn.textContent = 'Suggest Another';
@@ -980,13 +994,9 @@
               const payload = await resp.json();
               const normalizedCategory = toNormalizedCategory(payload?.archetypeCategory);
               const displayCategory = toDisplayCategory(normalizedCategory);
-              if (displayCategory && sel) {
-                sel.value = displayCategory;
-                dispatch(sel, 'change');
-              }
-              const displayName = payload?.name || payload?.personaType || 'Random Persona';
-              const typeOnly = payload?.personaType || displayName;
-              applySuggestionResult({ displayName, typeOnly });
+              const baseType = payload?.personaType || payload?.name || 'Random Persona';
+              const labeledType = displayCategory ? `${baseType} (${displayCategory})` : baseType;
+              applySuggestionResult({ typeOnly: labeledType, displayName: labeledType }, { append: true });
               if (suggestionDescEl) {
                 suggestionDescEl.value = payload?.description || '';
                 autosizeSuggestionDesc();
