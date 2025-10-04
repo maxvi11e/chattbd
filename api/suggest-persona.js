@@ -6,7 +6,7 @@
 const animalBuckets = {
   bucket1: [
     "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
-    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Swordfish", "Condor", "Vulture", 
+    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Sea Turtle", "Condor", 
     "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
@@ -15,12 +15,12 @@ const animalBuckets = {
   ],
   bucket3: [
     "Rabbit", "Guinea Pig", "Raccoon", "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", 
-    "Tapir", "Manatee", "Whale", "Beluga", "Octopus", "Squid", "Seal", "Sea Lion", "Walrus", "Cat", "Dog"
+    "Tapir", "Manatee", "Whale", "Beluga", "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog"
   ],
   bucket4: [
-    "Ferret", "River Otter", "Sea Otter", "Parrot", "Cockatoo", "Macaw", "Penguin", "Orca", "Porpoise", 
+    "Ferret", "River Otter", "Sea Otter", "Macaw", "Penguin", "Orca", "Porpoise", 
     "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
-    "Macaw", "Parakeet", "Toucan"
+    "Raccoon"
   ]
 };
 
@@ -29,24 +29,24 @@ const animalBuckets = {
 const humanArchetypeBuckets = {
   bucket1: [
     "Monk", "Zen Master", "Judge", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
-    "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Philosopher (Analytic)", "Stoic Thinker", 
+    "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
     "Mathematician", "Historian", "Logistician", "Policeman", "Banker"
   ],
   bucket2: [
     "Professor", "Doctor", "Therapist", "Psychologist", "Entrepreneur", "Manager", "Architect", "Strategist", 
-    "Diplomat", "Coach", "Politician", "Priest", "Community Leader", "Humanitarian", "Philosopher (Ethics)", 
+    "Diplomat", "Coach", "Politician", "Priest", "Community Leader", "Humanitarian", "Ethical Philosopher", 
     "Counselor", "Inventor", "Activist", "Explorer", "Journalist"
   ],
   bucket3: [
-    "Teacher", "Writer", "Poet", "Artist", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", 
-    "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Performer", "Optimist", "Romantic", 
+    "Teacher", "Writer", "Poet", "Painter", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", 
+    "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Jazz Artist",  "Optimist", "Romantic", 
     "Dreamer", "Student"
   ],
   bucket4: [
     "Comedian", "Visionary", "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
-    "Inventive Hacker", "Startup Founder", "Philosopher (Existential)", "Psychonaut", "Futurist", 
+    "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Psychonaut", "Futurist", 
     "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Childlike Wonderer", "Story Weaver", 
-    "Dream Architect", "Cultural Trickster"
+    "Dream Architect"
   ]
 };
 
@@ -78,16 +78,16 @@ const archetypeBuckets = {
     "Service Android",
     "Autonomous Factory Unit Robot",
     "Battle Mech",
-    "Swarm Drone",
+    "Drone Swarm",
     "Stealth Infiltrator Bot",
-    "AI Supercomputer Core Alien",
-    "Cybernetic Machine Alien",
+    "AI Supercomputer Core",
+    "Cybernetic Machine",
     "Space Marine",
     "Necromancer",
     "Reptilian Alien",
-    "Ancient Dark Lord Alien",
+    "Ancient Dark Lord",
     "Stoic Galactic Emperor",
-    "Ancient Precursor Alien",
+    "Ancient Precursor",
     "Ice Dragon",
     "Human Knight",
     "Dwarven Warrior",
@@ -104,14 +104,14 @@ const archetypeBuckets = {
     "Beastmaster",
     "Airship Captain",
     "Hobbit Hero",
-    "Alien Cantina Rogue",
+    "Cantina Alien",
     "Classic Grey Alien",
     "Aquatic Deep-Sea Alien",
     "Wise Wizard",
     "Ent-like Forest Guardian",
     "Dryad",
     "Dragon Rider",
-    "Loyal Human Knight", // (appears again for thematic balance if desired)
+    "Human Space Knight", // (appears again for thematic balance if desired)
     "Witch",
     "Starfighter Ace",
     "Space Explorer", // filler for balance
