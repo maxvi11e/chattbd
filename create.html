@@ -346,9 +346,11 @@
                   <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
                 </div>
                 <!-- Undo and Add Random buttons below Type field -->
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center;">
+                <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center; flex-wrap:wrap;">
                   <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:0; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); color:#ffffff; border-radius:50%; font-size:18px; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">↶</button>
-                  <button id="addRandomSuggestionBtn" style="width:180px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Add Random</button>
+                  <button id="addRandomSciFiBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Sci-Fi</button>
+                  <button id="addRandomAnimalBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Animal</button>
+                  <button id="addRandomRoleBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Role</button>
                 </div>
                 <!-- More Options button -->
                 <div style="display:flex; justify-content:center; margin-top:8px;">
@@ -778,7 +780,9 @@
         const row = document.getElementById('archetypeCustomRow');
         const input = document.getElementById('archetypeCustom');
   const genBtn = document.getElementById('generateSuggestionBtn');
-  const addRandomBtn = document.getElementById('addRandomSuggestionBtn');
+  const addRandomSciFiBtn = document.getElementById('addRandomSciFiBtn');
+  const addRandomAnimalBtn = document.getElementById('addRandomAnimalBtn');
+  const addRandomRoleBtn = document.getElementById('addRandomRoleBtn');
   const undoTypeBtn = document.getElementById('undoTypeBtn');
   const suggestionBox = document.getElementById('suggestionResult');
   const suggestionNameEl = document.getElementById('suggestionName');
@@ -788,13 +792,20 @@
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
         const archetypeSpecificDesc = document.getElementById('archetypeSpecificDesc');
-        const addRandomDefaultLabel = addRandomBtn?.textContent?.trim() || 'Add Random';
 
         // Track type history for undo functionality
         let typeHistory = [];
 
-        const hideAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'none'; };
-        const showAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'inline-block'; };
+        const hideAddRandomBtns = ()=>{ 
+          if (addRandomSciFiBtn) addRandomSciFiBtn.style.display = 'none';
+          if (addRandomAnimalBtn) addRandomAnimalBtn.style.display = 'none';
+          if (addRandomRoleBtn) addRandomRoleBtn.style.display = 'none';
+        };
+        const showAddRandomBtns = ()=>{ 
+          if (addRandomSciFiBtn) addRandomSciFiBtn.style.display = 'inline-block';
+          if (addRandomAnimalBtn) addRandomAnimalBtn.style.display = 'inline-block';
+          if (addRandomRoleBtn) addRandomRoleBtn.style.display = 'inline-block';
+        };
         const hideUndoBtn = ()=>{ if (undoTypeBtn) undoTypeBtn.style.display = 'none'; };
         const showUndoBtn = ()=>{ if (undoTypeBtn) undoTypeBtn.style.display = 'inline-block'; };
         const updateUndoBtnState = ()=>{
@@ -990,7 +1001,7 @@
               startBtn.style.display = 'none';
             }
           }
-          showAddRandom();
+          showAddRandomBtns();
         }
 
         function updateGenerateState(){
@@ -1001,14 +1012,14 @@
             genBtn.style.display = 'none';
             genBtn.disabled = true;
             genBtn.style.opacity = '0.6';
-            hideAddRandom();
+            hideAddRandomBtns();
             hideUndoBtn();
             return;
           }
           genBtn.style.display = 'inline-block';
           genBtn.disabled = false;
           genBtn.style.opacity = '1';
-          hideAddRandom();
+          hideAddRandomBtns();
           updateUndoBtnState();
         }
 
@@ -1018,7 +1029,7 @@
             if (!category || category==='custom') return;
             genBtn.textContent = 'Generating...';
             genBtn.disabled = true;
-            hideAddRandom();
+            hideAddRandomBtns();
             const { displayName, description, typeOnly } = await generateSuggestion(category);
             applySuggestionResult({ displayName, typeOnly }, { autoOpenArtSettings: randomizeFlow });
             if (suggestionDescEl) {
@@ -1034,47 +1045,60 @@
           };
           genBtn.addEventListener('click', handleGenerate);
         }
-        if (addRandomBtn) {
-          addRandomBtn.addEventListener('click', async ()=>{
-            if (addRandomBtn.disabled) return;
-            addRandomBtn.disabled = true;
-            addRandomBtn.textContent = 'Adding...';
-            try {
-              // Get current base archetype to exclude it from random selection
-              const currentArchetype = sel?.value?.trim().toLowerCase() || '';
-              const excludeCategory = currentArchetype === 'custom' ? null : currentArchetype;
-              
-              const resp = await fetch('/api/suggest-persona', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                  randomArchetype: true,
-                  excludeCategory: excludeCategory
-                })
-              });
-              if (!resp.ok) {
-                throw new Error('Random suggestion request failed');
-              }
-              const payload = await resp.json();
-              const baseTypeRaw = payload?.personaType || payload?.name || 'Random Persona';
-              const baseType = baseTypeRaw ? String(baseTypeRaw).trim() : 'Random Persona';
-              const incomingType = baseType || 'Random Persona';
-              applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: true });
-              if (suggestionDescEl) {
-                suggestionDescEl.value = payload?.description || '';
-                autosizeSuggestionDesc();
-              }
-              if (suggestionNameEl) {
-                suggestionNameEl.value = '';
-                autosizeSuggestionName();
-              }
-            } catch (error) {
-              console.error('Random suggestion error', error);
-            } finally {
-              addRandomBtn.textContent = addRandomDefaultLabel;
-              addRandomBtn.disabled = false;
-              showAddRandom();
+        
+        // Helper function to add random type from specific category
+        async function addRandomFromCategory(category, btnElement, btnLabel) {
+          if (!btnElement || btnElement.disabled) return;
+          btnElement.disabled = true;
+          const originalText = btnElement.textContent;
+          btnElement.textContent = 'Adding...';
+          try {
+            const resp = await fetch('/api/suggest-persona', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                randomArchetype: true,
+                forceCategory: category
+              })
+            });
+            if (!resp.ok) {
+              throw new Error('Random suggestion request failed');
             }
+            const payload = await resp.json();
+            const baseTypeRaw = payload?.personaType || payload?.name || 'Random Persona';
+            const baseType = baseTypeRaw ? String(baseTypeRaw).trim() : 'Random Persona';
+            const incomingType = baseType || 'Random Persona';
+            applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: true });
+            if (suggestionDescEl) {
+              suggestionDescEl.value = payload?.description || '';
+              autosizeSuggestionDesc();
+            }
+            if (suggestionNameEl) {
+              suggestionNameEl.value = '';
+              autosizeSuggestionName();
+            }
+          } catch (error) {
+            console.error('Random suggestion error', error);
+          } finally {
+            btnElement.textContent = originalText;
+            btnElement.disabled = false;
+          }
+        }
+        
+        // Three add random buttons
+        if (addRandomSciFiBtn) {
+          addRandomSciFiBtn.addEventListener('click', () => {
+            addRandomFromCategory('sci-fi / fantasy', addRandomSciFiBtn, '+ Sci-Fi');
+          });
+        }
+        if (addRandomAnimalBtn) {
+          addRandomAnimalBtn.addEventListener('click', () => {
+            addRandomFromCategory('animal', addRandomAnimalBtn, '+ Animal');
+          });
+        }
+        if (addRandomRoleBtn) {
+          addRandomRoleBtn.addEventListener('click', () => {
+            addRandomFromCategory('human', addRandomRoleBtn, '+ Role');
           });
         }
         
@@ -1176,7 +1200,7 @@
                 genBtn.style.display = 'none';
               }
             }
-            hideAddRandom();
+            hideAddRandomBtns();
           } else {
             if (suggestionBox) {
               suggestionBox.style.display = 'block';

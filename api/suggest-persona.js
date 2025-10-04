@@ -244,11 +244,11 @@ export default async function handler(req) {
   }
   try {
     const body = await req.json();
-    const { archetypeCategory, sliders = {}, randomArchetype, excludeCategory } = body || {};
+    const { archetypeCategory, sliders = {}, randomArchetype, forceCategory } = body || {};
     console.log('[suggest-persona] incoming', {
       archetypeCategory,
       randomArchetype,
-      excludeCategory,
+      forceCategory,
       sliders,
       timestamp: new Date().toISOString()
     });
@@ -261,20 +261,23 @@ export default async function handler(req) {
         );
       }
 
-      // Filter out the excluded category if provided
-      if (excludeCategory) {
-        categoryKeys = categoryKeys.filter(key => key.toLowerCase() !== excludeCategory.toLowerCase());
+      let normalizedCategory;
+      
+      // If forceCategory is provided, use that specific category
+      if (forceCategory) {
+        const forcedKey = categoryKeys.find(key => key.toLowerCase() === forceCategory.toLowerCase());
+        if (!forcedKey) {
+          return new Response(
+            JSON.stringify({ error: `Invalid category: ${forceCategory}` }),
+            { status: 400, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+        normalizedCategory = forcedKey;
+      } else {
+        // Otherwise pick randomly from all categories
+        normalizedCategory = randomItem(categoryKeys);
       }
 
-      // If no categories remain after filtering, return error
-      if (categoryKeys.length === 0) {
-        return new Response(
-          JSON.stringify({ error: 'No valid categories available after exclusion.' }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const normalizedCategory = randomItem(categoryKeys);
       const library = personaLibraries[normalizedCategory];
       const bucketKeys = Object.keys(library?.buckets || {}).filter(Boolean);
       const bucketKey = randomItem(bucketKeys);
