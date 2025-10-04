@@ -99,7 +99,7 @@ const archetypeBuckets = {
   bucket2: [ // 101–200: disciplined, heroic, competent
     "Droid Companion",
     "Noble Space Knight",
-    "Wise Mystic Mentor",
+    "Wise Mystic Alien",
     "Mysterious Ranger",
     "Beastmaster",
     "Airship Captain",
@@ -107,7 +107,7 @@ const archetypeBuckets = {
     "Alien Cantina Rogue",
     "Classic Grey Alien",
     "Aquatic Deep-Sea Alien",
-    "Wise Old Wizard",
+    "Wise Wizard",
     "Ent-like Forest Guardian",
     "Dryad",
     "Dragon Rider",
@@ -122,9 +122,9 @@ const archetypeBuckets = {
     "Humanoid Companion Robot",
     "Carebot",
     "Alien Cantina Rogue",
-    "Rebellious Freedom Fighter",
+    "Rebel Freedom Fighter",
     "Starfighter Ace",
-    "Explorer-type Adventurer",
+    "Elven King",
     "Poetic Wanderer",
     "Inventor",
     "Psychic Mage Alien",
@@ -141,7 +141,7 @@ const archetypeBuckets = {
     "Shapeshifter Alien"
   ],
   bucket4: [ // 301–400: mystical, chaotic, visionary
-    "Chaos Sorcerer",
+    "Alien Wizard",
     "AI Oracle",
     "Force-Wielding Sage",
     "Elemental Dragon",
@@ -150,7 +150,7 @@ const archetypeBuckets = {
     "Trickster Mystic",
     "Celestial Architect",
     "Cosmic Wanderer",
-    "Mythical Bard",
+    "Alien Merchant",
     "Illusionist",
     "Comic Relief Droid",
     "Space Mystic",
@@ -159,7 +159,7 @@ const archetypeBuckets = {
     "Virtual Deity",
     "Chaos Magician ",
     "Celestial Fairy",
-    "Playful Sprite",
+    "",
     "Companion Sprite"
   ]
 };
