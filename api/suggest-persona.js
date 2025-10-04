@@ -6,18 +6,16 @@
 const animalBuckets = {
   bucket1: [
     "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
-    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Sea Turtle", "Condor", 
-    "Polar Bear", "Grizzly Bear"
+    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Sea Turtle", "Condor","Panda", "Sloth", 
+    "Tiger", "Leopard", "Lion", "Cheetah", "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
     "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Okapi", "Zebra", 
-    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle"
+    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit", "Guinea Pig", "Raccoon", 
+    "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Tapir", "Manatee", "Whale", "Beluga" 
   ],
   bucket3: [
-    "Rabbit", "Guinea Pig", "Raccoon", "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", 
-    "Tapir", "Manatee", "Whale", "Beluga", "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog"
-  ],
-  bucket4: [
+    "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog",    
     "Ferret", "River Otter", "Sea Otter", "Macaw", "Penguin", "Orca", "Porpoise", 
     "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
     "Raccoon"
@@ -30,24 +28,22 @@ const humanArchetypeBuckets = {
   bucket1: [
     "Monk", "Zen Master", "Judge", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
     "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
-    "Mathematician", "Historian", "Logistician", "Policeman", "Banker"
+    "Mathematician", "Historian", "Logistician", "Policeman", "Banker", "Professor", "Doctor", "Therapist", "Psychologist", 
+    "Entrepreneur", "Manager", "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Community Leader",
   ],
-  bucket2: [
-    "Professor", "Doctor", "Therapist", "Psychologist", "Entrepreneur", "Manager", "Architect", "Strategist", 
-    "Diplomat", "Coach", "Politician", "Priest", "Community Leader", "Humanitarian", "Ethical Philosopher", 
-    "Counselor", "Inventor", "Activist", "Explorer", "Journalist"
-  ],
-  bucket3: [
+  bucket2: [ 
+    "Humanitarian", "Ethical Philosopher","Counselor", "Inventor", "Activist", "Explorer", "Journalist",
     "Teacher", "Writer", "Poet", "Painter", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", 
     "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Jazz Artist",  "Optimist", "Romantic", 
-    "Dreamer", "Student"
+    "Dreamer", "Student", "Comedian", "Visionary", 
   ],
-  bucket4: [
-    "Comedian", "Visionary", "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
+  bucket3: [
+    "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
     "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Psychonaut", "Futurist", 
     "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Childlike Wonderer", "Story Weaver", 
     "Dream Architect"
   ]
+
 };
 
 const humanBucketMeta = {
@@ -62,11 +58,6 @@ const humanBucketMeta = {
     fallback: "steady leadership"
   },
   bucket3: {
-    nameAdjectives: ["Friendly", "Curious", "Creative", "Warm"],
-    descriptors: ["relatable", "creative", "open-hearted"],
-    fallback: "creative warmth"
-  },
-  bucket4: {
     nameAdjectives: ["Whimsical", "Visionary", "Radiant", "Playful"],
     descriptors: ["imaginative", "free-spirited", "visionary"],
     fallback: "boundless imagination"
@@ -74,7 +65,7 @@ const humanBucketMeta = {
 };
 
 const archetypeBuckets = {
-  bucket1: [ // 0–100: serious, rational, practical
+  bucket1: [ // 0–133: serious, rational, practical
     "Service Android",
     "Autonomous Factory Unit Robot",
     "Battle Mech",
@@ -94,11 +85,8 @@ const archetypeBuckets = {
     "Noble Elf Lord",
     "Terraforming Machine Robot",
     "Dwarf Miner",
-    "Cunning Goblin"
-  ],
-  bucket2: [ // 101–200: disciplined, heroic, competent
-    "Droid Companion",
-    "Noble Space Knight",
+    "Cunning Goblin",
+    "Space Knight",
     "Wise Mystic Alien",
     "Mysterious Ranger",
     "Beastmaster",
@@ -108,6 +96,8 @@ const archetypeBuckets = {
     "Classic Grey Alien",
     "Aquatic Deep-Sea Alien",
     "Wise Wizard",
+  ],
+  bucket2: [ // 134–266: disciplined, heroic, competent
     "Ent-like Forest Guardian",
     "Dryad",
     "Dragon Rider",
@@ -116,9 +106,7 @@ const archetypeBuckets = {
     "Starfighter Ace",
     "Space Explorer", // filler for balance
     "Desert Outlaw Alien",
-    "Engineer Alien"
-  ],
-  bucket3: [ // 201–300: curious, adventurous, balanced imagination
+    "Engineer Alien",
     "Humanoid Companion Robot",
     "Carebot",
     "Rebel Freedom Fighter",
@@ -134,12 +122,12 @@ const archetypeBuckets = {
     "Alien Jazz Musician",
     "Ancient Scholar Alien",
     "Aquatic Dragon",
+  ],
+  bucket3: [ // 267–400: curious, adventurous, imaginative
     "Space Colonist",
     "Technologist Wizard",
     "Luminous Energy Being Alien",
-    "Shapeshifter Alien"
-  ],
-  bucket4: [ // 301–400: mystical, chaotic, visionary
+    "Shapeshifter Alien",
     "Alien Wizard",
     "AI Oracle",
     "Force-Wielding Sage",
@@ -158,7 +146,6 @@ const archetypeBuckets = {
     "Virtual Deity",
     "Chaos Magician ",
     "Celestial Fairy",
-    "",
     "Companion Sprite"
   ]
 };
@@ -204,10 +191,9 @@ function sliderScore(sliders) {
 
 function pickTypeFromScore(score, buckets) {
   let bucketKey;
-  if (score <= 100) bucketKey = 'bucket1';
-  else if (score <= 200) bucketKey = 'bucket2';
-  else if (score <= 300) bucketKey = 'bucket3';
-  else bucketKey = 'bucket4';
+  if (score <= 133) bucketKey = 'bucket1';
+  else if (score <= 266) bucketKey = 'bucket2';
+  else bucketKey = 'bucket3';
 
   const bucket = buckets[bucketKey] || [];
   return { type: randomItem(bucket), bucketKey };

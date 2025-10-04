@@ -290,20 +290,9 @@
               <img src="images/dice_icon.png" alt="Randomize" class="nav-icon" />
             </button>
           </div>
-          <!-- Archetype -->
-          <div class="field-heading">Select Base</div>
-          <div style="display:flex; gap:8px; align-items:center; flex-direction:column;">
-            <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-              <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                <option value="">Choose a Base</option>
-                <option>Human</option>
-                <option>Animal</option>
-                <option>Sci-Fi / Fantasy</option>
-                <option value="custom">Choose my own / get specific</option>
-              </select>
-            </div>
-            <div id="personalityHeading" class="field-heading">Define Personality with sliders</div>
-            <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:none; flex-direction:column; gap:10px;">
+          <!-- Personality Sliders -->
+          <div id="personalityHeading" class="field-heading">Define Personality with sliders</div>
+          <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px;">
             <!-- <div style="font-size:14px; color:#ffffff;">Personality Sliders</div> -->
             <div class="trait-row">
               <span class="trait-label left">Serious</span>
@@ -328,51 +317,53 @@
           </div>
 
 
-            <div id="archetypeCustomRow" style="display:none; width:100%; margin-top:8px;">
-              <label class="heroInput" aria-label="Custom archetype" style="flex:1;">
-                <input id="archetypeCustom" type="text" placeholder="Type the archetype (e.g., phoenix, clockwork automaton, sand elemental)" />
+          <!-- Random suggestion buttons and checkbox -->
+          <div style="display:flex; gap:8px; align-items:center; margin-top:16px; justify-content:center; flex-wrap:wrap;">
+            <button id="addRandomSciFiBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Sci-Fi</button>
+            <button id="addRandomAnimalBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Animal</button>
+            <button id="addRandomRoleBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Role</button>
+          </div>
+          
+          <!-- Suggest from personality checkbox -->
+          <div style="display:flex; justify-content:center; margin-top:12px; padding-left:4px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
+              <input type="checkbox" id="suggestFromPersonalityCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#ffffff;" />
+              <span>Suggest from personality</span>
+            </label>
+          </div>
+
+          <!-- Persona Suggestion Result (appears after using random buttons) -->
+          <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box; margin-top:16px;">
+            <div class="field-heading">Type <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+            <div style="width:100%; margin:0;">
+              <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+            </div>
+            <!-- AI Hologram checkbox -->
+            <div id="hologramCheckboxContainer" style="display:flex; width:100%; margin-top:8px; padding-left:4px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
+                <input type="checkbox" id="renderAsHologramCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#ffffff;" />
+                <span>Render as AI Energy Hologram</span>
               </label>
             </div>
-            <!-- Persona Suggestion (after choosing category) -->
-            <div id="suggestionControls" style="width:100%; display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-              <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap; align-items:center;">
-                <button id="generateSuggestionBtn" style="width:250px; padding:10px 16px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer; opacity:0.6;" disabled>Generate a suggestion from Personality</button>
-                <button id="continueCreateBtn" style="width:200px; padding:10px 16px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:14px; cursor:pointer; display:none;">Continue Creating</button>
-              </div>
-              <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box;">
-                <div class="field-heading">Type <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <div style="width:100%; margin:0;">
-                  <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-                </div>
-                <!-- AI Hologram checkbox -->
-                <div id="hologramCheckboxContainer" style="display:none; width:100%; margin-top:8px; padding-left:4px;">
-                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
-                    <input type="checkbox" id="renderAsHologramCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#ffffff;" />
-                    <span>Render as AI Energy Hologram</span>
-                  </label>
-                </div>
-                <!-- Undo and Add Random buttons below Type field -->
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center; flex-wrap:wrap;">
-                  <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:0; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); color:#ffffff; border-radius:50%; font-size:18px; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">↶</button>
-                  <button id="addRandomSciFiBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Sci-Fi</button>
-                  <button id="addRandomAnimalBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Animal</button>
-                  <button id="addRandomRoleBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer; display:none;">+ Role</button>
-                </div>
-                <!-- More Options button -->
-                <div style="display:flex; justify-content:center; margin-top:8px;">
-                  <button id="moreOptionsBtn" style="width:150px; padding:8px 16px; border:0px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:13px; cursor:pointer;">More Options</button>
-                </div>
-                <!-- Collapsible options section -->
-                <div id="moreOptionsSection" style="display:none;">
-                <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <div style="width:100%; margin:0;">
-                  <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-                </div>
-                <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-                <!-- Multiline auto-resizing textarea styled like chat composer -->
-                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; min-height:46px; max-height:none;"></textarea>
-                
-                <!-- Art style and vibe sections (only visible in artSettingsContainer when More Options is expanded) -->
+            <!-- Undo button below Type field -->
+            <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center; flex-wrap:wrap;">
+              <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:0; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); color:#ffffff; border-radius:50%; font-size:18px; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">↶</button>
+            </div>
+            <!-- More Options button -->
+            <div style="display:flex; justify-content:center; margin-top:8px;">
+              <button id="moreOptionsBtn" style="width:150px; padding:8px 16px; border:0px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:13px; cursor:pointer;">More Options</button>
+            </div>
+            <!-- Collapsible options section -->
+            <div id="moreOptionsSection" style="display:none;">
+            <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+            <div style="width:100%; margin:0;">
+              <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+            </div>
+            <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+            <!-- Multiline auto-resizing textarea styled like chat composer -->
+            <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; min-height:46px; max-height:none;"></textarea>
+            
+            <!-- Art style and vibe sections (only visible in artSettingsContainer when More Options is expanded) -->
                 <div id="moreOptionsArtSection" style="display:none; width:100%; flex-direction:column; gap:8px; align-items:center;">
                   <!-- Style Choice -->
                   <div class="field-heading">Choose art style</div>
@@ -420,21 +411,17 @@
                 <!-- End of art sections -->
                 
                 </div>
-              </div>
-              <input type="hidden" id="archetypeSpecific" />
-              <input type="hidden" id="archetypeSpecificDesc" />
             </div>
-
-          <!-- Personality Sliders (right after archetype) --> 
-
+            <input type="hidden" id="archetypeSpecific" />
+            <input type="hidden" id="archetypeSpecificDesc" />
           </div>
 
           <!-- Primary Use removed -->
-            </div>
-            <!-- Art settings toggle -->
-            <div style="width:100%; display:flex; justify-content:center;">
-              <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">Choose Art Style</button>
-            </div>
+
+          <!-- Art settings toggle -->
+          <div style="width:100%; display:flex; justify-content:center;">
+            <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">Choose Art Style</button>
+          </div>
 
             <!-- Art Settings Container (collapsed by default) -->
             <div id="artSettingsContainer" style="display:none; flex-direction:column; gap:8px; width:100%; align-items:center;">
@@ -1040,13 +1027,34 @@
           const originalText = btnElement.textContent;
           btnElement.textContent = 'Adding...';
           try {
+            // Check if "Suggest from personality" checkbox is checked
+            const suggestFromPersonalityCheckbox = document.getElementById('suggestFromPersonalityCheckbox');
+            const usePersonality = suggestFromPersonalityCheckbox?.checked || false;
+            
+            const requestBody = { 
+              randomArchetype: !usePersonality,  // If using personality, don't do pure random
+              forceCategory: category
+            };
+            
+            // If personality-based, add sliders and set archetypeCategory
+            if (usePersonality) {
+              function scale10To100(v){
+                const n = Number(v || 5);
+                return Math.round(((n - 1) / 9) * 100);
+              }
+              requestBody.archetypeCategory = category;
+              requestBody.sliders = {
+                seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
+                succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
+                rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
+                practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
+              };
+            }
+            
             const resp = await fetch('/api/suggest-persona', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 
-                randomArchetype: true,
-                forceCategory: category
-              })
+              body: JSON.stringify(requestBody)
             });
             if (!resp.ok) {
               throw new Error('Random suggestion request failed');
@@ -1205,9 +1213,10 @@
             }
           }
         };
-        if (!sel || !row) return;
-        sel.addEventListener('change', toggle);
-        toggle();
+        // Archetype dropdown removed - no longer need this toggle
+        // if (!sel || !row) return;
+        // sel.addEventListener('change', toggle);
+        // toggle();
       })();
 
   // Primary Use removed
@@ -1230,11 +1239,7 @@
           }
         }
 
-        // Get values from advanced panel (quiz)
-        const archetypeSelectEl = document.getElementById('archetype');
-        const archetypeValue = (archetypeSelectEl?.value || '').trim();
-        const archetypeCustom = (document.getElementById('archetypeCustom')?.value || '').trim();
-        const archetype = (archetypeValue === 'custom') ? archetypeCustom : archetypeValue;
+        // Get values from advanced panel
         const archetypeSpecificInputEl = document.getElementById('archetypeSpecific');
         const archetypeSpecificDescEl = document.getElementById('archetypeSpecificDesc');
         const suggestionNameInput = document.getElementById('suggestionName');
@@ -1258,11 +1263,6 @@
         }
         if (!archetypeSpecificDesc && suggestionDescInput) {
           archetypeSpecificDesc = suggestionDescInput.value.trim();
-        }
-
-        if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
-          showError('Please describe your custom agent before generating.');
-          return;
         }
 
         // Get vibe and traits early (needed for hologram generation)
@@ -1363,7 +1363,7 @@
         const payload = { 
           prompt: finalPrompt, 
           botName: resolvedName,
-          archetype, archetypeSpecific, archetypeSpecificDesc,
+          archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,
           traits,
@@ -1388,7 +1388,7 @@
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ 
               prompt: p,
-              archetype, vibe, setting, colors,
+              vibe, setting, colors,
               styleChoice, artStyleCustom,
               traits,
               personalityPrompt: (document.getElementById('additionalDetails')?.value || '').trim()
