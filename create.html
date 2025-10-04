@@ -771,15 +771,6 @@
         const hideAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'none'; };
         const showAddRandom = ()=>{ if (addRandomBtn) addRandomBtn.style.display = 'inline-block'; };
 
-        const CATEGORY_DISPLAY_BY_KEY = {
-          'human': 'Human',
-          'animal': 'Animal',
-          'sci-fi / fantasy': 'Sci-Fi / Fantasy'
-        };
-
-        const toNormalizedCategory = (value)=> (value || '').trim().toLowerCase();
-        const toDisplayCategory = (value)=> CATEGORY_DISPLAY_BY_KEY[value] || '';
-
         function currentSliderValues(){
           const val = (id)=> document.getElementById(id)?.value;
           const scale10To100 = (n)=> Math.round(((Number(n||5) - 1) / 9) * 100);
@@ -992,11 +983,10 @@
                 throw new Error('Random suggestion request failed');
               }
               const payload = await resp.json();
-              const normalizedCategory = toNormalizedCategory(payload?.archetypeCategory);
-              const displayCategory = toDisplayCategory(normalizedCategory);
-              const baseType = payload?.personaType || payload?.name || 'Random Persona';
-              const labeledType = displayCategory ? `${baseType} (${displayCategory})` : baseType;
-              applySuggestionResult({ typeOnly: labeledType, displayName: labeledType }, { append: true });
+              const baseTypeRaw = payload?.personaType || payload?.name || 'Random Persona';
+              const baseType = baseTypeRaw ? String(baseTypeRaw).trim() : 'Random Persona';
+              const incomingType = baseType || 'Random Persona';
+              applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: true });
               if (suggestionDescEl) {
                 suggestionDescEl.value = payload?.description || '';
                 autosizeSuggestionDesc();
