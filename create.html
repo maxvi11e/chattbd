@@ -363,6 +363,54 @@
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
                 <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; max-height:none;"></textarea>
+                
+                <!-- Art style and vibe sections (only visible in artSettingsContainer when More Options is expanded) -->
+                <div id="moreOptionsArtSection" style="display:none; width:100%; flex-direction:column; gap:8px; align-items:center;">
+                  <!-- Style Choice -->
+                  <div class="field-heading">Choose art style</div>
+                  <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
+                    <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+                      <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                        <option value="default">Default (Modern Illustration)</option>
+                        <option value="realistic">Photo Realistic</option>
+                        <option value="vector">Simplified Vector</option>
+                        <option value="anime">Anime</option>
+                        <option value="impressionistic">Impressionism</option>
+                        <option value="custom">Another Style (Enter Your Own)</option>
+                      </select>
+                    </div>
+                    <div id="customStyleRow" style="display:none; width:min(100%, 395px);">
+                      <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
+                        <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Vibe / Mood -->
+                  <div class="field-heading">Select art vibe / mood</div>
+                  <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
+                    <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
+                      <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
+                        <option value=""></option>
+                        <option value="radiant">Radiant</option>
+                        <option value="calming">Calming</option>
+                        <option value="dramatic">Dramatic</option>
+                        <option value="serene">Serene</option>
+                        <option value="mysterious">Mysterious</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="dreamlike">Dreamlike</option>
+                        <option value="custom">Another (user entry)</option>
+                      </select>
+                    </div>
+                    <div id="customVibeRow" style="display:none; width:min(100%, 395px);">
+                      <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
+                        <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <!-- End of art sections -->
+                
                 </div>
               </div>
               <input type="hidden" id="archetypeSpecific" />
@@ -382,53 +430,6 @@
 
             <!-- Art Settings Container (collapsed by default) -->
             <div id="artSettingsContainer" style="display:none; flex-direction:column; gap:8px; width:100%; align-items:center;">
-              <!-- Wrap art style and vibe in moreOptionsArtSection -->
-              <div id="moreOptionsArtSection" style="display:none; width:100%; display:flex; flex-direction:column; gap:8px; align-items:center;">
-                      <!-- Style Choice -->
-              <div class="field-heading">Choose art style</div>
-              <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-                <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                  <option value="default">Default (Modern Illustration)</option>
-                  <option value="realistic">Photo Realistic</option>
-                  <option value="vector">Simplified Vector</option>
-                  <option value="anime">Anime</option>
-                  <option value="impressionistic">Impressionism</option>
-                  <option value="custom">Another Style (Enter Your Own)</option>
-                </select>
-              </div>
-              <div id="customStyleRow" style="display:none; width:min(100%, 395px);">
-                <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
-                  <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
-                </label>
-              </div>
-            
-            </div>
-
-            <!-- Vibe / Mood -->
-            <div class="field-heading">Select art vibe / mood</div>
-            <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-              <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-                <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                  <option value=""></option>
-                  <option value="radiant">Radiant</option>
-                  <option value="calming">Calming</option>
-                  <option value="dramatic">Dramatic</option>
-                  <option value="serene">Serene</option>
-                  <option value="mysterious">Mysterious</option>
-                  <option value="energetic">Energetic</option>
-                  <option value="dreamlike">Dreamlike</option>
-                  <option value="custom">Another (user entry)</option>
-                </select>
-              </div>
-              <div id="customVibeRow" style="display:none; width:min(100%, 395px);">
-                <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
-                  <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
-                </label>
-              </div>
-            </div>
-              </div>
-            <!-- End of moreOptionsArtSection -->
             </div>
 
 
@@ -533,6 +534,12 @@
     artSettings.style.display = 'flex';
     artSettingsTriggered = true;
     if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
+    // If More Options is already expanded, show art sections
+    const moreOptionsArtSection = document.getElementById('moreOptionsArtSection');
+    const moreOptionsSection = document.getElementById('moreOptionsSection');
+    if (moreOptionsArtSection && moreOptionsSection && moreOptionsSection.style.display !== 'none') {
+      moreOptionsArtSection.style.display = 'flex';
+    }
     if (ensureStart && startBtn) {
       startBtn.style.display = 'flex';
       startBtn.disabled = false;
@@ -812,7 +819,11 @@
             moreOptionsExpanded = !moreOptionsExpanded;
             if (moreOptionsExpanded) {
               if (moreOptionsSection) moreOptionsSection.style.display = 'block';
-              if (moreOptionsArtSection) moreOptionsArtSection.style.display = 'flex';
+              // Only show art section if artSettingsContainer is visible
+              const artSettingsContainer = document.getElementById('artSettingsContainer');
+              if (moreOptionsArtSection && artSettingsContainer && artSettingsContainer.style.display !== 'none') {
+                moreOptionsArtSection.style.display = 'flex';
+              }
               moreOptionsBtn.textContent = 'Hide Options';
             } else {
               if (moreOptionsSection) moreOptionsSection.style.display = 'none';
