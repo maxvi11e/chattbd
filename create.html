@@ -1332,8 +1332,11 @@
 
           const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
 
+          // Use the Type field value, fallback to "abstract form" if empty
+          const typeValue = archetypeSpecific || 'abstract form';
+
           const descriptionLines = [
-            'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.',
+            `Centered abstract ${typeValue} bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.`,
             `Color: ${palette}.`,
             `Structure: ${logic}.`,
             `Fill: ${fill}.`,
