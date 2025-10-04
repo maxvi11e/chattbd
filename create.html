@@ -296,7 +296,6 @@
             <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
               <select id="archetype" aria-label="Archetype" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                 <option value="">Choose a Base</option>
-                <option>AI Hologram</option>                
                 <option>Human</option>
                 <option>Animal</option>
                 <option>Sci-Fi / Fantasy</option>
@@ -345,6 +344,13 @@
                 <div style="width:100%; margin:0;">
                   <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
                 </div>
+                <!-- AI Hologram checkbox -->
+                <div id="hologramCheckboxContainer" style="display:none; width:100%; margin-top:8px; padding-left:4px;">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
+                    <input type="checkbox" id="renderAsHologramCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#ffffff;" />
+                    <span>Render as AI Energy Hologram</span>
+                  </label>
+                </div>
                 <!-- Undo and Add Random buttons below Type field -->
                 <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center; flex-wrap:wrap;">
                   <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:0; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); color:#ffffff; border-radius:50%; font-size:18px; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">↶</button>
@@ -364,7 +370,7 @@
                 </div>
                 <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
                 <!-- Multiline auto-resizing textarea styled like chat composer -->
-                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; max-height:none;"></textarea>
+                <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; min-height:46px; max-height:none;"></textarea>
                 
                 <!-- Art style and vibe sections (only visible in artSettingsContainer when More Options is expanded) -->
                 <div id="moreOptionsArtSection" style="display:none; width:100%; flex-direction:column; gap:8px; align-items:center;">
@@ -462,8 +468,6 @@
     
     // Make supabase available globally for freemium-utils.js
     window.supabase = supabase;
-
-    let lastAbstractName = null;
 
     // Check auth and redirect if not authenticated
     async function checkAuthAndRedirect() {
@@ -678,13 +682,8 @@
         slider.addEventListener('change', () => applySliderColor(slider));
       });
 
-      function isAbstractArchetype(value){
-        if (!value) return false;
-        const normalized = value.trim().toLowerCase();
-        return normalized === 'abstract' || normalized === 'ai hologram';
-      }
       async function randomizeAll(){
-  // Mark that we should auto-open art settings after suggestion returns (non-hologram flows)
+  // Mark that we should auto-open art settings after suggestion returns
   randomizeFlow = true;
         // Ensure options mode is visible
         showOptionsMode();
@@ -693,7 +692,7 @@
     { value: 'Human', weight: 0.1 },
     { value: 'Animal', weight: 0.25 },
     { value: 'Sci-Fi / Fantasy', weight: 0.25 },
-    { value: 'AI Hologram', weight: 0.4 }
+    { value: 'Role', weight: 0.4 }
   ];
         const archetypeSel = document.getElementById('archetype');
         let selectedArchetype = null;
@@ -702,8 +701,6 @@
           archetypeSel.value = selectedArchetype;
           dispatch(archetypeSel, 'change');
         }
-  const hologramSelected = isAbstractArchetype(selectedArchetype);
-  randomizeFlow = selectedArchetype ? !hologramSelected : true;
   // Sliders (1-10 notched)
   const s1 = document.getElementById('traitSeriousPlayful');
   const s2 = document.getElementById('traitSuccinctChatty');
@@ -788,6 +785,8 @@
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
   const suggestionTypeEl = document.getElementById('suggestionType');
+  const hologramCheckboxContainer = document.getElementById('hologramCheckboxContainer');
+  const renderAsHologramCheckbox = document.getElementById('renderAsHologramCheckbox');
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
@@ -857,10 +856,9 @@
     async function generateSuggestion(category){
           try {
             const sliders = currentSliderValues();
-      const isAbstract = isAbstractArchetype(category);
-      const payload = isAbstract ? { sliders } : { archetypeCategory: category, sliders };
-      console.log(isAbstract ? '[suggest-abstract] sending' : '[suggest-persona] sending', payload);
-      const endpoint = isAbstract ? '/api/suggest-abstract' : '/api/suggest-persona';
+      const payload = { archetypeCategory: category, sliders };
+      console.log('[suggest-persona] sending', payload);
+      const endpoint = '/api/suggest-persona';
       const resp = await fetch(endpoint, {
               method:'POST',
               headers:{'Content-Type':'application/json'},
@@ -870,13 +868,8 @@
               throw new Error('Suggest API failed');
             }
             const json = await resp.json();
-      console.log(isAbstract ? '[suggest-abstract] received' : '[suggest-persona] received', json);
-      const displayName = isAbstract ? (json.name || 'Abstract Agent') : (json.name || 'New Persona');
-      if (isAbstract) {
-        lastAbstractName = displayName;
-      } else {
-        lastAbstractName = null;
-      }
+      console.log('[suggest-persona] received', json);
+      const displayName = json.name || 'New Persona';
       return {
         name: json.name || displayName,
         description: json.description,
@@ -885,9 +878,6 @@
       };
           } catch(e){
             console.error('Suggestion error', e);
-      if (isAbstractArchetype(category)) {
-        lastAbstractName = null;
-      }
             return {
         name: 'Original Concept',
         description: '',
@@ -915,7 +905,6 @@
         suggestionNameEl?.addEventListener('input', ()=>{
           autosizeSuggestionName();
           archetypeSpecificInput.value = suggestionNameEl.value;
-      lastAbstractName = suggestionNameEl.value.trim() || null;
         });
         suggestionTypeEl?.addEventListener('input', ()=>{
           autosizeSuggestionType();
@@ -987,7 +976,6 @@
           if (!append && archetypeSpecificDesc) {
             archetypeSpecificDesc.value = '';
           }
-          lastAbstractName = finalValue;
           if (genBtn) {
             genBtn.textContent = 'Suggest Another';
             genBtn.disabled = false;
@@ -1007,8 +995,7 @@
         function updateGenerateState(){
           const val = sel.value;
           if (!genBtn) return;
-          const isAbstractSelection = isAbstractArchetype(val);
-          if (!val || isAbstractSelection) {
+          if (!val) {
             genBtn.style.display = 'none';
             genBtn.disabled = true;
             genBtn.style.opacity = '0.6';
@@ -1124,9 +1111,6 @@
                 archetypeSpecificInput.value = newValue;
               }
               
-              // Update lastAbstractName
-              lastAbstractName = newValue;
-              
               // Update undo button state
               updateUndoBtnState();
             }
@@ -1138,7 +1122,6 @@
         const toggle = ()=>{
           const val = sel.value;
           const isCustom = val === 'custom';
-          const isAbstractSelection = isAbstractArchetype(val);
           const autoShowArt = shouldAutoShowArtSettings(val);
           row.style.display = 'none';
           updateGenerateState();
@@ -1149,6 +1132,12 @@
           if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
           const personalityHeading = document.getElementById('personalityHeading');
           if (personalityHeading) personalityHeading.style.display = val ? 'block' : 'none';
+          
+          // Show/hide hologram checkbox based on archetype selection
+          if (hologramCheckboxContainer) {
+            hologramCheckboxContainer.style.display = val ? 'block' : 'none';
+          }
+          
           if (!isCustom){
             // reset suggestion UI when category changes
             if (suggestionBox) {
@@ -1169,16 +1158,9 @@
             document.getElementById('archetypeSpecific').value = '';
             document.getElementById('archetypeSpecificDesc').value = '';
             hideUndoBtn();
-            if (!isAbstractSelection) {
-              lastAbstractName = null;
-            }
+            
             let startShouldShow = false;
-            if (isAbstractSelection) {
-              collapseArtSettingsPanel();
-              if (artSettingsBtn) artSettingsBtn.style.display = 'none';
-              if (persona) persona.value = '';
-              startShouldShow = true;
-            } else if (autoShowArt) {
+            if (autoShowArt) {
               openArtSettingsPanel({ ensureStart: true });
               startShouldShow = true;
             } else {
@@ -1192,9 +1174,7 @@
             }
 
             if (genBtn) {
-              if (isAbstractSelection) {
-                genBtn.style.display = 'none';
-              } else if (val) {
+              if (val) {
                 genBtn.style.display = 'inline-block';
               } else {
                 genBtn.style.display = 'none';
@@ -1279,66 +1259,72 @@
         if (!archetypeSpecificDesc && suggestionDescInput) {
           archetypeSpecificDesc = suggestionDescInput.value.trim();
         }
-        const abstractSelected = isAbstractArchetype(archetype);
 
         if (archetypeValue === 'custom' && !archetype && !archetypeSpecificDesc && !archetypeSpecific) {
           showError('Please describe your custom agent before generating.');
           return;
         }
 
-        if (abstractSelected) {
-          const fallbackName = 'Abstract Agent';
-          const fallbackDesc = 'Abstract digital organism shaped by your selected personality traits.';
-          const originalBtnText = startBtn?.textContent || 'Generate Agent!';
-          try {
-            if (startBtn) {
-              startBtn.disabled = true;
-              startBtn.textContent = 'Generating...';
-            }
+        // Check if hologram checkbox is selected
+        const useHologram = renderAsHologramCheckbox?.checked || false;
+        
+        // If hologram mode, generate abstract description
+        let hologramDescription = '';
+        if (useHologram) {
+          // Generate abstract description using suggest-abstract.js logic
+          const norm = (v) => {
+            const n = Number(v);
+            return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 50;
+          };
+          const s = {
+            sp: norm(traits.seriousPlayful),
+            sc: norm(traits.succinctChatty),
+            ri: norm(traits.rationalIntuitive),
+            cl: norm(traits.practicalImaginative)
+          };
 
-            let displayName = fallbackName;
-            let description = fallbackDesc;
-            const fetchSuggestion = window.fetchPersonaSuggestion;
-            if (typeof fetchSuggestion === 'function') {
-              const suggestion = await fetchSuggestion(archetype);
-              if (suggestion?.displayName && suggestion.displayName.trim()) {
-                displayName = suggestion.displayName.trim();
-              } else if (suggestion?.name && suggestion.name.trim()) {
-                displayName = suggestion.name.trim();
-              }
-              if (suggestion?.description && suggestion.description.trim()) {
-                description = suggestion.description.replace(/\r\n?/g, '\n').trim();
-              }
-            }
+          const bucket = (n) => n <= 30 ? 'low' : n >= 70 ? 'high' : 'mid';
+          const b = { sp: bucket(s.sp), sc: bucket(s.sc), ri: bucket(s.ri), cl: bucket(s.cl) };
 
-            if (archetypeSpecificInputEl) archetypeSpecificInputEl.value = displayName;
-            if (archetypeSpecificDescEl) archetypeSpecificDescEl.value = description;
-            archetypeSpecific = displayName;
-            archetypeSpecificDesc = description;
-            persona.value = description;
-            p = description;
-            lastAbstractName = displayName;
-          } catch (error) {
-            console.error('Abstract suggestion generation failed:', error);
-            if (!archetypeSpecific) {
-              archetypeSpecific = fallbackName;
-              if (archetypeSpecificInputEl) archetypeSpecificInputEl.value = fallbackName;
-            }
-            if (!archetypeSpecificDesc) {
-              archetypeSpecificDesc = fallbackDesc;
-              if (archetypeSpecificDescEl) archetypeSpecificDescEl.value = fallbackDesc;
-            }
-            if (!persona.value.trim()) {
-              persona.value = archetypeSpecificDesc;
-              p = archetypeSpecificDesc;
-            }
-            lastAbstractName = archetypeSpecific;
-          } finally {
-            if (startBtn) {
-              startBtn.textContent = originalBtnText;
-              startBtn.disabled = false;
-            }
-          }
+          const palette = b.sp === 'low'
+            ? 'cool white/blue lines with gentle deep blue glow'
+            : b.sp === 'high'
+              ? 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
+              : 'deep cool spectrum with high vibrancy accents';
+
+          const logic = b.ri === 'low'
+            ? 'geometric wireframe rings and grid'
+            : b.ri === 'high'
+              ? 'flowing energy strands and arcs'
+              : 'mesh of arcs and short lattice segments';
+
+          const fill = b.sc === 'low'
+            ? 'balanced interior with clear negative space between lines'
+            : b.sc === 'high'
+              ? 'richer line work with tight spacing, but keep background visible outside the figure'
+              : 'medium density with even spacing';
+
+          const symmetry = b.cl === 'low'
+            ? 'strong bilateral symmetry'
+            : b.cl === 'high'
+              ? 'slight asymmetry for energy direction'
+              : 'near-bilateral with small variations';
+
+          const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
+
+          const descriptionLines = [
+            'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.',
+            `Color: ${palette}.`,
+            `Structure: ${logic}.`,
+            `Fill: ${fill}.`,
+            `Symmetry: ${symmetry}.`,
+            'Eyes: friendly rounded almond openings with soft glow; no pupils.',
+            'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
+            'Extreme brightness and luminosity to all elements',
+            '10x thickness and brightness for 10% of all elements',
+            vibeLine
+          ].filter(Boolean);
+          hologramDescription = descriptionLines.join('\n');
         }
 
         if (!p && !isOptionsMode) return;
@@ -1364,18 +1350,22 @@
         };
 
         // Immediately route to edit page and let it handle generation + save with a loading spinner
-        const resolvedName = isAbstractArchetype(archetype)
-          ? (lastAbstractName ? lastAbstractName.trim() : (archetypeSpecific || archetype || 'New Avatar'))
-          : (archetypeSpecific || archetype || 'New Avatar');
+        const resolvedName = archetypeSpecific || archetype || 'New Avatar';
+
+        // If hologram mode, append abstract description to prompt
+        const finalPrompt = useHologram && hologramDescription 
+          ? `${hologramDescription}\n\nBased on the concept: ${archetypeSpecific || archetype}`
+          : p;
 
         const payload = { 
-          prompt: p, 
+          prompt: finalPrompt, 
           botName: resolvedName,
           archetype, archetypeSpecific, archetypeSpecificDesc,
           vibe,
           styleChoice, artStyleCustom,
           traits,
-          personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
+          personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim(),
+          useHologram
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
