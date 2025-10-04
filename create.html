@@ -352,7 +352,7 @@
                 </div>
                 <!-- More Options button -->
                 <div style="display:flex; justify-content:center; margin-top:8px;">
-                  <button id="moreOptionsBtn" style="width:150px; padding:8px 16px; border:1px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:13px; cursor:pointer;">More Options</button>
+                  <button id="moreOptionsBtn" style="width:150px; padding:8px 16px; border:0px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:13px; cursor:pointer;">More Options</button>
                 </div>
                 <!-- Collapsible options section -->
                 <div id="moreOptionsSection" style="display:none;">
@@ -1040,10 +1040,17 @@
             addRandomBtn.disabled = true;
             addRandomBtn.textContent = 'Adding...';
             try {
+              // Get current base archetype to exclude it from random selection
+              const currentArchetype = sel?.value?.trim().toLowerCase() || '';
+              const excludeCategory = currentArchetype === 'custom' ? null : currentArchetype;
+              
               const resp = await fetch('/api/suggest-persona', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ randomArchetype: true })
+                body: JSON.stringify({ 
+                  randomArchetype: true,
+                  excludeCategory: excludeCategory
+                })
               });
               if (!resp.ok) {
                 throw new Error('Random suggestion request failed');

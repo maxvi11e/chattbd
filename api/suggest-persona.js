@@ -121,7 +121,6 @@ const archetypeBuckets = {
   bucket3: [ // 201–300: curious, adventurous, balanced imagination
     "Humanoid Companion Robot",
     "Carebot",
-    "Alien Cantina Rogue",
     "Rebel Freedom Fighter",
     "Starfighter Ace",
     "Elven King",
@@ -245,19 +244,33 @@ export default async function handler(req) {
   }
   try {
     const body = await req.json();
-    const { archetypeCategory, sliders = {}, randomArchetype } = body || {};
+    const { archetypeCategory, sliders = {}, randomArchetype, excludeCategory } = body || {};
     console.log('[suggest-persona] incoming', {
       archetypeCategory,
       randomArchetype,
+      excludeCategory,
       sliders,
       timestamp: new Date().toISOString()
     });
     if (randomArchetype) {
-      const categoryKeys = Object.keys(personaLibraries);
+      let categoryKeys = Object.keys(personaLibraries);
       if (!categoryKeys.length) {
         return new Response(
           JSON.stringify({ error: 'No persona libraries configured.' }),
           { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Filter out the excluded category if provided
+      if (excludeCategory) {
+        categoryKeys = categoryKeys.filter(key => key.toLowerCase() !== excludeCategory.toLowerCase());
+      }
+
+      // If no categories remain after filtering, return error
+      if (categoryKeys.length === 0) {
+        return new Response(
+          JSON.stringify({ error: 'No valid categories available after exclusion.' }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
         );
       }
 
