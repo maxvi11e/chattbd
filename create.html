@@ -943,49 +943,98 @@
           genBtn.addEventListener('click', handleGenerate);
         }
         
+        // Deduplication cache to avoid repeating recent suggestions
+        const recentSuggestionsCache = {
+          'sci-fi / fantasy': [],
+          'animal': [],
+          'human': []
+        };
+        const MAX_CACHE_SIZE = 20; // Remember last 20 items per category
+        
+        function addToCache(category, item) {
+          if (!recentSuggestionsCache[category]) recentSuggestionsCache[category] = [];
+          const cache = recentSuggestionsCache[category];
+          // Add to front of cache
+          cache.unshift(item);
+          // Trim to max size
+          if (cache.length > MAX_CACHE_SIZE) {
+            cache.length = MAX_CACHE_SIZE;
+          }
+        }
+        
+        function isInRecentCache(category, item) {
+          const cache = recentSuggestionsCache[category] || [];
+          return cache.includes(item);
+        }
+        
         // Helper function to add random type from specific category
         async function addRandomFromCategory(category, btnElement, btnLabel) {
           if (!btnElement || btnElement.disabled) return;
           btnElement.disabled = true;
           const originalText = btnElement.textContent;
           btnElement.textContent = 'Adding...';
+          
+          let incomingType = null;
+          let attempts = 0;
+          const maxAttempts = 5; // Try up to 5 times to get a non-duplicate
+          
           try {
             // Check if "Suggest from personality" checkbox is checked
             const suggestFromPersonalityCheckbox = document.getElementById('suggestFromPersonalityCheckbox');
             const usePersonality = suggestFromPersonalityCheckbox?.checked || false;
             
-            const requestBody = { 
-              randomArchetype: !usePersonality,  // If using personality, don't do pure random
-              forceCategory: category
-            };
-            
-            // If personality-based, add sliders and set archetypeCategory
-            if (usePersonality) {
-              function scale10To100(v){
-                const n = Number(v || 5);
-                return Math.round(((n - 1) / 9) * 100);
-              }
-              requestBody.archetypeCategory = category;
-              requestBody.sliders = {
-                seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
-                succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
-                rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
-                practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
+            // Try multiple times to avoid recent duplicates
+            while (attempts < maxAttempts) {
+              attempts++;
+              
+              const requestBody = { 
+                randomArchetype: !usePersonality,  // If using personality, don't do pure random
+                forceCategory: category
               };
+              
+              // If personality-based, add sliders and set archetypeCategory
+              if (usePersonality) {
+                function scale10To100(v){
+                  const n = Number(v || 5);
+                  return Math.round(((n - 1) / 9) * 100);
+                }
+                requestBody.archetypeCategory = category;
+                requestBody.sliders = {
+                  seriousPlayful: scale10To100(document.getElementById('traitSeriousPlayful')?.value),
+                  succinctChatty: scale10To100(document.getElementById('traitSuccinctChatty')?.value),
+                  rationalIntuitive: scale10To100(document.getElementById('traitRationalIntuitive')?.value),
+                  practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
+                };
+              }
+              
+              const resp = await fetch('/api/suggest-persona', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody)
+              });
+              if (!resp.ok) {
+                throw new Error('Random suggestion request failed');
+              }
+              const payload = await resp.json();
+              const baseTypeRaw = payload?.personaType || payload?.name || 'Random Persona';
+              const baseType = baseTypeRaw ? String(baseTypeRaw).trim() : 'Random Persona';
+              const candidateType = baseType || 'Random Persona';
+              
+              // Check if this is a duplicate from recent cache
+              if (!isInRecentCache(category, candidateType) || attempts >= maxAttempts) {
+                // Either it's not a duplicate, or we've tried enough times
+                incomingType = candidateType;
+                // Add to cache to avoid using again soon
+                addToCache(category, incomingType);
+                break;
+              }
+              // Otherwise, try again
             }
             
-            const resp = await fetch('/api/suggest-persona', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(requestBody)
-            });
-            if (!resp.ok) {
-              throw new Error('Random suggestion request failed');
+            if (!incomingType) {
+              incomingType = 'Random Persona';
             }
-            const payload = await resp.json();
-            const baseTypeRaw = payload?.personaType || payload?.name || 'Random Persona';
-            const baseType = baseTypeRaw ? String(baseTypeRaw).trim() : 'Random Persona';
-            const incomingType = baseType || 'Random Persona';
+            
             applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: true });
             if (suggestionDescEl) {
               suggestionDescEl.value = payload?.description || '';
