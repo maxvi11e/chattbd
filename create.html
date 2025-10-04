@@ -583,8 +583,7 @@
         const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         if (artSettingsBtn) artSettingsBtn.style.display = 'none';
         collapseArtSettingsPanel();
-        // Hide start button until a base selection opens the fields
-        if (startBtn) startBtn.style.display = 'none';
+        // Start button now always visible - removed hide logic
       }
       // Immediately enter options mode
       showOptionsMode();
@@ -899,13 +898,7 @@
             genBtn.style.opacity = '1';
             genBtn.style.display = 'inline-block';
           }
-          if (startBtn) {
-            if (artSettingsTriggered && artSettings && artSettings.style.display !== 'none') {
-              startBtn.style.display = 'flex';
-            } else {
-              startBtn.style.display = 'none';
-            }
-          }
+          // Start button now always visible - removed conditional logic
           showAddRandomBtns();
         }
 
