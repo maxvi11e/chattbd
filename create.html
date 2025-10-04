@@ -405,87 +405,13 @@
             </button>
           </div>
 
-          <!-- More Options section (appears after using random buttons) -->
-          <div id="suggestionResult" style="display:none; width:min(100%, 395px); border:0px solid var(--stroke); border-radius:14px; padding:0; font-size:14px; line-height:1.4; background:rgba(255, 255, 255, 0); box-sizing:border-box; margin-top:16px;">
-            <!-- More Options button -->
-            <div style="display:flex; justify-content:center; margin-top:8px;">
-              <button id="moreOptionsBtn" style="width:150px; padding:8px 16px; border:0px solid var(--stroke); background:rgba(255,255,255,0.05); color:#ffffff; border-radius:800px; font-size:13px; cursor:pointer;">More Options</button>
-            </div>
-            <!-- Collapsible options section -->
-            <div id="moreOptionsSection" style="display:none;">
-            <div class="field-heading">Name <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-            <div style="width:100%; margin:0;">
-              <textarea id="suggestionName" placeholder="Persona name" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-            </div>
-            <div class="field-heading">Define appearance and behavior <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
-            <!-- Multiline auto-resizing textarea styled like chat composer -->
-            <textarea id="suggestionDesc" placeholder="Describe personality, appearance, or character" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; box-sizing:border-box; font-family:inherit; font-size:16px; line-height:1.35; display:block; margin-top:6px; resize:none; white-space:pre-wrap; word-break:break-word; overflow-y:auto; height:auto; min-height:46px; max-height:none;"></textarea>
-            
-            <!-- Art style and vibe sections (only visible in artSettingsContainer when More Options is expanded) -->
-                <div id="moreOptionsArtSection" style="display:none; width:100%; flex-direction:column; gap:8px; align-items:center;">
-                  <!-- Style Choice -->
-                  <div class="field-heading">Choose art style</div>
-                  <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-                    <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-                      <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                        <option value="default">Default (Modern Illustration)</option>
-                        <option value="realistic">Photo Realistic</option>
-                        <option value="vector">Simplified Vector</option>
-                        <option value="anime">Anime</option>
-                        <option value="impressionistic">Impressionism</option>
-                        <option value="custom">Another Style (Enter Your Own)</option>
-                      </select>
-                    </div>
-                    <div id="customStyleRow" style="display:none; width:min(100%, 395px);">
-                      <label class="heroInput" aria-label="Custom art style" style="flex:1; width:100%;">
-                        <input id="artStyleCustom" type="text" placeholder="Type the art style" style="width:100%;" />
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- Vibe / Mood -->
-                  <div class="field-heading">Select art vibe / mood</div>
-                  <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
-                    <div style="width:min(100%, 395px); border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
-                      <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                        <option value=""></option>
-                        <option value="radiant">Radiant</option>
-                        <option value="calming">Calming</option>
-                        <option value="dramatic">Dramatic</option>
-                        <option value="serene">Serene</option>
-                        <option value="mysterious">Mysterious</option>
-                        <option value="energetic">Energetic</option>
-                        <option value="dreamlike">Dreamlike</option>
-                        <option value="custom">Another (user entry)</option>
-                      </select>
-                    </div>
-                    <div id="customVibeRow" style="display:none; width:min(100%, 395px);">
-                      <label class="heroInput" aria-label="Custom vibe" style="flex:1; width:100%;">
-                        <input id="vibeCustom" type="text" placeholder="Type the vibe / mood" style="width:100%;" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <!-- End of art sections -->
-                
-                </div>
-            </div>
-            <input type="hidden" id="archetypeSpecific" />
-            <input type="hidden" id="archetypeSpecificDesc" />
-          </div>
+          <!-- Hidden fields for compatibility -->
+          <input type="hidden" id="archetypeSpecific" />
+          <input type="hidden" id="archetypeSpecificDesc" />
+          <textarea id="suggestionName" style="display:none;"></textarea>
+          <textarea id="suggestionDesc" style="display:none;"></textarea>
 
           <!-- Primary Use removed -->
-
-          <!-- Art settings toggle -->
-          <div style="width:100%; display:flex; justify-content:center;">
-            <button id="toggleArtSettingsBtn" style="display:none; width:150px; padding:10px 16px; margin:10px 0; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:14px; cursor:pointer;">Choose Art Style</button>
-          </div>
-
-            <!-- Art Settings Container (collapsed by default) -->
-            <div id="artSettingsContainer" style="display:none; flex-direction:column; gap:8px; width:100%; align-items:center;">
-            </div>
-
-
 
           <!-- Band / BookFilm removed -->
 
@@ -663,25 +589,7 @@
       // Immediately enter options mode
       showOptionsMode();
 
-    // Art settings: one-way expand. Hide the button after first click; no collapse behavior.
-      if (toggleArtSettingsBtn && artSettings){
-        // Start hidden
-        artSettings.style.display = 'none';
-        toggleArtSettingsBtn.style.display = 'none';
-        toggleArtSettingsBtn.addEventListener('click', ()=>{
-          // Open settings and remove the button to avoid blank space
-          artSettings.style.display = 'flex';
-          artSettingsTriggered = true;
-          toggleArtSettingsBtn.style.display = 'none';
-          // If a suggestion exists, allow Start button to appear now
-      const suggestionVisible = document.getElementById('suggestionResult')?.style.display === 'block';
-      const suggestedName = (document.getElementById('archetypeSpecific')?.value || '').trim();
-      const archetypeSel = document.getElementById('archetype');
-      const isCustomSelected = archetypeSel && archetypeSel.value === 'custom';
-      // Allow proceeding in custom path after opening Art Settings
-      if ((suggestionVisible || suggestedName || isCustomSelected) && startBtn) startBtn.style.display = 'flex';
-        });
-      }
+    // Art settings toggle removed - art settings now always visible
 
       // --- Randomize All ---
       function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
@@ -863,30 +771,7 @@
           }
         };
 
-        // More Options toggle
-        const moreOptionsBtn = document.getElementById('moreOptionsBtn');
-        const moreOptionsSection = document.getElementById('moreOptionsSection');
-        const moreOptionsArtSection = document.getElementById('moreOptionsArtSection');
-        let moreOptionsExpanded = false;
-
-        if (moreOptionsBtn) {
-          moreOptionsBtn.addEventListener('click', () => {
-            moreOptionsExpanded = !moreOptionsExpanded;
-            if (moreOptionsExpanded) {
-              if (moreOptionsSection) moreOptionsSection.style.display = 'block';
-              // Only show art section if artSettingsContainer is visible
-              const artSettingsContainer = document.getElementById('artSettingsContainer');
-              if (moreOptionsArtSection && artSettingsContainer && artSettingsContainer.style.display !== 'none') {
-                moreOptionsArtSection.style.display = 'flex';
-              }
-              moreOptionsBtn.textContent = 'Hide Options';
-            } else {
-              if (moreOptionsSection) moreOptionsSection.style.display = 'none';
-              if (moreOptionsArtSection) moreOptionsArtSection.style.display = 'none';
-              moreOptionsBtn.textContent = 'More Options';
-            }
-          });
-        }
+        // More Options removed - all fields now always visible
 
         function currentSliderValues(){
           const val = (id)=> document.getElementById(id)?.value;
@@ -989,27 +874,14 @@
           const finalValue = append && existingTypeValue
             ? `${existingTypeValue} + ${incomingValue}`
             : incomingValue;
-          if (suggestionBox) {
-            suggestionBox.style.display = 'block';
-          }
+          
           if (suggestionTypeEl) {
             suggestionTypeEl.value = finalValue;
             autosizeSuggestionType();
           }
           // Update undo button visibility
           updateUndoBtnState();
-          if (autoOpenArtSettings) {
-            if (artSettings) artSettings.style.display = 'flex';
-            artSettingsTriggered = true;
-            if (toggleArtSettingsBtn) toggleArtSettingsBtn.style.display = 'none';
-          }
-          if (artSettingsBtn) {
-            if (artSettings && artSettings.style.display !== 'none') {
-              artSettingsBtn.style.display = 'none';
-            } else {
-              artSettingsBtn.style.display = 'inline-block';
-            }
-          }
+          
           if (archetypeSpecificInput) {
             if (append && archetypeSpecificInput.value.trim()) {
               const existing = archetypeSpecificInput.value.trim();
