@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar History Demo</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #000;
+      color: #fff;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .current-avatar {
+      text-align: center;
+    }
+    .current-avatar img {
+      width: 300px;
+      height: 300px;
+      border-radius: 20px;
+      object-fit: cover;
+      border: 2px solid #fff;
+    }
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .history-item {
+      position: relative;
+      cursor: pointer;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .history-item:hover {
+      border-color: rgba(255,255,255,0.5);
+      transform: scale(1.05);
+    }
+    .history-item.current {
+      border-color: #4CAF50;
+    }
+    .history-item img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+    }
+    .history-item-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.8);
+      padding: 8px;
+      font-size: 11px;
+    }
+    .badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #4CAF50;
+      color: #000;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #ddd;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    h2 {
+      margin-top: 0;
+    }
+    .controls {
+      text-align: center;
+      margin: 20px 0;
+    }
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      width: 100%;
+      max-width: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Avatar Image History Demo</h1>
+  
+  <div class="controls">
+    <input type="text" id="avatarIdInput" placeholder="Enter Avatar ID (UUID)" />
+    <button id="loadBtn">Load Avatar & History</button>
+    <button id="simulateNewBtn">Simulate New Version</button>
+    <button id="pruneBtn">Prune Old Versions</button>
+  </div>
+
+  <div class="container">
+    <div>
+      <h2>Current Avatar</h2>
+      <div class="current-avatar">
+        <img id="currentImage" src="https://via.placeholder.com/300?text=No+Avatar" alt="Current Avatar">
+        <div id="currentInfo" style="margin-top: 20px;">
+          <p><strong>Name:</strong> <span id="avatarName">-</span></p>
+          <p><strong>Version:</strong> <span id="currentVersion">-</span></p>
+          <p><strong>Created:</strong> <span id="currentDate">-</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h2>Version History</h2>
+      <div id="historyGrid" class="history-grid">
+        <p style="grid-column: 1/-1; text-align: center; color: #666;">
+          Enter an Avatar ID and click "Load Avatar & History"
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Avatar History Utils -->
+  <script src="avatar-history-utils.js"></script>
+
+  <script>
+    // Initialize Supabase (replace with your credentials)
+    const supabaseUrl = 'YOUR_SUPABASE_URL';
+    const supabaseKey = 'YOUR_SUPABASE_ANON_KEY';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    let currentAvatarId = null;
+    let currentAvatarData = null;
+
+    // Load avatar and its history
+    async function loadAvatarAndHistory() {
+      const avatarId = document.getElementById('avatarIdInput').value.trim();
+      
+      if (!avatarId) {
+        alert('Please enter an Avatar ID');
+        return;
+      }
+
+      currentAvatarId = avatarId;
+
+      try {
+        // Load avatar data
+        const { data: avatar, error: avatarError } = await supabase
+          .from('avatars')
+          .select('*')
+          .eq('id', avatarId)
+          .single();
+
+        if (avatarError) throw avatarError;
+
+        currentAvatarData = avatar;
+        displayCurrentAvatar(avatar);
+
+        // Load history
+        const { success, history, error } = await AvatarHistory.getHistory(
+          supabase,
+          avatarId,
+          20
+        );
+
+        if (success) {
+          displayHistory(history);
+        } else {
+          console.error('Failed to load history:', error);
+          alert('Failed to load history: ' + error.message);
+        }
+
+      } catch (error) {
+        console.error('Error loading avatar:', error);
+        alert('Error loading avatar: ' + error.message);
+      }
+    }
+
+    // Display current avatar
+    function displayCurrentAvatar(avatar) {
+      document.getElementById('currentImage').src = avatar.image_url;
+      document.getElementById('avatarName').textContent = avatar.name;
+      document.getElementById('currentDate').textContent = 
+        new Date(avatar.created_at).toLocaleString();
+
+      // Get current version from history
+      AvatarHistory.getCurrentVersion(supabase, avatar.id).then(result => {
+        if (result.success && result.currentVersion) {
+          document.getElementById('currentVersion').textContent = 
+            'v' + result.currentVersion.version_number;
+        }
+      });
+    }
+
+    // Display history grid
+    function displayHistory(history) {
+      const grid = document.getElementById('historyGrid');
+      grid.innerHTML = '';
+
+      if (!history || history.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666;">No history found</p>';
+        return;
+      }
+
+      history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `history-item ${item.is_current ? 'current' : ''}`;
+        
+        div.innerHTML = `
+          ${item.is_current ? '<span class="badge">CURRENT</span>' : ''}
+          <img src="${item.image_url}" alt="Version ${item.version_number}" />
+          <div class="history-item-info">
+            <div><strong>v${item.version_number}</strong></div>
+            <div>${item.created_from}</div>
+            <div style="font-size:10px;">${new Date(item.created_at).toLocaleDateString()}</div>
+          </div>
+        `;
+
+        div.addEventListener('click', async () => {
+          if (item.is_current) {
+            alert('This is already the current version');
+            return;
+          }
+
+          if (confirm(`Restore version ${item.version_number}?`)) {
+            const { success } = await AvatarHistory.restoreVersion(
+              supabase,
+              currentAvatarId,
+              item.id
+            );
+
+            if (success) {
+              alert('Version restored successfully!');
+              loadAvatarAndHistory();
+            } else {
+              alert('Failed to restore version');
+            }
+          }
+        });
+
+        grid.appendChild(div);
+      });
+    }
+
+    // Simulate adding a new version (for testing)
+    async function simulateNewVersion() {
+      if (!currentAvatarId || !currentAvatarData) {
+        alert('Please load an avatar first');
+        return;
+      }
+
+      // Use a placeholder image service to generate a "new" image
+      const randomId = Math.floor(Math.random() * 1000);
+      const newImageUrl = `https://picsum.photos/400/400?random=${randomId}`;
+
+      const { success, historyId } = await AvatarHistory.addToHistory(
+        supabase,
+        currentAvatarId,
+        newImageUrl,
+        'regenerate',
+        'Simulated regeneration',
+        currentAvatarData.traits
+      );
+
+      if (success) {
+        // Update the avatar's main image_url
+        await supabase
+          .from('avatars')
+          .update({ image_url: newImageUrl })
+          .eq('id', currentAvatarId);
+
+        alert('New version added successfully!');
+        loadAvatarAndHistory();
+      } else {
+        alert('Failed to add new version');
+      }
+    }
+
+    // Prune old versions
+    async function pruneOldVersions() {
+      if (!currentAvatarId) {
+        alert('Please load an avatar first');
+        return;
+      }
+
+      const keepCount = prompt('How many versions to keep?', '5');
+      if (!keepCount) return;
+
+      const { success, deletedCount } = await AvatarHistory.pruneHistory(
+        supabase,
+        currentAvatarId,
+        parseInt(keepCount)
+      );
+
+      if (success) {
+        alert(`Deleted ${deletedCount} old version(s)`);
+        loadAvatarAndHistory();
+      } else {
+        alert('Failed to prune history');
+      }
+    }
+
+    // Event listeners
+    document.getElementById('loadBtn').addEventListener('click', loadAvatarAndHistory);
+    document.getElementById('simulateNewBtn').addEventListener('click', simulateNewVersion);
+    document.getElementById('pruneBtn').addEventListener('click', pruneOldVersions);
+
+    // Allow Enter key on input
+    document.getElementById('avatarIdInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') loadAvatarAndHistory();
+    });
+  </script>
+</body>
+</html>
