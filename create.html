@@ -397,7 +397,7 @@
           <div style="width:min(100%, 395px); margin-top:16px;">
             <div class="field-heading" style="margin-bottom:8px;">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
             <div style="width:100%; margin:0;">
-              <textarea id="suggestionType" placeholder="Use buttons below for suggestions..." rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+              <textarea id="suggestionType" placeholder="Use suggestion buttons or enter your own!" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:14px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
             </div>
           </div>
 
@@ -415,7 +415,7 @@
           <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
               <input type="checkbox" id="suggestFromPersonalityCheckbox" />
-              <span>Constrain Suggestions to Personality</span>
+              <span>Constrain Suggestion Buttons to Sliders</span>
             </label>
           </div>
 
@@ -715,59 +715,64 @@
       });
 
       async function randomizeAll(){
-  // Mark that we should auto-open art settings after suggestion returns
-  randomizeFlow = true;
         // Ensure options mode is visible
         showOptionsMode();
-        // Archetype
-  const archetypeWeights = [
-    { value: 'Human', weight: 0.1 },
-    { value: 'Animal', weight: 0.25 },
-    { value: 'Sci-Fi / Fantasy', weight: 0.25 },
-    { value: 'Role', weight: 0.4 }
-  ];
-        const archetypeSel = document.getElementById('archetype');
-        let selectedArchetype = null;
-        if (archetypeSel){
-          selectedArchetype = randPickWeighted(archetypeWeights);
-          archetypeSel.value = selectedArchetype;
-          dispatch(archetypeSel, 'change');
+        
+        // Randomize personality sliders (1-10 notched)
+        const s1 = document.getElementById('traitSeriousPlayful');
+        const s2 = document.getElementById('traitSuccinctChatty');
+        const s3 = document.getElementById('traitRationalIntuitive');
+        const s4 = document.getElementById('traitPracticalImaginative');
+        [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
+        
+        // Clear the suggestion type field first
+        const suggestionTypeEl = document.getElementById('suggestionType');
+        if (suggestionTypeEl) {
+          suggestionTypeEl.value = '';
+          autosizeSuggestionType();
         }
-  // Sliders (1-10 notched)
-  const s1 = document.getElementById('traitSeriousPlayful');
-  const s2 = document.getElementById('traitSuccinctChatty');
-  const s3 = document.getElementById('traitRationalIntuitive');
-  const s4 = document.getElementById('traitPracticalImaginative');
-
-  [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
-  // Vibe (select)
-  const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
-  const vibe = randPick(vibes);
-  const vibeSelect = document.getElementById('vibeChoice');
-  if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
-  // Style choice (select)
-  const styles = ['default','realistic','vector','anime','impressionistic'];
-  const styleSelect = document.getElementById('styleChoice');
-  if (!hologramSelected) {
-    const style = randPick(styles);
-    if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
-  } else if (styleSelect){
-    styleSelect.value = 'default';
-    dispatch(styleSelect,'change');
-  }
-        // Detail level
-        // Additional details (optional small prompt)
-        const extras = [
-          'warm lighting, soft textures',
-          'sleek silhouette, clean lines',
-          'mystic aura, subtle glow',
-          'playful expression, friendly vibe'
-        ];
-        const add = document.getElementById('additionalDetails');
-        if (add){ add.value = randPick(extras); dispatch(add,'input'); }
-        // Trigger AI suggestion for persona (if available for selected archetype)
-        const genBtn = document.getElementById('generateSuggestionBtn');
-        if (genBtn && !genBtn.disabled){ genBtn.click(); }
+        
+        // Trigger 2 random suggestion buttons (randomly pick which categories)
+        const randomButtons = [
+          document.getElementById('addRandomSciFiBtn'),
+          document.getElementById('addRandomAnimalBtn'),
+          document.getElementById('addRandomRoleBtn')
+        ].filter(btn => btn); // Filter out any null buttons
+        
+        if (randomButtons.length >= 2) {
+          // Shuffle and pick 2
+          const shuffled = randomButtons.sort(() => Math.random() - 0.5);
+          const [btn1, btn2] = shuffled.slice(0, 2);
+          
+          // Click first button
+          if (btn1 && !btn1.disabled) {
+            btn1.click();
+            // Wait a bit for first to complete, then click second
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (btn2 && !btn2.disabled) {
+              btn2.click();
+            }
+          }
+        }
+        
+        // Randomize vibe (select)
+        const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
+        const vibe = randPick(vibes);
+        const vibeSelect = document.getElementById('vibeChoice');
+        if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
+        
+        // Randomize style choice (select)
+        const renderAsHologramCheckbox = document.getElementById('renderAsHologramCheckbox');
+        const hologramSelected = renderAsHologramCheckbox?.checked || false;
+        const styles = ['default','realistic','vector','anime','impressionistic'];
+        const styleSelect = document.getElementById('styleChoice');
+        if (!hologramSelected) {
+          const style = randPick(styles);
+          if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
+        } else if (styleSelect){
+          styleSelect.value = 'default';
+          dispatch(styleSelect,'change');
+        }
       }
       randomizeBtn?.addEventListener('click', randomizeAll);
 
