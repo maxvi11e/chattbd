@@ -143,7 +143,11 @@ const AvatarHistory = {
   }
 };
 
-// Export for use in other modules
+// Export for use in browser and Node.js
+if (typeof window !== 'undefined') {
+  window.AvatarHistory = AvatarHistory;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = AvatarHistory;
 }
