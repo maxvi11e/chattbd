@@ -427,7 +427,7 @@
           </div>
 
           <!-- Art Options Toggle Button -->
-          <div style="display:flex; justify-content:center; margin-top:-24px;">
+          <div id="toggleArtOptionsContainer" style="display:flex; justify-content:center; margin-top:-24px;">
             <button id="toggleArtOptionsBtn">
               Show Art Options
             </button>
@@ -843,9 +843,13 @@
           if (isVisible) {
             // Move startBtn to after artSection (bottom of the page)
             artSection.parentNode.insertBefore(startBtnContainer, artSection.nextSibling);
+            // Add 20px spacing when art options are shown
+            toggleBtnContainer.style.marginTop = '20px';
           } else {
             // Move startBtn back to before toggleBtn (original position)
             toggleBtnContainer.parentNode.insertBefore(startBtnContainer, toggleBtnContainer);
+            // Reset to original spacing
+            toggleBtnContainer.style.marginTop = '-24px';
           }
         });
       })();
