@@ -725,11 +725,12 @@
         const s4 = document.getElementById('traitPracticalImaginative');
         [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
         
-        // Clear the suggestion type field first
+        // Clear the suggestion type field first and reset the flag
         const suggestionTypeEl = document.getElementById('suggestionType');
         if (suggestionTypeEl) {
           suggestionTypeEl.value = '';
         }
+        hasRandomSelections = false; // Reset the flag so we start fresh
         
         // Trigger 2 random suggestion buttons (randomly pick which categories)
         const randomButtons = [
@@ -743,10 +744,10 @@
           const shuffled = randomButtons.sort(() => Math.random() - 0.5);
           const [btn1, btn2] = shuffled.slice(0, 2);
           
-          // Click first button
+          // Click first button (will set field to first type)
           if (btn1 && !btn1.disabled) {
             btn1.click();
-            // Wait a bit for first to complete, then click second
+            // Wait a bit for first to complete, then click second (will append with +)
             await new Promise(resolve => setTimeout(resolve, 500));
             if (btn2 && !btn2.disabled) {
               btn2.click();
@@ -1151,7 +1152,12 @@
             }
             
             hasRandomSelections = true; // Mark that a random selection has been made
-            applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: true });
+            
+            // Check if suggestionType field is empty - if so, don't append
+            const suggestionTypeEl = document.getElementById('suggestionType');
+            const shouldAppend = suggestionTypeEl && suggestionTypeEl.value.trim() !== '';
+            
+            applySuggestionResult({ typeOnly: incomingType, displayName: incomingType }, { append: shouldAppend });
             if (suggestionDescEl) {
               suggestionDescEl.value = lastPayload?.description || '';
               autosizeSuggestionDesc();
