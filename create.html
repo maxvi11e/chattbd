@@ -828,7 +828,9 @@
       (function initArtOptionsToggle(){
         const toggleBtn = document.getElementById('toggleArtOptionsBtn');
         const artSection = document.getElementById('artSettingsSection');
-        if (!toggleBtn || !artSection) return;
+        const startBtnContainer = document.querySelector('#startBtn')?.parentElement;
+        const toggleBtnContainer = toggleBtn?.parentElement;
+        if (!toggleBtn || !artSection || !startBtnContainer || !toggleBtnContainer) return;
         
         let isVisible = false;
         
@@ -836,6 +838,15 @@
           isVisible = !isVisible;
           artSection.style.display = isVisible ? 'flex' : 'none';
           toggleBtn.textContent = isVisible ? 'Hide Art Options' : 'Show Art Options';
+          
+          // Move startBtn based on art options visibility
+          if (isVisible) {
+            // Move startBtn to after artSection (bottom of the page)
+            artSection.parentNode.insertBefore(startBtnContainer, artSection.nextSibling);
+          } else {
+            // Move startBtn back to before toggleBtn (original position)
+            toggleBtnContainer.parentNode.insertBefore(startBtnContainer, toggleBtnContainer);
+          }
         });
       })();
 
