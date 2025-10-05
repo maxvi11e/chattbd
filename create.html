@@ -1373,63 +1373,40 @@
         // If hologram mode, generate abstract description
         let hologramDescription = '';
         if (useHologram) {
-          // Generate abstract description using suggest-abstract.js logic
-          const norm = (v) => {
-            const n = Number(v);
-            return Number.isFinite(n) ? Math.min(100, Math.max(0, n)) : 50;
-          };
-          const s = {
-            sp: norm(traits.seriousPlayful),
-            sc: norm(traits.succinctChatty),
-            ri: norm(traits.rationalIntuitive),
-            cl: norm(traits.practicalImaginative)
-          };
-
-          const bucket = (n) => n <= 30 ? 'low' : n >= 70 ? 'high' : 'mid';
-          const b = { sp: bucket(s.sp), sc: bucket(s.sc), ri: bucket(s.ri), cl: bucket(s.cl) };
-
-          const palette = b.sp === 'low'
-            ? 'cool white/blue lines with gentle deep blue glow'
-            : b.sp === 'high'
-              ? 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
-              : 'deep cool spectrum with high vibrancy accents';
-
-          const logic = b.ri === 'low'
-            ? 'geometric wireframe rings and grid'
-            : b.ri === 'high'
-              ? 'flowing energy strands and arcs'
-              : 'mesh of arcs and short lattice segments';
-
-          const fill = b.sc === 'low'
-            ? 'balanced interior with clear negative space between lines'
-            : b.sc === 'high'
-              ? 'richer line work with tight spacing, but keep background visible outside the figure'
-              : 'medium density with even spacing';
-
-          const symmetry = b.cl === 'low'
-            ? 'strong bilateral symmetry'
-            : b.cl === 'high'
-              ? 'slight asymmetry for energy direction'
-              : 'near-bilateral with small variations';
-
-          const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
-
-          // Use the Type field value, fallback to "abstract form" if empty
-          const typeValue = archetypeSpecific || 'abstract form';
-
-          const descriptionLines = [
-            `Centered abstract ${typeValue} bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.`,
-            `Color: ${palette}.`,
-            `Structure: ${logic}.`,
-            `Fill: ${fill}.`,
-            `Symmetry: ${symmetry}.`,
-            'Eyes: friendly rounded almond openings with soft glow; no pupils.',
-            'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
-            'Extreme brightness and luminosity to all elements',
-            '10x thickness and brightness for 10% of all elements',
-            vibeLine
-          ].filter(Boolean);
-          hologramDescription = descriptionLines.join('\n');
+          // Call the suggest-abstract API to generate hologram description
+          try {
+            const response = await fetch('/api/suggest-abstract', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                sliders: traits,
+                vibe: vibe || undefined
+              })
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              hologramDescription = data.description || '';
+              
+              // Optionally use the typeValue to customize the description
+              const typeValue = archetypeSpecific || 'abstract form';
+              if (typeValue && typeValue !== 'abstract form') {
+                // Replace "abstract figure" with "abstract [typeValue] figure"
+                hologramDescription = hologramDescription.replace(
+                  'Centered abstract figure',
+                  `Centered abstract ${typeValue} figure`
+                );
+              }
+            } else {
+              console.error('Failed to fetch abstract description:', response.status);
+              // Fallback to a basic description if API fails
+              hologramDescription = 'Centered abstract figure drawn as luminous lines on a pure black background.';
+            }
+          } catch (error) {
+            console.error('Error calling suggest-abstract API:', error);
+            // Fallback to a basic description if API call fails
+            hologramDescription = 'Centered abstract figure drawn as luminous lines on a pure black background.';
+          }
         }
 
         if (!p && !isOptionsMode) return;

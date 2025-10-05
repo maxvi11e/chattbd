@@ -53,7 +53,7 @@ export default async function handler(req, res){
     const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
     const descriptionLines = [
-      'Centered abstract humanoid bust (head, neck, shoulders, upper chest and upper arms) drawn as luminous lines on a pure black background.',
+      'Centered abstract figure (head, torso) drawn as luminous lines on a pure black background.',
       `Color: ${palette}.`,
       `Structure: ${logic}.`,
       `Fill: ${fill}.`,
