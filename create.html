@@ -180,7 +180,7 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:14px 28px;
+      padding:14px 10px;
       height:auto;
       min-width:220px;
       border-radius:999px;
@@ -191,7 +191,7 @@
       animation: neonGlow 3.2s ease-in-out infinite;
       will-change: transform, box-shadow;
       transition: transform 0.15s ease-in-out, box-shadow 0.3s ease;
-  margin-bottom:20px;
+      margin-bottom:6px;
     }
     #startBtn:hover{
       transform: translateY(-2px) scale(1.02);
@@ -319,9 +319,10 @@
     /* Art Options Toggle Link Style */
     #toggleArtOptionsBtn {
       padding: 4px 8px;
+      margin-top: 0px;
       border: none;
       background: transparent;
-      color: #ffffff;
+      color: #0066cc;
       font-size: 14px;
       cursor: pointer;
       text-decoration: none;
@@ -394,7 +395,7 @@
 
           <!-- Type field - visible on load -->
           <div style="width:min(100%, 395px); margin-top:16px;">
-            <div class="field-heading">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+            <div class="field-heading" style="margin-bottom:8px;">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
             <div style="width:100%; margin:0;">
               <textarea id="suggestionType" placeholder="Use buttons below for suggestions..." rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
             </div>
@@ -414,19 +415,26 @@
           <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
               <input type="checkbox" id="suggestFromPersonalityCheckbox" />
-              <span>Constrain Suggestions to personality sliders</span>
+              <span>Constrain Suggestions to Personality</span>
             </label>
           </div>
 
+          <!-- Generate Agent Button - Always Visible -->
+          <div style="width:100%; display:flex; justify-content:center; margin-top:24px; padding-bottom:6px;">
+            <button id="startBtn" style="display:flex; width:250px; margin-bottom:24px; margin-top:20px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
+              Generate Agent!
+            </button>
+          </div>
+
           <!-- Art Options Toggle Button -->
-          <div style="display:flex; justify-content:center; margin-top:12px;">
-            <button id="toggleArtOptionsBtn" style="padding:4px 8px; border:none; background:transparent; color:#ffffff; font-size:14px; cursor:pointer; text-decoration:none; transition:all 0.2s ease;">
-              Art Options
+          <div style="display:flex; justify-content:center; margin-top:-24px;">
+            <button id="toggleArtOptionsBtn">
+              Show Art Options
             </button>
           </div>
 
           <!-- Art Settings - Toggleable -->
-          <div id="artSettingsSection" style="width:min(100%, 395px); margin-top:24px; display:none; flex-direction:column; gap:4px;">
+          <div id="artSettingsSection" style="width:min(100%, 395px); margin-top:-16px; display:none; flex-direction:column; gap:4px;">
             <!-- Style Choice -->
             <div>
               <div class="field-heading">Choose art style</div>
@@ -473,21 +481,14 @@
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- AI Hologram checkbox - above Generate Agent button -->
-          <div id="hologramCheckboxContainer" style="display:flex; justify-content:center; width:100%; margin-top:24px; padding-left:4px;">
-            <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
-              <input type="checkbox" id="renderAsHologramCheckbox" checked />
-              <span>Render as AI hologram</span>
-            </label>
-          </div>
-
-          <!-- Generate Agent Button - Always Visible -->
-          <div style="width:100%; display:flex; justify-content:center; margin-top:10px; padding-bottom:24px;">
-            <button id="startBtn" style="display:flex; width:250px; margin-bottom:24px; padding:14px 24px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
-              Generate Agent!
-            </button>
+            <!-- AI Hologram checkbox -->
+            <div style="display:flex; justify-content:center; width:100%; margin-top:12px; margin-bottom:32px; padding-left:4px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
+                <input type="checkbox" id="renderAsHologramCheckbox" checked />
+                <span>Render as AI hologram</span>
+              </label>
+            </div>
           </div>
 
           <!-- Hidden fields for compatibility -->
@@ -657,8 +658,6 @@
       // Always show options mode on init
       function showOptionsMode(){
         advancedPanel.style.display = 'flex';
-        document.getElementById('dynamicStartContainer').style.display = 'flex';
-        document.getElementById('dynamicStartContainer').appendChild(startBtn);
         inputContainer.style.display = 'none';
         // Hide art settings button on entering options mode until suggestion is generated
         const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
@@ -815,7 +814,7 @@
         toggleBtn.addEventListener('click', () => {
           isVisible = !isVisible;
           artSection.style.display = isVisible ? 'flex' : 'none';
-          toggleBtn.textContent = isVisible ? 'Hide Art Options' : 'Art Options';
+          toggleBtn.textContent = isVisible ? 'Hide Art Options' : 'Show Art Options';
         });
       })();
 
