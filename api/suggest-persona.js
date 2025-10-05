@@ -6,17 +6,17 @@
 const animalBuckets = {
   bucket1: [
     "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
-    "Yak", "Bison", "Moose", "Camel", "Wild Boar", "Lizard", "Iguana", "Sea Turtle", "Condor","Panda", "Sloth", 
+    "Yak", "Bison", "Moose", "Camel", "Lizard", "Iguana", "Sea Turtle", "Panda", "Sloth", 
     "Tiger", "Leopard", "Lion", "Cheetah", "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
     "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Okapi", "Zebra", 
-    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit", "Guinea Pig", "Raccoon", 
-    "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Tapir", "Manatee", "Whale", "Beluga" 
+    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit",
+    "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Manatee", "Blue Whale", "Beluga" 
   ],
   bucket3: [
     "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog",    
-    "Ferret", "River Otter", "Sea Otter", "Macaw", "Penguin", "Orca", "Porpoise", 
+    "Ferret", "River Otter", "Sea Otter", "Penguin", "Orca", "Porpoise", 
     "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
     "Raccoon"
   ]
@@ -26,24 +26,22 @@ const animalBuckets = {
 
 const humanArchetypeBuckets = {
   bucket1: [
-    "Monk", "Zen Master", "Judge", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
-    "Archivist", "Librarian", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
-    "Mathematician", "Historian", "Logistician", "Policeman", "Banker", "Professor", "Doctor", "Therapist", "Psychologist", 
-    "Entrepreneur", "Manager", "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Community Leader",
+    "Monk", "Zen Master", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
+    "Archivist", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
+    "Mathematician", "Historian", "Logistician", "Banker", "Professor", "Doctor", "Therapist", "Psychologist", 
+    "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Coach", "Software Developer"
   ],
   bucket2: [ 
-    "Humanitarian", "Ethical Philosopher","Counselor", "Inventor", "Activist", "Explorer", "Journalist",
-    "Teacher", "Writer", "Poet", "Painter", "Musician", "Chef", "Traveler", "Freelancer", "Parent", "Mentor", 
-    "Neighbor", "Friend", "Mediator", "Storyteller", "Athlete", "Jazz Artist",  "Optimist", "Romantic", 
-    "Dreamer", "Student", "Comedian", "Visionary", 
+    "Humanitarian", "Ethical Philosopher", "Counselor", "Inventor", "Activist", "Explorer", "Journalist",
+    "Teacher", "Writer", "Poet", "Painter", "Chef", "Traveler", "Mentor", 
+    "Neighbor", "Friend", "Athlete", "Optimist", "Romantic", 
+    "Dreamer", "Comedian", "Visionary", 
   ],
   bucket3: [
     "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
     "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Psychonaut", "Futurist", 
-    "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Childlike Wonderer", "Story Weaver", 
-    "Dream Architect"
-  ]
-
+    "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Story Weaver", 
+    "Dream Architect", "Storyteller", "Music Producer", "Jazz Artist", "Rapper", "Contemporary Artist"],
 };
 
 const humanBucketMeta = {
@@ -70,83 +68,69 @@ const archetypeBuckets = {
     "Autonomous Factory Unit Robot",
     "Battle Mech",
     "Drone Swarm",
-    "Stealth Infiltrator Bot",
-    "AI Supercomputer Core",
-    "Cybernetic Machine",
     "Space Marine",
     "Necromancer",
-    "Reptilian Alien",
-    "Ancient Dark Lord",
     "Stoic Galactic Emperor",
-    "Ancient Precursor",
+    "Ancient Precursor Alien",
     "Ice Dragon",
     "Human Knight",
     "Dwarven Warrior",
-    "Noble Elf Lord",
+    "Elven Warrior",
     "Terraforming Machine Robot",
     "Dwarf Miner",
-    "Cunning Goblin",
     "Space Knight",
     "Wise Mystic Alien",
     "Mysterious Ranger",
-    "Beastmaster",
     "Airship Captain",
     "Hobbit Hero",
     "Cantina Alien",
-    "Classic Grey Alien",
-    "Aquatic Deep-Sea Alien",
-    "Wise Wizard",
+    "Grey Alien",
+    "Aquatic Alien",
   ],
   bucket2: [ // 134–266: disciplined, heroic, competent
     "Ent-like Forest Guardian",
     "Dryad",
     "Dragon Rider",
-    "Human Space Knight", // (appears again for thematic balance if desired)
+    "Space Knight", // (appears again for thematic balance if desired)
     "Witch",
     "Starfighter Ace",
-    "Space Explorer", // filler for balance
     "Desert Outlaw Alien",
     "Engineer Alien",
-    "Humanoid Companion Robot",
+    "Companion Robot",
     "Carebot",
     "Rebel Freedom Fighter",
     "Starfighter Ace",
     "Elven King",
-    "Poetic Wanderer",
-    "Inventor",
-    "Psychic Mage Alien",
-    "Cosmonaut Tinkerer",
+    "Space Bard",
+    "Astronaut Inventor",
+    "Mage Alien",
     "Alien Merchant",
     "Time Traveler",
     "Sasquatch",
-    "Alien Jazz Musician",
+    "Cantina Alien",
     "Ancient Scholar Alien",
     "Aquatic Dragon",
   ],
   bucket3: [ // 267–400: curious, adventurous, imaginative
     "Space Colonist",
     "Technologist Wizard",
-    "Luminous Energy Being Alien",
-    "Shapeshifter Alien",
-    "Alien Wizard",
-    "AI Oracle",
+    "Luminous Energy Being",
+    "Wizard Alien",
     "Force-Wielding Sage",
     "Elemental Dragon",
-    "Jovial Wizard", // (works here too, but skewed mystical version)
+    "Jovial Wizard",
     "Dryad",
-    "Trickster Mystic",
     "Celestial Architect",
     "Cosmic Wanderer",
     "Alien Merchant",
     "Illusionist",
-    "Comic Relief Droid",
+    "Friendly Droid",
     "Space Mystic",
-    "Arcane Genius",
-    "Cosmic Shaman",
-    "Virtual Deity",
-    "Chaos Magician ",
-    "Celestial Fairy",
-    "Companion Sprite"
+    "Space Shaman",
+    "Fairy",
+    "Sprite",
+    "Phoenix",
+    "Griffin"
   ]
 };
 
