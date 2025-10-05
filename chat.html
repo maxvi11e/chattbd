@@ -533,10 +533,39 @@ body {
   background:rgba(0,0,0,0.9);
   transform:scale(1.1);
 }
+/* Edit button */
+.edit-btn {
+  position:absolute;
+  top:8px;
+  right:8px;
+  background:rgba(0,0,0,0.8);
+  border:none;
+  color:var(--ink);
+  cursor:pointer;
+  padding:6px;
+  border-radius:6px;
+  font-size:12px;
+  opacity:1;
+  transition:all 0.3s ease;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.edit-btn:hover {
+  background:rgba(0,0,0,0.9);
+  transform:scale(1.1);
+}
 /* Maximize/expand button position (when avatar is minimized) */
 .avatar-section.minimized .minimize-btn {
   left:auto;
   right:8px;
+}
+/* Hide edit button when avatar is minimized */
+.avatar-section.minimized .edit-btn {
+  display:none;
 }
 .pane {
   position:relative;
@@ -1530,6 +1559,8 @@ body {
               
               // Add minimize button
               addMinimizeButton();
+              // Add edit button
+              addEditButton();
         // Idle wiggle removed
             };
             img.onerror = (e) => {
@@ -1544,6 +1575,8 @@ body {
             
             // Add minimize button to fallback avatar too
             addMinimizeButton();
+            // Add edit button to fallback avatar too
+            addEditButton();
           }
 
           if (isNew) {
@@ -2100,6 +2133,27 @@ body {
           toggleMinimize();
         });
         avatar.appendChild(minimizeBtn);
+      }
+
+      function addEditButton() {
+        // Remove existing edit button if any
+        const existingBtn = avatar.querySelector('.edit-btn');
+        if (existingBtn) existingBtn.remove();
+        
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn';
+        editBtn.innerHTML = '✎';
+        editBtn.title = 'Edit avatar';
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          // Get current avatar ID from URL or localStorage
+          const urlParams = new URLSearchParams(window.location.search);
+          const avatarId = urlParams.get('avatar') || localStorage.getItem('lastSelectedAvatar');
+          if (avatarId) {
+            window.location.href = `edit.html?avatar=${avatarId}`;
+          }
+        });
+        avatar.appendChild(editBtn);
       }
 
       function toggleMinimize() {

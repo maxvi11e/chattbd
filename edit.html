@@ -66,7 +66,7 @@
   .sidebar-bottom {
     display:flex;
     align-items:center;
-    justify-content:center;
+    justify-content:space-between;
     padding:16px;
     border-top:0px solid #333;
   }
@@ -200,9 +200,16 @@
     flex-direction:column;
     align-items:center;
     gap:8px;
+    position:absolute;
+    bottom:12px;
+    left:0;
+    right:0;
   }
   .sidebar.collapsed .sidebar-bottom .user-email {
     display:none;
+  }
+  .sidebar.collapsed .logout-btn {
+    padding:8px 0;
   }
   .resize-handle {
     position:absolute;
@@ -228,9 +235,9 @@
     min-width:0;
   }
   .sidebar-toggle {
-    position:fixed;
+    position:absolute;
     top:50px;
-    left:260px;
+    right:10px;
     width:32px;
     height:32px;
     background:transparent;
@@ -243,24 +250,24 @@
     justify-content:center;
     font-size:30px;
     font-weight:bold;
-    z-index:1000;
-    transition:left 0.3s ease;
+    z-index:10;
+    transition:all 0.3s ease;
   }
   .sidebar-toggle:hover {
-    background:transparent;
+    background:rgba(255,255,255,0.1);
   }
   .sidebar-toggle:active {
-    background:transparent;
+    background:rgba(255,255,255,0.15);
   }
   .sidebar-toggle:focus {
-    background:transparent;
+    background:rgba(255,255,255,0.1);
     outline:none;
   }
   .sidebar.collapsed .sidebar-toggle {
-    position:absolute !important;
-    top:14px !important;
-    left:6px !important;
-    border-radius:8px;
+    top:16px;
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
   }
   /* Prevent laggy animation of toggle during live resize */
   .sidebar.resizing .sidebar-toggle {
@@ -635,25 +642,13 @@
     .form-btn {
       width:100%;
     }
-    .sidebar-toggle {
-      left:200px;
-      top:24px;
-    }
   }
   @media (max-width: 600px) {
     .user-email {
       display:none;
     }
-    #logoutBtn {
-      bottom:10px !important;
-      right:10px !important;
-      padding:10px !important;
-    }
-    #logoutBtn span {
+    .logout-btn span {
       display:none;
-    }
-    .sidebar-toggle {
-      left:0;
     }
   }
 </style>
@@ -685,11 +680,10 @@
       </div>
       <div class="sidebar-bottom">
         <span id="userEmail" class="user-email">Loading...</span>
+        <button id="logoutBtn" class="logout-btn" title="Sign out">
+          <img src="images/logout_icon.png" alt="Logout" />
+        </button>
       </div>
-      <div class="resize-handle" id="resizeHandle" title="Drag to resize sidebar"></div>
-    </div>
-
-    <div class="main-edit">
       <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <rect x="3" y="6" width="18" height="2" fill="#ffffff"/>
@@ -697,7 +691,10 @@
           <rect x="3" y="16" width="18" height="2" fill="#ffffff"/>
         </svg>
       </button>
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize sidebar"></div>
+    </div>
 
+    <div class="main-edit">
       <div class="screen dashboard">
         <!-- Main Content -->
         <div class="main-content">
@@ -772,12 +769,6 @@
     </div>
   </div>
   </div>
-
-  <!-- Sign Out Button (bottom of page) -->
-  <button id="logoutBtn" class="logout-btn" title="Sign out" style="position:fixed;bottom:20px;right:20px;z-index:999;padding:12px 20px;border:1px solid var(--stroke);background:var(--bg);color:var(--ink);border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;gap:8px;">
-    <img src="images/logout_icon.png" alt="Logout" style="width:20px;height:20px;" />
-    <span>Sign Out</span>
-  </button>
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1354,26 +1345,10 @@
         return Number.isNaN(stored) ? null : stored;
       };
 
-      const setTogglePosition = (width) => {
-        const collapsedWidth = COLLAPSED_SIDEBAR_WIDTH;
-        const isCollapsed = sidebar.classList.contains('collapsed');
-        let effectiveWidth = width;
-        if (!effectiveWidth || Number.isNaN(effectiveWidth)) {
-          effectiveWidth = isCollapsed ? collapsedWidth : (sidebar.offsetWidth || 300);
-        }
-        if (window.innerWidth <= 768) {
-          sidebarToggle.style.left = `${collapsedWidth}px`;
-          return;
-        }
-        const offset = isCollapsed ? collapsedWidth : Math.max(effectiveWidth - 40, collapsedWidth);
-        sidebarToggle.style.left = `${offset}px`;
-      };
-
       const expandSidebar = () => {
         const width = getStoredWidth() || 300;
         sidebar.classList.remove('collapsed');
         sidebar.style.width = `${width}px`;
-        setTogglePosition(width);
         sidebarToggle.title = 'Collapse sidebar';
         localStorage.setItem(EDIT_SIDEBAR_STATE_KEY, 'false');
       };
@@ -1388,7 +1363,6 @@
         }
         sidebar.classList.add('collapsed');
         sidebar.style.width = `${COLLAPSED_SIDEBAR_WIDTH}px`;
-        setTogglePosition(COLLAPSED_SIDEBAR_WIDTH);
         sidebarToggle.title = 'Expand sidebar';
         if (persistState) {
           localStorage.setItem(EDIT_SIDEBAR_STATE_KEY, 'true');
@@ -1432,7 +1406,6 @@
           newWidth = Math.max(200, Math.min(newWidth, 600));
           sidebar.style.width = `${newWidth}px`;
           localStorage.setItem(EDIT_SIDEBAR_WIDTH_KEY, Math.round(newWidth));
-          setTogglePosition(newWidth);
         };
 
         const handleUp = () => {
@@ -1455,9 +1428,6 @@
             return;
           }
         }
-
-        const width = sidebar.classList.contains('collapsed') ? COLLAPSED_SIDEBAR_WIDTH : sidebar.offsetWidth;
-        setTogglePosition(width);
       });
     }
 
