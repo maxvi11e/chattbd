@@ -714,6 +714,9 @@
         slider.addEventListener('change', () => applySliderColor(slider));
       });
 
+      // Track if any random selection has been made (used by undo button)
+      let hasRandomSelections = false;
+
       async function randomizeAll(){
         // Ensure options mode is visible
         showOptionsMode();
@@ -859,7 +862,6 @@
 
         // Track type history for undo functionality
         let typeHistory = [];
-        let hasRandomSelections = false; // Track if any random selection has been made
 
         const hideAddRandomBtns = ()=>{ 
           if (addRandomSciFiBtn) addRandomSciFiBtn.style.display = 'none';
