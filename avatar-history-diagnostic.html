@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar History Diagnostic</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #000;
+      color: #fff;
+    }
+    .status {
+      padding: 20px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 2px solid #333;
+    }
+    .status.success { border-color: #4CAF50; background: rgba(76, 175, 80, 0.1); }
+    .status.error { border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1); }
+    .status.warning { border-color: #ffa500; background: rgba(255, 165, 0, 0.1); }
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin: 10px 5px 10px 0;
+    }
+    button:hover { background: #ddd; }
+    pre {
+      background: #111;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #111;
+      color: #fff;
+      width: 100%;
+      max-width: 400px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Avatar History Diagnostic Tool</h1>
+  <p>This tool checks if the avatar history feature is properly set up in your database.</p>
+
+  <button onclick="runDiagnostics()">Run Diagnostics</button>
+  <button onclick="testWithAvatarId()">Test With Avatar ID</button>
+  
+  <div style="margin-top: 20px;">
+    <input type="text" id="avatarIdInput" placeholder="Enter Avatar ID (optional)" />
+  </div>
+
+  <div id="results"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="avatar-history-utils.js"></script>
+
+  <script>
+    const supabaseUrl = 'https://eyptqyzkwcpaillnwmle.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function runDiagnostics() {
+      const results = document.getElementById('results');
+      results.innerHTML = '<h2>Running diagnostics...</h2>';
+
+      const checks = [];
+
+      // Check 1: Auth
+      checks.push(await checkAuth());
+
+      // Check 2: AvatarHistory utility loaded
+      checks.push(checkUtilityLoaded());
+
+      // Check 3: Database function exists
+      checks.push(await checkDatabaseFunction());
+
+      // Check 4: Table exists
+      checks.push(await checkTableExists());
+
+      // Check 5: Get user's avatars
+      checks.push(await checkUserAvatars());
+
+      // Display results
+      displayResults(checks);
+    }
+
+    async function checkAuth() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          return {
+            name: 'Authentication',
+            status: 'success',
+            message: 'User authenticated: ' + session.user.email
+          };
+        } else {
+          return {
+            name: 'Authentication',
+            status: 'error',
+            message: 'Not authenticated - please log in first'
+          };
+        }
+      } catch (error) {
+        return {
+          name: 'Authentication',
+          status: 'error',
+          message: 'Error checking auth: ' + error.message
+        };
+      }
+    }
+
+    function checkUtilityLoaded() {
+      if (window.AvatarHistory) {
+        return {
+          name: 'Avatar History Utility',
+          status: 'success',
+          message: 'avatar-history-utils.js loaded successfully'
+        };
+      } else {
+        return {
+          name: 'Avatar History Utility',
+          status: 'error',
+          message: 'avatar-history-utils.js not loaded'
+        };
+      }
+    }
+
+    async function checkDatabaseFunction() {
+      try {
+        // Try to call the function with a dummy UUID
+        const { data, error } = await supabase.rpc('get_avatar_image_history', {
+          p_avatar_id: '00000000-0000-0000-0000-000000000000',
+          p_limit: 1
+        });
+
+        if (error) {
+          if (error.message.includes('function') && error.message.includes('does not exist')) {
+            return {
+              name: 'Database Function',
+              status: 'error',
+              message: '❌ Function does not exist - migration NOT run',
+              details: error.message
+            };
+          } else {
+            // Function exists but returned an error (probably permission/auth related, which is fine)
+            return {
+              name: 'Database Function',
+              status: 'success',
+              message: 'Function exists (returned expected auth error)',
+              details: error.message
+            };
+          }
+        }
+
+        return {
+          name: 'Database Function',
+          status: 'success',
+          message: 'Function exists and is callable'
+        };
+      } catch (error) {
+        return {
+          name: 'Database Function',
+          status: 'error',
+          message: 'Error checking function: ' + error.message
+        };
+      }
+    }
+
+    async function checkTableExists() {
+      try {
+        const { data, error } = await supabase
+          .from('avatar_image_history')
+          .select('id')
+          .limit(1);
+
+        if (error) {
+          if (error.message.includes('relation') && error.message.includes('does not exist')) {
+            return {
+              name: 'History Table',
+              status: 'error',
+              message: '❌ Table does not exist - migration NOT run'
+            };
+          } else {
+            return {
+              name: 'History Table',
+              status: 'warning',
+              message: 'Table may exist but query failed: ' + error.message
+            };
+          }
+        }
+
+        return {
+          name: 'History Table',
+          status: 'success',
+          message: 'avatar_image_history table exists'
+        };
+      } catch (error) {
+        return {
+          name: 'History Table',
+          status: 'error',
+          message: 'Error checking table: ' + error.message
+        };
+      }
+    }
+
+    async function checkUserAvatars() {
+      try {
+        const { data, error } = await supabase
+          .from('avatars')
+          .select('id, name')
+          .limit(5);
+
+        if (error) {
+          return {
+            name: 'User Avatars',
+            status: 'error',
+            message: 'Error fetching avatars: ' + error.message
+          };
+        }
+
+        if (data && data.length > 0) {
+          return {
+            name: 'User Avatars',
+            status: 'success',
+            message: 'Found ' + data.length + ' avatar(s)',
+            details: JSON.stringify(data, null, 2)
+          };
+        } else {
+          return {
+            name: 'User Avatars',
+            status: 'warning',
+            message: 'No avatars found - create one first'
+          };
+        }
+      } catch (error) {
+        return {
+          name: 'User Avatars',
+          status: 'error',
+          message: 'Error: ' + error.message
+        };
+      }
+    }
+
+    async function testWithAvatarId() {
+      const avatarId = document.getElementById('avatarIdInput').value.trim();
+      
+      if (!avatarId) {
+        alert('Please enter an Avatar ID');
+        return;
+      }
+
+      const results = document.getElementById('results');
+      results.innerHTML = '<h2>Testing with Avatar ID: ' + avatarId + '</h2>';
+
+      const checks = [];
+
+      // Try to get history
+      try {
+        const { success, history, error } = await AvatarHistory.getHistory(supabase, avatarId, 20);
+        
+        if (success) {
+          checks.push({
+            name: 'Get History',
+            status: 'success',
+            message: 'Retrieved ' + (history ? history.length : 0) + ' version(s)',
+            details: history ? JSON.stringify(history, null, 2) : null
+          });
+        } else {
+          checks.push({
+            name: 'Get History',
+            status: 'error',
+            message: 'Failed to get history',
+            details: error ? error.message : 'Unknown error'
+          });
+        }
+      } catch (error) {
+        checks.push({
+          name: 'Get History',
+          status: 'error',
+          message: 'Exception: ' + error.message
+        });
+      }
+
+      displayResults(checks);
+    }
+
+    function displayResults(checks) {
+      const results = document.getElementById('results');
+      let html = '<h2>Diagnostic Results</h2>';
+
+      checks.forEach(check => {
+        html += `
+          <div class="status ${check.status}">
+            <h3>${check.name}</h3>
+            <p><strong>${check.status.toUpperCase()}:</strong> ${check.message}</p>
+            ${check.details ? '<pre>' + check.details + '</pre>' : ''}
+          </div>
+        `;
+      });
+
+      // Summary
+      const successCount = checks.filter(c => c.status === 'success').length;
+      const errorCount = checks.filter(c => c.status === 'error').length;
+
+      html += '<div class="status ' + (errorCount > 0 ? 'error' : 'success') + '">';
+      html += '<h3>Summary</h3>';
+      html += '<p>✅ ' + successCount + ' passed | ❌ ' + errorCount + ' failed</p>';
+      
+      if (errorCount > 0) {
+        html += '<p><strong>Action Required:</strong> Run <code>sql/avatar-history-migration.sql</code> in Supabase SQL Editor</p>';
+      } else {
+        html += '<p><strong>All checks passed!</strong> The feature should be working.</p>';
+      }
+      
+      html += '</div>';
+
+      results.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

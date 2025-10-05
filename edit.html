@@ -1934,7 +1934,17 @@
     
     // Load and display history
     async function loadHistory() {
-      if (!currentBot || !window.AvatarHistory) return;
+      const historyGrid = document.getElementById('historyGrid');
+      
+      if (!currentBot) {
+        historyGrid.innerHTML = '<div class="history-empty">No avatar loaded</div>';
+        return;
+      }
+      
+      if (!window.AvatarHistory) {
+        historyGrid.innerHTML = '<div class="history-empty">History feature not available</div>';
+        return;
+      }
       
       try {
         const { success, history, error } = await window.AvatarHistory.getHistory(
@@ -1943,13 +1953,24 @@
           20
         );
 
-        if (success && history) {
-          displayHistory(history);
+        if (success) {
+          if (history && history.length > 0) {
+            displayHistory(history);
+          } else {
+            historyGrid.innerHTML = '<div class="history-empty">No edit history yet<br><br><small>History will be created when you regenerate this avatar</small></div>';
+          }
         } else {
           console.error('Failed to load history:', error);
+          // Check if it's a missing function error (migration not run)
+          if (error && error.message && error.message.includes('function') && error.message.includes('does not exist')) {
+            historyGrid.innerHTML = '<div class="history-empty" style="color:#ff6b6b;">⚠️ Database migration required<br><br><small>Please run avatar-history-migration.sql in Supabase SQL Editor</small></div>';
+          } else {
+            historyGrid.innerHTML = '<div class="history-empty" style="color:#ff6b6b;">Failed to load history<br><br><small>' + (error.message || 'Unknown error') + '</small></div>';
+          }
         }
       } catch (error) {
         console.error('Error loading history:', error);
+        historyGrid.innerHTML = '<div class="history-empty" style="color:#ff6b6b;">Error loading history<br><br><small>' + error.message + '</small></div>';
       }
     }
 
