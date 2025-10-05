@@ -251,6 +251,38 @@
     #suggestionDesc::-webkit-scrollbar-thumb{
       background: transparent;
     }
+
+    /* Random Suggestion Buttons */
+    #randomSuggestionBtns {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: -4px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    #randomSuggestionBtns button {
+      width: 140px;
+      padding: 8px 12px;
+      border: 1px solid var(--stroke);
+      background: #ffffff;
+      color: #000000;
+      border-radius: 800px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    #randomSuggestionBtns button:hover {
+      background: #f0f0f0;
+      transform: translateY(-1px);
+    }
+    #randomSuggestionBtns button:active {
+      transform: translateY(0);
+    }
+    #randomSuggestionBtns button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 
@@ -315,27 +347,24 @@
 
           <!-- Type field - visible on load -->
           <div style="width:min(100%, 395px); margin-top:16px;">
-            <div class="field-heading">Type <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
+            <div class="field-heading">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
             <div style="width:100%; margin:0;">
-              <textarea id="suggestionType" placeholder="Archetype type" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-            </div>
-            <!-- Undo button below Type field -->
-            <div style="display:flex; gap:8px; align-items:center; margin-top:8px; justify-content:center; flex-wrap:wrap;">
-              <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:6px; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
-              </button>
+              <textarea id="suggestionType" placeholder="Use buttons below for creative suggestions..." rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
             </div>
           </div>
 
-          <!-- Random suggestion buttons and checkbox -->
-          <div style="display:flex; gap:8px; align-items:center; margin-top:16px; justify-content:center; flex-wrap:wrap;">
-            <button id="addRandomSciFiBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Sci-Fi</button>
-            <button id="addRandomAnimalBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Animal</button>
-            <button id="addRandomRoleBtn" style="width:140px; padding:8px 12px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:13px; cursor:pointer;">+ Role</button>
+          <!-- Random suggestion buttons with undo button -->
+          <div id="randomSuggestionBtns">
+            <button id="undoTypeBtn" title="Undo last type" style="width:36px; height:36px; padding:6px; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+              <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
+            </button>
+            <button id="addRandomSciFiBtn">+ Sci-Fi</button>
+            <button id="addRandomAnimalBtn">+ Animal</button>
+            <button id="addRandomRoleBtn">+ Role</button>
           </div>
           
           <!-- Suggest from personality checkbox -->
-          <div style="display:flex; justify-content:center; margin-top:12px; padding-left:4px;">
+          <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
             <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
               <input type="checkbox" id="suggestFromPersonalityCheckbox" style="width:18px; height:18px; cursor:pointer; accent-color:#ffffff;" />
               <span>Suggest from personality sliders</span>
