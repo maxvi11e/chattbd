@@ -1,10 +1,12 @@
 # Avatar Animation Setup Guide
 
-This guide walks you through setting up avatar animation using fal.ai's LivePortrait.
+This guide walks you through setting up avatar animation using fal.ai's Stable Video Diffusion (Fast SVD).
 
 ## Overview
 
-The system generates 1-second animated videos of avatar images with subtle movements and blinking. Animations are created when users confirm an avatar in the edit screen.
+The system generates 1-second animated videos of avatar images with subtle movements. Animations are created when users confirm an avatar in the edit screen.
+
+**Note:** We use Stable Video Diffusion instead of LivePortrait because it doesn't require a driving video and works great for subtle avatar animations.
 
 ## Setup Steps
 
@@ -100,13 +102,13 @@ avatar_image_history:
 ## API Costs
 
 ### fal.ai Pricing
-- LivePortrait: ~$0.01 per 1-second video
-- Processing time: 2-5 seconds
+- Stable Video Diffusion (Fast): ~$0.005-0.01 per 1-second video
+- Processing time: 3-8 seconds
 
 ### Cost Comparison
 - Static avatar image: $0.01-0.02 (DALL-E)
-- Animated avatar: $0.02-0.03 total (DALL-E + fal.ai)
-- **Increase: ~50-100% per avatar**
+- Animated avatar: $0.015-0.03 total (DALL-E + fal.ai)
+- **Increase: ~25-50% per avatar**
 
 ## File Changes
 
@@ -125,11 +127,10 @@ avatar_image_history:
 
 ```javascript
 {
-  video_length: 1.0,        // Duration in seconds
-  motion_scale: 0.4,        // Movement intensity (0.0-1.0)
-  enable_blink: true,       // Natural eye blinking
-  enable_mouth: true,       // Subtle mouth movement
-  fps: 25                   // Frame rate
+  image_url: imageUrl,
+  motion_bucket_id: 40,  // Motion intensity (1-255, lower = less motion)
+  fps: 6,                // Frames per second
+  steps: 4               // Quality steps (fewer = faster)
 }
 ```
 
@@ -139,13 +140,13 @@ To adjust animation intensity, edit `api/animate-avatar.js`:
 
 ```javascript
 // Subtle animation (current setting)
-motion_scale: 0.4
+motion_bucket_id: 40
 
 // More dramatic animation
-motion_scale: 0.7
+motion_bucket_id: 100
 
-// Minimal animation
-motion_scale: 0.2
+// Very subtle animation
+motion_bucket_id: 20
 ```
 
 ## Troubleshooting
@@ -159,9 +160,45 @@ motion_scale: 0.2
 
 ### Slow animation generation?
 
-- fal.ai typically takes 2-5 seconds
+- fal.ai Stable Video typically takes 3-8 seconds
 - If taking longer, check your fal.ai account status
 - Network issues can cause delays
+
+### Alternative Models (if you want to try others)
+
+If you want to try different animation approaches, edit `api/animate-avatar.js`:
+
+**Option 1: Standard Stable Video Diffusion** (higher quality, slower)
+```javascript
+const falResponse = await fetch('https://fal.run/fal-ai/stable-video-diffusion', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Key ${process.env.FAL_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    image_url: imageUrl,
+    motion_bucket_id: 127,
+    cond_aug: 0.02
+  })
+});
+```
+
+**Option 2: AnimateDiff** (more stylized)
+```javascript
+const falResponse = await fetch('https://fal.run/fal-ai/fast-animatediff/image-to-video', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Key ${process.env.FAL_KEY}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    image_url: imageUrl,
+    prompt: "subtle breathing, gentle movement",
+    num_frames: 8
+  })
+});
+```
 
 ### Videos not displaying?
 
