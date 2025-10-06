@@ -2035,7 +2035,7 @@ body {
         log.appendChild(row);
         setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
         let i=0; const finalText = (text||'').trim();
-        const speed = 3; // Characters per frame (higher = faster)
+        const speed = 15; // Characters per frame (higher = faster)
         const animate=()=>{
           b.textContent = finalText.slice(0,i);
           log.scrollTop = log.scrollHeight;
