@@ -47,10 +47,10 @@ export default async function handler(req, res) {
       hasFalKey: !!process.env.FAL_KEY
     });
 
-    // Call fal.ai - Using better SVD with high image fidelity
+    // Call fal.ai - Using fast-svd with high image fidelity
     // This version preserves the original image much better
-    console.log('📤 Calling fal.ai Stable Video Diffusion API (high fidelity)...');
-    const falResponse = await fetch('https://fal.run/fal-ai/stable-video-diffusion', {
+    console.log('📤 Calling fal.ai Fast SVD API (high fidelity)...');
+    const falResponse = await fetch('https://fal.run/fal-ai/fast-svd', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${process.env.FAL_KEY}`,
@@ -58,11 +58,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         image_url: imageUrl,
-        motion_bucket_id: 50,      // Moderate motion (1-255, lower = less motion)
+        motion_bucket_id: 30,      // Lower motion = more subtle, preserves image better
         cond_aug: 0.01,            // Very low = stay faithful to original image
-        seed: 42,                  // Consistent results
-        fps: 6,                    // Smooth but not too fast
-        num_frames: 14             // ~2.3 seconds at 6fps
+        steps: 6                   // More steps for better quality
       })
     });
 
@@ -84,7 +82,7 @@ export default async function handler(req, res) {
           status: falResponse.status,
           statusText: falResponse.statusText,
           message: errorText.slice(0, 500),
-          endpoint: 'fal.ai/fast-svd/image-to-video',
+          endpoint: 'fal.ai/fast-svd',
           imageUrl: imageUrl.slice(0, 100) + '...'
         }
       });
