@@ -31,7 +31,7 @@ export default async function handler(req, res){
     const broad = (archetype || '').trim();
     const isAbstract = broad.toLowerCase() === 'abstract';
 
-    const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
+    const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Combine archetypes into a single figure.';
     const personaSeed = explicitPersonaType || normalizedPrompt;
     const personaText = useClassicFlow
       ? trimmedClassicPrompt
@@ -61,11 +61,18 @@ export default async function handler(req, res){
 
     const resolvedVibe = (vibe && String(vibe).trim()) || '';
 
-    // Only use basePrompt for non-abstract avatars
-    let finalPrompt = isAbstract ? '' : basePrompt;
-    if (resolvedStyle) finalPrompt += ` Art style: ${resolvedStyle}.`;
-    if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
-    finalPrompt += ` Persona: ${personaText}`;
+    // Different prompt structure for abstract vs non-abstract avatars
+    let finalPrompt = '';
+    if (isAbstract) {
+      // For abstract: use the full description as-is, no basePrompt, no "Persona:" prefix
+      finalPrompt = personaText;
+    } else {
+      // For non-abstract: use basePrompt + styling + persona
+      finalPrompt = basePrompt;
+      if (resolvedStyle) finalPrompt += ` Art style: ${resolvedStyle}.`;
+      if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
+      finalPrompt += ` Persona: ${personaText}`;
+    }
     const qualitySetting = 'medium';
 
     const bodyPayload = {
