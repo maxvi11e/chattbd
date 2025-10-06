@@ -477,7 +477,7 @@
               <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                    <option value="..."></option>
+                    <option value="default">Soft light, Neutral</option>
                     <option value="radiant">Radiant</option>
                     <option value="calming">Calming</option>
                     <option value="dramatic">Dramatic</option>
@@ -1442,7 +1442,9 @@
         const vibeSelectEl = document.getElementById('vibeChoice');
         const vibeChoice = vibeSelectEl ? vibeSelectEl.value : '';
         const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
-        const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
+        let vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
+        // Send null if default is selected for vibe
+        if (vibe === 'default') vibe = null;
         const styleChoiceRaw = document.getElementById('styleChoice')?.value || 'default';
         // Send null if default is selected, otherwise send the actual value
         const styleChoice = (styleChoiceRaw === 'default') ? null : styleChoiceRaw;
