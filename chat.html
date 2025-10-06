@@ -1990,7 +1990,7 @@ body {
           setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
           // Animate text typing
           let i=0;
-          const speed = 15; // Characters per frame (higher = faster)
+          const speed = 7; // Characters per frame (higher = faster)
           const animate = ()=>{
             if(!bubble) return;
             bubble.textContent = finalText.slice(0,i);
@@ -2035,7 +2035,7 @@ body {
         log.appendChild(row);
         setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
         let i=0; const finalText = (text||'').trim();
-        const speed = 15; // Characters per frame (higher = faster)
+        const speed = 7; // Characters per frame (higher = faster)
         const animate=()=>{
           b.textContent = finalText.slice(0,i);
           log.scrollTop = log.scrollHeight;
