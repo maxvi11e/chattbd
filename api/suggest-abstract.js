@@ -54,6 +54,7 @@ export default async function handler(req, res){
 
     const descriptionLines = [
       'Centered abstract figure (head, torso) drawn as luminous lines on a pure black background.',
+      'Combine all archetypes into a single figure.'
       `Color: ${palette}.`,
       `Structure: ${logic}.`,
       `Fill: ${fill}.`,
