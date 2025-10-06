@@ -61,7 +61,8 @@ export default async function handler(req, res){
 
     const resolvedVibe = (vibe && String(vibe).trim()) || '';
 
-    let finalPrompt = basePrompt;
+    // Only use basePrompt for non-abstract avatars
+    let finalPrompt = isAbstract ? '' : basePrompt;
     if (resolvedStyle) finalPrompt += ` Art style: ${resolvedStyle}.`;
     if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
     finalPrompt += ` Persona: ${personaText}`;
