@@ -1771,6 +1771,11 @@
 
       try {
         console.log('📹 Starting animation generation...');
+        console.log('🔍 Current bot:', {
+          id: currentBot.id,
+          name: currentBot.name,
+          imageUrl: currentBot.image_url
+        });
         
         // Update button to show progress
         const originalText = confirmBtn.textContent;
@@ -1778,6 +1783,7 @@
         confirmBtn.disabled = true;
 
         // Call animation API
+        console.log('📤 Calling /api/animate-avatar...');
         const response = await fetch('/api/animate-avatar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1787,10 +1793,13 @@
           })
         });
 
+        console.log('📥 API Response status:', response.status, response.statusText);
         const result = await response.json();
+        console.log('📥 API Response data:', result);
 
         if (!response.ok || !result.videoUrl) {
           console.error('❌ Animation failed:', result);
+          alert(`Animation failed: ${result.error || 'Unknown error'}. Check console for details.`);
           // Don't block the user - just log and continue
           confirmBtn.textContent = originalText;
           confirmBtn.disabled = false;
@@ -1800,15 +1809,24 @@
         console.log('✅ Animation created:', result.videoUrl);
 
         // Upload video to Supabase storage
+        console.log('👤 Getting user...');
         const { data: { user } } = await supabase.auth.getUser();
+        console.log('👤 User:', user?.id);
+        
         if (user) {
+          console.log('📤 Uploading video to Supabase...');
           const videoUrl = await uploadVideoToSupabase(result.videoUrl, user.id, currentBot.name);
+          console.log('✅ Video uploaded:', videoUrl);
           
           // Update the current history entry with video URL
           if (window.AvatarHistory) {
+            console.log('📚 Getting history...');
             const { success, history } = await window.AvatarHistory.getHistory(supabase, currentBot.id, 1);
+            console.log('📚 History result:', { success, historyCount: history?.length });
+            
             if (success && history && history.length > 0) {
               const currentHistoryId = history[0].id;
+              console.log('💾 Updating history entry:', currentHistoryId);
               
               // Update history entry with video URL
               const { error } = await supabase
@@ -1821,11 +1839,18 @@
                 .eq('id', currentHistoryId);
 
               if (error) {
-                console.error('Error updating history with video:', error);
+                console.error('❌ Error updating history with video:', error);
+                alert(`Failed to save video URL to database: ${error.message}`);
               } else {
                 console.log('✅ History updated with video URL');
+                alert('Animation created successfully! 🎉');
               }
+            } else {
+              console.warn('⚠️ No history entry found to update');
+              alert('Warning: Animation created but no history entry found to update.');
             }
+          } else {
+            console.error('❌ AvatarHistory not available');
           }
         }
 
@@ -1834,6 +1859,7 @@
 
       } catch (error) {
         console.error('❌ Animation generation error:', error);
+        alert(`Error: ${error.message}. Check console for details.`);
         // Don't block the user - restore button and continue
         confirmBtn.textContent = 'Confirm & Create Animation';
         confirmBtn.disabled = false;

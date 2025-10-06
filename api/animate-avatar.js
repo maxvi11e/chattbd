@@ -12,16 +12,27 @@ export default async function handler(req, res) {
     const { imageUrl, avatarId, historyId } = req.body || {};
 
     if (!imageUrl) {
+      console.error('❌ Missing imageUrl in request');
       return res.status(400).json({ error: 'Missing imageUrl' });
+    }
+
+    // Check if FAL_KEY is configured
+    if (!process.env.FAL_KEY) {
+      console.error('❌ FAL_KEY environment variable not set!');
+      return res.status(500).json({ 
+        error: 'Animation service not configured. Please set FAL_KEY environment variable.' 
+      });
     }
 
     console.log('📹 Starting avatar animation', {
       avatarId: avatarId || 'unknown',
       historyId: historyId || 'unknown',
-      imageUrl: imageUrl.slice(0, 80) + '...'
+      imageUrl: imageUrl.slice(0, 80) + '...',
+      hasFalKey: !!process.env.FAL_KEY
     });
 
     // Call fal.ai LivePortrait API
+    console.log('📤 Calling fal.ai LivePortrait API...');
     const falResponse = await fetch('https://fal.run/fal-ai/live-portrait', {
       method: 'POST',
       headers: {
@@ -37,6 +48,8 @@ export default async function handler(req, res) {
         fps: 25                    // Standard frame rate
       })
     });
+
+    console.log('📥 fal.ai response status:', falResponse.status, falResponse.statusText);
 
     if (!falResponse.ok) {
       const errorText = await falResponse.text();
