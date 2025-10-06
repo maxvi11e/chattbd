@@ -55,15 +55,19 @@ export default async function handler(req, res) {
       console.error('❌ fal.ai animation failed:', {
         status: falResponse.status,
         statusText: falResponse.statusText,
-        error: errorText.slice(0, 500)
+        error: errorText.slice(0, 1000),
+        fullError: errorText
       });
 
-      // Return graceful error
+      // Return detailed error for debugging
       return res.status(500).json({
         error: 'Animation generation failed',
         debug: {
           status: falResponse.status,
-          message: errorText.slice(0, 200)
+          statusText: falResponse.statusText,
+          message: errorText.slice(0, 500),
+          endpoint: 'fal.ai/fast-svd/image-to-video',
+          imageUrl: imageUrl.slice(0, 100) + '...'
         }
       });
     }
