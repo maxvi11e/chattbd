@@ -943,7 +943,6 @@
           <button id="personalityToggleBtn" class="action-btn">Edit Personality</button>
           <button id="editBtn" class="action-btn edit-btn">Edit Appearance</button>
         </div>
-        <button id="animateBtn" class="action-btn animate-btn">Create Animation</button>
         <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Chat</button>
       </div>
       
@@ -1044,7 +1043,6 @@
     const agentNameInput = document.getElementById('agentNameInput');
     const botPreview = document.getElementById('botPreview');
     const editBtn = document.getElementById('editBtn');
-    const animateBtn = document.getElementById('animateBtn');
     const confirmBtn = document.getElementById('confirmBtn');
     const editForm = document.getElementById('editForm');
     const actionButtons = document.getElementById('actionButtons');
@@ -1280,8 +1278,8 @@
     }
 
     // Display bot information
-    async function displayBot(bot) {
-      // Show spinner in frame until the image/video loads
+    function displayBot(bot) {
+      // Show spinner in frame until the image loads
       botImage.classList.remove('visible');
       botVideo.classList.remove('visible');
       frameSpinner.classList.remove('hidden');
@@ -1294,49 +1292,20 @@
         pendingNameValue = null;
       }
       
-      // Check if there's a video URL in history for this avatar
-      let videoUrl = null;
-      if (window.AvatarHistory) {
-        const { success, history } = await window.AvatarHistory.getHistory(supabase, bot.id, 1);
-        if (success && history && history.length > 0 && history[0].video_url) {
-          videoUrl = history[0].video_url;
-          console.log('🎬 Found video for avatar:', videoUrl);
-        }
-      }
-      
-      // If video exists, show video; otherwise show image
-      if (videoUrl) {
-        botImage.style.display = 'none';
-        botVideo.style.display = 'block';
-        botVideo.src = videoUrl;
-        botVideo.onloadeddata = () => {
-          botVideo.classList.add('visible');
-          frameSpinner.classList.add('hidden');
-          botVideo.play().catch(err => {
-            console.warn('Autoplay blocked:', err);
-          });
-        };
-        botVideo.onerror = () => {
-          console.error('Failed to load video, falling back to image');
-          botVideo.style.display = 'none';
-          botImage.style.display = 'block';
-          botImage.src = bot.image_url;
-        };
-      } else {
-        botVideo.style.display = 'none';
-        botImage.style.display = 'block';
-        botImage.alt = bot.name || 'Agent preview';
-        botImage.onload = () => {
-          botImage.classList.add('visible');
-          frameSpinner.classList.add('hidden');
-        };
-        botImage.onerror = () => {
-          // Keep spinner to avoid ugly broken image icon
-          frameSpinner.classList.remove('hidden');
-          botImage.classList.remove('visible');
-        };
-        botImage.src = bot.image_url;
-      }
+      // Always show image (video feature disabled for now)
+      botVideo.style.display = 'none';
+      botImage.style.display = 'block';
+      botImage.alt = bot.name || 'Agent preview';
+      botImage.onload = () => {
+        botImage.classList.add('visible');
+        frameSpinner.classList.add('hidden');
+      };
+      botImage.onerror = () => {
+        // Keep spinner to avoid ugly broken image icon
+        frameSpinner.classList.remove('hidden');
+        botImage.classList.remove('visible');
+      };
+      botImage.src = bot.image_url;
       
       populatePersonalitySliders(bot.traits);
     }
@@ -1352,11 +1321,6 @@
       // Edit button
       editBtn.addEventListener('click', () => {
         showEditForm();
-      });
-
-      // Animate button
-      animateBtn.addEventListener('click', () => {
-        generateAnimation();
       });
 
       // Confirm button
@@ -1803,7 +1767,22 @@
       window.location.href = `chat.html?avatar=${currentBot.id}&new=true`;
     }
 
-    // Generate animation for current avatar
+    /* ============================================
+     * ANIMATION FEATURES (DISABLED)
+     * 
+     * Animation generation temporarily disabled due to poor quality
+     * from available AI models. Infrastructure kept for future implementation
+     * when better models become available.
+     * 
+     * To re-enable:
+     * 1. Uncomment animation button in HTML above
+     * 2. Uncomment animateBtn DOM reference
+     * 3. Uncomment event listener
+     * 4. Update displayBot to check for video_url in history
+     * 5. Test with latest fal.ai models or alternative services
+     * ============================================ */
+
+    // Generate animation for current avatar (DISABLED)
     async function generateAnimation() {
       if (!currentBot?.image_url) {
         console.warn('⚠️ No image to animate');
