@@ -942,7 +942,7 @@
           <button id="personalityToggleBtn" class="action-btn">Edit Personality</button>
           <button id="editBtn" class="action-btn edit-btn">Edit Appearance</button>
         </div>
-        <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Chat</button>
+        <button id="confirmBtn" class="action-btn confirm-btn">Confirm & Create Animation</button>
       </div>
       
       <!-- Loading State -->
@@ -1752,11 +1752,131 @@
     }
 
     // Confirm bot and go to chat
-    function confirmBot() {
+    async function confirmBot() {
       if (!currentBot) return;
+      
+      // Generate animation for the current avatar image
+      await generateAnimation();
       
       localStorage.setItem('lastSelectedAvatar', currentBot.id);
       window.location.href = `chat.html?avatar=${currentBot.id}&new=true`;
+    }
+
+    // Generate animation for current avatar
+    async function generateAnimation() {
+      if (!currentBot?.image_url) {
+        console.warn('⚠️ No image to animate');
+        return;
+      }
+
+      try {
+        console.log('📹 Starting animation generation...');
+        
+        // Update button to show progress
+        const originalText = confirmBtn.textContent;
+        confirmBtn.textContent = 'Creating Animation...';
+        confirmBtn.disabled = true;
+
+        // Call animation API
+        const response = await fetch('/api/animate-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl: currentBot.image_url,
+            avatarId: currentBot.id
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.videoUrl) {
+          console.error('❌ Animation failed:', result);
+          // Don't block the user - just log and continue
+          confirmBtn.textContent = originalText;
+          confirmBtn.disabled = false;
+          return;
+        }
+
+        console.log('✅ Animation created:', result.videoUrl);
+
+        // Upload video to Supabase storage
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const videoUrl = await uploadVideoToSupabase(result.videoUrl, user.id, currentBot.name);
+          
+          // Update the current history entry with video URL
+          if (window.AvatarHistory) {
+            const { success, history } = await window.AvatarHistory.getHistory(supabase, currentBot.id, 1);
+            if (success && history && history.length > 0) {
+              const currentHistoryId = history[0].id;
+              
+              // Update history entry with video URL
+              const { error } = await supabase
+                .from('avatar_image_history')
+                .update({ 
+                  video_url: videoUrl,
+                  animation_status: 'completed',
+                  animation_created_at: new Date().toISOString()
+                })
+                .eq('id', currentHistoryId);
+
+              if (error) {
+                console.error('Error updating history with video:', error);
+              } else {
+                console.log('✅ History updated with video URL');
+              }
+            }
+          }
+        }
+
+        confirmBtn.textContent = originalText;
+        confirmBtn.disabled = false;
+
+      } catch (error) {
+        console.error('❌ Animation generation error:', error);
+        // Don't block the user - restore button and continue
+        confirmBtn.textContent = 'Confirm & Create Animation';
+        confirmBtn.disabled = false;
+      }
+    }
+
+    // Upload video to Supabase storage
+    async function uploadVideoToSupabase(videoUrl, userId, avatarName) {
+      try {
+        // Fetch the video from fal.ai
+        const response = await fetch(videoUrl);
+        if (!response.ok) throw new Error('Failed to fetch video');
+        
+        const blob = await response.blob();
+        const path = `${userId}/${crypto.randomUUID()}-${avatarName.replace(/[^a-z0-9-_]+/gi, '_')}.mp4`;
+        
+        // Upload to Supabase storage
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(path, blob, { 
+            upsert: true, 
+            contentType: 'video/mp4',
+            cacheControl: '3600'
+          });
+          
+        if (uploadError) throw uploadError;
+        
+        // Get public URL
+        const { data } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(path);
+          
+        const url = new URL(data.publicUrl);
+        url.protocol = 'https:';
+        
+        console.log('✅ Video uploaded to Supabase:', url.toString());
+        return url.toString();
+        
+      } catch (error) {
+        console.error('Error uploading video to Supabase:', error);
+        // Return original fal.ai URL as fallback
+        return videoUrl;
+      }
     }
 
     // Regenerate bot with edits

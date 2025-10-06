@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avatar Animation Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #0a0a0a;
+      color: #fff;
+    }
+    .container {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid #333;
+    }
+    h1 { margin-top: 0; }
+    .test-section {
+      margin: 20px 0;
+      padding: 20px;
+      background: #0a0a0a;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.8; }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status {
+      margin: 15px 0;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .status.info { background: #1a3a5a; border: 1px solid #2a5a8a; }
+    .status.success { background: #1a3a1a; border: 1px solid #2a5a2a; }
+    .status.error { background: #3a1a1a; border: 1px solid #5a2a2a; }
+    .result {
+      margin-top: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 400px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+    pre {
+      background: #0a0a0a;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 12px;
+      border: 1px solid #333;
+    }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .metric {
+      background: #0a0a0a;
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 5px;
+    }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎬 Avatar Animation Test</h1>
+    <p>Test the fal.ai LivePortrait integration before deploying.</p>
+
+    <div class="test-section">
+      <h2>Test Animation Generation</h2>
+      <p>Enter an image URL to test animation generation:</p>
+      
+      <input 
+        type="text" 
+        id="imageUrl" 
+        placeholder="https://example.com/avatar.png"
+        value="https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/object/public/avatars/test-avatar.png"
+      />
+      
+      <button id="testBtn">Generate Animation</button>
+      
+      <div id="status"></div>
+      <div id="result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>📊 Performance Metrics</h2>
+      <div class="metrics" id="metrics">
+        <div class="metric">
+          <div class="metric-label">Status</div>
+          <div class="metric-value" id="metricStatus">-</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Generation Time</div>
+          <div class="metric-value" id="metricTime">-</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Cost Estimate</div>
+          <div class="metric-value" id="metricCost">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>📝 Setup Instructions</h2>
+      <ol>
+        <li>Set <code>FAL_KEY</code> environment variable</li>
+        <li>Deploy <code>api/animate-avatar.js</code></li>
+        <li>Run SQL migration in Supabase</li>
+        <li>Test with an avatar image URL</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const imageUrlInput = document.getElementById('imageUrl');
+    const testBtn = document.getElementById('testBtn');
+    const statusDiv = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+
+    testBtn.addEventListener('click', async () => {
+      const imageUrl = imageUrlInput.value.trim();
+      
+      if (!imageUrl) {
+        showStatus('error', 'Please enter an image URL');
+        return;
+      }
+
+      // Reset UI
+      resultDiv.innerHTML = '';
+      testBtn.disabled = true;
+      testBtn.textContent = 'Generating...';
+      
+      const startTime = Date.now();
+      
+      try {
+        showStatus('info', '🎬 Calling animation API...');
+        updateMetric('metricStatus', '⏳ Processing');
+        
+        // Call the API endpoint
+        const response = await fetch('/api/animate-avatar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageUrl })
+        });
+
+        const result = await response.json();
+        const duration = Date.now() - startTime;
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Animation failed');
+        }
+
+        // Show success
+        showStatus('success', `✅ Animation generated in ${(duration / 1000).toFixed(1)}s`);
+        updateMetric('metricStatus', '✅ Success');
+        updateMetric('metricTime', `${(duration / 1000).toFixed(1)}s`);
+        updateMetric('metricCost', '~$0.01');
+
+        // Display video
+        if (result.videoUrl) {
+          resultDiv.innerHTML = `
+            <h3>Result:</h3>
+            <video controls autoplay loop>
+              <source src="${result.videoUrl}" type="video/mp4">
+              Your browser doesn't support video playback.
+            </video>
+            <br><br>
+            <strong>Video URL:</strong><br>
+            <input type="text" value="${result.videoUrl}" readonly style="font-size: 12px;" />
+          `;
+        }
+
+        // Show raw response
+        resultDiv.innerHTML += `
+          <br>
+          <details>
+            <summary style="cursor: pointer; margin-top: 15px;">View Raw Response</summary>
+            <pre>${JSON.stringify(result, null, 2)}</pre>
+          </details>
+        `;
+
+      } catch (error) {
+        const duration = Date.now() - startTime;
+        showStatus('error', `❌ Error: ${error.message}`);
+        updateMetric('metricStatus', '❌ Failed');
+        updateMetric('metricTime', `${(duration / 1000).toFixed(1)}s`);
+        updateMetric('metricCost', '-');
+        
+        resultDiv.innerHTML = `
+          <h3>Error Details:</h3>
+          <pre>${error.message}</pre>
+          <p style="color: #999; font-size: 14px;">
+            Check console for more details.
+          </p>
+        `;
+        console.error('Animation test error:', error);
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = 'Generate Animation';
+      }
+    });
+
+    function showStatus(type, message) {
+      statusDiv.className = `status ${type}`;
+      statusDiv.textContent = message;
+      statusDiv.style.display = 'block';
+    }
+
+    function updateMetric(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    // Auto-test if URL param provided
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('autotest') === 'true') {
+      setTimeout(() => testBtn.click(), 1000);
+    }
+  </script>
+</body>
+</html>

@@ -12,16 +12,18 @@ const AvatarHistory = {
    * @param {string} createdFrom - Source: 'initial', 'regenerate', 'edit', 'restore'
    * @param {string} editPrompt - Optional prompt used for generation
    * @param {object} traitsSnapshot - Optional snapshot of traits at creation
+   * @param {string} videoUrl - Optional video animation URL
    * @returns {Promise<{success: boolean, historyId: string|null, error: any}>}
    */
-  async addToHistory(supabase, avatarId, imageUrl, createdFrom = 'initial', editPrompt = null, traitsSnapshot = null) {
+  async addToHistory(supabase, avatarId, imageUrl, createdFrom = 'initial', editPrompt = null, traitsSnapshot = null, videoUrl = null) {
     try {
       const { data, error } = await supabase.rpc('add_avatar_image_to_history', {
         p_avatar_id: avatarId,
         p_image_url: imageUrl,
         p_created_from: createdFrom,
         p_edit_prompt: editPrompt,
-        p_traits_snapshot: traitsSnapshot
+        p_traits_snapshot: traitsSnapshot,
+        p_video_url: videoUrl
       });
 
       if (error) throw error;
