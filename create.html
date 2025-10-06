@@ -428,7 +428,7 @@
             <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
                 <input type="checkbox" id="suggestFromPersonalityCheckbox" />
-                <span>Constrain Suggestion Buttons to Sliders</span>
+                <span>Constrain Suggestion Buttons to Personality</span>
               </label>
             </div>
           </div>
@@ -753,12 +753,33 @@
         // Ensure options mode is visible
         showOptionsMode();
         
+        // First, switch to Personality tab
+        const personalityTabBtn = document.querySelector('[data-tab="personality"]');
+        const appearanceTabBtn = document.querySelector('[data-tab="appearance"]');
+        const personalityTab = document.getElementById('personalityTab');
+        const appearanceTab = document.getElementById('appearanceTab');
+        
+        // Make sure we're on the Personality tab
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        personalityTabBtn.classList.add('active');
+        personalityTab.classList.add('active');
+        
         // Randomize personality sliders (1-10 notched)
         const s1 = document.getElementById('traitSeriousPlayful');
         const s2 = document.getElementById('traitSuccinctChatty');
         const s3 = document.getElementById('traitRationalIntuitive');
         const s4 = document.getElementById('traitPracticalImaginative');
         [s1,s2,s3,s4].forEach(s=>{ if(s){ s.value = String(randInt(1,10)); dispatch(s,'input'); }});
+        
+        // Wait 2 seconds before switching to Appearance tab
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Switch to Appearance tab
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        appearanceTabBtn.classList.add('active');
+        appearanceTab.classList.add('active');
         
         // Clear the suggestion type field first and reset the flag
         const suggestionTypeEl = document.getElementById('suggestionType');
