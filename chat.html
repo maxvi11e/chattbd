@@ -1990,12 +1990,12 @@ body {
           setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
           // Animate text typing
           let i=0;
-          const speed = 8;
+          const speed = 15; // Characters per frame (higher = faster)
           const animate = ()=>{
             if(!bubble) return;
             bubble.textContent = finalText.slice(0,i);
             log.scrollTop = log.scrollHeight;
-            if(i < finalText.length){ i++; requestAnimationFrame(animate); }
+            if(i < finalText.length){ i+=speed; requestAnimationFrame(animate); }
           };
           animate();
           convo.push({ role:'assistant', content: finalText });
