@@ -1758,7 +1758,13 @@
       if (!currentBot) return;
       
       // Generate animation for the current avatar image
-      await generateAnimation();
+      const videoCreated = await generateAnimation();
+      
+      // If video was created, show it briefly before navigating
+      if (videoCreated) {
+        // Wait 2 seconds to let user see the animation
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
       
       localStorage.setItem('lastSelectedAvatar', currentBot.id);
       window.location.href = `chat.html?avatar=${currentBot.id}&new=true`;
@@ -1801,11 +1807,10 @@
 
         if (!response.ok || !result.videoUrl) {
           console.error('❌ Animation failed:', result);
-          alert(`Animation failed: ${result.error || 'Unknown error'}. Check console for details.`);
           // Don't block the user - just log and continue
           confirmBtn.textContent = originalText;
           confirmBtn.disabled = false;
-          return;
+          return false;
         }
 
         console.log('✅ Animation created:', result.videoUrl);
@@ -1842,37 +1847,47 @@
 
               if (error) {
                 console.error('❌ Error updating history with video:', error);
-                alert(`Failed to save video URL to database: ${error.message}`);
+                confirmBtn.textContent = originalText;
+                confirmBtn.disabled = false;
+                return false;
               } else {
                 console.log('✅ History updated with video URL');
                 
                 // Show the video instead of the static image
                 showBotVideo(videoUrl);
                 
-                alert('Animation created successfully! 🎉');
+                // Keep button showing it worked
+                confirmBtn.textContent = '✓ Animation Created!';
+                confirmBtn.disabled = false;
+                
+                return true; // Video was successfully created
               }
             } else {
               console.warn('⚠️ No history entry found to update');
-              alert('Warning: Animation created but no history entry found to update.');
+              confirmBtn.textContent = originalText;
+              confirmBtn.disabled = false;
+              return false;
             }
           } else {
             console.error('❌ AvatarHistory not available');
+            confirmBtn.textContent = originalText;
+            confirmBtn.disabled = false;
+            return false;
           }
         }
 
         confirmBtn.textContent = originalText;
         confirmBtn.disabled = false;
+        return false;
 
       } catch (error) {
         console.error('❌ Animation generation error:', error);
-        alert(`Error: ${error.message}. Check console for details.`);
         // Don't block the user - restore button and continue
         confirmBtn.textContent = 'Confirm & Create Animation';
         confirmBtn.disabled = false;
+        return false;
       }
-    }
-
-    // Upload video to Supabase storage
+    }    // Upload video to Supabase storage
     async function uploadVideoToSupabase(videoUrl, userId, avatarName) {
       try {
         // Fetch the video from fal.ai
