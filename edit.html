@@ -1174,6 +1174,11 @@
             body: JSON.stringify(pending)
           });
           const json = await res.json().catch(()=>({}));
+          console.log('📥 Avatar generation response', {
+            promptUsed: json.promptUsed,
+            mode: json.mode,
+            botName: json.botName
+          });
           if (!res.ok || !json?.dataUrl) {
             showError(json?.error || 'Failed to generate avatar.');
             setLoadingState(false);
