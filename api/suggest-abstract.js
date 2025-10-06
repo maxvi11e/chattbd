@@ -7,7 +7,7 @@ import { pickAbstractName } from './_lib/abstract-names.js';
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const { sliders = {}, vibe, detailLevel } = await req.body || {};
+    const { sliders = {}, vibe, detailLevel } = req.body || {};
     // Normalize values 0-100 (fallback 50)
     const norm = (v)=>{ const n=Number(v); return Number.isFinite(n)? Math.min(100,Math.max(0,n)) : 50; };
     const s = {
@@ -53,8 +53,7 @@ export default async function handler(req, res){
     const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
     const descriptionLines = [
-      'Centered abstract figure (head, torso) drawn as luminous lines on a pure black background.',
-      'Combine all archetypes into a single figure.'
+      'Single abstract figure (head, torso) drawn as luminous lines on a pure black background.',
       `Color: ${palette}.`,
       `Structure: ${logic}.`,
       `Fill: ${fill}.`,
