@@ -81,6 +81,8 @@ export default async function handler(req, res){
       mode: useClassicFlow ? 'classic' : 'structured',
       art_style: resolvedStyle || null,
       vibe: resolvedVibe || null,
+      isAbstract: isAbstract,
+      finalPrompt: finalPrompt,
       body: bodyPayload
     });
 
