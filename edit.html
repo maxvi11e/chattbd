@@ -761,6 +761,14 @@
     transform:scale(1.05);
   }
   
+  .personality-toggle-btn-top {
+    top:60px;
+  }
+  
+  .edit-appearance-btn-top {
+    top:112px;
+  }
+  
   @media (max-width: 1024px) {
     .bot-preview {
       flex-direction:column;
@@ -893,6 +901,14 @@
             <!-- History Toggle Button -->
             <button id="historyToggleBtn" class="history-toggle-btn" title="View Edit History">
               <img src="images/history_icon.png" alt="History" />
+            </button>
+            <!-- Personality Toggle Button -->
+            <button id="personalityToggleBtnTop" class="history-toggle-btn personality-toggle-btn-top" title="Edit Personality">
+              <img src="images/sliders_icon.png" alt="Personality" />
+            </button>
+            <!-- Edit Appearance Button -->
+            <button id="editAppearanceBtnTop" class="history-toggle-btn edit-appearance-btn-top" title="Edit Appearance">
+              <img src="images/palette_icon.png" alt="Edit Appearance" />
             </button>
           </div>
         </div>
@@ -1406,6 +1422,22 @@
       const historyToggleBtn = document.getElementById('historyToggleBtn');
       if (historyToggleBtn) {
         historyToggleBtn.addEventListener('click', toggleHistoryPanel);
+      }
+
+      // Personality toggle button (top)
+      const personalityToggleBtnTop = document.getElementById('personalityToggleBtnTop');
+      if (personalityToggleBtnTop) {
+        personalityToggleBtnTop.addEventListener('click', () => {
+          togglePersonalityPanel();
+        });
+      }
+
+      // Edit Appearance button (top)
+      const editAppearanceBtnTop = document.getElementById('editAppearanceBtnTop');
+      if (editAppearanceBtnTop) {
+        editAppearanceBtnTop.addEventListener('click', () => {
+          showEditForm();
+        });
       }
 
       // History close button

@@ -85,12 +85,12 @@
     .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:rgba(255,255,255,0.05); border-radius:800px; width:fit-content; border:1px solid rgba(255,255,255,0.1);}
     .tab-btn{padding:10px 32px; border:none; background:transparent; color:var(--muted); border-radius:800px; cursor:pointer; font-size:16px; font-weight:500; transition:all 0.3s ease; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
     .tab-btn:hover{background:rgba(255,255,255,0.05);}
-    .tab-btn.active{background:var(--ink); color:var(--bg); font-weight:600;}
+    .tab-btn.active{background:var(--bg); color:var(--ink); font-weight:600; border:1px solid rgba(255,255,255,0.1);}
     .tab-content{display:none;}
     .tab-content.active{display:flex; flex-direction:column; gap:12px;}
 
     /* Create Form */
-    .create-form{display:flex; justify-content:center; padding:0 48px;}
+    .create-form{display:flex; justify-content:center; padding:0 24px;}
     .input-container{display:flex; align-items:center; gap:11.2px; max-width:800px; width:100%;}
     .heroInput{display:flex; align-items:center; flex:1; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; background:transparent}
     .heroInput input{flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:21.6px; line-height:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:0; min-width:0;}
@@ -407,10 +407,10 @@
           <!-- Appearance Tab Content -->
           <div id="appearanceTab" class="tab-content">
             <!-- Type field - visible on load -->
-            <div style="width:min(100%, 395px);">
+            <div style="width:min(100%, 415px);">
               <div class="field-heading" style="margin-bottom:8px;">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
               <div style="width:100%; margin:0;">
-                <textarea id="suggestionType" placeholder="Use suggestion buttons or enter your own!" rows="1" style="width:100%; background:transparent; border:1px solid var(--stroke); color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:14px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+                <textarea id="suggestionType" placeholder="Use suggestion buttons or create your own ✨" rows="1" style="width:100%; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:14px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
               </div>
             </div>
 
