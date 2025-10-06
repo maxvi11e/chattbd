@@ -455,7 +455,7 @@
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                    <option value="..."></option>
+                    <option value="default">Default (Modern illustration)</option>
                     <option value="realistic">Photo Realistic</option>
                     <option value="vector">Simplified Vector</option>
                     <option value="anime">Anime</option>
@@ -1443,7 +1443,9 @@
         const vibeChoice = vibeSelectEl ? vibeSelectEl.value : '';
         const vibeCustom = (document.getElementById('vibeCustom')?.value || '').trim();
         const vibe = (vibeChoice === 'custom') ? vibeCustom : vibeChoice;
-        const styleChoice = document.getElementById('styleChoice')?.value || 'default';
+        const styleChoiceRaw = document.getElementById('styleChoice')?.value || 'default';
+        // Send null if default is selected, otherwise send the actual value
+        const styleChoice = (styleChoiceRaw === 'default') ? null : styleChoiceRaw;
         const artStyleCustom = (document.getElementById('artStyleCustom')?.value || '').trim();
         
         function scale10To100(v){
