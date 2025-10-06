@@ -32,9 +32,9 @@ export default async function handler(req, res) {
     });
 
     // Call fal.ai - Using stable-video for simple image animation
-    // LivePortrait requires a driving video, so we'll use a different model
+    // Note: Different models have different endpoints
     console.log('📤 Calling fal.ai Stable Video Diffusion API...');
-    const falResponse = await fetch('https://fal.run/fal-ai/fast-svd/image-to-video', {
+    const falResponse = await fetch('https://fal.run/fal-ai/fast-svd', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${process.env.FAL_KEY}`,
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         image_url: imageUrl,
         motion_bucket_id: 40,  // Lower = less motion (subtle animation)
-        fps: 6,                // Frames per second
+        cond_aug: 0.02,        // Conditioning augmentation
         steps: 4               // Fewer steps = faster but still good quality
       })
     });
