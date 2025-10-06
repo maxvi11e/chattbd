@@ -82,12 +82,22 @@
     .page-title{font-size:32px; font-weight:600; margin:0;}
 
     /* Tab Navigation */
-    .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:rgba(255,255,255,0.05); border-radius:800px; width:fit-content; border:1px solid rgba(255,255,255,0.1);}
-    .tab-btn{padding:10px 32px; border:none; background:transparent; color:var(--muted); border-radius:800px; cursor:pointer; font-size:16px; font-weight:500; transition:all 0.3s ease; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
+    .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:rgba(255,255,255,0.05); border-radius:800px; width:fit-content; max-width:95%; border:1px solid rgba(255,255,255,0.1);}
+    .tab-btn{padding:10px 22px; border:none; background:transparent; color:var(--muted); border-radius:800px; cursor:pointer; font-size:14px; font-weight:500; transition:all 0.3s ease; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
     .tab-btn:hover{background:rgba(255,255,255,0.05);}
     .tab-btn.active{background:var(--bg); color:var(--ink); font-weight:600; border:1px solid rgba(255,255,255,0.1);}
     .tab-content{display:none;}
     .tab-content.active{display:flex; flex-direction:column; gap:12px;}
+
+    /* Responsive tab navigation */
+    @media (max-width: 600px) {
+      .tab-nav{gap:4px; padding:3px; max-width:98%;}
+      .tab-btn{padding:8px 16px; font-size:13px;}
+    }
+    @media (max-width: 450px) {
+      .tab-nav{gap:3px; padding:2px;}
+      .tab-btn{padding:8px 12px; font-size:12px;}
+    }
 
     /* Create Form */
     .create-form{display:flex; justify-content:center; padding:0 24px;}
@@ -324,21 +334,30 @@
       cursor: not-allowed;
     }
 
-    /* Art Options Toggle Link Style */
-    #toggleArtOptionsBtn {
-      padding: 4px 8px;
-      margin-top: 0px;
-      border: none;
-      background: transparent;
-      color: #0066cc;
-      font-size: 14px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s ease;
+    /* Hologram Tooltip */
+    .hologram-tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: rgba(0, 0, 0, 0.9);
+      color: #ffffff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+      pointer-events: none;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      z-index: 1000;
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    #toggleArtOptionsBtn:hover {
-      text-decoration: underline;
+    .hologram-label:hover .hologram-tooltip {
+      visibility: visible;
+      opacity: 1;
     }
+
   </style>
 </head>
 
@@ -372,6 +391,7 @@
         <div class="tab-nav">
           <button class="tab-btn active" data-tab="personality">Personality</button>
           <button class="tab-btn" data-tab="appearance">Appearance</button>
+          <button class="tab-btn" data-tab="art">Art Options</button>
         </div>
         
     <!-- Advanced Options Panel (Final Simplified Quiz) -->
@@ -407,7 +427,7 @@
           <!-- Appearance Tab Content -->
           <div id="appearanceTab" class="tab-content">
             <!-- Type field - visible on load -->
-            <div style="width:min(100%, 415px);">
+            <div style="width:min(100%, 395px);">
               <div class="field-heading" style="margin-bottom:8px;">Define Appearance <img class="icon" src="images/pencil_icon.png" alt="edit" /></div>
               <div style="width:100%; margin:0;">
                 <textarea id="suggestionType" placeholder="Use suggestion buttons or create your own ✨" rows="1" style="width:100%; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:14px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
@@ -433,24 +453,10 @@
             </div>
           </div>
 
-          <!-- Generate Agent Button - Always Visible -->
-          <div style="width:100%; display:flex; justify-content:center; margin-top:24px; padding-bottom:6px;">
-            <button id="startBtn" style="display:flex; width:250px; margin-bottom:24px; margin-top:20px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
-              Generate Agent!
-            </button>
-          </div>
-
-          <!-- Art Options Toggle Button -->
-          <div id="toggleArtOptionsContainer" style="display:flex; justify-content:center; margin-top:-24px;">
-            <button id="toggleArtOptionsBtn">
-              Show Art Options
-            </button>
-          </div>
-
-          <!-- Art Settings - Toggleable -->
-          <div id="artSettingsSection" style="width:min(100%, 395px); margin-top:-16px; display:none; flex-direction:column; gap:4px;">
+          <!-- Art Options Tab Content -->
+          <div id="artTab" class="tab-content">
             <!-- Style Choice -->
-            <div>
+            <div style="width:min(100%, 395px);">
               <div class="field-heading">Choose art style</div>
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
@@ -472,7 +478,7 @@
             </div>
 
             <!-- Vibe / Mood -->
-            <div>
+            <div style="width:min(100%, 395px);">
               <div class="field-heading">Select art vibe / mood</div>
               <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
@@ -498,11 +504,19 @@
 
             <!-- AI Hologram checkbox -->
             <div style="display:flex; justify-content:center; width:100%; margin-top:12px; margin-bottom:32px; padding-left:4px;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px; position:relative;" class="hologram-label">
                 <input type="checkbox" id="renderAsHologramCheckbox" checked />
                 <span>Render as AI hologram</span>
+                <span class="hologram-tooltip">Creates figure from abstract colors and patterns, based on personality input</span>
               </label>
             </div>
+          </div>
+
+          <!-- Generate Agent Button - Always Visible -->
+          <div style="width:100%; display:flex; justify-content:center; margin-top:12px; padding-bottom:6px;">
+            <button id="startBtn" style="display:flex; width:250px; margin-bottom:24px; margin-top:20px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
+              Generate Agent!
+            </button>
           </div>
 
           <!-- Hidden fields for compatibility -->
@@ -756,8 +770,10 @@
         // First, switch to Personality tab
         const personalityTabBtn = document.querySelector('[data-tab="personality"]');
         const appearanceTabBtn = document.querySelector('[data-tab="appearance"]');
+        const artTabBtn = document.querySelector('[data-tab="art"]');
         const personalityTab = document.getElementById('personalityTab');
         const appearanceTab = document.getElementById('appearanceTab');
+        const artTab = document.getElementById('artTab');
         
         // Make sure we're on the Personality tab
         tabBtns.forEach(b => b.classList.remove('active'));
@@ -811,13 +827,14 @@
           }
         }
         
-        // Open the art options panel
-        const toggleBtn = document.getElementById('toggleArtOptionsBtn');
-        const artSection = document.getElementById('artSettingsSection');
-        if (toggleBtn && artSection && artSection.style.display !== 'flex') {
-          // Simulate clicking the toggle button to open it
-          toggleBtn.click();
-        }
+        // Wait 2 seconds before switching to Art Options tab
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Switch to Art Options tab
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        artTabBtn.classList.add('active');
+        artTab.classList.add('active');
         
         // Randomize "Render as AI hologram" checkbox (40% probability)
         const renderAsHologramCheckbox = document.getElementById('renderAsHologramCheckbox');
@@ -875,36 +892,6 @@
         };
         sel.addEventListener('change', toggle);
         toggle();
-      })();
-
-      // Art Options toggle button
-      (function initArtOptionsToggle(){
-        const toggleBtn = document.getElementById('toggleArtOptionsBtn');
-        const artSection = document.getElementById('artSettingsSection');
-        const startBtnContainer = document.querySelector('#startBtn')?.parentElement;
-        const toggleBtnContainer = toggleBtn?.parentElement;
-        if (!toggleBtn || !artSection || !startBtnContainer || !toggleBtnContainer) return;
-        
-        let isVisible = false;
-        
-        toggleBtn.addEventListener('click', () => {
-          isVisible = !isVisible;
-          artSection.style.display = isVisible ? 'flex' : 'none';
-          toggleBtn.textContent = isVisible ? 'Hide Art Options' : 'Show Art Options';
-          
-          // Move startBtn based on art options visibility
-          if (isVisible) {
-            // Move startBtn to after artSection (bottom of the page)
-            artSection.parentNode.insertBefore(startBtnContainer, artSection.nextSibling);
-            // Add 20px spacing when art options are shown
-            toggleBtnContainer.style.marginTop = '20px';
-          } else {
-            // Move startBtn back to before toggleBtn (original position)
-            toggleBtnContainer.parentNode.insertBefore(startBtnContainer, toggleBtnContainer);
-            // Reset to original spacing
-            toggleBtnContainer.style.marginTop = '-24px';
-          }
-        });
       })();
 
   // Show custom archetype field when selected
