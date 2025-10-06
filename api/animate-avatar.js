@@ -47,9 +47,9 @@ export default async function handler(req, res) {
       hasFalKey: !!process.env.FAL_KEY
     });
 
-    // Call fal.ai - Using fast-svd with high image fidelity
-    // This version preserves the original image much better
-    console.log('📤 Calling fal.ai Fast SVD API (high fidelity)...');
+    // Call fal.ai - Using fast-svd with minimal motion, maximum preservation
+    // Prioritize keeping the image sharp over creating dramatic motion
+    console.log('📤 Calling fal.ai Fast SVD API (minimal motion, high quality)...');
     const falResponse = await fetch('https://fal.run/fal-ai/fast-svd', {
       method: 'POST',
       headers: {
@@ -58,9 +58,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         image_url: imageUrl,
-        motion_bucket_id: 30,      // Lower motion = more subtle, preserves image better
-        cond_aug: 0.01,            // Very low = stay faithful to original image
-        steps: 6                   // More steps for better quality
+        motion_bucket_id: 15,      // Very minimal motion to avoid degradation
+        cond_aug: 0.005,           // Extremely low = barely change the image
+        steps: 10                  // More steps to maintain quality
       })
     });
 
