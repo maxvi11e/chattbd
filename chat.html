@@ -2035,11 +2035,11 @@ body {
         log.appendChild(row);
         setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
         let i=0; const finalText = (text||'').trim();
-        const speed = 8;
+        const speed = 3; // Characters per frame (higher = faster)
         const animate=()=>{
           b.textContent = finalText.slice(0,i);
           log.scrollTop = log.scrollHeight;
-          if(i < finalText.length){ i++; requestAnimationFrame(animate); }
+          if(i < finalText.length){ i+=speed; requestAnimationFrame(animate); }
         };
         requestAnimationFrame(animate);
       }
