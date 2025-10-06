@@ -1465,6 +1465,9 @@
         // Check if hologram checkbox is selected
         const useHologram = renderAsHologramCheckbox?.checked || false;
         
+        // Set archetype based on hologram mode
+        const archetype = useHologram ? 'abstract' : null;
+        
         // If hologram mode, generate abstract description
         let hologramDescription = '';
         if (useHologram) {
