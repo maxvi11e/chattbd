@@ -1209,6 +1209,22 @@
           localStorage.setItem('lastSelectedAvatar', currentBot.id);
           localStorage.setItem('lastGeneratedAvatar', currentBot.id);
 
+          // Save initial image to history
+          if (window.AvatarHistory && avatarData.image_url) {
+            console.log('💾 Saving initial image to history (create-in-edit flow)');
+            await window.AvatarHistory.addToHistory(
+              supabase,
+              avatarData.id,
+              avatarData.image_url,
+              'create',
+              avatarData.traits?.original_prompt || 'Initial creation',
+              avatarData.traits
+            );
+            console.log('✅ Initial image saved to history');
+            // Reload history to show the new version
+            await loadHistory();
+          }
+
           // Exit loading, show actions (keep edit form hidden)
           setLoadingState(false);
           hideEditForm();
@@ -1268,6 +1284,24 @@
         console.log('✅ Bot loaded successfully:', bot.name);
         currentBot = bot;
         displayBot(bot);
+        
+        // Save initial image to history if coming from create.html
+        // Check if history is empty first to avoid duplicates
+        if (window.AvatarHistory && bot.image_url) {
+          const { success, history } = await window.AvatarHistory.getHistory(supabase, bot.id, 1);
+          if (success && (!history || history.length === 0)) {
+            console.log('💾 Saving initial image to history');
+            await window.AvatarHistory.addToHistory(
+              supabase,
+              bot.id,
+              bot.image_url,
+              'create',
+              bot.traits?.original_prompt || 'Initial creation',
+              bot.traits
+            );
+            console.log('✅ Initial image saved to history');
+          }
+        }
       } catch (error) {
         console.error('❌ Error in loadBot:', error);
         showError('Failed to load agent data. Redirecting to create page...');
