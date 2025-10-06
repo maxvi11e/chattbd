@@ -1,5 +1,21 @@
 // api/animate-avatar.js
-// Generates a short animated video from a static avatar image using fal.ai LivePortrait
+// Generates a short animated video from a static avatar image using fal.ai
+
+/**
+ * ANIMATION MODEL OPTIONS (uncomment/swap to try different approaches):
+ * 
+ * 1. AnimateDiff (CURRENT) - Good for portraits with subtle movement
+ *    - Pros: Natural looking, supports prompts for control
+ *    - Cons: Can be slower, ~$0.02-0.03 per video
+ * 
+ * 2. Stable Video Diffusion - Simple motion, very fast
+ *    - Pros: Fastest, cheapest (~$0.005)
+ *    - Cons: Can look artificial, limited control
+ * 
+ * 3. Kling AI - Best quality (if available)
+ *    - Pros: Highest quality, most realistic
+ *    - Cons: Most expensive, slower
+ */
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -116,3 +132,63 @@ export default async function handler(req, res) {
     });
   }
 }
+
+/**
+ * ALTERNATIVE CONFIGURATIONS:
+ * 
+ * === OPTION 1: Better SVD (Higher Quality) ===
+ * Replace fetch call with:
+ * 
+ * const falResponse = await fetch('https://fal.run/fal-ai/stable-video-diffusion', {
+ *   method: 'POST',
+ *   headers: {
+ *     'Authorization': `Key ${process.env.FAL_KEY}`,
+ *     'Content-Type': 'application/json'
+ *   },
+ *   body: JSON.stringify({
+ *     image_url: imageUrl,
+ *     motion_bucket_id: 127,    // 1-255, higher = more motion
+ *     cond_aug: 0.02,           // Lower = more faithful to image
+ *     seed: 42,                 // Fixed seed for consistency
+ *     fps: 6,                   // Frames per second
+ *     num_frames: 14            // Total frames
+ *   })
+ * });
+ * 
+ * 
+ * === OPTION 2: Minimal SVD (Fastest, Cheapest) ===
+ * Replace fetch call with:
+ * 
+ * const falResponse = await fetch('https://fal.run/fal-ai/fast-svd', {
+ *   method: 'POST',
+ *   headers: {
+ *     'Authorization': `Key ${process.env.FAL_KEY}`,
+ *     'Content-Type': 'application/json'
+ *   },
+ *   body: JSON.stringify({
+ *     image_url: imageUrl,
+ *     motion_bucket_id: 20,     // Very subtle motion
+ *     cond_aug: 0.01,           // Stay close to original
+ *     steps: 6                  // More steps than before for better quality
+ *   })
+ * });
+ * 
+ * 
+ * === OPTION 3: AnimateDiff with Image-to-Video ===
+ * Replace fetch call with:
+ * 
+ * const falResponse = await fetch('https://fal.run/fal-ai/fast-animatediff/image-to-video', {
+ *   method: 'POST',
+ *   headers: {
+ *     'Authorization': `Key ${process.env.FAL_KEY}`,
+ *     'Content-Type': 'application/json'
+ *   },
+ *   body: JSON.stringify({
+ *     image_url: imageUrl,
+ *     prompt: "breathing, subtle movement, stable portrait",
+ *     negative_prompt: "distortion, warping, blurry, low quality",
+ *     num_frames: 16,
+ *     fps: 8
+ *   })
+ * });
+ */
