@@ -31,20 +31,24 @@ export default async function handler(req, res) {
       hasFalKey: !!process.env.FAL_KEY
     });
 
-    // Call fal.ai - Using stable-video for simple image animation
-    // Note: Different models have different endpoints
-    console.log('📤 Calling fal.ai Stable Video Diffusion API...');
-    const falResponse = await fetch('https://fal.run/fal-ai/fast-svd', {
+    // Call fal.ai - Try AnimateDiff for better portrait animation
+    // AnimateDiff is better at creating realistic subtle movements
+    console.log('📤 Calling fal.ai AnimateDiff API...');
+    const falResponse = await fetch('https://fal.run/fal-ai/fast-animatediff/text-to-video', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${process.env.FAL_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        prompt: "portrait photo, subtle breathing, gentle eye blink, minimal movement, high quality, stable",
+        negative_prompt: "blurry, distorted, warped, morphing, ugly, deformed, bad quality, artifacts",
         image_url: imageUrl,
-        motion_bucket_id: 40,  // Lower = less motion (subtle animation)
-        cond_aug: 0.02,        // Conditioning augmentation
-        steps: 4               // Fewer steps = faster but still good quality
+        num_inference_steps: 8,     // More steps = better quality
+        num_frames: 16,              // Frame count for 1 second at 16fps
+        fps: 16,                     // Frames per second
+        motion_module: "mm_sd15_v2", // Motion module version
+        guidance_scale: 7.5          // How closely to follow the prompt
       })
     });
 
