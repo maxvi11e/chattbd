@@ -31,9 +31,10 @@ export default async function handler(req, res) {
       hasFalKey: !!process.env.FAL_KEY
     });
 
-    // Call fal.ai LivePortrait API
-    console.log('📤 Calling fal.ai LivePortrait API...');
-    const falResponse = await fetch('https://fal.run/fal-ai/live-portrait', {
+    // Call fal.ai - Using stable-video for simple image animation
+    // LivePortrait requires a driving video, so we'll use a different model
+    console.log('📤 Calling fal.ai Stable Video Diffusion API...');
+    const falResponse = await fetch('https://fal.run/fal-ai/fast-svd/image-to-video', {
       method: 'POST',
       headers: {
         'Authorization': `Key ${process.env.FAL_KEY}`,
@@ -41,11 +42,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         image_url: imageUrl,
-        video_length: 1.0,        // 1 second animation
-        motion_scale: 0.4,         // Subtle but noticeable movement
-        enable_blink: true,        // Enable natural blinking
-        enable_mouth: true,        // Enable subtle mouth movement
-        fps: 25                    // Standard frame rate
+        motion_bucket_id: 40,  // Lower = less motion (subtle animation)
+        fps: 6,                // Frames per second
+        steps: 4               // Fewer steps = faster but still good quality
       })
     });
 
