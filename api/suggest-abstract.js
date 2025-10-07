@@ -53,15 +53,16 @@ export default async function handler(req, res){
     const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
     const descriptionLines = [
+      'Abstract digital avatar artwork:',
       'Single abstract figure (head, torso) drawn as luminous lines on a pure black background.',
-      `Color: ${palette}.`,
-      `Structure: ${logic}.`,
-      `Fill: ${fill}.`,
-      `Symmetry: ${symmetry}.`,
-      'Eyes: friendly rounded almond openings with soft glow; no pupils.',
-      'Contrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
-      'Extreme brightness and luminosity to all elements',
-      '10x thickness and brightness for 10% of all elements',
+      `Color palette: ${palette}.`,
+      `Line structure: ${logic}.`,
+      `Line density: ${fill}.`,
+      `Visual symmetry: ${symmetry}.`,
+      'Eye design: friendly rounded almond openings with soft glow; no pupils.',
+      'Visual style: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.',
+      'Extreme brightness and luminosity to all line elements',
+      '10x thickness and brightness for 10% of all line elements',
       vibeLine,
       detailLine
     ].filter(Boolean);

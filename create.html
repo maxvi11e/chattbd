@@ -1495,9 +1495,9 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = archetypeSpecific || archetype || 'New Avatar';
 
-        // If hologram mode, append abstract description to prompt
+        // If hologram mode, append abstract description to prompt with safe framing
         const finalPrompt = useHologram && hologramDescription 
-          ? `${hologramDescription}\n\nBased on the concept: ${archetypeSpecific || archetype}`
+          ? `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || archetype || 'abstract form'}`
           : p;
 
         const payload = { 
