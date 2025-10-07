@@ -33,9 +33,14 @@ export default async function handler(req, res){
 
     const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Combine archetypes into a single figure.';
     const personaSeed = explicitPersonaType || normalizedPrompt;
-    const personaText = useClassicFlow
+    let personaText = useClassicFlow
       ? trimmedClassicPrompt
       : personaSeed || (archetypeSpecificDesc && String(archetypeSpecificDesc).trim()) || (archetypeSpecific && String(archetypeSpecific).trim()) || '';
+
+    // For abstract mode, if we have a prompt but no personaText, use the prompt
+    if (isAbstract && !personaText && normalizedPrompt) {
+      personaText = normalizedPrompt;
+    }
 
     if (!personaText) {
       return res.status(400).json({ error: 'Missing prompt' });
@@ -73,7 +78,7 @@ export default async function handler(req, res){
       if (resolvedVibe) finalPrompt += ` Atmosphere: ${resolvedVibe}.`;
       finalPrompt += ` Persona: ${personaText}`;
     }
-    const qualitySetting = 'medium';
+    const qualitySetting = 'low';
 
     const bodyPayload = {
       model: 'gpt-image-1',
