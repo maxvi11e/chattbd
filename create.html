@@ -79,7 +79,7 @@
     /* Page Title */
     .page-header{display:flex; align-items:center; gap:0px; margin-top:11px; margin-bottom:0px; justify-content:center;}
     .page-icon{height:40px; width:auto;}
-    .page-title{font-size:32px; font-weight:600; margin:0;}
+    .page-title{font-size:24px; font-weight:600; margin:0;}
 
     /* Tab Navigation */
     .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:rgba(255,255,255,0.05); border-radius:800px; width:fit-content; max-width:95%; border:1px solid rgba(255,255,255,0.1);}
@@ -334,30 +334,6 @@
       cursor: not-allowed;
     }
 
-    /* Hologram Tooltip */
-    .hologram-tooltip {
-      visibility: hidden;
-      opacity: 0;
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      background: rgba(0, 0, 0, 0.9);
-      color: #ffffff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      white-space: nowrap;
-      pointer-events: none;
-      transition: opacity 0.2s ease, visibility 0.2s ease;
-      z-index: 1000;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .hologram-label:hover .hologram-tooltip {
-      visibility: visible;
-      opacity: 1;
-    }
-
   </style>
 </head>
 
@@ -434,21 +410,30 @@
               </div>
             </div>
 
-            <!-- Random suggestion buttons with undo button -->
-            <div id="randomSuggestionBtns">
-              <button id="undoTypeBtn" title="Undo last type" style="width:36px !important; height:36px; padding:6px !important; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
-              </button>
-              <button id="addRandomSciFiBtn">+ Sci-Fi</button>
-              <button id="addRandomAnimalBtn">+ Animal</button>
-              <button id="addRandomRoleBtn">+ Role</button>
+            <!-- Random suggestion buttons with undo and dice buttons -->
+            <div id="randomSuggestionBtns" style="display:flex; flex-direction:column; gap:8px; align-items:center;">
+              <!-- First row -->
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button id="addRandomSciFiBtn">+ Sci-Fi</button>
+                <button id="addRandomAnimalBtn">+ Animal</button>
+              </div>
+              <!-- Second row with circular buttons and Role -->
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button id="undoTypeBtn" title="Undo last type" style="width:36px !important; height:36px; padding:6px !important; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                  <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
+                </button>
+                <button id="addRandomRoleBtn">+ Role</button>
+                <button id="randomizeTypeBtn" title="Randomize appearance" style="width:36px !important; height:36px; padding:6px !important; border:1px solid var(--stroke); background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                  <img src="images/dice_icon.png" alt="Randomize" style="width:100%; height:100%; display:block;">
+                </button>
+              </div>
             </div>
             
             <!-- Suggest from personality checkbox -->
             <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
                 <input type="checkbox" id="suggestFromPersonalityCheckbox" />
-                <span>Constrain Suggestion Buttons to Personality</span>
+                <span>Base Suggestions on Personality</span>
               </label>
             </div>
           </div>
@@ -461,11 +446,12 @@
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                    <option value="default">Default (Modern illustration)</option>
+                    <option value="default">Default (Illustration)</option>
                     <option value="realistic">Photo Realistic</option>
                     <option value="vector">Simplified Vector</option>
                     <option value="anime">Anime</option>
                     <option value="impressionistic">Impressionism</option>
+                    <option value="hologram">AI Hologram (High Chroma Abstract patterns)</option>
                     <option value="custom">Another Style (Enter Your Own)</option>
                   </select>
                 </div>
@@ -491,7 +477,7 @@
                     <option value="mysterious">Mysterious</option>
                     <option value="energetic">Energetic</option>
                     <option value="dreamlike">Dreamlike</option>
-                    <option value="custom">Another (user entry)</option>
+                    <option value="custom">Another (Enter your own)</option>
                   </select>
                 </div>
                 <div id="customVibeRow" style="display:none; width:100%;">
@@ -500,15 +486,6 @@
                   </label>
                 </div>
               </div>
-            </div>
-
-            <!-- AI Hologram checkbox -->
-            <div style="display:flex; justify-content:center; width:100%; margin-top:12px; margin-bottom:32px; padding-left:4px;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px; position:relative;" class="hologram-label">
-                <input type="checkbox" id="renderAsHologramCheckbox" checked />
-                <span>Render as AI hologram</span>
-                <span class="hologram-tooltip">Creates figure from abstract colors and patterns, based on personality input</span>
-              </label>
             </div>
           </div>
 
@@ -836,27 +813,19 @@
         artTabBtn.classList.add('active');
         artTab.classList.add('active');
         
-        // Randomize "Render as AI hologram" checkbox (40% probability)
-        const renderAsHologramCheckbox = document.getElementById('renderAsHologramCheckbox');
-        if (renderAsHologramCheckbox) {
-          renderAsHologramCheckbox.checked = Math.random() < 0.4; // 40% chance
-        }
-        const hologramSelected = renderAsHologramCheckbox?.checked || false;
-        
         // Randomize vibe (select)
         const vibes = ['radiant','calming','dramatic','serene','mysterious','energetic','dreamlike'];
         const vibe = randPick(vibes);
         const vibeSelect = document.getElementById('vibeChoice');
         if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
         
-        // Randomize style choice (select)
-        const styles = ['default','realistic','vector','anime','impressionistic'];
+        // Randomize style choice (select) - 40% chance for hologram
+        const useHologram = Math.random() < 0.4;
+        const styles = useHologram ? ['hologram'] : ['default','realistic','vector','anime','impressionistic'];
         const styleSelect = document.getElementById('styleChoice');
-        if (!hologramSelected) {
+        if (styleSelect) {
           const style = randPick(styles);
-          if (styleSelect){ styleSelect.value = style; dispatch(styleSelect,'change'); }
-        } else if (styleSelect){
-          styleSelect.value = 'default';
+          styleSelect.value = style;
           dispatch(styleSelect,'change');
         }
       }
@@ -908,8 +877,6 @@
   const suggestionNameEl = document.getElementById('suggestionName');
   const suggestionDescEl = document.getElementById('suggestionDesc');
   const suggestionTypeEl = document.getElementById('suggestionType');
-  const hologramCheckboxContainer = document.getElementById('hologramCheckboxContainer');
-  const renderAsHologramCheckbox = document.getElementById('renderAsHologramCheckbox');
       const traitsGroup = document.getElementById('traitsGroup');
       const artSettingsBtn = document.getElementById('toggleArtSettingsBtn');
         const archetypeSpecificInput = document.getElementById('archetypeSpecific');
@@ -1248,6 +1215,41 @@
           });
         }
         
+        // Randomize type button - randomly clicks two of the above buttons
+        const randomizeTypeBtn = document.getElementById('randomizeTypeBtn');
+        if (randomizeTypeBtn) {
+          randomizeTypeBtn.addEventListener('click', async () => {
+            // Clear the suggestion type field first
+            if (suggestionTypeEl) {
+              suggestionTypeEl.value = '';
+            }
+            hasRandomSelections = false; // Reset the flag
+            
+            // Randomly pick 2 buttons
+            const randomButtons = [
+              addRandomSciFiBtn,
+              addRandomAnimalBtn,
+              addRandomRoleBtn
+            ].filter(btn => btn && !btn.disabled);
+            
+            if (randomButtons.length >= 2) {
+              // Shuffle and pick 2
+              const shuffled = randomButtons.sort(() => Math.random() - 0.5);
+              const [btn1, btn2] = shuffled.slice(0, 2);
+              
+              // Click first button
+              if (btn1) {
+                btn1.click();
+                // Wait a bit for first to complete, then click second
+                await new Promise(resolve => setTimeout(resolve, 500));
+                if (btn2) {
+                  btn2.click();
+                }
+              }
+            }
+          });
+        }
+        
         // Undo button - removes last type append
         if (undoTypeBtn) {
           undoTypeBtn.addEventListener('click', ()=>{
@@ -1300,11 +1302,6 @@
           if (traitsGroup) traitsGroup.style.display = val ? 'flex' : 'none';
           const personalityHeading = document.getElementById('personalityHeading');
           if (personalityHeading) personalityHeading.style.display = val ? 'block' : 'none';
-          
-          // Show/hide hologram checkbox based on archetype selection
-          if (hologramCheckboxContainer) {
-            hologramCheckboxContainer.style.display = val ? 'block' : 'none';
-          }
           
           if (!isCustom){
             // reset suggestion UI when category changes
@@ -1449,8 +1446,8 @@
           practicalImaginative: scale10To100(document.getElementById('traitPracticalImaginative')?.value)
         };
 
-        // Check if hologram checkbox is selected
-        const useHologram = renderAsHologramCheckbox?.checked || false;
+        // Check if hologram (AI Hologram) style is selected
+        const useHologram = (styleChoiceRaw === 'hologram');
         
         // Set archetype based on hologram mode
         const archetype = useHologram ? 'abstract' : null;
@@ -1510,10 +1507,10 @@
           archetype,
           archetypeSpecific, archetypeSpecificDesc,
           vibe,
-          styleChoice, artStyleCustom,
+          styleChoice: useHologram ? null : styleChoice,
+          artStyleCustom,
           traits,
-          personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim(),
-          useHologram
+          personalityPrompt: (document.getElementById('suggestionDesc')?.value || '').trim()
         };
         try {
           localStorage.setItem('pendingCreate', JSON.stringify(payload));
