@@ -3,7 +3,7 @@ export const config = { runtime: 'edge' };
 
 export default async function handler(req) {
   try {
-  const { persona, message, history, temperature, presencePenalty, frequencyPenalty, stream } = await req.json();
+  const { persona, personalityTraits, message, history, temperature, presencePenalty, frequencyPenalty, stream } = await req.json();
 
     if (!message || !persona) {
       return new Response(JSON.stringify({ error: 'Missing persona or message' }), {
@@ -12,7 +12,8 @@ export default async function handler(req) {
       });
     }
 
-    const sys = `You are the persona described by the user: "${persona}". 
+    const traitsText = personalityTraits ? ` Personality: ${personalityTraits}.` : '';
+    const sys = `You are the persona described by the user: "${persona}".${traitsText} 
 Respond concisely and stay in character. Never break persona.`;
 
     if(stream){

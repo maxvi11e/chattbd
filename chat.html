@@ -1706,7 +1706,15 @@ body {
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.95, presencePenalty: 0.6, frequencyPenalty: 0.4 })
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              personalityTraits: flavor.join(', ') || null,
+              message: instruction, 
+              history: [], 
+              temperature: 0.95, 
+              presencePenalty: 0.6, 
+              frequencyPenalty: 0.4 
+            })
           });
           const { text } = await res.json();
           let q = cleanTrailing((text || '').trim());
@@ -1776,7 +1784,15 @@ body {
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.9, presencePenalty: 0.5, frequencyPenalty: 0.35 })
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              personalityTraits: flavor.join(', ') || null,
+              message: instruction, 
+              history: [], 
+              temperature: 0.9, 
+              presencePenalty: 0.5, 
+              frequencyPenalty: 0.35 
+            })
           });
           const { text } = await res.json();
           let topic = cleanTrailing((text || '').trim());
@@ -1844,7 +1860,15 @@ body {
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
-            body: JSON.stringify({ persona: currentAvatar.name, message: instruction, history: [], temperature: 0.92, presencePenalty: 0.55, frequencyPenalty: 0.4 })
+            body: JSON.stringify({ 
+              persona: currentAvatar.name, 
+              personalityTraits: flavor.join(', ') || null,
+              message: instruction, 
+              history: [], 
+              temperature: 0.92, 
+              presencePenalty: 0.55, 
+              frequencyPenalty: 0.4 
+            })
           });
           const { text } = await res.json();
           let facts = cleanTrailing((text || '').trim());
@@ -1864,7 +1888,15 @@ body {
               const retryRes = await fetch('/api/chat', {
                 method:'POST',
                 headers:{ 'Content-Type':'application/json' },
-                body: JSON.stringify({ persona: currentAvatar.name, message: retryInstruction, history: [], temperature: 0.95, presencePenalty: 0.65, frequencyPenalty: 0.55 })
+                body: JSON.stringify({ 
+                  persona: currentAvatar.name, 
+                  personalityTraits: flavor.join(', ') || null,
+                  message: retryInstruction, 
+                  history: [], 
+                  temperature: 0.95, 
+                  presencePenalty: 0.65, 
+                  frequencyPenalty: 0.55 
+                })
               });
               const retryJson = await retryRes.json();
               let retryFacts = cleanTrailing((retryJson.text || '').trim());
@@ -1952,12 +1984,30 @@ body {
             });
           if (msgError) console.error('Error saving message:', msgError);
 
+          // Extract lightweight personality traits
+          const traits = currentAvatar?.traits || {};
+          const sliders = traits.persona_traits || traits.sliders_raw || traits.sliders || {};
+          const s = {
+            seriousPlayful: sliders.seriousPlayful ?? sliders.serious_playful ?? null,
+            succinctChatty: sliders.succinctChatty ?? sliders.succinct_chatty ?? null,
+            rationalIntuitive: sliders.rationalIntuitive ?? sliders.rational_intuitive ?? null,
+            practicalImaginative: sliders.practicalImaginative ?? sliders.practical_imaginative ?? null
+          };
+          const flavor = [];
+          const bucket = (v, low, high)=>{ if(v==null) return; if(v<=35) flavor.push(low); else if(v>=65) flavor.push(high); };
+          bucket(s.seriousPlayful,'serious','playful');
+          bucket(s.succinctChatty,'succinct','chatty');
+          bucket(s.rationalIntuitive,'rational','intuitive');
+          bucket(s.practicalImaginative,'practical','imaginative');
+          const personalityTraits = flavor.join(', ') || null;
+
           // Non-stream fetch + typewriter simulation (fallback while real streaming debug)
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
             body: JSON.stringify({ 
-              persona: currentAvatar.name, 
+              persona: currentAvatar.name,
+              personalityTraits: personalityTraits,
               message: t, 
               history: convo.slice(-10),
               temperature: 0.85,
