@@ -1533,10 +1533,39 @@
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = archetypeSpecific || archetype || 'New Avatar';
 
-        // If hologram mode, append abstract description to prompt with safe framing
-        const finalPrompt = useHologram && hologramDescription 
-          ? `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || archetype || 'abstract form'}`
-          : p;
+        // Build the prompt based on style
+        let finalPrompt = '';
+        if (useHologram && hologramDescription) {
+          // Hologram mode: use abstract description
+          finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || archetype || 'abstract form'}`;
+        } else {
+          // Non-hologram mode: build prompt from archetypeSpecific
+          const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
+          const personaText = archetypeSpecific || archetypeSpecificDesc || 'humanoid character';
+          finalPrompt = `${basePrompt} Persona: ${personaText}`;
+          
+          // Add style if not default
+          if (styleChoice && styleChoice !== 'default') {
+            const styleMap = {
+              realistic: 'Photo realistic portrait style',
+              vector: 'Simplified vector art style',
+              anime: 'Anime illustration style',
+              impressionistic: 'Impressionistic painting style'
+            };
+            const styleText = styleMap[styleChoice] || styleChoice;
+            finalPrompt += `. Art style: ${styleText}`;
+          }
+          
+          // Add custom art style
+          if (artStyleCustom) {
+            finalPrompt += `. Art style: ${artStyleCustom}`;
+          }
+          
+          // Add vibe
+          if (vibe) {
+            finalPrompt += `. Atmosphere: ${vibe}`;
+          }
+        }
 
         const payload = { 
           prompt: finalPrompt, 
