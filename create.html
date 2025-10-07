@@ -398,6 +398,13 @@
                 <span class="trait-label right">Imaginative</span>
               </div>
             </div>
+            
+            <!-- Navigation Button for Personality Tab -->
+            <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
+              <button id="goToAppearanceBtn" style="display:flex; width:250px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
+                Create Appearance →
+              </button>
+            </div>
           </div>
 
           <!-- Appearance Tab Content -->
@@ -429,6 +436,13 @@
                 <input type="checkbox" id="suggestFromPersonalityCheckbox" />
                 <span>Base Suggestions on Personality</span>
               </label>
+            </div>
+            
+            <!-- Navigation Button for Appearance Tab -->
+            <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
+              <button id="goToArtOptionsBtn" style="display:flex; width:250px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
+                Define Art Options →
+              </button>
             </div>
           </div>
 
@@ -481,13 +495,13 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Generate Agent Button - Always Visible -->
-          <div style="width:100%; display:flex; justify-content:center; margin-top:12px; padding-bottom:6px;">
-            <button id="startBtn" style="display:flex; width:250px; margin-bottom:24px; margin-top:20px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
-              Generate Agent!
-            </button>
+            
+            <!-- Generate Agent Button - Only on Art Options Tab -->
+            <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
+              <button id="startBtn" style="display:flex; width:250px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
+                Generate Agent!
+              </button>
+            </div>
           </div>
 
           <!-- Hidden fields for compatibility -->
@@ -599,6 +613,30 @@
       document.getElementById(targetTab + 'Tab').classList.add('active');
     });
   });
+
+  // Navigation button handlers
+  const goToAppearanceBtn = document.getElementById('goToAppearanceBtn');
+  const goToArtOptionsBtn = document.getElementById('goToArtOptionsBtn');
+  
+  if (goToAppearanceBtn) {
+    goToAppearanceBtn.addEventListener('click', () => {
+      // Switch to Appearance tab
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      document.querySelector('[data-tab="appearance"]').classList.add('active');
+      document.getElementById('appearanceTab').classList.add('active');
+    });
+  }
+  
+  if (goToArtOptionsBtn) {
+    goToArtOptionsBtn.addEventListener('click', () => {
+      // Switch to Art Options tab
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      document.querySelector('[data-tab="art"]').classList.add('active');
+      document.getElementById('artTab').classList.add('active');
+    });
+  }
 
   function shouldAutoShowArtSettings(value){
     if (!value) return false;
