@@ -593,17 +593,16 @@
   .spinner {
     width:40px;
     height:40px;
-    border:3px solid rgba(255,255,255,0.3);
-    border-top:3px solid var(--ink);
     border-radius:50%;
-    animation:spin 10s linear infinite;
+    background: conic-gradient(var(--ink) 0deg, rgba(255,255,255,0.3) 0deg);
+    animation:fillSpinner 60s linear forwards;
   }
-  @keyframes spin {
+  @keyframes fillSpinner {
     0% {
-      transform: rotate(0deg);
+      background: conic-gradient(var(--ink) 0deg, rgba(255,255,255,0.3) 0deg);
     }
     100% {
-      transform: rotate(360deg);
+      background: conic-gradient(var(--ink) 360deg, rgba(255,255,255,0.3) 360deg);
     }
   }
   /* Error Message */

@@ -31,7 +31,7 @@ export default async function handler(req, res){
       prompt: finalPrompt,
       size: '1024x1024',
       n: 1,
-      quality: 'standard'
+      quality: 'medium'
     };
 
     console.log('📤 Generating avatar', {
