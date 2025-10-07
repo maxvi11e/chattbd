@@ -54,7 +54,7 @@ export default async function handler(req, res){
 
     const descriptionLines = [
       'Create an abstract digital avatar artwork in the style of neon line art.',
-      'Depict a single stylized abstract figure with head and torso shapes.',
+      'Depict a single stylized figure from waist up in a dynamic pose, facing forward or in slight profile.',
       'Draw using luminous glowing lines on a pure black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
