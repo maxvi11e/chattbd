@@ -1487,6 +1487,11 @@
 
         if (!p && !isOptionsMode) return;
 
+        // If archetypeSpecific is blank and we're in hologram mode, use a default
+        if (!archetypeSpecific && useHologram) {
+          archetypeSpecific = 'humanoid form';
+        }
+
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = archetypeSpecific || archetype || 'New Avatar';
 
