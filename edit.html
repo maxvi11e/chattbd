@@ -1163,6 +1163,48 @@
             }
           }
 
+          // Create placeholder avatar record FIRST (so it exists even if user navigates away)
+          const { data: { user } } = await supabase.auth.getUser();
+          const placeholderBotName = (
+            (pending.botName && String(pending.botName).trim()) ||
+            (pending.archetypeSpecific && String(pending.archetypeSpecific).trim()) ||
+            (pending.archetype && String(pending.archetype).trim()) ||
+            'New Avatar'
+          );
+          
+          console.log('💾 Creating placeholder avatar record...');
+          const { data: placeholderAvatar, error: placeholderError } = await supabase
+            .from('avatars')
+            .insert({
+              user_id: user.id,
+              name: placeholderBotName,
+              image_url: 'https://via.placeholder.com/512x512/000000/FFFFFF?text=Generating...', // Temporary placeholder
+              traits: {
+                status: 'generating',
+                original_prompt: pending.prompt,
+                archetype: pending.archetype || null,
+                archetype_specific: pending.archetypeSpecific || null,
+                vibe: pending.vibe || null,
+                style_choice: pending.styleChoice || 'default',
+                art_style_custom: pending.artStyleCustom || null,
+                persona_traits: pending.traits || null,
+                personality_prompt: pending.personalityPrompt || null
+              }
+            })
+            .select()
+            .single();
+          
+          if (placeholderError) {
+            console.error('❌ Failed to create placeholder:', placeholderError);
+            showError('Failed to create avatar record. Please try again.');
+            setLoadingState(false);
+            return;
+          }
+          
+          console.log('✅ Placeholder avatar created:', placeholderAvatar.id);
+          localStorage.setItem('lastSelectedAvatar', placeholderAvatar.id);
+          localStorage.setItem('lastGeneratedAvatar', placeholderAvatar.id);
+
           // Generate avatar via existing API
           console.log('📤 Sending avatar payload', {
             endpoint: '/api/generate-avatar',
@@ -1185,20 +1227,19 @@
             return;
           }
 
-          // Upload and save to DB
-          const { data: { user } } = await supabase.auth.getUser();
+          // Upload and update the placeholder avatar with real image
+          const safeFileBase = placeholderBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
+          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
+          
           const finalBotName = (
             (json.botName && String(json.botName).trim()) ||
-            (pending.prompt && String(pending.prompt).trim()) ||
-            (pending.archetype && String(pending.archetype).trim()) ||
-            'New Avatar'
+            placeholderBotName
           );
-          const safeFileBase = finalBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
-          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
-      const { data: avatarData, error: avatarError } = await supabase
+          
+          // Update the placeholder record with the actual image
+          const { data: avatarData, error: updateError } = await supabase
             .from('avatars')
-            .insert({
-              user_id: user.id,
+            .update({
               name: finalBotName,
               image_url: url,
               traits: {
@@ -1206,23 +1247,22 @@
                 art_style: json.artStyle || null,
                 style_choice: json.styleChoice || pending.styleChoice || 'default',
                 art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
-                // new quiz traits
                 archetype: (json.traits?.archetype) || pending.archetype || null,
                 archetype_specific: (json.traits?.archetype_specific) || pending.archetypeSpecific || null,
-                // deprecated fields retained for backward compatibility
                 vibe: (json.traits?.vibe) || pending.vibe || null,
                 setting: (json.traits?.setting) || pending.setting || null,
                 colors: (json.traits?.colors) || pending.colors || [],
-                // legacy/compat
                 animal: (json.traits?.animal) || pending.animal || null,
-                // sliders raw values (optional)
                 persona_traits: (json.traits?.sliders) || pending.traits || null,
-                personality_prompt: json.personalityPrompt || pending.personalityPrompt || null
+                personality_prompt: json.personalityPrompt || pending.personalityPrompt || null,
+                status: 'complete' // Mark as complete
               },
             })
+            .eq('id', placeholderAvatar.id)
             .select()
             .single();
-          if (avatarError) throw avatarError;
+          
+          if (updateError) throw updateError;
 
           // Display and store
           currentBot = avatarData;
