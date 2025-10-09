@@ -25,45 +25,41 @@ export default async function handler(req, res){
     const name = selectedAbstractName.label;
 
     // ---- Description (original logic) ----
-    const palettes = {
+    const palette = {
       low: 'cool white lines with gentle white glow',
       mid: 'deep cool chromatic spectrum with medium vibrancy accents',
       high: 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
-    };
-    const palette = palettes[b.sp];
+    }[b.sp];
 
-    const logics = {
+    const logic = {
       low: 'geometric wireframe rings and grid',
       mid: 'mesh of arcs and short lattice segments',
       high: 'flowing energy strands and arcs'
-    };
-    const logic = logics[b.ri];
+    }[b.ri];
 
-    const fills = {
+    const fill = {
       low: 'balanced interior with clear negative space between lines',
       mid: 'medium density with even spacing',
       high: 'richer line work with tight spacing, but keep background visible within figure'
-    };
-    const fill = fills[b.sc];
+    }[b.sc];
 
-    const symmetries = {
+    const symmetry = {
       low: 'strong bilateral symmetry',
       mid: 'near-bilateral with small variations',
       high: 'flowing asymmetrical forms for dynamic movement'
-    };
-    const symmetry = symmetries[b.cl];
+    }[b.cl];
 
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
 
     const descriptionLines = [
       'Create an abstract digital avatar artwork in the style of neon line art.',
-      'Depict a single stylized figure from chest up in a dynamic pose, facing forward or in slight profile.',
+      'Depict a single stylized figure from chest up, facing forward',
       'Draw using luminous glowing lines on a pure black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
       `Line density and spacing: ${fill}.`,
       `Visual symmetry approach: ${symmetry}.`,
-      'Eye design: friendly rounded openings with bright inner glow; no detailed pupils.',
+      'Eye design: friendly rounded almond shaped openings with bright inner glow; no detailed pupils.',
       'Art style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.',
       'Apply extreme brightness and luminosity to all line elements for a glowing neon effect.',
       'Make approximately 20% of all line elements 10x thicker and brighter for visual emphasis.',
