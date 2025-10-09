@@ -48,7 +48,7 @@
     border-right:1px solid #333;
     display:flex;
     flex-direction:column;
-    transition:width 0.3s ease;
+    transition:width 0.15s ease;
     position:relative;
     min-width:200px;
     max-width:600px;
@@ -236,7 +236,7 @@
   }
   .sidebar-toggle {
     position:absolute;
-    top:50px;
+    top:16px;
     right:10px;
     width:32px;
     height:32px;
@@ -251,7 +251,7 @@
     font-size:30px;
     font-weight:bold;
     z-index:10;
-    transition:all 0.3s ease;
+    transition:all 0.15s ease;
   }
   .sidebar-toggle:hover {
     background:rgba(255,255,255,0.1);
@@ -264,7 +264,6 @@
     outline:none;
   }
   .sidebar.collapsed .sidebar-toggle {
-    top:16px;
     left:50%;
     right:auto;
     transform:translateX(-50%);
@@ -286,8 +285,8 @@
   .page-header {
     display:flex;
     align-items:center;
-    gap:16px;
-    margin-bottom:40px;
+    gap:12px;
+    padding:24px 24px 0 24px;
     justify-content:center;
   }
   .page-icon {
@@ -295,9 +294,32 @@
     width:auto;
   }
   .page-title {
-    font-size:32px;
+    font-size:24px;
     font-weight:600;
     margin:0;
+    color:var(--ink);
+  }
+  .icon-btn {
+    background:transparent;
+    border:none;
+    padding:6px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:6px;
+    transition:background 0.2s ease;
+  }
+  .icon-btn:hover {
+    background:rgba(255,255,255,0.1);
+  }
+  .icon-btn img {
+    width:20px;
+    height:20px;
+    opacity:0.8;
+  }
+  .icon-btn:hover img {
+    opacity:1;
   }
   /* Bot Preview */
   .bot-preview {
@@ -350,13 +372,12 @@
   .frame-spinner.hidden {
     display:none;
   }
-  .agent-name-field {
-    width:100%;
+  .bot-preview-main {
     display:flex;
     flex-direction:column;
     align-items:center;
-    gap:6px;
-    margin-bottom:16px;
+    transform:translateY(0);
+    transition:transform 0.35s ease;
   }
   .field-heading {
     color:#a8a8a8;
@@ -371,40 +392,10 @@
     align-items:center;
     gap:6px;
   }
-  .agent-name-field .field-heading {
-    align-self:center;
-  }
   .field-heading img.icon {
     width:18px;
     height:18px;
     opacity:0.95;
-  }
-  #agentNameInput {
-    width:100%;
-    max-width:400px;
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.3);
-    color:var(--ink);
-    border-radius:24.5px;
-    padding:11px 18px;
-    font-size:18px;
-    font-weight:400;
-    line-height:1.3;
-    min-height:46px;
-    resize:none;
-    overflow:hidden;
-    text-align:center;
-    transition:border-color 0.2s ease, box-shadow 0.2s ease;
-    font-family:inherit;
-  }
-  #agentNameInput:focus {
-    outline:none;
-    border-color:var(--ink);
-    box-shadow:0 0 0 1px var(--ink);
-  }
-  #agentNameInput[disabled] {
-    opacity:0.6;
-    cursor:not-allowed;
   }
   /* Action Buttons */
   .action-buttons {
@@ -851,11 +842,11 @@
       padding:16px;
     }
     .bot-frame {
-      width:250px;
-      height:250px;
+      width:330px;
+      height:330px;
     }
     .personality-panel {
-      width:100%;
+      width:340px;
       max-width:100%;
       padding:16px;
     }
@@ -870,18 +861,20 @@
       flex-direction:column;
       align-items:center;
       width:100%;
+      max-width:340px;
     }
     .edit-buttons-row {
       flex-direction:column;
       width:100%;
+      max-width:340px;
       align-items:center;
     }
     .action-buttons .action-btn {
       width:100%;
-      max-width:300px;
+      max-width:340px;
     }
     .action-buttons .confirm-btn {
-      max-width:300px;
+      max-width:340px;
     }
     .form-buttons {
       flex-direction:column;
@@ -943,6 +936,14 @@
 
     <div class="main-edit">
       <div class="screen dashboard">
+        <!-- Page Title -->
+        <div class="page-header">
+          <h1 id="pageTitle" class="page-title">Loading...</h1>
+          <button id="editNameBtn" class="icon-btn" title="Edit name" aria-label="Edit AI name">
+            <img src="images/pencil_icon.png" alt="Edit" />
+          </button>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
       <!-- Error Message -->
@@ -951,10 +952,6 @@
       <!-- Bot Preview -->
       <div id="botPreview" class="bot-preview">
         <div class="bot-preview-main">
-          <div class="agent-name-field">
-            <div class="field-heading">AI Name <img class="icon" src="images/pencil_icon.png" alt="Edit" /></div>
-            <textarea id="agentNameInput" rows="1" placeholder="Name your AI" aria-label="AI name" disabled spellcheck="false">Loading...</textarea>
-          </div>
           <div class="bot-frame">
             <div id="frameSpinner" class="frame-spinner">
               <svg class="spinner" viewBox="0 0 40 40">
@@ -1060,9 +1057,12 @@
   <!-- Avatar History Utils -->
   <script src="avatar-history-utils.js"></script>
 
+  <!-- Abstract Names -->
+  <script src="abstract-names-browser.js"></script>
+
   <script>
     // DESIGN MODE: Set to true to preview the page locally without authentication/redirects
-    const DESIGN_MODE = true;
+    const DESIGN_MODE = false;
     
     // Initialize Supabase
     const supabaseUrl = 'https://eyptqyzkwcpaillnwmle.supabase.co';
@@ -1129,7 +1129,8 @@
   const botImage = document.getElementById('botImage');
   const botVideo = document.getElementById('botVideo');
   const frameSpinner = document.getElementById('frameSpinner');
-    const agentNameInput = document.getElementById('agentNameInput');
+    const pageTitle = document.getElementById('pageTitle');
+    const editNameBtn = document.getElementById('editNameBtn');
     const botPreview = document.getElementById('botPreview');
     const editBtn = document.getElementById('editBtn');
     const confirmBtn = document.getElementById('confirmBtn');
@@ -1170,7 +1171,7 @@
   // Ensure controls are wired regardless of flow
   setupEventListeners();
   setupSidebarControls();
-  setupNameField();
+  setupPageTitle();
   setupPersonalityEditor();
 
   // Prepare initial frame state
@@ -1464,11 +1465,11 @@
       botVideo.classList.remove('visible');
       frameSpinner.classList.remove('hidden');
       
-      if (agentNameInput) {
-        agentNameInput.disabled = false;
-        agentNameInput.value = bot.name || '';
-        latestNameDraft = agentNameInput.value;
-        autosizeAgentName();
+      // Set bot name, use abstract name if not set
+      const botName = bot.name || getRandomAbstractName();
+      if (pageTitle) {
+        pageTitle.textContent = botName;
+        latestNameDraft = botName;
         pendingNameValue = null;
       }
       
@@ -1880,57 +1881,28 @@
       });
     }
 
-    function autosizeAgentName() {
-      if (!agentNameInput) return;
-      agentNameInput.style.height = 'auto';
-      const newHeight = Math.max(agentNameInput.scrollHeight, 46);
-      agentNameInput.style.height = `${newHeight}px`;
-    }
-
-    function setupNameField() {
-      if (!agentNameInput) return;
-      autosizeAgentName();
-      agentNameInput.addEventListener('input', () => {
-        autosizeAgentName();
-        scheduleNameSave();
-      });
-      agentNameInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' && !event.shiftKey) {
-          event.preventDefault();
-          agentNameInput.blur();
+    function setupPageTitle() {
+      if (!editNameBtn || !pageTitle) return;
+      
+      editNameBtn.addEventListener('click', () => {
+        const currentName = pageTitle.textContent;
+        const newName = prompt('Enter a new name for your AI:', currentName);
+        
+        if (newName !== null && newName.trim() !== '' && newName.trim() !== currentName) {
+          persistAgentName(newName.trim());
         }
       });
-      agentNameInput.addEventListener('blur', () => {
-        if (nameSaveTimer) {
-          clearTimeout(nameSaveTimer);
-          nameSaveTimer = null;
-        }
-        persistAgentName(agentNameInput.value.trim());
-      });
-    }
-
-    function scheduleNameSave(delay = 600) {
-      if (!agentNameInput || !currentBot) return;
-      latestNameDraft = agentNameInput.value;
-      if (nameSaveTimer) clearTimeout(nameSaveTimer);
-      nameSaveTimer = setTimeout(() => {
-        persistAgentName(latestNameDraft);
-      }, delay);
     }
 
     async function persistAgentName(name) {
-      if (!agentNameInput || !currentBot) return;
-      nameSaveTimer = null;
+      if (!pageTitle || !currentBot) return;
+      
       const trimmed = (name || '').trim();
       if (!trimmed) {
         showError('Agent name cannot be empty.');
-        agentNameInput.value = currentBot.name || 'Agent';
-        autosizeAgentName();
-        latestNameDraft = agentNameInput.value;
         return;
       }
       if (trimmed === currentBot.name) {
-        latestNameDraft = currentBot.name || '';
         return;
       }
       if (isSavingName) {
@@ -1938,7 +1910,6 @@
         return;
       }
       isSavingName = true;
-      nameSaveTimer = null;
 
       try {
         const { data, error } = await supabase
@@ -1954,16 +1925,15 @@
         if (error) throw error;
 
         currentBot = { ...currentBot, ...data };
-        agentNameInput.value = currentBot.name || '';
-        autosizeAgentName();
+        pageTitle.textContent = currentBot.name || '';
         botImage.alt = currentBot.name || 'Agent preview';
         latestNameDraft = currentBot.name || '';
+        console.log('✅ Agent name updated successfully');
       } catch (error) {
         console.error('Error updating agent name:', error);
         showError('Failed to update agent name. Please try again.');
-        agentNameInput.value = currentBot?.name || '';
-        autosizeAgentName();
-        latestNameDraft = agentNameInput.value;
+        pageTitle.textContent = currentBot?.name || '';
+        latestNameDraft = pageTitle.textContent;
       } finally {
         isSavingName = false;
         if (pendingNameValue && currentBot && pendingNameValue !== currentBot.name) {
@@ -2321,7 +2291,6 @@
   loadingState.classList.remove('hidden');
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
-        if (agentNameInput) agentNameInput.disabled = true;
         editForm.classList.remove('visible');
         actionButtons.style.display = 'none';
       } else {
@@ -2332,7 +2301,6 @@
           editForm.classList.remove('visible');
           actionButtons.style.display = 'flex';
         }
-        if (agentNameInput && currentBot) agentNameInput.disabled = false;
       }
     }
 
