@@ -1460,13 +1460,14 @@
 
     // Display bot information
     function displayBot(bot) {
+      try {
       // Show spinner in frame until the image loads
       botImage.classList.remove('visible');
       botVideo.classList.remove('visible');
       frameSpinner.classList.remove('hidden');
       
       // Set bot name, use abstract name if not set
-      const botName = bot.name || getRandomAbstractName();
+      const botName = bot.name || (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'Agent');
       if (pageTitle) {
         pageTitle.textContent = botName;
         latestNameDraft = botName;
@@ -1489,6 +1490,10 @@
       botImage.src = bot.image_url;
       
       populatePersonalitySliders(bot.traits);
+      } catch (error) {
+        console.error('❌ Error in displayBot:', error);
+        showError('Failed to display agent. Please refresh the page.');
+      }
     }
 
     // Setup event listeners
