@@ -482,7 +482,7 @@
     gap:8px;
   }
   .personality-slider-row span {
-    width:110px;
+    width:65px;
     font-size:12px;
     color:#ffffff;
   }
@@ -491,6 +491,56 @@
   }
   .personality-slider-row input[type="range"] {
     flex:1;
+  }
+  /* Personality sliders use a custom track so both sides stay white */
+  input[type="range"].personality-slider {
+    --slider-thumb-color:#fff;
+    --slider-thumb-outline:rgba(0,0,0,0.35);
+    -webkit-appearance:none;
+    appearance:none;
+    width:100%;
+    height:2px;
+    background:#ffffff;
+    border-radius:0;
+    outline:none;
+  }
+  input[type="range"].personality-slider::-webkit-slider-runnable-track {
+    background:#ffffff;
+    border:none;
+    height:2px;
+    border-radius:0;
+  }
+  input[type="range"].personality-slider::-webkit-slider-thumb {
+    -webkit-appearance:none;
+    appearance:none;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#1a1a1a;
+    border:2px solid var(--slider-thumb-color);
+    margin-top:-11px;
+    cursor:pointer;
+  }
+  input[type="range"].personality-slider::-moz-range-track {
+    background:#ffffff;
+    border:none;
+    height:2px;
+    border-radius:0;
+  }
+  input[type="range"].personality-slider::-moz-range-progress {
+    background:#ffffff;
+    border:none;
+    height:2px;
+    border-radius:0;
+  }
+  input[type="range"].personality-slider::-moz-range-thumb {
+    appearance:none;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#1a1a1a;
+    border:2px solid var(--slider-thumb-color);
+    cursor:pointer;
   }
   .personality-actions {
     display:flex;
@@ -933,22 +983,22 @@
           <p class="personality-subtext">Adjust how your AI behaves. Changes are saved without regenerating art.</p>
           <div class="personality-slider-row">
             <span>Serious</span>
-            <input id="traitSeriousPlayful" type="range" min="1" max="10" step="1" value="5" />
+            <input id="traitSeriousPlayful" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
             <span>Playful</span>
           </div>
           <div class="personality-slider-row">
             <span>Succinct</span>
-            <input id="traitSuccinctChatty" type="range" min="1" max="10" step="1" value="5" />
+            <input id="traitSuccinctChatty" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
             <span>Talkative</span>
           </div>
           <div class="personality-slider-row">
             <span>Rational</span>
-            <input id="traitRationalIntuitive" type="range" min="1" max="10" step="1" value="5" />
+            <input id="traitRationalIntuitive" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
             <span>Intuitive</span>
           </div>
           <div class="personality-slider-row">
             <span>Practical</span>
-            <input id="traitPracticalImaginative" type="range" min="1" max="10" step="1" value="5" />
+            <input id="traitPracticalImaginative" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
             <span>Imaginative</span>
           </div>
           <div class="personality-actions">
@@ -1011,6 +1061,9 @@
   <script src="avatar-history-utils.js"></script>
 
   <script>
+    // DESIGN MODE: Set to true to preview the page locally without authentication/redirects
+    const DESIGN_MODE = true;
+    
     // Initialize Supabase
     const supabaseUrl = 'https://eyptqyzkwcpaillnwmle.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c';
@@ -1019,6 +1072,10 @@
 
     // Auth check function
     async function checkAuthAndRedirect() {
+      if (DESIGN_MODE) {
+        console.log('🎨 DESIGN MODE: Skipping auth check');
+        return true;
+      }
       console.log('🔐 Checking authentication...');
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -1318,6 +1375,12 @@
       }
 
       if (!botId) {
+        if (DESIGN_MODE) {
+          console.log('🎨 DESIGN MODE: No bot ID, but continuing for design preview');
+          // In design mode, just show the interface without loading a bot
+          frameSpinner.classList.add('hidden');
+          return;
+        }
         console.error('❌ No bot ID found');
         showError('No agent found. Please create an agent first.');
         setTimeout(() => {
@@ -1331,6 +1394,12 @@
 
     // Load bot data
     async function loadBot(botId) {
+      if (DESIGN_MODE) {
+        console.log('🎨 DESIGN MODE: Skipping bot load');
+        frameSpinner.classList.add('hidden');
+        return;
+      }
+      
       try {
         console.log('🔍 Loading bot with ID:', botId);
         
@@ -1451,10 +1520,29 @@
         });
       }
 
+      // Personality slider color change
+      function sliderValueToColor(value) {
+        const numeric = Number(value);
+        const clamped = Number.isFinite(numeric) ? Math.min(Math.max(numeric, 1), 10) : 5;
+        const ratio = (clamped - 1) / 9; // 0 at cool extreme, 1 at warm extreme
+        const hue = 210 - (210 * ratio); // 210 (cool blue) → 0 (red)
+        const saturation = 90;
+        const lightness = 60;
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      }
+
+      function applySliderColor(slider) {
+        if (!slider) return;
+        const color = sliderValueToColor(slider.value);
+        slider.style.setProperty('--slider-thumb-color', color);
+      }
+
       personalitySliderKeys.forEach(key => {
         const input = personalitySliderElements[key];
         if (!input) return;
+        applySliderColor(input);
         input.addEventListener('input', () => {
+          applySliderColor(input);
           updatePersonalitySaveState();
         });
       });
@@ -1564,6 +1652,7 @@
         const storedValue = source ? source[key] : undefined;
         const sliderValue = percentToSlider(storedValue);
         input.value = sliderValue;
+        applySliderColor(input);
         sliderState[key] = sliderValue;
       });
       memorizePersonality(sliderState);
