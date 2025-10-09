@@ -341,9 +341,13 @@ body {
   width:190px;
   height:190px;
   margin-bottom:10px;
-  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  animation: neonGlow 3.2s ease-in-out infinite;
-  will-change: box-shadow;
+  /* Animated gradient glow - commented out for white static shadow */
+  /* box-shadow: 0 0 0 rgba(0, 0, 0, 0); */
+  /* animation: neonGlow 3.2s ease-in-out infinite; */
+  /* will-change: box-shadow; */
+  /* White static shadow */
+  /* box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); */
+  border:1px solid #333;
 }
 /* Avatar Actions Menu */
 .avatar-actions {
