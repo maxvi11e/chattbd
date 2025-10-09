@@ -814,6 +814,12 @@
         appearanceTabBtn.classList.add('active');
         appearanceTab.classList.add('active');
         
+        // Uncheck "Base Suggestions on Personality" checkbox
+        const suggestFromPersonalityCheckbox = document.getElementById('suggestFromPersonalityCheckbox');
+        if (suggestFromPersonalityCheckbox) {
+          suggestFromPersonalityCheckbox.checked = false;
+        }
+        
         // Clear the suggestion type field first and reset the flag
         const suggestionTypeEl = document.getElementById('suggestionType');
         if (suggestionTypeEl) {

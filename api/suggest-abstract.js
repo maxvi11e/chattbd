@@ -25,47 +25,49 @@ export default async function handler(req, res){
     const name = selectedAbstractName.label;
 
     // ---- Description (original logic) ----
-    const palette = b.sp === 'low'
-      ? 'cool white/blue lines with gentle deep blue glow'
-      : b.sp === 'high'
-        ? 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
-        : 'deep cool spectrum with high vibrancy accents';
+    const palettes = {
+      low: 'cool white lines with gentle white glow',
+      mid: 'deep cool chromatic spectrum with medium vibrancy accents',
+      high: 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
+    };
+    const palette = palettes[b.sp];
 
-    const logic = b.ri === 'low'
-      ? 'geometric wireframe rings and grid'
-      : b.ri === 'high'
-        ? 'flowing energy strands and arcs'
-        : 'mesh of arcs and short lattice segments';
+    const logics = {
+      low: 'geometric wireframe rings and grid',
+      mid: 'mesh of arcs and short lattice segments',
+      high: 'flowing energy strands and arcs'
+    };
+    const logic = logics[b.ri];
 
-    const fill = b.sc === 'low'
-      ? 'balanced interior with clear negative space between lines'
-      : b.sc === 'high'
-        ? 'richer line work with tight spacing, but keep background visible outside the figure'
-        : 'medium density with even spacing';
+    const fills = {
+      low: 'balanced interior with clear negative space between lines',
+      mid: 'medium density with even spacing',
+      high: 'richer line work with tight spacing, but keep background visible within figure'
+    };
+    const fill = fills[b.sc];
 
-    const symmetry = b.cl === 'low'
-      ? 'strong bilateral symmetry'
-      : b.cl === 'high'
-        ? 'slight asymmetry for energy direction'
-        : 'near-bilateral with small variations';
+    const symmetries = {
+      low: 'strong bilateral symmetry',
+      mid: 'near-bilateral with small variations',
+      high: 'flowing asymmetrical forms for dynamic movement'
+    };
+    const symmetry = symmetries[b.cl];
 
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
-    const detailLine = Number.isFinite(Number(detailLevel)) ? `Detail level ${Math.min(10,Math.max(1,Number(detailLevel)))}/10.` : '';
 
     const descriptionLines = [
       'Create an abstract digital avatar artwork in the style of neon line art.',
-      'Depict a single stylized figure from waist up in a dynamic pose, facing forward or in slight profile.',
+      'Depict a single stylized figure from chest up in a dynamic pose, facing forward or in slight profile.',
       'Draw using luminous glowing lines on a pure black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
       `Line density and spacing: ${fill}.`,
       `Visual symmetry approach: ${symmetry}.`,
-      'Eye design: friendly rounded almond-shaped openings with soft inner glow; no detailed pupils.',
-      'Art style: very bright neon lines with crisp edges; maintain pure black background; avoid any interface elements, HUD overlays, text, or logos.',
+      'Eye design: friendly rounded openings with bright inner glow; no detailed pupils.',
+      'Art style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.',
       'Apply extreme brightness and luminosity to all line elements for a glowing neon effect.',
-      'Make approximately 10% of all line elements 10x thicker and brighter for visual emphasis.',
+      'Make approximately 20% of all line elements 10x thicker and brighter for visual emphasis.',
       vibeLine,
-      detailLine
     ].filter(Boolean);
     const description = descriptionLines.join('\n');
 
