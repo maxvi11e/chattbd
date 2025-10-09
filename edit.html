@@ -1494,6 +1494,10 @@
       // Set bot name, use abstract name if not set
       const botName = bot.name || (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'Agent');
       console.log('🏷️ Bot name:', botName);
+      
+      // Update page title
+      document.title = `${botName} — Aeaea`;
+      
       if (pageTitle) {
         pageTitle.textContent = botName;
         latestNameDraft = botName;
