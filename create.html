@@ -82,10 +82,10 @@
     .page-title{font-size:24px; font-weight:600; margin:0;}
 
     /* Tab Navigation */
-    .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:rgba(255,255,255,0.05); border-radius:800px; width:fit-content; max-width:95%; border:1px solid rgba(255,255,255,0.1);}
+    .tab-nav{display:flex; gap:8px; justify-content:center; margin:24px auto; padding:4px; background:#000000; border-radius:800px; width:fit-content; max-width:95%; border:1px solid rgba(255,255,255,0.4);}
     .tab-btn{padding:10px 22px; border:none; background:transparent; color:var(--muted); border-radius:800px; cursor:pointer; font-size:14px; font-weight:500; transition:all 0.3s ease; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
     .tab-btn:hover{background:rgba(255,255,255,0.05);}
-    .tab-btn.active{background:var(--bg); color:var(--ink); font-weight:600; border:1px solid rgba(255,255,255,0.1);}
+    .tab-btn.active{background:var(--bg); color:var(--ink); font-weight:600; border:1px solid rgba(255,255,255,.6);}
     .tab-content{display:none;}
     .tab-content.active{display:flex; flex-direction:column; gap:12px;}
 
@@ -136,15 +136,16 @@
       -webkit-appearance:none;
       appearance:none;
       width:100%;
-      height:8px;
-      background:#fff;
-      border-radius:999px;
+      height:2px;
+      background:#ffffff;
+      border-radius:0;
       outline:none;
     }
     input[type="range"].personality-slider::-webkit-slider-runnable-track {
-      background:#fff;
-      height:8px;
-      border-radius:999px;
+      background:#ffffff;
+      border:none;
+      height:2px;
+      border-radius:0;
     }
     input[type="range"].personality-slider::-webkit-slider-thumb {
       -webkit-appearance:none;
@@ -152,28 +153,30 @@
       width:24px;
       height:24px;
       border-radius:50%;
-      background:var(--slider-thumb-color);
-      border:none;
-      margin-top:-8px;
+      background:#000000;
+      border:2px solid var(--slider-thumb-color);
+      margin-top:-11px;
       cursor:pointer;
     }
     input[type="range"].personality-slider::-moz-range-track {
-      background:#fff;
-      height:8px;
-      border-radius:999px;
+      background:#ffffff;
+      border:none;
+      height:2px;
+      border-radius:0;
     }
     input[type="range"].personality-slider::-moz-range-progress {
-      background:#fff;
-      height:8px;
-      border-radius:999px;
+      background:#ffffff;
+      border:none;
+      height:2px;
+      border-radius:0;
     }
     input[type="range"].personality-slider::-moz-range-thumb {
       appearance:none;
       width:24px;
       height:24px;
       border-radius:50%;
-      background:var(--slider-thumb-color);
-      border:none;
+      background:#000000;
+      border:2px solid var(--slider-thumb-color);
       cursor:pointer;
     }
     @media (max-width: 540px) {
@@ -307,27 +310,27 @@
       display: flex;
       gap: 8px;
       align-items: center;
-      margin-top: 0px;
+      margin-top: -15px;
       justify-content: center;
       flex-wrap: wrap;
     }
     #randomSuggestionBtns button:not(#undoTypeBtn) {
       width: 140px;
       padding: 8px 12px;
-      border: 1px solid var(--stroke);
-      background: #ffffff;
-      color: #000000;
+      border: 1px solid #d3d3d3;
+      background: #000000;
+      color: #ffffff;
       border-radius: 800px;
       font-size: 13px;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     #randomSuggestionBtns button:not(#undoTypeBtn):hover {
-      background: #f0f0f0;
-      transform: translateY(-1px);
+      background: #1a1a1a;
+      transform: scale(1.05);
     }
     #randomSuggestionBtns button:not(#undoTypeBtn):active {
-      transform: translateY(0);
+      transform: scale(1);
     }
     #randomSuggestionBtns button:not(#undoTypeBtn):disabled {
       opacity: 0.6;
@@ -376,7 +379,7 @@
           <!-- Personality Tab Content -->
           <div id="personalityTab" class="tab-content active">
             <div id="personalityHeading" class="field-heading">Define Personality with sliders</div>
-            <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:12px;">
+            <div id="traitsGroup" style="border:0px solid var(--stroke); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:16px;">
               <div class="trait-row">
                 <span class="trait-label left">Serious</span>
                 <input id="traitSeriousPlayful" class="personality-slider" type="range" min="1" max="10" step="1" value="5" />
@@ -401,8 +404,8 @@
             
             <!-- Navigation Button for Personality Tab -->
             <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
-              <button id="goToAppearanceBtn" style="display:flex; width:250px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
-                Create Appearance →
+              <button id="goToAppearanceBtn" style="display:flex; width:46px; height:46px; padding:10px; border:1px solid #d3d3d3; background:#000000; border-radius:50%; cursor:pointer; justify-content:center; align-items:center; transition:all 0.2s ease;" onmouseover="this.style.background='#1a1a1a'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000000'; this.style.transform='scale(1)'">
+                <img src="images/next_icon.png" alt="→" style="width:100%; height:100%; object-fit:contain;" />
               </button>
             </div>
           </div>
@@ -416,11 +419,19 @@
                 <button id="undoTypeBtn" title="Undo last type" style="width:46px !important; height:46px; padding:8px !important; border:1px solid #d3d3d3; background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
                   <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
                 </button>
-                <textarea id="suggestionType" placeholder="Use suggestion buttons or create your own ✨" rows="1" style="flex:1; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:14px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
-                <button id="randomizeTypeBtn" title="Randomize appearance" style="width:46px !important; height:46px; padding:8px !important; border:1px solid #d3d3d3; background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                <textarea id="suggestionType" placeholder="Enter your own or use suggestions below" rows="1" style="flex:1; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+                <button id="randomizeTypeBtn" title="Randomize appearance" style="width:46px !important; height:46px; padding:10px !important; border:1px solid #d3d3d3; background:#000000; border-radius:50%; cursor:pointer; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='#1a1a1a'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000000'; this.style.transform='scale(1)'">
                   <img src="images/dice_icon.png" alt="Randomize" style="width:100%; height:100%; display:block;">
                 </button>
               </div>
+            </div>
+
+            <!-- Suggest from personality checkbox -->
+            <div style="display:flex; justify-content:center; margin-top:0px; margin-bottom:12px; padding-left:4px;">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:12px;">
+                <input type="checkbox" id="suggestFromPersonalityCheckbox" checked />
+                <span>Base Suggestions on Personality</span>
+              </label>
             </div>
 
             <!-- Random suggestion buttons -->
@@ -430,18 +441,10 @@
               <button id="addRandomRoleBtn">+ Role</button>
             </div>
             
-            <!-- Suggest from personality checkbox -->
-            <div style="display:flex; justify-content:center; margin-top:-4px; padding-left:4px;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:14px;">
-                <input type="checkbox" id="suggestFromPersonalityCheckbox" />
-                <span>Base Suggestions on Personality</span>
-              </label>
-            </div>
-            
             <!-- Navigation Button for Appearance Tab -->
             <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
-              <button id="goToArtOptionsBtn" style="display:flex; width:250px; padding:14px; border:1px solid var(--stroke); background:#ffffff; color:#000000; border-radius:800px; font-size:16px; font-weight:600; cursor:pointer; justify-content:center; align-items:center;">
-                Define Art Options →
+              <button id="goToArtOptionsBtn" style="display:flex; width:46px; height:46px; padding:10px; border:1px solid #d3d3d3; background:#000000; border-radius:50%; cursor:pointer; justify-content:center; align-items:center; transition:all 0.2s ease;" onmouseover="this.style.background='#1a1a1a'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000000'; this.style.transform='scale(1)'">
+                <img src="images/next_icon.png" alt="→" style="width:100%; height:100%; object-fit:contain;" />
               </button>
             </div>
           </div>
@@ -477,7 +480,7 @@
               <div id="vibeGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                    <option value="default">Soft light, Neutral</option>
+                    <option value="default">Neutral</option>
                     <option value="radiant">Radiant</option>
                     <option value="calming">Calming</option>
                     <option value="dramatic">Dramatic</option>
