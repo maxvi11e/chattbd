@@ -294,10 +294,18 @@
     width:auto;
   }
   .page-title {
-    font-size:24px;
+    font-size:18px;
     font-weight:600;
     margin:0;
     color:var(--ink);
+    padding:4px 8px;
+    border-radius:4px;
+    transition:background 0.2s ease;
+  }
+  .page-title[contenteditable="true"] {
+    background:rgba(255,255,255,0.05);
+    outline:1px solid rgba(255,255,255,0.3);
+    cursor:text;
   }
   .icon-btn {
     background:transparent;
@@ -840,6 +848,9 @@
   @media (max-width: 768px) {
     .main-content {
       padding:16px;
+    }
+    .page-title {
+      font-size:12px;
     }
     .bot-frame {
       width:330px;
@@ -1907,12 +1918,53 @@
       if (!editNameBtn || !pageTitle) return;
       
       editNameBtn.addEventListener('click', () => {
+        // Make the title editable
         const currentName = pageTitle.textContent;
-        const newName = prompt('Enter a new name for your AI:', currentName);
+        pageTitle.contentEditable = 'true';
+        pageTitle.focus();
         
-        if (newName !== null && newName.trim() !== '' && newName.trim() !== currentName) {
-          persistAgentName(newName.trim());
-        }
+        // Select all text
+        const range = document.createRange();
+        range.selectNodeContents(pageTitle);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Hide edit button while editing
+        editNameBtn.style.display = 'none';
+        
+        // Handle blur (clicking away or pressing Enter)
+        const finishEditing = () => {
+          pageTitle.contentEditable = 'false';
+          editNameBtn.style.display = 'flex';
+          
+          const newName = pageTitle.textContent.trim();
+          if (newName === '' || newName === currentName) {
+            // Revert if empty or unchanged
+            pageTitle.textContent = currentName;
+          } else {
+            // Save the new name
+            persistAgentName(newName);
+          }
+          
+          // Remove listeners
+          pageTitle.removeEventListener('blur', finishEditing);
+          pageTitle.removeEventListener('keydown', handleKeydown);
+        };
+        
+        const handleKeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            pageTitle.blur();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            pageTitle.textContent = currentName;
+            pageTitle.blur();
+          }
+        };
+        
+        pageTitle.addEventListener('blur', finishEditing);
+        pageTitle.addEventListener('keydown', handleKeydown);
       });
     }
 
