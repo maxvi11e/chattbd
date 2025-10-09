@@ -1159,6 +1159,30 @@
     let isSavingPersonality = false;
     let isSidebarResizing = false;
 
+    // Personality slider color functions
+    function sliderValueToColor(value) {
+      const numeric = Number(value);
+      const clamped = Number.isFinite(numeric) ? Math.min(Math.max(numeric, 1), 10) : 5;
+      const ratio = (clamped - 1) / 9; // 0 at cool extreme, 1 at warm extreme
+      const hue = 210 - (210 * ratio); // 210 (cool blue) → 0 (red)
+      const saturation = 90;
+      const lightness = 60;
+      return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    function applySliderColor(slider) {
+      if (!slider) {
+        console.warn('⚠️ applySliderColor called with null slider');
+        return;
+      }
+      try {
+        const color = sliderValueToColor(slider.value);
+        slider.style.setProperty('--slider-thumb-color', color);
+      } catch (error) {
+        console.error('❌ Error in applySliderColor:', error);
+      }
+    }
+
     // Initialize the page
     async function initializePage() {
       console.log('🚀 Initializing edit page...');
@@ -1530,30 +1554,7 @@
         });
       }
 
-      // Personality slider color change
-      function sliderValueToColor(value) {
-        const numeric = Number(value);
-        const clamped = Number.isFinite(numeric) ? Math.min(Math.max(numeric, 1), 10) : 5;
-        const ratio = (clamped - 1) / 9; // 0 at cool extreme, 1 at warm extreme
-        const hue = 210 - (210 * ratio); // 210 (cool blue) → 0 (red)
-        const saturation = 90;
-        const lightness = 60;
-        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      }
-
-      function applySliderColor(slider) {
-        if (!slider) {
-          console.warn('⚠️ applySliderColor called with null slider');
-          return;
-        }
-        try {
-          const color = sliderValueToColor(slider.value);
-          slider.style.setProperty('--slider-thumb-color', color);
-        } catch (error) {
-          console.error('❌ Error in applySliderColor:', error);
-        }
-      }
-
+      // Apply initial colors and setup event listeners for personality sliders
       personalitySliderKeys.forEach(key => {
         const input = personalitySliderElements[key];
         if (!input) return;
