@@ -14,12 +14,12 @@ export default async function handler(req, res){
       sp: norm(sliders.seriousPlayful),
       sc: norm(sliders.succinctChatty),
       ri: norm(sliders.rationalIntuitive),
-      cl: norm(sliders.practicalImaginative)
+      pi: norm(sliders.practicalImaginative)
     };
 
     // Buckets
     const bucket = (n)=> n<=30? 'low' : n>=70? 'high':'mid';
-    const b = { sp: bucket(s.sp), sc: bucket(s.sc), ri: bucket(s.ri), cl: bucket(s.cl) };
+    const b = { sp: bucket(s.sp), sc: bucket(s.sc), ri: bucket(s.ri), pi: bucket(s.pi) };
 
     const selectedAbstractName = pickAbstractName();
     const name = selectedAbstractName.label;
@@ -31,23 +31,23 @@ export default async function handler(req, res){
       high: 'luminous high-chroma spectral gradients. use high saturation, high vibrancy colors'
     }[b.sp];
 
-    const logic = {
-      low: 'geometric wireframe rings and grid',
-      mid: 'mesh of arcs and short lattice segments',
-      high: 'flowing energy strands and arcs'
-    }[b.ri];
-
     const fill = {
       low: 'balanced interior with clear negative space between lines',
       mid: 'medium density with even spacing',
       high: 'richer line work with tight spacing, but keep background visible within figure'
     }[b.sc];
 
+    const logic = {
+      low: 'geometric wireframe rings and grid',
+      mid: 'mesh of arcs and short lattice segments',
+      high: 'flowing energy strands and arcs'
+    }[b.ri];
+
     const symmetry = {
       low: 'strong bilateral symmetry',
       mid: 'near-bilateral with small variations',
       high: 'flowing asymmetrical forms for dynamic movement'
-    }[b.cl];
+    }[b.pi];
 
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
 

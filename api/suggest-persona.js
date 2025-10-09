@@ -10,15 +10,15 @@ const animalBuckets = {
     "Tiger", "Leopard", "Lion", "Cheetah", "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
-    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Okapi", "Zebra", 
-    "Horse", "Cow", "Goat", "Sheep", "Pig", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit",
+    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Zebra", 
+    "Horse", "Cow", "Goat", "Sheep", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit",
     "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Manatee", "Blue Whale", "Beluga" 
   ],
   bucket3: [
     "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog",    
     "Ferret", "River Otter", "Sea Otter", "Penguin", "Orca", "Porpoise", 
-    "Red Panda", "Capuchin Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
-    "Raccoon"
+    "Red Panda", "Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
+    "Raccoon", "Panda"
   ]
 };
 
@@ -26,10 +26,10 @@ const animalBuckets = {
 
 const humanArchetypeBuckets = {
   bucket1: [
-    "Monk", "Zen Master", "Military Officer", "Engineer", "Scientist", "Accountant", "Lawyer", 
+    "Monk", "Zen Master", "Engineer", "Scientist", "Accountant", "Lawyer", 
     "Archivist", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
     "Mathematician", "Historian", "Logistician", "Banker", "Professor", "Doctor", "Therapist", "Psychologist", 
-    "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Coach", "Software Developer"
+    "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Software Developer"
   ],
   bucket2: [ 
     "Humanitarian", "Ethical Philosopher", "Counselor", "Inventor", "Activist", "Explorer", "Journalist",
@@ -40,7 +40,7 @@ const humanArchetypeBuckets = {
   bucket3: [
     "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
     "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Psychonaut", "Futurist", 
-    "Creative Genius", "Iconoclast", "Rebel", "Idealist", "Bohemian", "Story Weaver", 
+    "Creative Genius", "Rebel", "Idealist", "Story Weaver", 
     "Dream Architect", "Storyteller", "Music Producer", "Jazz Artist", "Rapper", "Contemporary Artist"],
 };
 
@@ -64,51 +64,42 @@ const humanBucketMeta = {
 
 const archetypeBuckets = {
   bucket1: [ // 0–133: serious, rational, practical
-    "Service Android",
-    "Autonomous Factory Unit Robot",
+    "Service Droid",
+    "Autonomous Factory Robot",
     "Battle Mech",
     "Drone Swarm",
     "Space Marine",
-    "Necromancer",
-    "Stoic Galactic Emperor",
-    "Ancient Precursor Alien",
     "Ice Dragon",
     "Human Knight",
-    "Dwarven Warrior",
-    "Elven Warrior",
-    "Terraforming Machine Robot",
+    "Dwarf",
+    "Elf",
+    "Terraforming Machine",
     "Dwarf Miner",
     "Space Knight",
-    "Wise Mystic Alien",
-    "Mysterious Ranger",
-    "Airship Captain",
-    "Hobbit Hero",
-    "Cantina Alien",
+    "Mystic Alien",
+    "Ranger",
+    "Hobbit",
     "Grey Alien",
     "Aquatic Alien",
+    "Loch Ness Monster"
   ],
   bucket2: [ // 134–266: disciplined, heroic, competent
-    "Ent-like Forest Guardian",
+    "Ent",
     "Dryad",
     "Dragon Rider",
     "Space Knight", // (appears again for thematic balance if desired)
     "Witch",
     "Starfighter Ace",
-    "Desert Outlaw Alien",
-    "Engineer Alien",
-    "Companion Robot",
-    "Carebot",
-    "Rebel Freedom Fighter",
+    "Desert Alien",
+    "Rebel Fighter",
     "Starfighter Ace",
     "Elven King",
     "Space Bard",
     "Astronaut Inventor",
     "Mage Alien",
-    "Alien Merchant",
+    "Merchant Alien",
     "Time Traveler",
-    "Sasquatch",
-    "Cantina Alien",
-    "Ancient Scholar Alien",
+    "Yeti",
     "Aquatic Dragon",
   ],
   bucket3: [ // 267–400: curious, adventurous, imaginative
@@ -117,12 +108,10 @@ const archetypeBuckets = {
     "Luminous Energy Being",
     "Wizard Alien",
     "Force-Wielding Sage",
-    "Elemental Dragon",
-    "Jovial Wizard",
-    "Dryad",
+    "Dragon",
+    "Wizard",
     "Celestial Architect",
     "Cosmic Wanderer",
-    "Alien Merchant",
     "Illusionist",
     "Friendly Droid",
     "Space Mystic",
