@@ -903,7 +903,7 @@
 
 <body>
   <div class="chat-container">
-    <div class="sidebar">
+    <div class="sidebar collapsed">
       <div class="sidebar-nav">
         <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" />
       </div>
@@ -1790,13 +1790,13 @@
       const EDIT_SIDEBAR_WIDTH_KEY = 'editSidebarWidth';
       const EDIT_SIDEBAR_STATE_KEY = 'editSidebarCollapsed';
 
-      const getStoredWidth = () => {
+      function getSavedSidebarWidth() {
         const stored = parseInt(localStorage.getItem(EDIT_SIDEBAR_WIDTH_KEY) || '', 10);
-        return Number.isNaN(stored) ? null : stored;
-      };
+        return Number.isFinite(stored) ? stored : 300;
+      }
 
       const expandSidebar = () => {
-        const width = getStoredWidth() || 300;
+        const width = getSavedSidebarWidth();
         sidebar.classList.remove('collapsed');
         sidebar.style.width = `${width}px`;
         sidebarToggle.title = 'Collapse sidebar';
@@ -1819,12 +1819,6 @@
         }
       };
 
-      const savedState = localStorage.getItem(EDIT_SIDEBAR_STATE_KEY);
-      const isMobile = window.innerWidth <= 768;
-      
-      // Always start collapsed (minimized) on page load
-      collapseSidebar({ saveWidth: false, persistState: false });
-
       sidebarToggle.addEventListener('click', () => {
         if (sidebar.classList.contains('collapsed')) {
           expandSidebar();
@@ -1833,11 +1827,21 @@
         }
       });
 
+      // Initialize sidebar state (default collapsed if no preference saved)
+      const savedSidebarState = localStorage.getItem(EDIT_SIDEBAR_STATE_KEY);
+      if (savedSidebarState === 'false' && window.innerWidth > 768) {
+        expandSidebar();
+      } else if (savedSidebarState === 'true') {
+        collapseSidebar({ saveWidth: false, persistState: false });
+      } else {
+        // Default to collapsed on first load
+        collapseSidebar({ saveWidth: false, persistState: false });
+      }
+
       resizeHandle.addEventListener('mousedown', (event) => {
         event.preventDefault();
-        if (sidebar.classList.contains('collapsed')) {
-          expandSidebar();
-        }
+        // Disable on mobile or when collapsed to avoid interference
+        if (window.innerWidth <= 768 || sidebar.classList.contains('collapsed')) return;
 
         isSidebarResizing = true;
         sidebar.classList.add('resizing');
