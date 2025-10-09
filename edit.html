@@ -1329,10 +1329,8 @@
           const safeFileBase = placeholderBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
           const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
           
-          const finalBotName = (
-            (json.botName && String(json.botName).trim()) ||
-            placeholderBotName
-          );
+          // Use the placeholder name (which includes abstract name fallback)
+          const finalBotName = placeholderBotName;
           
           // Update the placeholder record with the actual image
           const { data: avatarData, error: updateError } = await supabase
