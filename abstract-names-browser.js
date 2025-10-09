@@ -52,7 +52,8 @@ const ABSTRACT_NAMES = [
 ];
 
 function getRandomAbstractName() {
-  return ABSTRACT_NAMES[Math.floor(Math.random() * ABSTRACT_NAMES.length)].name;
+  const entry = ABSTRACT_NAMES[Math.floor(Math.random() * ABSTRACT_NAMES.length)];
+  return `${entry.name}: ${entry.expansion}`;
 }
 
 function pickAbstractName() {
