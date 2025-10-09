@@ -462,7 +462,7 @@
               <div id="styleChoiceGroup" style="border:0; border-radius:14px; padding:0; display:flex; flex-direction:column; gap:8px; align-items:center; width:100%;">
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
-                    <option value="hologram" selected>AI Hologram (High Chroma Abstract patterns)</option>                    
+                    <option value="hologram" selected>AI Hologram (Neon Abstract patterns)</option>                    
                     <option value="default"> Modern Illustration</option>
                     <option value="realistic">Photo Realistic</option>
                     <option value="vector">Simplified Vector</option>
@@ -827,26 +827,21 @@
         }
         hasRandomSelections = false; // Reset the flag so we start fresh
         
-        // Trigger 2 random suggestion buttons (randomly pick which categories)
+        // Trigger 1 random suggestion button (randomly pick which category)
         const randomButtons = [
           document.getElementById('addRandomSciFiBtn'),
           document.getElementById('addRandomAnimalBtn'),
           document.getElementById('addRandomRoleBtn')
         ].filter(btn => btn); // Filter out any null buttons
         
-        if (randomButtons.length >= 2) {
-          // Shuffle and pick 2
+        if (randomButtons.length >= 1) {
+          // Shuffle and pick 1
           const shuffled = randomButtons.sort(() => Math.random() - 0.5);
-          const [btn1, btn2] = shuffled.slice(0, 2);
+          const btn1 = shuffled[0];
           
-          // Click first button (will set field to first type)
+          // Click the button
           if (btn1 && !btn1.disabled) {
             btn1.click();
-            // Wait a bit for first to complete, then click second (will append with +)
-            await new Promise(resolve => setTimeout(resolve, 500));
-            if (btn2 && !btn2.disabled) {
-              btn2.click();
-            }
           }
         }
         
@@ -865,8 +860,8 @@
         const vibeSelect = document.getElementById('vibeChoice');
         if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
         
-        // Randomize style choice (select) - 40% chance for hologram
-        const useHologram = Math.random() < 0.4;
+        // Randomize style choice (select) - 30% chance for hologram
+        const useHologram = Math.random() < 0.3;
         const styles = useHologram ? ['hologram'] : ['default','realistic','vector','anime','impressionistic'];
         const styleSelect = document.getElementById('styleChoice');
         if (styleSelect) {
@@ -1265,32 +1260,24 @@
         const randomizeTypeBtn = document.getElementById('randomizeTypeBtn');
         if (randomizeTypeBtn) {
           randomizeTypeBtn.addEventListener('click', async () => {
-            // Clear the suggestion type field first
-            if (suggestionTypeEl) {
-              suggestionTypeEl.value = '';
-            }
-            hasRandomSelections = false; // Reset the flag
+            // Don't clear the field - we want to append
+            // hasRandomSelections flag stays as is
             
-            // Randomly pick 2 buttons
+            // Randomly pick 1 button to add (append) a type
             const randomButtons = [
               addRandomSciFiBtn,
               addRandomAnimalBtn,
               addRandomRoleBtn
             ].filter(btn => btn && !btn.disabled);
             
-            if (randomButtons.length >= 2) {
-              // Shuffle and pick 2
+            if (randomButtons.length >= 1) {
+              // Shuffle and pick 1
               const shuffled = randomButtons.sort(() => Math.random() - 0.5);
-              const [btn1, btn2] = shuffled.slice(0, 2);
+              const btn1 = shuffled[0];
               
-              // Click first button
+              // Click the button (will append if field already has content)
               if (btn1) {
                 btn1.click();
-                // Wait a bit for first to complete, then click second
-                await new Promise(resolve => setTimeout(resolve, 500));
-                if (btn2) {
-                  btn2.click();
-                }
               }
             }
           });
