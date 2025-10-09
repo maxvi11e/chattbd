@@ -1267,7 +1267,7 @@
             (pending.botName && String(pending.botName).trim()) ||
             (pending.archetypeSpecific && String(pending.archetypeSpecific).trim()) ||
             (pending.archetype && String(pending.archetype).trim()) ||
-            'New Avatar'
+            (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'New Avatar')
           );
           
           console.log('💾 Creating placeholder avatar record...');
