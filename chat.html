@@ -452,7 +452,7 @@ body {
 .chat {
   position:relative;
   padding:10px 22px 32px;
-  max-width:1200px;
+  max-width:1020px;
   margin:0 auto;
   flex:1;
   width:100%;
@@ -570,7 +570,7 @@ body {
 .pane {
   position:relative;
   width:100%;
-  max-width:760px;
+  max-width:720px;
 }
 /* TEMP: slow transitions to inspect animation */
 .scroller {
@@ -629,24 +629,22 @@ body {
   margin-top:20px;
   margin-bottom:10px;
   width:100%;
-  max-width:735.36px;
   margin-left:auto;
   margin-right:auto;
   display:flex;
   align-items:center;
-  gap:11.2px;
   z-index:3;
 }
 .composer {
   flex:1;
-  border:1px solid var(--stroke);
-  border-radius:24.5px;
-  padding:11.2px 14.4px;
+  border:1px solid #d3d3d3;
+  border-radius:999px;
+  padding:8px 16px;
   display:flex;
   align-items:center;
   gap:8px;
   background:rgba(255, 255, 255, .1);
-  min-height:46.4px;
+  min-height:44px;
   max-height:200px;
   overflow-y:auto;
 }
@@ -669,12 +667,16 @@ body {
 }
 .circleBtn.sendBtn {
   background:rgba(255, 255, 255, .1);
+  flex-shrink:0;
+  width:36px;
+  height:36px;
+  margin-right:-7px;
 }
 .circleBtn {
   width:46.4px;
   height:46.4px;
   border-radius:999px;
-  border:1px solid var(--stroke);
+  border:0px solid var(--stroke);
   background:transparent;
   display:grid;
   place-items:center;
@@ -765,6 +767,9 @@ body {
   }
   .ask-question-bar {
     display:none;
+  }
+  .chat {
+    padding:8px 6px 16px;
   }
 }
 </style>
@@ -863,10 +868,10 @@ body {
             <div class="composerWrap">
               <label class="composer">
                 <textarea id="ask" placeholder="Ask anything..." rows="1"></textarea>
+                <button id="send" class="circleBtn sendBtn" title="Send">
+                  <img src="images/send_icon.png" alt="Send" style="width:18px; height:18px;">
+                </button>
               </label>
-              <button id="send" class="circleBtn sendBtn" title="Send">
-                <img src="images/send_icon.png" alt="Send" style="width:24px; height:24px;">
-              </button>
             </div>
           </div>
         </div>
