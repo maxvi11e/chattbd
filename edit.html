@@ -1461,6 +1461,7 @@
     // Display bot information
     function displayBot(bot) {
       try {
+      console.log('🎨 Displaying bot:', bot);
       // Show spinner in frame until the image loads
       botImage.classList.remove('visible');
       botVideo.classList.remove('visible');
@@ -1468,6 +1469,7 @@
       
       // Set bot name, use abstract name if not set
       const botName = bot.name || (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'Agent');
+      console.log('🏷️ Bot name:', botName);
       if (pageTitle) {
         pageTitle.textContent = botName;
         latestNameDraft = botName;
@@ -1489,7 +1491,9 @@
       };
       botImage.src = bot.image_url;
       
+      console.log('🎚️ Populating personality sliders...');
       populatePersonalitySliders(bot.traits);
+      console.log('✅ Bot displayed successfully');
       } catch (error) {
         console.error('❌ Error in displayBot:', error);
         showError('Failed to display agent. Please refresh the page.');
@@ -1538,9 +1542,16 @@
       }
 
       function applySliderColor(slider) {
-        if (!slider) return;
-        const color = sliderValueToColor(slider.value);
-        slider.style.setProperty('--slider-thumb-color', color);
+        if (!slider) {
+          console.warn('⚠️ applySliderColor called with null slider');
+          return;
+        }
+        try {
+          const color = sliderValueToColor(slider.value);
+          slider.style.setProperty('--slider-thumb-color', color);
+        } catch (error) {
+          console.error('❌ Error in applySliderColor:', error);
+        }
       }
 
       personalitySliderKeys.forEach(key => {
@@ -1650,19 +1661,26 @@
 
     function populatePersonalitySliders(traits) {
       if (!personalityPanel) return;
+      console.log('🎚️ populatePersonalitySliders called with traits:', traits);
       const source = extractPersonalityTraits(traits);
+      console.log('📊 Extracted personality traits:', source);
       const sliderState = {};
       personalitySliderKeys.forEach(key => {
         const input = personalitySliderElements[key];
-        if (!input) return;
+        if (!input) {
+          console.warn(`⚠️ Slider element not found for key: ${key}`);
+          return;
+        }
         const storedValue = source ? source[key] : undefined;
         const sliderValue = percentToSlider(storedValue);
         input.value = sliderValue;
+        console.log(`🎚️ Applying color to ${key} slider with value ${sliderValue}`);
         applySliderColor(input);
         sliderState[key] = sliderValue;
       });
       memorizePersonality(sliderState);
       updatePersonalitySaveState();
+      console.log('✅ Personality sliders populated');
     }
 
     function extractPersonalityTraits(traits) {
