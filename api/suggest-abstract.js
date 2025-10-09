@@ -52,9 +52,9 @@ export default async function handler(req, res){
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
 
     const descriptionLines = [
-      'Create an abstract digital avatar artwork in the style of neon line art.',
+      'Create an abstract digital AI assistant using luminous neon lines.',
       'Depict a single stylized figure from chest up, facing forward',
-      'Draw using luminous glowing lines on a pure black background.',
+      'Draw using luminous glowing lines on a black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
       `Line density and spacing: ${fill}.`,
