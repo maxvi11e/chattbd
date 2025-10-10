@@ -2433,14 +2433,14 @@
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
         editForm.classList.remove('visible');
-        actionButtons.style.display = 'none';
+        if (actionButtons) actionButtons.style.display = 'none';
       } else {
         loadingState.classList.add('hidden');
   if (wasEditFormVisible) {
           editForm.classList.add('visible');
         } else {
           editForm.classList.remove('visible');
-          actionButtons.style.display = 'flex';
+          if (actionButtons) actionButtons.style.display = 'flex';
         }
       }
     }
