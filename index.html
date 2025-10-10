@@ -553,6 +553,8 @@ body {
   .avatar-name {
     font-size: 14px;
     margin-top: 4px;
+    max-height:calc(1.4em * 2 + 8px);
+    /* Recalculate for smaller font size */
   }
   /* Avatar menu button adjustments for smaller size */
   .avatar-menu-btn {
@@ -604,6 +606,8 @@ body {
   }
   .avatar-name {
     font-size: 13px;
+    max-height:calc(1.4em * 2 + 8px);
+    /* Recalculate for smaller font size */
   }
   .avatar-menu-btn {
     width: 20px;
@@ -956,14 +960,14 @@ body {
           avatarItem.innerHTML = `
             <div class="avatar-circle" data-avatar-id="${avatar.id}">
               ${avatar.image_url 
-                ? `<img src="${avatar.image_url}" alt="${avatar.nickname || avatar.name}" />`
+                ? `<img src="${avatar.image_url}" alt="${avatar.name}" />`
                 : `<div style="color:#666; text-align:center;">No image</div>`
               }
             </div>
             <div class="avatar-actions">
               <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
             </div>
-            <p class="avatar-name">${avatar.nickname || avatar.name || 'Unnamed Avatar'}</p>
+            <p class="avatar-name">${avatar.name || 'Unnamed Avatar'}</p>
           `;
           
           // Create dropdown menu and append to body (to avoid transform issues)
@@ -973,8 +977,8 @@ body {
           dropdown.innerHTML = `
             <button class="dropdown-item" onclick="openChat('${avatar.id}')">Chat</button>
             <button class="dropdown-item" onclick="editAvatar('${avatar.id}')">Edit</button>
-            <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
-            <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
+            <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.name || '').replace(/'/g, "\\'")}')">Rename</button>
+            <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.name || '').replace(/'/g, "\\'")}')">Delete</button>
           `;
           document.body.appendChild(dropdown);
           
@@ -1370,7 +1374,10 @@ body {
           try {
             const { error } = await supabase
               .from('avatars')
-              .update({ nickname: newName })
+              .update({ 
+                name: newName,
+                updated_at: new Date().toISOString()
+              })
               .eq('id', avatarId);
               
             if (error) throw error;
