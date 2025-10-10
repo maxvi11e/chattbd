@@ -17,7 +17,7 @@
   box-sizing:border-box;
 }
 html,body {
-  height:100%;
+  height:100dvh;
   margin:0;
   padding:0;
 }
@@ -40,6 +40,7 @@ body {
   width:100%;
   max-width:280px;
   gap:0px;
+  margin-top:-60px;
 }
 /* Logo Image! */
 .logo-image {
@@ -95,18 +96,20 @@ body {
   outline: none;
 }
 .auth-btn.primary {
-  background: var(--ink);
-  color: var(--bg);
+  background: #212121;
+  color: #ffffff;
+  border: 1px solid #d3d3d3;
 }
 .auth-btn.primary:hover {
-  background: #e0e0e0;
+  background: #404040;
 }
 .auth-btn.secondary {
-  background: var(--ink);
-  color: var(--bg);
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #d3d3d3;
 }
 .auth-btn.secondary:hover {
-  background: #e0e0e0;
+  background: #333333;
 }
 .auth-btn:disabled {
   opacity: 0.6;
@@ -117,7 +120,7 @@ body {
   text-align: center;
   color: var(--muted);
   font-size: 14px;
-  margin: 20px 0 16px 0;
+  margin: 12px 0 16px 0;
 }
 .google-btn {
   width: 100%;
@@ -149,7 +152,7 @@ body {
 }
 @media (max-width: 480px) {
   .auth-content {
-    max-width: 80%;
+    max-width: 70%;
   }
   /* .logo-image {
     width: 80%;
@@ -171,7 +174,7 @@ body {
       <!-- Logo -->
       <img src="images/logo.png" alt="Aeaea Logo" class="logo-image" /> <!-- Codex test comment -->
 
-      <div class="tagline">Personal AI</div>
+      <div class="tagline">Personal AI Assistants</div>
 
       <!-- Google Sign-In -->
       <div class="auth-section">
@@ -192,7 +195,7 @@ body {
       <div class="auth-section" id="auth-section">
         <input id="auth-email" type="email" class="auth-input" placeholder="Enter your email" />
         <input id="auth-password" type="password" class="auth-input" placeholder="Enter your password" />
-        <button id="auth-btn" class="auth-btn primary">Continue</button>
+        <button id="auth-btn" class="auth-btn primary">Sign in</button>
       </div>
     </div>
   </div>
