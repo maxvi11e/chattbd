@@ -977,6 +977,8 @@ body {
         function showAvatarMenu(clientX, clientY) {
           longPressTriggered = true;
           
+          console.log('Long press at:', clientX, clientY); // Debug log
+          
           // Create a synthetic event with the original touch/click coordinates
           const syntheticEvent = {
             clientX: clientX,
@@ -997,6 +999,7 @@ body {
           
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
+          console.log('Touch start captured:', touchStartX, touchStartY); // Debug log
           touchStartTime = Date.now();
           hasMoved = false;
           longPressTriggered = false;
@@ -1136,17 +1139,16 @@ body {
         
         if (!isShowing) {
           // Position menu at click/touch point
-          const x = event.clientX || event.touches?.[0]?.clientX || 0;
-          const y = event.clientY || event.touches?.[0]?.clientY || 0;
+          // Use clientX/clientY which are already provided in our synthetic event
+          const x = event.clientX;
+          const y = event.clientY;
           
-          // Set initial position
-          menu.style.left = `${x}px`;
-          menu.style.top = `${y}px`;
+          console.log('Menu position:', x, y); // Debug log
           
-          // Show menu to get its dimensions
+          // Show menu first to get its dimensions
           menu.classList.add('show');
           
-          // Adjust position if menu goes off screen
+          // Get menu dimensions
           const rect = menu.getBoundingClientRect();
           const viewportWidth = window.innerWidth;
           const viewportHeight = window.innerHeight;
@@ -1154,14 +1156,14 @@ body {
           let finalX = x;
           let finalY = y;
           
-          // Adjust horizontal position if needed
-          if (rect.right > viewportWidth) {
-            finalX = viewportWidth - rect.width - 10;
+          // Adjust horizontal position if menu would go off right edge
+          if (x + rect.width > viewportWidth) {
+            finalX = Math.max(10, viewportWidth - rect.width - 10);
           }
           
-          // Adjust vertical position if needed
-          if (rect.bottom > viewportHeight) {
-            finalY = viewportHeight - rect.height - 10;
+          // Adjust vertical position if menu would go off bottom edge
+          if (y + rect.height > viewportHeight) {
+            finalY = Math.max(10, viewportHeight - rect.height - 10);
           }
           
           // Ensure menu doesn't go off left edge
