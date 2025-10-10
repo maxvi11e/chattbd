@@ -478,6 +478,18 @@ body {
   -webkit-box-orient:vertical;
   overflow:hidden;
   text-overflow:ellipsis;
+  padding:4px 8px;
+  border-radius:4px;
+  transition:background 0.2s ease;
+}
+.avatar-name[contenteditable="true"] {
+  display:block;
+  -webkit-line-clamp:unset;
+  line-clamp:unset;
+  overflow:visible;
+  background:rgba(255,255,255,0.05);
+  outline:1px solid rgba(255,255,255,0.3);
+  cursor:text;
 }
 /* Empty state */
 .empty-state {
@@ -1188,23 +1200,83 @@ body {
       };
 
       window.renameAvatar = async function(avatarId, currentName) {
-        const newName = prompt('Enter new display name:', currentName);
-        if (!newName || newName === currentName) return;
+        // Close any open menus
+        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
         
-        try {
-          const { error } = await supabase
-            .from('avatars')
-            .update({ nickname: newName })
-            .eq('id', avatarId);
-            
-          if (error) throw error;
-          
-          // Refresh avatars
-          loadAvatars();
-        } catch (error) {
-          console.error('Error renaming avatar:', error);
-          alert('Failed to rename avatar');
+        // Find the avatar name element
+        const avatarItems = document.querySelectorAll('.avatar-item');
+        let targetNameElement = null;
+        
+        for (const item of avatarItems) {
+          const circle = item.querySelector(`[data-avatar-id="${avatarId}"]`);
+          if (circle) {
+            targetNameElement = item.querySelector('.avatar-name');
+            break;
+          }
         }
+        
+        if (!targetNameElement) return;
+        
+        // Make it editable
+        targetNameElement.contentEditable = true;
+        targetNameElement.focus();
+        
+        // Select all text
+        const range = document.createRange();
+        range.selectNodeContents(targetNameElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Store original name for cancel
+        const originalName = targetNameElement.textContent;
+        
+        // Save on blur or Enter
+        const saveRename = async () => {
+          const newName = targetNameElement.textContent.trim();
+          targetNameElement.contentEditable = false;
+          
+          if (!newName || newName === originalName) {
+            targetNameElement.textContent = originalName;
+            return;
+          }
+          
+          try {
+            const { error } = await supabase
+              .from('avatars')
+              .update({ nickname: newName })
+              .eq('id', avatarId);
+              
+            if (error) throw error;
+            
+            targetNameElement.textContent = newName;
+          } catch (error) {
+            console.error('Error renaming avatar:', error);
+            alert('Failed to rename avatar');
+            targetNameElement.textContent = originalName;
+          }
+        };
+        
+        // Cancel on Escape
+        const cancelRename = () => {
+          targetNameElement.contentEditable = false;
+          targetNameElement.textContent = originalName;
+          targetNameElement.removeEventListener('blur', saveRename);
+          targetNameElement.removeEventListener('keydown', handleKeydown);
+        };
+        
+        const handleKeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            targetNameElement.blur();
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelRename();
+          }
+        };
+        
+        targetNameElement.addEventListener('blur', saveRename, { once: true });
+        targetNameElement.addEventListener('keydown', handleKeydown);
       };
 
       window.deleteAvatar = async function(avatarId, name) {
