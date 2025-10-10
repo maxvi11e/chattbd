@@ -322,7 +322,7 @@ body {
   font-style:italic;
   color:#dddddd;
   margin-bottom:12px;
-  padding-left:12px;
+  padding-left:30px;
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
@@ -342,7 +342,8 @@ body {
   position:relative;
   display:flex;
   justify-content:space-between;
-  align-items:center;
+  align-items:flex-start;
+  gap:8px;
 }
 .conversation-item:hover {
   background:rgba(255,255,255,0.1);
@@ -358,7 +359,12 @@ body {
   flex:1;
   overflow:hidden;
   text-overflow:ellipsis;
-  white-space:nowrap;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  line-height:1.4;
+  max-height:calc(1.4em * 2);
 }
 .conversation-actions {
   opacity:0;
@@ -764,15 +770,110 @@ body {
 .hide {
   display:none;
 }
+/* Mobile Top Navigation */
+.mobile-top-nav {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--bg);
+  border-bottom: 1px solid #333;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 1001;
+  gap: 0;
+}
+.mobile-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mobile-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.mobile-nav-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.mobile-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.mobile-avatar-preview {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid #333;
+  transition: border-color 0.2s ease;
+  display: none;
+}
+.mobile-avatar-preview.visible {
+  display: block;
+}
+.mobile-avatar-preview:hover {
+  border-color: #666;
+}
+.mobile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
+  .mobile-top-nav {
+    display: flex;
+  }
   .chat-container {
     height:100dvh;
+    padding-top: 60px;
   }
+  /* Hide sidebar by default on mobile, show as overlay when toggled */
   .sidebar {
-    height:100dvh;
-    max-height:100dvh;
-    min-width:222px;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    z-index: 1002;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  }
+  .sidebar.mobile-visible {
+    display: flex !important;
+  }
+  /* Mobile sidebar backdrop */
+  .mobile-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+  }
+  .mobile-sidebar-backdrop.visible {
+    display: block;
+  }
+  /* Hide sidebar toggle on mobile */
+  .sidebar-toggle {
+    display: none !important;
   }
   .scroller.expanded {
     max-height:600px;
@@ -789,6 +890,7 @@ body {
     padding:8px 2px 0;
     align-items:center;
     gap:8px;
+    margin-top:-26px;
   }
   .sidebar .avatar-section.in-sidebar .avatarFrame {
     width:40px;
@@ -797,21 +899,22 @@ body {
     border-radius:50%;
   }
   .sidebar:not(.collapsed) .avatar-section.in-sidebar .avatarFrame {
-    width:70px;
-    height:70px;
-    border-radius:50%;
-  }
-  /* Increase avatar size by 20% when minimized and sidebar is expanded */
-  .sidebar:not(.collapsed) .avatar-section.in-sidebar.minimized .avatarFrame {
     width:130px;
     height:130px;
+    border-radius:50%;
   }
+  /* Increase avatar size by 20% when minimized and sidebar is expanded - REMOVED, now always minimized */
+  /* .sidebar:not(.collapsed) .avatar-section.in-sidebar.minimized .avatarFrame {
+    width:130px;
+    height:130px;
+  } */
   .sidebar .avatar-section.in-sidebar .minimize-btn {
     left:auto;
     right:2px;
     top:2px;
+    display: none; /* Hide minimize button since avatar is always minimized in sidebar */
   }
-  .sidebar .avatar-section.in-sidebar + .sidebar-nav {
+  .sidebar .avatar-section.in-sidebar + .conversations {
     margin-top:12px;
   }
   .chat {
@@ -822,6 +925,32 @@ body {
 </head>
 
 <body>
+  <!-- Mobile Top Nav (hidden on desktop) -->
+  <div class="mobile-top-nav">
+    <div class="mobile-nav-left">
+      <button class="mobile-nav-btn" id="mobileToggleBtn" title="Menu">
+        <img src="images/toggle_icon.png" alt="Menu" style="width:24px; height:24px;">
+      </button>
+      <button class="mobile-nav-btn" id="mobileNewChatBtn" title="New Chat">
+        <img src="images/new_chat_icon.png" alt="New Chat" style="width:24px; height:24px;">
+      </button>
+    </div>
+    <div class="mobile-avatar-preview" id="mobileAvatarPreview">
+      <img src="images/favicon.png" alt="Avatar" class="mobile-avatar-img" id="mobileAvatarImg">
+    </div>
+    <div class="mobile-nav-right">
+      <button class="mobile-nav-btn" id="mobilePersonalityBtn" title="Personality">
+        <img src="images/sliders_icon.png" alt="Personality" style="width:24px; height:24px;">
+      </button>
+      <button class="mobile-nav-btn" id="mobileLibraryBtn" title="Library">
+        <img src="images/library_icon.png" alt="Library" style="width:24px; height:24px;">
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div class="mobile-sidebar-backdrop" id="mobileSidebarBackdrop"></div>
+
   <div class="chat-container">
     <!-- Sidebar -->
     <div class="sidebar collapsed">
@@ -1001,6 +1130,66 @@ body {
         startNewChat();
       });
 
+      // Mobile nav button handlers
+      const mobileNewChatBtn = document.getElementById('mobileNewChatBtn');
+      const mobileLibraryBtn = document.getElementById('mobileLibraryBtn');
+      const mobilePersonalityBtn = document.getElementById('mobilePersonalityBtn');
+      const mobileToggleBtn = document.getElementById('mobileToggleBtn');
+      const mobileAvatarPreview = document.getElementById('mobileAvatarPreview');
+      const mobileAvatarImg = document.getElementById('mobileAvatarImg');
+      const mobileSidebarBackdrop = document.getElementById('mobileSidebarBackdrop');
+
+      // Update mobile avatar image when avatar loads
+      function updateMobileAvatar() {
+        if (currentAvatar && currentAvatar.image_url) {
+          mobileAvatarImg.src = currentAvatar.image_url;
+        }
+      }
+
+      mobileNewChatBtn?.addEventListener('click', async () => {
+        await saveCurrentConversation();
+        startNewChat();
+      });
+
+      mobileLibraryBtn?.addEventListener('click', () => {
+        window.location.href = 'index.html';
+      });
+
+      mobilePersonalityBtn?.addEventListener('click', () => {
+        if (currentAvatar) {
+          window.location.href = `edit.html?id=${currentAvatar.id}`;
+        }
+      });
+
+      mobileToggleBtn?.addEventListener('click', () => {
+        // Toggle sidebar visibility on mobile
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          const isVisible = sidebar.classList.contains('mobile-visible');
+          if (isVisible) {
+            sidebar.classList.remove('mobile-visible');
+            mobileSidebarBackdrop?.classList.remove('visible');
+          } else {
+            sidebar.classList.add('mobile-visible');
+            sidebar.classList.remove('collapsed');
+            mobileSidebarBackdrop?.classList.add('visible');
+          }
+        }
+      });
+
+      // Close sidebar when backdrop is clicked
+      mobileSidebarBackdrop?.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-visible');
+        mobileSidebarBackdrop.classList.remove('visible');
+      });
+
+      mobileAvatarPreview?.addEventListener('click', () => {
+        // Maximize the avatar when clicked
+        if (isMinimized) {
+          toggleMinimize(); // This will maximize the avatar and hide the mobile preview
+        }
+      });
+
       // Helper function to set toggle position based on screen size
       function setTogglePosition(width) {
         const collapsedWidth = COLLAPSED_SIDEBAR_WIDTH;
@@ -1020,11 +1209,11 @@ body {
         const stored = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
         const isMobile = window.innerWidth <= 768;
         
-        if (Number.isNaN(stored)) return isMobile ? 222 : 300;
+        if (Number.isNaN(stored)) return isMobile ? 280 : 300;
         
-        // On mobile, clamp between 222-400px; on desktop, 200-600px
+        // On mobile, clamp between 280-400px; on desktop, 200-600px
         if (isMobile) {
-          return Math.min(Math.max(stored, 222), 400);
+          return Math.min(Math.max(stored, 280), 400);
         }
         return Math.min(Math.max(stored, 200), 600);
       }
@@ -1570,6 +1759,9 @@ body {
               img.style.objectFit = 'cover';
               img.style.borderRadius = '24px';
               avatar.appendChild(img);
+              
+              // Update mobile avatar preview
+              updateMobileAvatar();
               
               // Add minimize button
               addMinimizeButton();
@@ -2227,12 +2419,18 @@ body {
 
       function moveAvatarToSidebar() {
         if (!avatarSection || !sidebar) return;
-        if (avatarSection.parentNode !== sidebar) {
-          sidebar.insertBefore(avatarSection, sidebar.firstElementChild);
-        } else if (sidebar.firstElementChild !== avatarSection) {
-          sidebar.insertBefore(avatarSection, sidebar.firstElementChild);
+        const sidebarActions = sidebar.querySelector('.sidebar-actions');
+        if (sidebarActions && avatarSection.parentNode !== sidebar) {
+          // Insert after sidebar-actions (after "New Conversation")
+          sidebarActions.parentNode.insertBefore(avatarSection, sidebarActions.nextSibling);
+        } else if (sidebarActions && avatarSection.previousElementSibling !== sidebarActions) {
+          // Move to after sidebar-actions if already in sidebar but wrong position
+          sidebarActions.parentNode.insertBefore(avatarSection, sidebarActions.nextSibling);
         }
         avatarSection.classList.add('in-sidebar');
+        // Always show as minimized in sidebar
+        avatarSection.classList.add('minimized');
+        scroller.classList.add('expanded');
       }
 
       function moveAvatarToColumn() {
@@ -2241,6 +2439,11 @@ body {
           avatarPlaceholder.parentNode.insertBefore(avatarSection, avatarPlaceholder);
         }
         avatarSection.classList.remove('in-sidebar');
+        // Restore the actual minimized state when moving back to column
+        if (!isMinimized) {
+          avatarSection.classList.remove('minimized');
+          scroller.classList.remove('expanded');
+        }
       }
 
       function updateAvatarPlacement() {
@@ -2305,6 +2508,9 @@ body {
           if (isMobileLayout()) {
             scroller.style.maxHeight = '580px';
           }
+          // Show mobile avatar preview when minimized
+          mobileAvatarPreview?.classList.add('visible');
+          
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '+';
             minimizeBtn.title = 'Expand avatar';
@@ -2323,6 +2529,9 @@ body {
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
           scroller.style.maxHeight = '';
+          // Hide mobile avatar preview when maximized
+          mobileAvatarPreview?.classList.remove('visible');
+          
           if (minimizeBtn) {
             minimizeBtn.innerHTML = '−';
             minimizeBtn.title = 'Minimize avatar';
