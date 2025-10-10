@@ -100,8 +100,8 @@ body {
   position:fixed;
   top:12px;
   left:260px;
-  width:32px;
-  height:32px;
+  width:36px;
+  height:36px;
   background:transparent;
   border:none;
   border-radius:8px;
@@ -167,6 +167,10 @@ body {
   height:44px;
   width:auto;
 }
+/* Hide favicon when avatar is minimized and sidebar is expanded */
+.sidebar:not(.collapsed):has(.avatar-section.minimized) .nav-logo {
+  display:none;
+}
 .nav-icon {
   height:24px;
   width:auto;
@@ -214,19 +218,20 @@ body {
 .sidebar.collapsed .sidebar-actions {
   padding:12px 8px;
   align-items:center;
+  margin-top: -10px;
 }
 .sidebar.collapsed .action-btn {
   justify-content:center;
   gap:0;
-  padding:10px 0;
+  padding:8px;
 }
 .sidebar.collapsed .action-btn .action-label {
   display:none;
 }
 .sidebar.collapsed .action-btn img,
 .sidebar.collapsed .action-btn svg {
-  width:20px;
-  height:20px;
+  width:22px;
+  height:22px;
 }
 .sidebar.collapsed .sidebar-bottom {
   padding:12px 8px;
@@ -249,11 +254,11 @@ body {
 }
 .ask-bar-btn {
   background:rgba(255, 255, 255, 0.1);
-  color:#fff;
+  color:#e1e1e1;
   border:0px solid rgba(255, 255, 255, 0.1);
   border-radius:20px;
   padding:6px 14px;
-  font-size:13px;
+  font-size:12px;
   cursor:pointer;
   display:flex;
   align-items:center;
@@ -274,6 +279,10 @@ body {
   flex-direction:column;
   gap:8px;
 }
+/* Move sidebar-actions up when avatar is minimized and sidebar is expanded */
+.sidebar:not(.collapsed):has(.avatar-section.minimized) .sidebar-actions {
+  margin-top:-20px;
+}
 .action-btn {
   display:flex;
   align-items:center;
@@ -293,8 +302,8 @@ body {
   background:rgba(255,255,255,0.1);
 }
 .action-btn img, .action-btn svg {
-  width:16px;
-  height:16px;
+  width:20px;
+  height:20px;
   fill:var(--ink);
 }
 .action-btn .action-label {
@@ -313,7 +322,15 @@ body {
   font-style:italic;
   color:#dddddd;
   margin-bottom:12px;
-  padding-left:32px;
+  padding-left:12px;
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.4;
+  max-height:calc(1.4em * 2);
 }
 .conversation-item {
   padding:12px;
@@ -434,9 +451,17 @@ body {
   display:flex;
   align-items:center;
   justify-content:center;
+  outline:none;
 }
 .sidebar-bottom .logout-btn:hover {
   background:rgba(255,255,255,0.1);
+}
+.sidebar-bottom .logout-btn:focus {
+  outline:none;
+  background:transparent;
+}
+.sidebar.collapsed .logout-btn:focus {
+  background:transparent;
 }
 .sidebar-bottom .logout-btn img {
   width:24px;
@@ -508,17 +533,22 @@ body {
   transform:none;
   border-radius:50%;
 }
+/* Increase avatar size by 20% when minimized and sidebar is expanded */
+.sidebar:not(.collapsed) .avatar-section.minimized .avatarFrame {
+  width:180px;
+  height:180px;
+}
 /* Minimize button */
 .minimize-btn {
   position:absolute;
   top:8px;
-  left:8px;
+  right:36px;
   background:rgba(0,0,0,0.8);
-  border:none;
+  border:1px solid rgba(255,255,255,0.3);
   color:var(--ink);
   cursor:pointer;
   padding:6px;
-  border-radius:6px;
+  border-radius:50%;
   font-size:12px;
   opacity:1;
   transition:all 0.3s ease;
@@ -539,11 +569,11 @@ body {
   top:8px;
   right:8px;
   background:rgba(0,0,0,0.8);
-  border:none;
+  border:1px solid rgba(255,255,255,0.3);
   color:var(--ink);
   cursor:pointer;
   padding:6px;
-  border-radius:6px;
+  border-radius:50%;
   font-size:12px;
   opacity:1;
   transition:all 0.3s ease;
@@ -560,7 +590,6 @@ body {
 }
 /* Maximize/expand button position (when avatar is minimized) */
 .avatar-section.minimized .minimize-btn {
-  left:auto;
   right:8px;
 }
 /* Hide edit button when avatar is minimized */
@@ -643,7 +672,7 @@ body {
   display:flex;
   align-items:center;
   gap:8px;
-  background:rgba(255, 255, 255, .1);
+  background:#0a0a0a;
   min-height:44px;
   max-height:200px;
   overflow-y:auto;
@@ -729,13 +758,14 @@ body {
   .sidebar {
     height:100dvh;
     max-height:100dvh;
+    min-width:222px;
   }
   .scroller.expanded {
     max-height:600px;
   }
   /* Sidebar toggle positioning for mobile */
   .sidebar-toggle {
-    left:200px;
+    left:222px;
   }
   /* Just inside the right edge of 300px sidebar */
   .sidebar.collapsed + .main-chat .sidebar-toggle {
@@ -757,6 +787,11 @@ body {
     height:70px;
     border-radius:50%;
   }
+  /* Increase avatar size by 20% when minimized and sidebar is expanded */
+  .sidebar:not(.collapsed) .avatar-section.in-sidebar.minimized .avatarFrame {
+    width:130px;
+    height:130px;
+  }
   .sidebar .avatar-section.in-sidebar .minimize-btn {
     left:auto;
     right:2px;
@@ -764,9 +799,6 @@ body {
   }
   .sidebar .avatar-section.in-sidebar + .sidebar-nav {
     margin-top:12px;
-  }
-  .ask-question-bar {
-    display:none;
   }
   .chat {
     padding:8px 8px 16px;
@@ -805,11 +837,7 @@ body {
         </a>
         <button id="newChatBtn" class="action-btn">
           <img src="images/new_chat_icon.png" alt="New Chat">
-          <span class="action-label">New Chat</span>
-        </button>
-        <button id="searchBtn" class="action-btn">
-          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          <span class="action-label">Search</span>
+          <span class="action-label">New Conversation</span>
         </button>
       </div>
       
@@ -940,7 +968,6 @@ body {
       const send = document.getElementById('send');
       const logoutBtn = document.getElementById('logoutBtn');
       const newChatBtn = document.getElementById('newChatBtn');
-      const searchBtn = document.getElementById('searchBtn');
       const conversationsList = document.getElementById('conversationsList');
       const sidebar = document.querySelector('.sidebar');
       const sidebarToggle = document.getElementById('sidebarToggle');
@@ -964,14 +991,6 @@ body {
         startNewChat();
       });
 
-      // Search handler - simple search through conversations
-      searchBtn.addEventListener('click', () => {
-        const searchTerm = prompt('Search conversations:');
-        if (!searchTerm || !searchTerm.trim()) return;
-        
-        performSearch(searchTerm.trim().toLowerCase());
-      });
-
       // Helper function to set toggle position based on screen size
       function setTogglePosition(width) {
         const collapsedWidth = COLLAPSED_SIDEBAR_WIDTH;
@@ -989,7 +1008,14 @@ body {
 
       function getSavedSidebarWidth() {
         const stored = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
-        if (Number.isNaN(stored)) return 300;
+        const isMobile = window.innerWidth <= 768;
+        
+        if (Number.isNaN(stored)) return isMobile ? 222 : 300;
+        
+        // On mobile, clamp between 222-400px; on desktop, 200-600px
+        if (isMobile) {
+          return Math.min(Math.max(stored, 222), 400);
+        }
         return Math.min(Math.max(stored, 200), 600);
       }
 
@@ -1123,44 +1149,6 @@ body {
       });
 
       // Simple search function
-      function performSearch(searchTerm) {
-        const filteredConversations = allConversations.filter(conv => {
-          // Search in conversation titles
-          const titleMatch = conv.title.toLowerCase().includes(searchTerm);
-          return titleMatch;
-        });
-        
-        if (filteredConversations.length === 0) {
-          alert(`No conversations found containing "${searchTerm}"`);
-          return;
-        }
-        
-        // Display filtered results
-        displayConversations(filteredConversations);
-        
-        // Add a way to clear search and show all conversations
-        if (!document.getElementById('clearSearchBtn')) {
-          const clearBtn = document.createElement('button');
-          clearBtn.id = 'clearSearchBtn';
-          clearBtn.className = 'action-btn';
-          clearBtn.innerHTML = `
-            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            Clear Search
-          `;
-          clearBtn.addEventListener('click', () => {
-            displayConversations(allConversations);
-            clearBtn.remove();
-            conversationsHeader.textContent = currentAvatar ? `Chats with ${currentAvatar.nickname || currentAvatar.name}` : 'Chats';
-          });
-          
-          // Add clear button after search button
-          searchBtn.parentNode.insertBefore(clearBtn, searchBtn.nextSibling);
-          
-          // Update header to show search results
-          conversationsHeader.textContent = `Search: "${searchTerm}" (${filteredConversations.length} results)`;
-        }
-      }
-
       // Watch auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
@@ -1273,6 +1261,14 @@ body {
             convo.push({ role: message.role, content: message.text });
             add(message.role === 'user' ? 'from-me' : 'from-bot', message.text);
           });
+          
+          // Hide ask question bar if there are messages (existing conversation)
+          if (messages && messages.length > 0) {
+            hideAskQuestionBar();
+          } else {
+            // Show bar if it's an empty conversation
+            showAskQuestionBar();
+          }
 
           // Update active conversation in sidebar
           displayConversations(allConversations);
@@ -1377,6 +1373,9 @@ body {
         convo.length = 0;
         log.innerHTML = '';
         currentConversationId = null;
+        
+        // Show the ask question bar for new conversation
+        showAskQuestionBar();
         
         // Remove active state from all conversations
         displayConversations(allConversations);
@@ -1666,9 +1665,25 @@ body {
       });
       send.addEventListener('click', doSend);
 
+      // Function to hide the ask question bar after first interaction
+      const askQuestionBar = document.getElementById('askQuestionBar');
+      function hideAskQuestionBar() {
+        if (askQuestionBar) {
+          askQuestionBar.style.display = 'none';
+        }
+      }
+      
+      // Function to show the ask question bar for new conversations
+      function showAskQuestionBar() {
+        if (askQuestionBar) {
+          askQuestionBar.style.display = 'flex';
+        }
+      }
+
       // Ask Question (personality-aware) button logic
       const askQuestionBtn = document.getElementById('askQuestionBtn');
       askQuestionBtn?.addEventListener('click', async ()=>{
+        hideAskQuestionBar(); // Hide bar when button is clicked
         if(!currentAvatar){ return; }
         try {
           const cleanTrailing = (s)=>{
@@ -1757,6 +1772,7 @@ body {
 
       const discussTopicBtn = document.getElementById('discussTopicBtn');
       discussTopicBtn?.addEventListener('click', async ()=>{
+        hideAskQuestionBar(); // Hide bar when button is clicked
         if(!currentAvatar) return;
         try {
           const traits = currentAvatar?.traits || {};
@@ -1835,6 +1851,7 @@ body {
 
       const learnSubjectBtn = document.getElementById('learnSubjectBtn');
       learnSubjectBtn?.addEventListener('click', async ()=>{
+        hideAskQuestionBar(); // Hide bar when button is clicked
         if(!currentAvatar) return;
         try {
           const traits = currentAvatar?.traits || {};
@@ -1963,6 +1980,8 @@ body {
       async function doSend(){
         const t = ask.value.trim(); 
         if(!t) return;
+        
+        hideAskQuestionBar(); // Hide bar when user sends a message
         
         ask.value=''; 
         ask.style.height = 'auto'; // Reset height after sending

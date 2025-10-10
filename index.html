@@ -499,9 +499,14 @@ body {
   display:none;
 }
 @media (max-width: 768px) {
+  /* Sidebar width on mobile */
+  .sidebar {
+    width:222px;
+    min-width:222px;
+  }
   /* Sidebar toggle positioning for mobile */
   .sidebar-toggle {
-    left:200px;
+    left:350px;
   }
   .sidebar.collapsed .sidebar-toggle {
     left:6px !important;
@@ -813,8 +818,15 @@ body {
         const collapsedWidth = COLLAPSED_SIDEBAR_WIDTH;
         const effectiveWidth = Math.max(width || 0, sidebar.classList.contains('collapsed') ? collapsedWidth : 0);
         const isMobile = window.innerWidth <= 768;
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        
         if (isMobile) {
-          sidebarToggle.style.left = `${collapsedWidth}px`;
+          if (isCollapsed) {
+            sidebarToggle.style.left = `${collapsedWidth}px`;
+          } else {
+            // Position at the right edge of expanded sidebar on mobile (222px width)
+            sidebarToggle.style.left = `182px`;
+          }
         } else {
           const offset = Math.max(effectiveWidth - 40, collapsedWidth);
           sidebarToggle.style.left = `${offset}px`;
@@ -826,6 +838,13 @@ body {
 
       function getSavedSidebarWidth() {
         const stored = parseInt(localStorage.getItem(SIDEBAR_WIDTH_KEY) || '', 10);
+        const isMobile = window.innerWidth <= 768;
+        
+        // On mobile, always use 222px
+        if (isMobile) {
+          return 222;
+        }
+        
         return Number.isFinite(stored) ? stored : 300;
       }
 
