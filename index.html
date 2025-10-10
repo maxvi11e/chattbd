@@ -947,14 +947,20 @@ body {
             </div>
             <div class="avatar-actions">
               <button class="avatar-menu-btn" onclick="toggleAvatarMenu(event, '${avatar.id}')">⋯</button>
-              <div id="menu-${avatar.id}" class="dropdown">
-                <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
-                <button class="dropdown-item" onclick="editAvatar('${avatar.id}')">Edit</button>
-                <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
-              </div>
             </div>
             <p class="avatar-name">${avatar.nickname || avatar.name || 'Unnamed Avatar'}</p>
           `;
+          
+          // Create dropdown menu and append to body (to avoid transform issues)
+          const dropdown = document.createElement('div');
+          dropdown.id = `menu-${avatar.id}`;
+          dropdown.className = 'dropdown';
+          dropdown.innerHTML = `
+            <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
+            <button class="dropdown-item" onclick="editAvatar('${avatar.id}')">Edit</button>
+            <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
+          `;
+          document.body.appendChild(dropdown);
           
           // Add touch/click handlers for better mobile UX
           const avatarCircle = avatarItem.querySelector('.avatar-circle');
