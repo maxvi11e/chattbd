@@ -1623,7 +1623,7 @@
       if (confirmChatBtn) {
         confirmChatBtn.addEventListener('click', () => {
           if (currentBot?.id) {
-            window.location.href = `chat.html?id=${currentBot.id}`;
+            window.location.href = `chat.html?avatar=${currentBot.id}`;
           } else {
             console.error('No current bot ID available');
             showError('Please wait for the bot to load before chatting.');
