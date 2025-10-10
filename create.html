@@ -97,10 +97,22 @@
     @media (max-width: 600px) {
       .tab-nav{gap:4px; padding:3px; max-width:98%;}
       .tab-btn{padding:8px 16px; font-size:13px;}
+      .tab-btn.active{margin:-4px 0; padding:12px 16px;}
+      .tab-btn:hover{margin:-4px 0; padding:12px 16px;}
+      .tab-btn:first-child.active{margin-left:-4px; padding-left:20px;}
+      .tab-btn:first-child:hover{margin-left:-4px; padding-left:20px;}
+      .tab-btn:last-child.active{margin-right:-4px; padding-right:20px;}
+      .tab-btn:last-child:hover{margin-right:-4px; padding-right:20px;}
     }
     @media (max-width: 450px) {
       .tab-nav{gap:3px; padding:2px;}
       .tab-btn{padding:8px 12px; font-size:12px;}
+      .tab-btn.active{margin:-3px 0; padding:11px 12px;}
+      .tab-btn:hover{margin:-3px 0; padding:11px 12px;}
+      .tab-btn:first-child.active{margin-left:-3px; padding-left:15px;}
+      .tab-btn:first-child:hover{margin-left:-3px; padding-left:15px;}
+      .tab-btn:last-child.active{margin-right:-3px; padding-right:15px;}
+      .tab-btn:last-child:hover{margin-right:-3px; padding-right:15px;}
     }
 
     /* Create Form */
@@ -315,7 +327,7 @@
       display: flex;
       gap: 8px;
       align-items: center;
-      margin-top: -15px;
+      margin-top: 2px;
       justify-content: center;
       flex-wrap: wrap;
     }
@@ -424,13 +436,19 @@
                 <button id="undoTypeBtn" title="Undo last type" style="width:46px !important; height:46px; padding:8px !important; border:1px solid #d3d3d3; background:rgba(255,255,255,0.1); border-radius:50%; cursor:pointer; display:none; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
                   <img src="images/undo_icon.png" alt="Undo" style="width:100%; height:100%; display:block;">
                 </button>
-                <textarea id="suggestionType" placeholder="Enter your own or use suggestions below" rows="1" style="flex:1; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
+                <textarea id="suggestionType" placeholder="Enter your own or use buttons ↓" rows="1" style="flex:1; background:transparent; border:1px solid #d3d3d3; color:#cfcfcf; border-radius:24.5px; padding:11px 14px; font-size:16px; line-height:1.35; height:auto; min-height:46px; box-sizing:border-box; resize:none; overflow:hidden; font-family: Arial, Helvetica, sans-serif;"></textarea>
                 <button id="randomizeTypeBtn" title="Randomize appearance" style="width:46px !important; height:46px; padding:10px !important; border:1px solid #d3d3d3; background:#000000; border-radius:50%; cursor:pointer; flex-shrink:0; transition:all 0.2s ease;" onmouseover="this.style.background='#1a1a1a'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000000'; this.style.transform='scale(1)'">
                   <img src="images/dice_icon.png" alt="Randomize" style="width:100%; height:100%; display:block;">
                 </button>
               </div>
             </div>
 
+            <!-- Random suggestion buttons -->
+            <div id="randomSuggestionBtns">
+              <button id="addRandomRoleBtn">+ Role</button>              
+              <button id="addRandomSciFiBtn">+ Sci-Fi</button>
+              <button id="addRandomAnimalBtn">+ Animal</button>
+            </div>
             <!-- Suggest from personality checkbox -->
             <div style="display:flex; justify-content:center; margin-top:0px; margin-bottom:12px; padding-left:4px;">
               <label style="display:flex; align-items:center; gap:8px; cursor:pointer; color:#ffffff; font-size:12px;">
@@ -438,14 +456,6 @@
                 <span>Base Suggestions on Personality</span>
               </label>
             </div>
-
-            <!-- Random suggestion buttons -->
-            <div id="randomSuggestionBtns">
-              <button id="addRandomSciFiBtn">+ Sci-Fi</button>
-              <button id="addRandomAnimalBtn">+ Animal</button>
-              <button id="addRandomRoleBtn">+ Role</button>
-            </div>
-            
             <!-- Navigation Button for Appearance Tab -->
             <div style="width:100%; display:flex; justify-content:center; margin-top:20px; padding-bottom:6px;">
               <button id="goToArtOptionsBtn" style="display:flex; width:46px; height:46px; padding:10px; border:1px solid #d3d3d3; background:#000000; border-radius:50%; cursor:pointer; justify-content:center; align-items:center; transition:all 0.2s ease;" onmouseover="this.style.background='#1a1a1a'; this.style.transform='scale(1.05)'" onmouseout="this.style.background='#000000'; this.style.transform='scale(1)'">
@@ -1006,6 +1016,8 @@
         function autosizeSuggestionType(){
           if (!suggestionTypeEl) return;
           suggestionTypeEl.style.height = 'auto';
+          // Force reflow by accessing offsetHeight before reading scrollHeight
+          void suggestionTypeEl.offsetHeight;
           suggestionTypeEl.style.height = suggestionTypeEl.scrollHeight + 'px';
         }
 
