@@ -464,6 +464,12 @@ body {
   font-weight:400;
   text-align:center;
   margin:0;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 /* Empty state */
 .empty-state {
@@ -502,15 +508,15 @@ body {
     max-width: none;
   }
   .avatar-circle {
-    width: 120px;
-    /* Increased from 100px */
-    height: 120px;
+    width: 130px;
+    /* Increased from 120px for better mobile visibility */
+    height: 130px;
     margin-bottom: 8px;
   }
   /* Create New: match standard avatar size on tablet */
   .avatar-circle.create-new {
-    width:120px;
-    height:120px;
+    width:130px;
+    height:130px;
     margin-bottom:8px;
   }
   .create-plus img {
@@ -557,14 +563,14 @@ body {
     padding: 0 12px;
   }
   .avatar-circle {
-    width: 110px;
-    /* Even smaller for very small screens */
-    height: 110px;
+    width: 130px;
+    /* Consistent size across mobile breakpoints */
+    height: 130px;
   }
   /* Create New: match standard avatar size on small phones */
   .avatar-circle.create-new {
-    width:110px;
-    height:110px;
+    width:130px;
+    height:130px;
   }
   .create-plus img {
     width:55px;
@@ -956,9 +962,16 @@ body {
         let touchStartY = 0;
         let touchStartTime = 0;
         let hasMoved = false;
+        let longPressTimer = null;
         
         // Handle taps on avatar item (but not avatar-circle) for menu
         function handleAvatarItemTouch(e) {
+          // Clear long press timer
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+          
           // Don't handle if tapping directly on menu button, dropdown, or avatar-circle
           if (e.target.closest('.avatar-menu-btn') || 
               e.target.closest('.dropdown') || 
@@ -983,6 +996,12 @@ body {
 
         // Handle taps on avatar-circle for immediate chat entry
         function handleAvatarCircleTouch(e) {
+          // Clear long press timer
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+          
           const touchDuration = Date.now() - touchStartTime;
           
           // Only proceed if it was a quick tap without movement
@@ -992,12 +1011,53 @@ body {
           }
         }
         
+        // Show avatar menu on long press
+        function showAvatarMenu(e) {
+          e.preventDefault();
+          const menuBtn = avatarItem.querySelector('.avatar-menu-btn');
+          if (menuBtn) {
+            // Simulate click on menu button
+            menuBtn.click();
+          }
+        }
+        
         // Track touch start position and time for the entire avatar item
         avatarItem.addEventListener('touchstart', (e) => {
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
           touchStartTime = Date.now();
           hasMoved = false;
+          
+          // Start long press timer (500ms)
+          longPressTimer = setTimeout(() => {
+            if (!hasMoved) {
+              showAvatarMenu(e);
+            }
+          }, 500);
+        });
+        
+        // Mouse down for desktop long press
+        avatarItem.addEventListener('mousedown', (e) => {
+          // Only handle if not a touch device
+          if ('ontouchstart' in window) return;
+          
+          touchStartTime = Date.now();
+          hasMoved = false;
+          
+          // Start long press timer (500ms)
+          longPressTimer = setTimeout(() => {
+            if (!hasMoved) {
+              showAvatarMenu(e);
+            }
+          }, 500);
+        });
+        
+        // Clear long press on mouse up
+        avatarItem.addEventListener('mouseup', (e) => {
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
         });
         
         // Track if user is moving/scrolling
@@ -1008,6 +1068,21 @@ body {
           // If moved more than 10px in any direction, consider it a scroll/drag
           if (deltaX > 10 || deltaY > 10) {
             hasMoved = true;
+            // Clear long press timer on movement
+            if (longPressTimer) {
+              clearTimeout(longPressTimer);
+              longPressTimer = null;
+            }
+          }
+        });
+        
+        // Track mouse movement for desktop
+        avatarItem.addEventListener('mousemove', (e) => {
+          hasMoved = true;
+          // Clear long press timer on movement
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
           }
         });
         
