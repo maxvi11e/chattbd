@@ -342,6 +342,9 @@
     margin-bottom:0px;
     transition:gap 0.35s ease;
     flex-wrap:nowrap;
+    max-width:fit-content;
+    margin-left:auto;
+    margin-right:auto;
   }
   .bot-preview-main {
     display:flex;
@@ -350,7 +353,6 @@
     transition:transform 0.35s ease;
   }
   .bot-preview.personality-visible .bot-preview-main {
-    transform:translateX(-24px);
   }
   .bot-frame {
     width:400px;
@@ -465,15 +467,20 @@
     gap:12px;
     width:320px;
     max-width:360px;
-    margin:0;
+    margin:0 0 0 0px;
     padding:20px 18px;
     border:1px solid rgba(255,255,255,0.14);
     border-radius:var(--radius-md);
     background:rgba(255,255,255,0.04);
     flex-shrink:0;
+    opacity:0;
+    transform:translateX(-40px);
+    transition:opacity 0.35s ease, transform 0.35s ease;
   }
   .personality-panel.visible {
     display:flex;
+    opacity:1;
+    transform:translateX(0);
   }
   .personality-panel .field-heading {
     max-width:100%;
@@ -709,7 +716,7 @@
     align-items:center;
     justify-content:space-between;
     padding:20px;
-    border-bottom:1px solid #333;
+    border-bottom:0px solid #333;
   }
   .history-header h3 {
     margin:0;
@@ -827,17 +834,23 @@
     transform:scale(1.05);
   }
   
-  .chat-btn-top {
-    left:8px;
-    right:auto;
-  }
-  
   .personality-toggle-btn-top {
     top:60px;
   }
   
   .edit-appearance-btn-top {
     top:112px;
+  }
+  
+  .confirm-chat-btn {
+    top:auto;
+    bottom:8px;
+    right:8px;
+  }
+  
+  .confirm-chat-btn:hover {
+    background:rgba(0,0,0,0.5);
+    transform:scale(1.05);
   }
   
   @media (max-width: 1024px) {
@@ -978,7 +991,7 @@
       <div class="screen dashboard">
         <!-- Page Title -->
         <div class="page-header">
-          <h1 id="pageTitle" class="page-title">Loading...</h1>
+          <h1 id="pageTitle" class="page-title">...</h1>
           <button id="editNameBtn" class="icon-btn" title="Edit name" aria-label="Edit AI name">
             <img src="images/rename_pencil_icon.png" alt="Edit" />
           </button>
@@ -1001,10 +1014,6 @@
             </div>
             <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
             <video id="botVideo" src="" class="bot-image" loop muted playsinline style="display: none;"></video>
-            <!-- Chat Button -->
-            <button id="chatBtnTop" class="history-toggle-btn chat-btn-top" title="Chat with AI">
-              <img src="images/chat_icon.png" alt="Chat" />
-            </button>
             <!-- History Toggle Button -->
             <button id="historyToggleBtn" class="history-toggle-btn" title="View Edit History">
               <img src="images/history_icon.png" alt="History" />
@@ -1016,6 +1025,10 @@
             <!-- Edit Appearance Button -->
             <button id="editAppearanceBtnTop" class="history-toggle-btn edit-appearance-btn-top" title="Edit Appearance">
               <img src="images/edit_image_icon.png" alt="Edit Appearance" />
+            </button>
+            <!-- Confirm and Chat Button -->
+            <button id="confirmChatBtn" class="history-toggle-btn confirm-chat-btn" title="Confirm & Chat">
+              <img src="images/next_icon.png" alt="Confirm & Chat" />
             </button>
           </div>
         </div>
@@ -1605,10 +1618,10 @@
         historyToggleBtn.addEventListener('click', toggleHistoryPanel);
       }
 
-      // Chat button (top)
-      const chatBtnTop = document.getElementById('chatBtnTop');
-      if (chatBtnTop) {
-        chatBtnTop.addEventListener('click', () => {
+      // Confirm and Chat button
+      const confirmChatBtn = document.getElementById('confirmChatBtn');
+      if (confirmChatBtn) {
+        confirmChatBtn.addEventListener('click', () => {
           if (currentBot?.id) {
             window.location.href = `chat.html?id=${currentBot.id}`;
           }
@@ -1639,6 +1652,19 @@
         });
       }
 
+      // Close history panel when clicking outside
+      document.addEventListener('click', (e) => {
+        const historyPanel = document.getElementById('historyPanel');
+        const historyToggleBtn = document.getElementById('historyToggleBtn');
+        
+        if (historyPanel && historyPanel.classList.contains('visible')) {
+          // Check if click is outside history panel and not on the toggle button
+          if (!historyPanel.contains(e.target) && !historyToggleBtn.contains(e.target)) {
+            historyPanel.classList.remove('visible');
+          }
+        }
+      });
+
       // Auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
@@ -1657,12 +1683,39 @@
       updatePersonalitySaveState();
     }
 
+    // Close all panels except the specified one
+    function closeAllPanelsExcept(panelToKeep) {
+      const historyPanel = document.getElementById('historyPanel');
+      
+      if (panelToKeep !== 'personality') {
+        if (personalityPanel) {
+          setPersonalityPanelVisibility(false);
+        }
+      }
+      
+      if (panelToKeep !== 'history') {
+        if (historyPanel) {
+          historyPanel.classList.remove('visible');
+        }
+      }
+      
+      if (panelToKeep !== 'edit') {
+        if (editForm) {
+          hideEditForm();
+        }
+      }
+    }
+
     function togglePersonalityPanel() {
       if (!personalityPanel) return;
       const shouldShow = !personalityPanel.classList.contains('visible');
-      setPersonalityPanelVisibility(shouldShow);
+      
       if (shouldShow) {
+        closeAllPanelsExcept('personality');
+        setPersonalityPanelVisibility(true);
         populatePersonalitySliders(currentBot?.traits);
+      } else {
+        setPersonalityPanelVisibility(false);
       }
     }
 
@@ -2032,15 +2085,16 @@
 
     // Show edit form
     function showEditForm() {
+      closeAllPanelsExcept('edit');
       editForm.classList.add('visible');
-      actionButtons.style.display = 'none';
+      if (actionButtons) actionButtons.style.display = 'none';
       editPrompt.focus();
     }
 
     // Hide edit form
     function hideEditForm() {
       editForm.classList.remove('visible');
-      actionButtons.style.display = 'flex';
+      if (actionButtons) actionButtons.style.display = 'flex';
       editPrompt.value = '';
     }
 
@@ -2586,11 +2640,14 @@
     // Toggle history panel
     function toggleHistoryPanel() {
       const historyPanel = document.getElementById('historyPanel');
-      historyPanel.classList.toggle('visible');
+      const shouldShow = !historyPanel.classList.contains('visible');
       
-      // Load history when opening
-      if (historyPanel.classList.contains('visible')) {
+      if (shouldShow) {
+        closeAllPanelsExcept('history');
+        historyPanel.classList.add('visible');
         loadHistory();
+      } else {
+        historyPanel.classList.remove('visible');
       }
     }
 
