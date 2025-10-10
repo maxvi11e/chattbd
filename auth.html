@@ -51,7 +51,7 @@ body {
   font-size: 22px;
   color: var(--ink);
   margin: 0 0 30px;
-  text-align: center;
+  text-align: left;
   font-weight: 400;
 }
 /* Form Sections */
@@ -60,30 +60,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-.section-divider {
-  text-align: center;
-  color: var(--ink);
-  font-size: 16px;
-  margin: 10px 0 20px 0;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-.section-divider:hover {
-  opacity: 0.8;
-}
-/* Collapsible signup section */
-.signup-section {
-  overflow: hidden;
-  transition: max-height 0.3s ease, opacity 0.3s ease;
-}
-.signup-section.collapsed {
-  max-height: 0;
-  opacity: 0;
-}
-.signup-section.expanded {
-  max-height: 300px;
-  opacity: 1;
 }
 /* Input Styling */
 .auth-input {
@@ -142,22 +118,6 @@ body {
   color: var(--muted);
   font-size: 14px;
   margin: 20px 0 16px 0;
-  position: relative;
-}
-.oauth-divider::before,
-.oauth-divider::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 40%;
-  height: 1px;
-  background: var(--input-border);
-}
-.oauth-divider::before {
-  left: 0;
-}
-.oauth-divider::after {
-  right: 0;
 }
 .google-btn {
   width: 100%;
@@ -211,7 +171,7 @@ body {
       <!-- Logo -->
       <img src="images/logo.png" alt="Aeaea Logo" class="logo-image" /> <!-- Codex test comment -->
 
-      <div class="tagline">Personal AI Agents</div>
+      <div class="tagline">Personal AI</div>
 
       <!-- Google Sign-In -->
       <div class="auth-section">
@@ -228,22 +188,11 @@ body {
 
       <div class="oauth-divider">or</div>
 
-      <!-- Sign In Section -->
-      <div class="auth-section" id="signin-section">
-        <input id="signin-email" type="email" class="auth-input" placeholder="Enter your email" />
-        <input id="signin-password" type="password" class="auth-input" placeholder="Enter your password" />
-        <button id="signin-btn" class="auth-btn primary">Sign In</button>
-      </div>
-      
-      <!-- Divider -->
-      <div class="section-divider" id="toggle-signup">Don't have an account?</div>
-      
-      <!-- Create Account Section -->
-      <div class="auth-section signup-section collapsed" id="signup-section">
-        <input id="signup-username" type="text" class="auth-input" placeholder="Create your username" />
-        <input id="signup-email" type="email" class="auth-input" placeholder="Enter your email" />
-        <input id="signup-password" type="password" class="auth-input" placeholder="Create a password" />
-        <button id="signup-btn" class="auth-btn secondary">Create new account</button>
+      <!-- Email/Password Section -->
+      <div class="auth-section" id="auth-section">
+        <input id="auth-email" type="email" class="auth-input" placeholder="Enter your email" />
+        <input id="auth-password" type="password" class="auth-input" placeholder="Enter your password" />
+        <button id="auth-btn" class="auth-btn primary">Continue</button>
       </div>
     </div>
   </div>
@@ -256,9 +205,6 @@ body {
     const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-    // Flag to prevent automatic redirect during signup
-    let isSigningUp = false;
 
     // Check if already authenticated
     async function checkExistingAuth() {
@@ -273,16 +219,10 @@ body {
     checkExistingAuth();
 
     // Get form elements
-    const signinEmailInput = document.getElementById("signin-email");
-    const signinPasswordInput = document.getElementById("signin-password");
-    const signupUsernameInput = document.getElementById("signup-username");
-    const signupEmailInput = document.getElementById("signup-email");
-    const signupPasswordInput = document.getElementById("signup-password");
-    const signinBtn = document.getElementById("signin-btn");
-    const signupBtn = document.getElementById("signup-btn");
+    const authEmailInput = document.getElementById("auth-email");
+    const authPasswordInput = document.getElementById("auth-password");
+    const authBtn = document.getElementById("auth-btn");
     const googleSigninBtn = document.getElementById("google-signin-btn");
-    const toggleSignup = document.getElementById("toggle-signup");
-    const signupSection = document.getElementById("signup-section");
 
     // Google Sign-In handler
     googleSigninBtn.addEventListener("click", async () => {
@@ -318,74 +258,13 @@ body {
       }
     });
 
-    // Toggle signup section
-    const signinSection = document.getElementById("signin-section");
-    
-    toggleSignup.addEventListener("click", () => {
-      if (signupSection.classList.contains("collapsed")) {
-        // Show signup, hide signin
-        signupSection.classList.remove("collapsed");
-        signupSection.classList.add("expanded");
-        signinSection.style.display = "none";
-        toggleSignup.textContent = "Already have an account?";
-      } else {
-        // Show signin, hide signup
-        signupSection.classList.remove("expanded");
-        signupSection.classList.add("collapsed");
-        signinSection.style.display = "flex";
-        toggleSignup.textContent = "Don't have an account?";
-      }
-    });
-
-    // Sign in handler
-    signinBtn.addEventListener("click", async () => {
-      const email = signinEmailInput.value.trim();
-      const password = signinPasswordInput.value;
+    // Unified auth handler (sign in or sign up)
+    authBtn.addEventListener("click", async () => {
+      const email = authEmailInput.value.trim();
+      const password = authPasswordInput.value;
       
       if (!email || !password) {
         alert('Please enter both email and password');
-        return;
-      }
-
-      try {
-        signinBtn.textContent = 'Signing in...';
-        signinBtn.disabled = true;
-
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        console.log('Successfully signed in as:', data.user.email);
-        // Redirect to main app
-        window.location.href = 'index.html';
-        
-      } catch (error) {
-        console.error('Error signing in:', error.message);
-        if (error.message.includes('Invalid login credentials')) {
-          alert('Incorrect email or password. Please try again.');
-        } else {
-          alert(error.message);
-        }
-      } finally {
-        signinBtn.textContent = 'Sign In';
-        signinBtn.disabled = false;
-      }
-    });
-
-    // Sign up handler
-    signupBtn.addEventListener("click", async () => {
-      console.log('Signup button clicked!');
-      const username = signupUsernameInput.value.trim();
-      const email = signupEmailInput.value.trim();
-      const password = signupPasswordInput.value;
-      
-      console.log('Signup form values - Username:', username, 'Email:', email, 'Password length:', password.length);
-      
-      if (!username || !email || !password) {
-        alert('Please fill in all fields');
         return;
       }
 
@@ -395,123 +274,100 @@ body {
       }
 
       try {
-        isSigningUp = true;
-        signupBtn.textContent = 'Creating account...';
-        signupBtn.disabled = true;
+        authBtn.textContent = 'Signing in...';
+        authBtn.disabled = true;
 
-        console.log('Starting sign up process for:', email);
-        console.log('Username for signup:', username);
-        
-        // Sign out if there's an existing session
-        await supabase.auth.signOut();
-
-        // Create auth user with auto-confirm
-        console.log('About to call supabase.auth.signUp with username:', username);
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { 
-              confirmed: true,
-              display_name: username
-            },
-            emailRedirectTo: window.location.origin
-          }
-        });
-
-        if (error) {
-          console.error('Sign up error:', error);
-          throw error;
-        }
-        
-        console.log('Sign up response data:', data);
-
-        console.log('Sign up successful, attempting immediate sign in');
-
-        // Immediately sign in
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        // First, try to sign in
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
           email,
           password
         });
 
         if (signInError) {
-          console.error('Auto sign in error:', signInError);
-          throw signInError;
-        }
-
-        console.log('Sign in successful after signup');
-
-        // Create profile for new user
-        if (data.user) {
-          console.log('Creating profile for user:', data.user.id, 'with username:', username);
-          console.log('Username type:', typeof username, 'Username length:', username?.length);
-          
-          const profileData = { 
-            id: data.user.id,
-            display_name: username,
-            created_at: new Date().toISOString()
-          };
-          
-          console.log('Profile data to insert:', profileData);
-          
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert(profileData, { 
-              onConflict: 'id'
-            });
+          // If sign in fails with invalid credentials, try to create account
+          if (signInError.message.includes('Invalid login credentials')) {
+            console.log('No account found, creating new account...');
+            authBtn.textContent = 'Creating account...';
             
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-            // Don't throw here, profile creation failure shouldn't block auth
-          } else {
-            console.log('Profile created successfully');
-          }
-        }
+            // Sign out any existing session
+            await supabase.auth.signOut();
+            
+            // Generate username from email
+            const username = email.split('@')[0];
+            
+            // Create new account
+            const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+              email,
+              password,
+              options: {
+                data: { 
+                  confirmed: true,
+                  display_name: username
+                },
+                emailRedirectTo: window.location.origin
+              }
+            });
 
-        // Reset flag and redirect to main app
-        isSigningUp = false;
-        console.log('Signup process complete, redirecting to index.html');
-        window.location.href = 'index.html';
+            if (signUpError) throw signUpError;
+
+            // Sign in immediately after signup
+            const { error: autoSignInError } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+            if (autoSignInError) throw autoSignInError;
+
+            // Create profile for new user
+            if (signUpData.user) {
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({
+                  id: signUpData.user.id,
+                  display_name: username,
+                  created_at: new Date().toISOString()
+                }, { 
+                  onConflict: 'id'
+                });
+                
+              if (profileError) {
+                console.error('Error creating profile:', profileError);
+              }
+            }
+
+            console.log('Account created and signed in successfully');
+            window.location.href = 'index.html';
+          } else {
+            // Some other error
+            throw signInError;
+          }
+        } else {
+          // Sign in successful
+          console.log('Successfully signed in as:', signInData.user.email);
+          window.location.href = 'index.html';
+        }
         
       } catch (error) {
-        console.error('Signup process error:', error);
-        console.error('Error details:', {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        });
+        console.error('Error with authentication:', error.message);
         alert(error.message);
       } finally {
-        isSigningUp = false;
-        signupBtn.textContent = 'Create new account';
-        signupBtn.disabled = false;
+        authBtn.textContent = 'Continue';
+        authBtn.disabled = false;
       }
     });
 
     // Enter key support
-    signinEmailInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') signinPasswordInput.focus();
+    authEmailInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') authPasswordInput.focus();
     });
 
-    signinPasswordInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') signinBtn.click();
-    });
-
-    signupUsernameInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') signupEmailInput.focus();
-    });
-
-    signupEmailInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') signupPasswordInput.focus();
-    });
-
-    signupPasswordInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') signupBtn.click();
+    authPasswordInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') authBtn.click();
     });
 
     // Watch auth state changes
     supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user && !isSigningUp) {
+      if (session?.user) {
         console.log("Signed in as", session.user.email, "Event:", event);
         
         // For OAuth sign-ins, ensure profile exists
