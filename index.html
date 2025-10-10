@@ -386,9 +386,7 @@ body {
   transform:scale(1.3);
 }
 .dropdown {
-  position:absolute;
-  top:100%;
-  right:0;
+  position:fixed;
   background:var(--bg);
   border:1px solid var(--stroke);
   border-radius:8px;
@@ -1012,13 +1010,18 @@ body {
         }
         
         // Show avatar menu on long press
-        function showAvatarMenu(e) {
+        function showAvatarMenu(e, clientX, clientY) {
           e.preventDefault();
-          const menuBtn = avatarItem.querySelector('.avatar-menu-btn');
-          if (menuBtn) {
-            // Simulate click on menu button
-            menuBtn.click();
-          }
+          
+          // Create a synthetic event with the original touch/click coordinates
+          const syntheticEvent = {
+            clientX: clientX,
+            clientY: clientY,
+            stopPropagation: () => {}
+          };
+          
+          // Directly call toggleAvatarMenu with coordinates
+          window.toggleAvatarMenu(syntheticEvent, avatarId);
         }
         
         // Track touch start position and time for the entire avatar item
@@ -1031,7 +1034,7 @@ body {
           // Start long press timer (500ms)
           longPressTimer = setTimeout(() => {
             if (!hasMoved) {
-              showAvatarMenu(e);
+              showAvatarMenu(e, touchStartX, touchStartY);
             }
           }, 500);
         });
@@ -1041,13 +1044,15 @@ body {
           // Only handle if not a touch device
           if ('ontouchstart' in window) return;
           
+          const mouseX = e.clientX;
+          const mouseY = e.clientY;
           touchStartTime = Date.now();
           hasMoved = false;
           
           // Start long press timer (500ms)
           longPressTimer = setTimeout(() => {
             if (!hasMoved) {
-              showAvatarMenu(e);
+              showAvatarMenu(e, mouseX, mouseY);
             }
           }, 500);
         });
@@ -1133,7 +1138,47 @@ body {
         document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
         
         if (!isShowing) {
+          // Position menu at click/touch point
+          const x = event.clientX || event.touches?.[0]?.clientX || 0;
+          const y = event.clientY || event.touches?.[0]?.clientY || 0;
+          
+          // Set initial position
+          menu.style.left = `${x}px`;
+          menu.style.top = `${y}px`;
+          
+          // Show menu to get its dimensions
           menu.classList.add('show');
+          
+          // Adjust position if menu goes off screen
+          const rect = menu.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          let finalX = x;
+          let finalY = y;
+          
+          // Adjust horizontal position if needed
+          if (rect.right > viewportWidth) {
+            finalX = viewportWidth - rect.width - 10;
+          }
+          
+          // Adjust vertical position if needed
+          if (rect.bottom > viewportHeight) {
+            finalY = viewportHeight - rect.height - 10;
+          }
+          
+          // Ensure menu doesn't go off left edge
+          if (finalX < 10) {
+            finalX = 10;
+          }
+          
+          // Ensure menu doesn't go off top edge
+          if (finalY < 10) {
+            finalY = 10;
+          }
+          
+          menu.style.left = `${finalX}px`;
+          menu.style.top = `${finalY}px`;
         }
       };
 
