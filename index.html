@@ -971,57 +971,11 @@ body {
         let touchStartTime = 0;
         let hasMoved = false;
         let longPressTimer = null;
-        
-        // Handle taps on avatar item (but not avatar-circle) for menu
-        function handleAvatarItemTouch(e) {
-          // Clear long press timer
-          if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-          }
-          
-          // Don't handle if tapping directly on menu button, dropdown, or avatar-circle
-          if (e.target.closest('.avatar-menu-btn') || 
-              e.target.closest('.dropdown') || 
-              e.target.closest('.avatar-circle')) {
-            return;
-          }
-          
-          const touchDuration = Date.now() - touchStartTime;
-          
-          // Only proceed if it was a quick tap without movement
-          if (!hasMoved && touchDuration < 300) {
-            e.preventDefault();
-            
-            // Hide all other menu buttons first
-            document.querySelectorAll('.avatar-item.menu-visible').forEach(item => {
-              item.classList.remove('menu-visible');
-            });
-            // Show this menu button
-            avatarItem.classList.add('menu-visible');
-          }
-        }
-
-        // Handle taps on avatar-circle for immediate chat entry
-        function handleAvatarCircleTouch(e) {
-          // Clear long press timer
-          if (longPressTimer) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-          }
-          
-          const touchDuration = Date.now() - touchStartTime;
-          
-          // Only proceed if it was a quick tap without movement
-          if (!hasMoved && touchDuration < 300) {
-            e.preventDefault();
-            openChat(avatarId);
-          }
-        }
+        let longPressTriggered = false;
         
         // Show avatar menu on long press
-        function showAvatarMenu(e, clientX, clientY) {
-          e.preventDefault();
+        function showAvatarMenu(clientX, clientY) {
+          longPressTriggered = true;
           
           // Create a synthetic event with the original touch/click coordinates
           const syntheticEvent = {
@@ -1034,35 +988,46 @@ body {
           window.toggleAvatarMenu(syntheticEvent, avatarId);
         }
         
-        // Track touch start position and time for the entire avatar item
+        // Track touch start position and time
         avatarItem.addEventListener('touchstart', (e) => {
+          // Don't interfere with menu button or dropdown
+          if (e.target.closest('.avatar-menu-btn') || e.target.closest('.dropdown')) {
+            return;
+          }
+          
           touchStartX = e.touches[0].clientX;
           touchStartY = e.touches[0].clientY;
           touchStartTime = Date.now();
           hasMoved = false;
+          longPressTriggered = false;
           
           // Start long press timer (500ms)
           longPressTimer = setTimeout(() => {
             if (!hasMoved) {
-              showAvatarMenu(e, touchStartX, touchStartY);
+              showAvatarMenu(touchStartX, touchStartY);
             }
           }, 500);
-        });
+        }, { passive: true });
         
         // Mouse down for desktop long press
         avatarItem.addEventListener('mousedown', (e) => {
           // Only handle if not a touch device
           if ('ontouchstart' in window) return;
+          // Don't interfere with menu button or dropdown
+          if (e.target.closest('.avatar-menu-btn') || e.target.closest('.dropdown')) {
+            return;
+          }
           
           const mouseX = e.clientX;
           const mouseY = e.clientY;
           touchStartTime = Date.now();
           hasMoved = false;
+          longPressTriggered = false;
           
           // Start long press timer (500ms)
           longPressTimer = setTimeout(() => {
             if (!hasMoved) {
-              showAvatarMenu(e, mouseX, mouseY);
+              showAvatarMenu(mouseX, mouseY);
             }
           }, 500);
         });
@@ -1089,7 +1054,7 @@ body {
               longPressTimer = null;
             }
           }
-        });
+        }, { passive: true });
         
         // Track mouse movement for desktop
         avatarItem.addEventListener('mousemove', (e) => {
@@ -1101,11 +1066,28 @@ body {
           }
         });
         
-        // Handle touch end on avatar item (for menu)
-        avatarItem.addEventListener('touchend', handleAvatarItemTouch);
-        
-        // Handle touch end on avatar circle (for immediate chat entry)
-        avatarCircle.addEventListener('touchend', handleAvatarCircleTouch);
+        // Handle touch end - open chat on quick tap
+        avatarCircle.addEventListener('touchend', (e) => {
+          // Clear long press timer
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+          
+          // If long press was triggered, don't open chat
+          if (longPressTriggered) {
+            longPressTriggered = false;
+            return;
+          }
+          
+          const touchDuration = Date.now() - touchStartTime;
+          
+          // Only proceed if it was a quick tap without movement
+          if (!hasMoved && touchDuration < 500) {
+            e.preventDefault();
+            openChat(avatarId);
+          }
+        });
         
         // Prevent default context menu on long press (Chrome mobile image save menu)
         avatarItem.addEventListener('contextmenu', (e) => {
@@ -1120,17 +1102,11 @@ body {
         
         // Mouse click for desktop - keep simple, direct to chat
         avatarCircle.addEventListener('click', (e) => {
-          // Only handle if not a touch device
-          if (!('ontouchstart' in window)) {
+          // Only handle if not a touch device and no long press
+          if (!('ontouchstart' in window) && !longPressTriggered) {
             openChat(avatarId);
           }
-        });
-        
-        // Hide menu button when clicking elsewhere
-        document.addEventListener('touchstart', (e) => {
-          if (!e.target.closest('.avatar-item')) {
-            avatarItem.classList.remove('menu-visible');
-          }
+          longPressTriggered = false;
         });
       }
 
