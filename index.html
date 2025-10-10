@@ -286,8 +286,8 @@ body {
   display:flex;
   align-items:center;
   gap:16px;
-  margin-bottom:20px;
-  margin-top:10px;
+  margin-bottom:4px;
+  margin-top:0px;
   justify-content:center;
 }
 .page-icon {
@@ -470,6 +470,7 @@ body {
   color:var(--ink);
   font-size:16px;
   font-weight:400;
+  line-height:1.4;
   text-align:center;
   margin:0;
   display:-webkit-box;
@@ -481,6 +482,8 @@ body {
   padding:4px 8px;
   border-radius:4px;
   transition:background 0.2s ease;
+  max-height:calc(1.4em * 2 + 8px);
+  /* 2 lines * line-height + padding */
 }
 .avatar-name[contenteditable="true"] {
   display:block;
@@ -505,8 +508,8 @@ body {
   }
   /* Page Header */
   .page-header {
-    margin-bottom:24px;
-    padding:0 16px;
+    margin-bottom:0px;
+    padding:0 0px;
   }
   .page-title {
     font-size:28px;
@@ -968,8 +971,9 @@ body {
           dropdown.id = `menu-${avatar.id}`;
           dropdown.className = 'dropdown';
           dropdown.innerHTML = `
-            <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
+            <button class="dropdown-item" onclick="openChat('${avatar.id}')">Chat</button>
             <button class="dropdown-item" onclick="editAvatar('${avatar.id}')">Edit</button>
+            <button class="dropdown-item" onclick="renameAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Rename</button>
             <button class="dropdown-item danger" onclick="deleteAvatar('${avatar.id}', '${(avatar.nickname || avatar.name).replace(/'/g, "\\'")}')">Delete</button>
           `;
           document.body.appendChild(dropdown);
@@ -995,7 +999,7 @@ body {
         function showAvatarMenu(clientX, clientY) {
           longPressTriggered = true;
           
-          console.log('Long press at:', clientX, clientY); // Debug log
+          console.log('Long press triggered, menu should appear'); // Debug log
           
           // Create a synthetic event with the original touch/click coordinates
           const syntheticEvent = {
@@ -1053,11 +1057,40 @@ body {
           }, 500);
         });
         
-        // Clear long press on mouse up
+        // Clear long press on mouse up (only if it hasn't triggered yet)
         avatarItem.addEventListener('mouseup', (e) => {
-          if (longPressTimer) {
+          console.log('Mouse up, longPressTriggered:', longPressTriggered); // Debug
+          // If long press was triggered, don't clear - menu should stay open
+          if (!longPressTriggered && longPressTimer) {
             clearTimeout(longPressTimer);
             longPressTimer = null;
+          }
+        });
+        
+        // Prevent click event from closing menu if long press just triggered
+        avatarItem.addEventListener('click', (e) => {
+          console.log('Avatar item clicked, longPressTriggered:', longPressTriggered); // Debug
+          if (longPressTriggered) {
+            e.stopPropagation();
+            e.preventDefault();
+            return false;
+          }
+        }, true); // Use capture phase to prevent other handlers from running
+        
+        // Mouse click for desktop - keep simple, direct to chat
+        avatarCircle.addEventListener('click', (e) => {
+          console.log('Avatar circle clicked, longPressTriggered:', longPressTriggered); // Debug
+          // Only handle if not a touch device and no long press
+          if (!('ontouchstart' in window) && !longPressTriggered) {
+            openChat(avatarId);
+          }
+          // Don't reset immediately - let the item handler check it first
+          if (longPressTriggered) {
+            e.stopPropagation();
+            e.preventDefault();
+            setTimeout(() => {
+              longPressTriggered = false;
+            }, 100);
           }
         });
         
@@ -1110,14 +1143,107 @@ body {
           }
         });
         
-        // Prevent default context menu on long press (Chrome mobile image save menu)
+        // Right-click context menu - show avatar actions
         avatarItem.addEventListener('contextmenu', (e) => {
           e.preventDefault();
+          e.stopPropagation();
+          
+          // Don't show menu if right-clicking on menu button or dropdown
+          if (e.target.closest('.avatar-menu-btn') || e.target.closest('.dropdown')) {
+            return false;
+          }
+          
+          const x = e.clientX;
+          const y = e.clientY;
+          
+          console.log('Right click at:', x, y); // Debug
+          
+          // Close all other menus
+          document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+          
+          // Show this menu at cursor position
+          const menu = document.getElementById(`menu-${avatarId}`);
+          menu.classList.add('show');
+          
+          // Get menu dimensions
+          const rect = menu.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          let finalX = x;
+          let finalY = y;
+          
+          // Adjust horizontal position if menu would go off right edge
+          if (x + rect.width > viewportWidth) {
+            finalX = Math.max(10, viewportWidth - rect.width - 10);
+          }
+          
+          // Adjust vertical position if menu would go off bottom edge
+          if (y + rect.height > viewportHeight) {
+            finalY = Math.max(10, viewportHeight - rect.height - 10);
+          }
+          
+          // Ensure menu doesn't go off left edge
+          if (finalX < 10) {
+            finalX = 10;
+          }
+          
+          // Ensure menu doesn't go off top edge
+          if (finalY < 10) {
+            finalY = 10;
+          }
+          
+          menu.style.left = `${finalX}px`;
+          menu.style.top = `${finalY}px`;
+          
           return false;
         });
         
         avatarCircle.addEventListener('contextmenu', (e) => {
           e.preventDefault();
+          e.stopPropagation();
+          
+          const x = e.clientX;
+          const y = e.clientY;
+          
+          // Close all other menus
+          document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+          
+          // Show this menu at cursor position
+          const menu = document.getElementById(`menu-${avatarId}`);
+          menu.classList.add('show');
+          
+          // Get menu dimensions
+          const rect = menu.getBoundingClientRect();
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          let finalX = x;
+          let finalY = y;
+          
+          // Adjust horizontal position if menu would go off right edge
+          if (x + rect.width > viewportWidth) {
+            finalX = Math.max(10, viewportWidth - rect.width - 10);
+          }
+          
+          // Adjust vertical position if menu would go off bottom edge
+          if (y + rect.height > viewportHeight) {
+            finalY = Math.max(10, viewportHeight - rect.height - 10);
+          }
+          
+          // Ensure menu doesn't go off left edge
+          if (finalX < 10) {
+            finalX = 10;
+          }
+          
+          // Ensure menu doesn't go off top edge
+          if (finalY < 10) {
+            finalY = 10;
+          }
+          
+          menu.style.left = `${finalX}px`;
+          menu.style.top = `${finalY}px`;
+          
           return false;
         });
         
@@ -1328,9 +1454,15 @@ body {
 
       // Close menus when clicking outside
       document.addEventListener('click', (event) => {
-        if (!event.target.closest('.avatar-actions')) {
-          document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+        console.log('Global click, target:', event.target); // Debug
+        // Don't close if clicking on menu button, dropdown, or if long press just triggered
+        if (event.target.closest('.avatar-menu-btn') || 
+            event.target.closest('.dropdown')) {
+          console.log('Click on menu element, not closing'); // Debug
+          return;
         }
+        console.log('Closing all menus'); // Debug
+        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
       });
 
       // Load avatars on page load
