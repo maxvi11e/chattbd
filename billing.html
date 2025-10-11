@@ -51,7 +51,7 @@
     /* Available Plans */
     .plans-section{margin-bottom:48px;}
     .section-title{font-size:24px; font-weight:600; margin:0 0 24px 0; text-align:center;}
-    .plans-grid{display:flex; flex-wrap:wrap; gap:24px; justify-content:center;}
+    .plans-grid{display:flex; flex-wrap:nowrap; gap:24px; justify-content:center; overflow-x:auto;}
     
     .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg); width:300px !important; max-width:300px !important; flex-shrink:0; flex-grow:0;}
     .plan-card.recommended{border-color:#2196F3; background:rgba(33, 150, 243, 0.1);}
@@ -96,7 +96,7 @@
       .main-content{padding:20px 16px; margin-top:-12px;}
       .plans-grid{flex-direction:column; align-items:center;}
       .current-plan{padding:24px 16px;}
-      .plan-card{padding:24px 16px; width:300px !important; max-width:300px !important;}
+      .plan-card{padding:24px 16px; width:275px !important; max-width:275px !important;}
       
       .history-table{font-size:14px;}
       .history-table th, .history-table td{padding:12px 8px;}
@@ -180,7 +180,6 @@
 
       <!-- Delete Account Section -->
       <div class="delete-account-section">
-        <h2 class="section-title">Danger Zone</h2>
         <div class="delete-account-card">
           <div class="delete-account-info">
             <h3>Delete Account</h3>
