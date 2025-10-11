@@ -777,6 +777,13 @@ body {
   <script type="module" src="freemium-utils.js"></script>
   
   <script type="module">
+    // Normalize URL - if at root, redirect to /index.html explicitly
+    // This helps Chrome mobile maintain consistent session storage
+    if (window.location.pathname === '/' && !window.location.hash) {
+      console.log("Root URL detected, normalizing to /index.html");
+      window.history.replaceState(null, '', '/index.html' + window.location.search);
+    }
+    
     // === Supabase Auth ===
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -788,7 +795,8 @@ body {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
-        flowType: 'pkce'
+        flowType: 'pkce',
+        storageKey: 'sb-auth-token' // Explicit storage key
       }
     });
     const COLLAPSED_SIDEBAR_WIDTH = 44;
@@ -796,6 +804,9 @@ body {
     // Make supabase available globally for freemium-utils.js
     window.supabase = supabase;
 
+    // Prevent accidental session clearing on page load
+    console.log("Index.html loaded, checking session...");
+    
     // Check auth and redirect if not authenticated
     async function checkAuthAndRedirect() {
       // Check if we're coming from an OAuth redirect
