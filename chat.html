@@ -893,12 +893,13 @@ body {
   .sidebar-toggle {
     display: none !important;
   }
-  /* Reduce scroller height by 50px when avatar is expanded (not minimized) */
-  .scroller {
-    max-height:120px;
+  /* Set scroller height to 150px when avatar is not minimized (expanded) */
+  .column:not(:has(.avatar-section.minimized)) .scroller {
+    max-height:150px;
   }
+
   .scroller.expanded {
-    max-height:600px;
+    max-height:550px;
   }
   /* Sidebar toggle positioning for mobile */
   .sidebar-toggle {
