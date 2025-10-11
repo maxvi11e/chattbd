@@ -550,6 +550,10 @@ body {
   .mobile-top-nav {
     display: flex;
   }
+  /* Make nav logo clickable on mobile */
+  .nav-logo {
+    cursor: pointer;
+  }
   /* Sidebar as overlay on mobile - always full width */
   .sidebar {
     position: fixed !important;
@@ -706,7 +710,7 @@ body {
     <div class="sidebar collapsed">
       <!-- Top Navigation -->
       <div class="sidebar-nav">
-        <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo">
+        <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" id="sidebarNavLogo">
         <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
           <img src="images/toggle_icon.png" alt="Toggle" style="width:18px; height:18px;">
         </button>
@@ -866,13 +870,23 @@ body {
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
       const mobileLogoBtn = document.getElementById('mobileLogoBtn');
       const mobileSidebarBackdrop = document.getElementById('mobileSidebarBackdrop');
+      const sidebarNavLogo = document.getElementById('sidebarNavLogo');
 
-      // Mobile logo - toggle sidebar
+      // Mobile logo (top nav) - toggle sidebar open
       mobileLogoBtn?.addEventListener('click', () => {
         const isMobile = window.innerWidth <= 768;
         if (isMobile) {
           sidebar.classList.toggle('mobile-open');
           mobileSidebarBackdrop.classList.toggle('show');
+        }
+      });
+
+      // Sidebar nav logo - close sidebar on mobile
+      sidebarNavLogo?.addEventListener('click', () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.remove('mobile-open');
+          mobileSidebarBackdrop.classList.remove('show');
         }
       });
 
