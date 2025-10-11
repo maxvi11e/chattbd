@@ -327,12 +327,12 @@ body {
   padding-left:30px;
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
-  line-clamp:2;
+  -webkit-line-clamp:1;
+  line-clamp:1;
   overflow:hidden;
   text-overflow:ellipsis;
   line-height:1.4;
-  max-height:calc(1.4em * 2);
+  max-height:calc(1.4em * 1);
 }
 .conversation-item {
   padding:12px;
@@ -363,11 +363,11 @@ body {
   text-overflow:ellipsis;
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
-  line-clamp:2;
+  -webkit-line-clamp:1;
+  line-clamp:1;
   line-height:1.3;
-  max-height:2.6em;
-  /* Exact calculation: 1.3em * 2 lines = 2.6em */
+  max-height:1.3em;
+  /* Exact calculation: 1.3em * 1 line = 1.3em */
 }
 .conversation-actions {
   opacity:0;
@@ -620,6 +620,10 @@ body {
   padding:0 0 0 0;
   transition: max-height 0.3s ease;
   position:relative;
+}
+/* Reduce scroller height when avatar is expanded (not minimized) on desktop */
+.column:not(:has(.avatar-section.minimized)) .scroller {
+  max-height:250px;
 }
 .scroller.expanded {
   max-height:550px;
@@ -1526,6 +1530,11 @@ body {
             add(message.role === 'user' ? 'from-me' : 'from-bot', message.text);
           });
           
+          // Scroll to bottom after loading messages
+          setTimeout(() => {
+            log.scrollTop = log.scrollHeight;
+          }, 0);
+          
           // Hide ask question bar if there are messages (existing conversation)
           if (messages && messages.length > 0) {
             hideAskQuestionBar();
@@ -1907,6 +1916,11 @@ body {
               add(msg.role === 'user' ? 'from-me' : 'from-bot', msg.text);
               convo.push({ role: msg.role, content: msg.text });
             });
+
+            // Scroll to bottom after loading messages
+            setTimeout(() => {
+              log.scrollTop = log.scrollHeight;
+            }, 0);
 
             if (messages.length === 0) {
               add('from-bot', `Hi! I'm ${currentAvatar.name}. What would you like to talk about?`);
