@@ -352,11 +352,11 @@
     align-items:center;
     transition:transform 0.35s ease;
   }
-  .bot-preview.personality-visible .bot-preview-main {
-  }
   .bot-frame {
     width:400px;
     height:400px;
+    max-width:calc(100vw - 80px);
+    max-height:calc(100vw - 80px);
     border-radius:var(--radius-lg);
     border:1px solid #333;
     background:transparent;
@@ -853,6 +853,68 @@
     transform:scale(1.05);
   }
   
+  /* Mobile Top Navigation */
+  .mobile-top-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--bg);
+    border-bottom: 0px solid #333;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1001;
+  }
+  .mobile-nav-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .mobile-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .mobile-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .mobile-nav-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+    pointer-events: none;
+  }
+  
+  /* Mobile sidebar backdrop */
+  .mobile-sidebar-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+  }
+  .mobile-sidebar-backdrop.show {
+    display: block;
+  }
+  
   @media (max-width: 1024px) {
     .bot-preview {
       flex-direction:column;
@@ -870,6 +932,77 @@
   }
   /* Responsive Design */
   @media (max-width: 768px) {
+    .mobile-top-nav {
+      display: flex;
+    }
+    /* Make nav logo clickable on mobile */
+    .nav-logo {
+      cursor: pointer;
+    }
+    /* Sidebar as overlay on mobile - always full width */
+    .sidebar {
+      position: fixed !important;
+      left: -300px;
+      top: 0;
+      height: 100dvh;
+      width: 300px !important;
+      min-width: 300px !important;
+      z-index: 1002;
+      transition: left 0.3s ease;
+    }
+    /* Override collapsed state on mobile */
+    .sidebar.collapsed {
+      width: 300px !important;
+      min-width: 300px !important;
+      overflow: visible !important;
+    }
+    .sidebar.collapsed .sidebar-nav {
+      justify-content: center;
+      padding: 14px 24px 0px 24px;
+    }
+    .sidebar.collapsed .nav-logo {
+      display: block;
+    }
+    .sidebar.collapsed .sidebar-actions {
+      padding: 16px;
+      align-items: flex-start;
+      margin-top: 0;
+    }
+    .sidebar.collapsed .action-btn {
+      justify-content: flex-start;
+      padding: 12px 16px;
+      gap: 12px;
+    }
+    .sidebar.collapsed .action-btn .action-label {
+      display: inline-flex;
+    }
+    .sidebar.collapsed .action-btn img,
+    .sidebar.collapsed .action-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+    .sidebar.collapsed .sidebar-bottom {
+      padding: 16px;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar.collapsed .sidebar-bottom .user-email {
+      display: block;
+    }
+    .sidebar.collapsed .logout-btn {
+      padding: 8px;
+    }
+    .sidebar.mobile-open {
+      left: 0;
+    }
+    /* Hide sidebar toggle on mobile */
+    .sidebar-toggle {
+      display: none !important;
+    }
+    .chat-container {
+      padding-top: 60px;
+    }
     .main-content {
       padding:16px;
     }
@@ -883,6 +1016,8 @@
     .bot-frame {
       width:330px;
       height:330px;
+      max-width:calc(100vw - 48px);
+      max-height:calc(100vw - 48px);
     }
     .personality-panel {
       width:340px;
@@ -944,14 +1079,48 @@
       display:none;
     }
   }
+  @media (max-width: 420px) {
+    .main-content {
+      padding:12px;
+    }
+    .bot-frame {
+      width:calc(100vw - 40px);
+      height:calc(100vw - 40px);
+    }
+    .form-textarea {
+      width:calc(100vw - 40px) !important;
+    }
+    .action-buttons,
+    .edit-buttons-row,
+    .action-buttons .action-btn,
+    .action-buttons .confirm-btn,
+    .form-buttons {
+      max-width:calc(100vw - 40px);
+    }
+  }
+
 </style>
 </head>
 
 <body>
+  <!-- Mobile sidebar backdrop -->
+  <div class="mobile-sidebar-backdrop" id="mobileSidebarBackdrop"></div>
+  
+  <!-- Mobile Top Nav (hidden on desktop) -->
+  <div class="mobile-top-nav">
+    <div class="mobile-logo" id="mobileLogoBtn">
+      <img src="images/favicon.png" alt="Logo" style="width:30px; height:30px;">
+    </div>
+    <h1 class="mobile-nav-title">Edit Avatar</h1>
+    <button class="mobile-nav-btn" id="mobileMenuBtn" title="Account">
+      <img src="images/account_icon.png" alt="Account" style="width:32px; height:32px;">
+    </button>
+  </div>
+
   <div class="chat-container">
     <div class="sidebar collapsed">
       <div class="sidebar-nav">
-        <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" />
+        <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" id="sidebarNavLogo">
       </div>
       <div class="sidebar-actions">
         <a href="index.html" class="action-btn" title="AI library">
@@ -1249,6 +1418,7 @@
   // Ensure controls are wired regardless of flow
   setupEventListeners();
   setupSidebarControls();
+  setupMobileNavigation();
   setupPageTitle();
   setupPersonalityEditor();
 
@@ -1891,6 +2061,61 @@
         isSavingPersonality = false;
         updatePersonalitySaveState();
       }
+    }
+
+    // Mobile nav button handlers
+    function setupMobileNavigation() {
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileLogoBtn = document.getElementById('mobileLogoBtn');
+      const mobileSidebarBackdrop = document.getElementById('mobileSidebarBackdrop');
+      const sidebarNavLogo = document.getElementById('sidebarNavLogo');
+
+      // Mobile logo (top nav) - toggle sidebar open
+      mobileLogoBtn?.addEventListener('click', () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.toggle('mobile-open');
+          mobileSidebarBackdrop.classList.toggle('show');
+        }
+      });
+
+      // Sidebar nav logo - close sidebar on mobile
+      sidebarNavLogo?.addEventListener('click', () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.remove('mobile-open');
+          mobileSidebarBackdrop.classList.remove('show');
+        }
+      });
+
+      // Close sidebar when clicking backdrop
+      mobileSidebarBackdrop?.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+        mobileSidebarBackdrop.classList.remove('show');
+      });
+
+      // Account button - redirect to billing
+      mobileMenuBtn?.addEventListener('click', () => {
+        window.location.href = 'billing.html';
+      });
+
+      // Close mobile sidebar when clicking any action button
+      const closeMobileSidebar = () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.remove('mobile-open');
+          mobileSidebarBackdrop.classList.remove('show');
+        }
+      };
+
+      // Add close handler to all action buttons
+      document.querySelectorAll('.sidebar .action-btn').forEach(btn => {
+        btn.addEventListener('click', closeMobileSidebar);
+      });
+
+      // Add close handler to logout button
+      const logoutBtn = document.getElementById('logoutBtn');
+      logoutBtn?.addEventListener('click', closeMobileSidebar);
     }
 
     function setupSidebarControls() {
