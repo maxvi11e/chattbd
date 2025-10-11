@@ -10,10 +10,7 @@
   --bg:#000;
   --ink:#fff;
   --muted:#d9d9d9;
-  --bubble:#333;
   --stroke:#fff;
-  --radius-lg:24px;
-  --radius-md:14px;
 }
 * {
   box-sizing:border-box;
@@ -293,15 +290,14 @@ body {
   gap:16px;
   margin-bottom:4px;
   margin-top:0px;
-  justify-content:center;
-}
-.page-icon {
-  height:40px;
-  width:auto;
+  justify-content:flex-start;
+  padding:20px 20px 0;
 }
 .page-title {
-  font-size:32px;
-  font-weight:600;
+  font-size:18pt;
+  font-weight:700;
+  text-align:left;
+  margin:0;
 }
 /* Avatar Grid */
 .avatars-grid {
@@ -351,18 +347,11 @@ body {
   user-select: none;
   pointer-events: none;
 }
-/* Create New: match standard avatar size, keep glow */
+/* Create New: match standard avatar size */
 .avatar-circle.create-new {
   width:190px;
   height:190px;
   margin-bottom:10px;
-  /* Animated gradient glow - commented out for white static shadow */
-  /* box-shadow: 0 0 0 rgba(0, 0, 0, 0); */
-  /* animation: neonGlow 3.2s ease-in-out infinite; */
-  /* will-change: box-shadow; */
-  /* White static shadow */
-  /* box-shadow: 0 0 15px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.3) !important; */
-  animation: none !important;
   border:1px solid #333;
 }
 /* Avatar Actions Menu */
@@ -395,7 +384,6 @@ body {
 .avatar-item.menu-visible .avatar-menu-btn {
   opacity:1;
 }
-/* Mobile menu visibility class */
 .avatar-menu-btn:hover {
   background:transparent;
   transform:scale(1.3);
@@ -488,7 +476,6 @@ body {
   border-radius:4px;
   transition:background 0.2s ease;
   max-height:calc(1.4em * 2 + 8px);
-  /* 2 lines * line-height + padding */
 }
 .avatar-name[contenteditable="true"] {
   display:block;
@@ -498,10 +485,6 @@ body {
   background:rgba(255,255,255,0.05);
   outline:1px solid rgba(255,255,255,0.3);
   cursor:text;
-}
-/* Empty state */
-.empty-state {
-  display:none;
 }
 /* Mobile Top Navigation */
 .mobile-top-nav {
@@ -537,7 +520,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: auto;
 }
 .mobile-nav-title {
   position: absolute;
@@ -567,38 +549,26 @@ body {
   .sidebar.collapsed .sidebar-toggle {
     left:6px !important;
   }
-  /* Page Header */
+  /* Page Header - hidden on mobile */
   .page-header {
-    margin-bottom:0px;
-    padding:0 0px;
-  }
-  .page-title {
-    font-size:28px;
-  }
-  .page-icon {
-    height:36px;
+    display:none;
   }
   /* Main Content */
   .main-content {
     padding:0px;
   }
-  /* Avatars Grid - Two columns, 50% smaller */
+  /* Avatars Grid */
   .avatars-grid {
     grid-template-columns: 1fr 1fr;
-    /* Two column grid */
     gap: 50px 13px !important;
-    /* Increased row spacing (+20%), decreased column spacing (-20%) */
     padding: 14px 16px 0;
-    /* Added 20px top padding to increase space from mobile top nav */
     max-width: none;
   }
   .avatar-circle {
     width: 130px;
-    /* Increased from 120px for better mobile visibility */
     height: 130px;
     margin-bottom: 8px;
   }
-  /* Create New: match standard avatar size on tablet */
   .avatar-circle.create-new {
     width:130px;
     height:130px;
@@ -610,7 +580,6 @@ body {
   }
   .create-plus {
     font-size: 50px;
-    /* Proportionally smaller */
   }
   .avatar-name {
     font-size: 14px;
@@ -623,9 +592,7 @@ body {
     text-overflow:ellipsis;
     line-height:1.4;
     max-height:calc(1.4em * 2 + 8px);
-    /* Recalculate for smaller font size */
   }
-  /* Avatar menu button adjustments for smaller size */
   .avatar-menu-btn {
     width: 24px;
     height: 24px;
@@ -643,48 +610,14 @@ body {
   }
 }
 @media (max-width: 480px) {
-  /* Even smaller screens */
-  .page-title {
-    font-size:24px;
-  }
-  .page-header {
-    padding:0 12px;
-  }
-  /* Keep two columns but make even more compact */
   .avatars-grid {
     gap: 35px 10px !important;
-    /* Increased row spacing to match 768px breakpoint, decreased column spacing (-17%) */
     padding: 20px 12px 0;
-    /* Added 20px top padding to increase space from mobile top nav */
   }
   .avatar-circle {
     width: 122px;
-    /* Consistent size across mobile breakpoints */
     height: 122px;
   }
-  /* Create New: match standard avatar size on small phones */
-  .avatar-circle.create-new {
-    width:122px;
-    height:122px;
-  }
-  .create-plus img {
-    width:55px;
-    height:55px;
-  }
-  .create-plus {
-    font-size: 40px;
-  }
-  .avatar-name {
-    font-size: 13px;
-    max-height:calc(1.4em * 2 + 8px);
-    /* Recalculate for smaller font size */
-  }
-  .avatar-menu-btn {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-  }
-}
 </style>
 </head>
 
@@ -745,8 +678,7 @@ body {
         <div class="main-content">
       <!-- Page Header -->
       <div class="page-header">
-        <!-- <img src="images/library_icon.png" alt="Library" class="page-icon"> -->
-        <!-- <h1 class="page-title">AI Library</h1> -->
+        <h1 class="page-title">AI Library</h1>
       </div>
       
 
