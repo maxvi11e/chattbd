@@ -520,6 +520,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 .mobile-nav-title {
   position: absolute;
@@ -531,13 +532,36 @@ body {
   color: var(--ink);
   pointer-events: none;
 }
+/* Mobile sidebar backdrop */
+.mobile-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+}
+.mobile-sidebar-backdrop.show {
+  display: block;
+}
 @media (max-width: 768px) {
   .mobile-top-nav {
     display: flex;
   }
-  /* Hide sidebar completely on mobile */
+  /* Sidebar as overlay on mobile */
   .sidebar {
-    display: none !important;
+    position: fixed !important;
+    left: -300px;
+    top: 0;
+    height: 100dvh;
+    width: 300px !important;
+    z-index: 1002;
+    transition: left 0.3s ease;
+  }
+  .sidebar.mobile-open {
+    left: 0;
   }
   /* Hide sidebar toggle on mobile */
   .sidebar-toggle {
@@ -622,9 +646,12 @@ body {
 </head>
 
 <body>
+  <!-- Mobile sidebar backdrop -->
+  <div class="mobile-sidebar-backdrop" id="mobileSidebarBackdrop"></div>
+  
   <!-- Mobile Top Nav (hidden on desktop) -->
   <div class="mobile-top-nav">
-    <div class="mobile-logo">
+    <div class="mobile-logo" id="mobileLogoBtn">
       <img src="images/favicon.png" alt="Logo" style="width:30px; height:30px;">
     </div>
     <h1 class="mobile-nav-title">AI Library</h1>
@@ -796,12 +823,45 @@ body {
 
       // Mobile nav button handlers
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileLogoBtn = document.getElementById('mobileLogoBtn');
+      const mobileSidebarBackdrop = document.getElementById('mobileSidebarBackdrop');
 
+      // Mobile logo - toggle sidebar
+      mobileLogoBtn?.addEventListener('click', () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.toggle('mobile-open');
+          mobileSidebarBackdrop.classList.toggle('show');
+        }
+      });
+
+      // Close sidebar when clicking backdrop
+      mobileSidebarBackdrop?.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+        mobileSidebarBackdrop.classList.remove('show');
+      });
+
+      // Account button - redirect to billing
       mobileMenuBtn?.addEventListener('click', () => {
-        // Open account/settings menu
-        // For now, redirect to billing page
         window.location.href = 'billing.html';
       });
+
+      // Close mobile sidebar when clicking any action button
+      const closeMobileSidebar = () => {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+          sidebar.classList.remove('mobile-open');
+          mobileSidebarBackdrop.classList.remove('show');
+        }
+      };
+
+      // Add close handler to all action buttons
+      document.querySelectorAll('.sidebar .action-btn').forEach(btn => {
+        btn.addEventListener('click', closeMobileSidebar);
+      });
+
+      // Add close handler to logout button
+      logoutBtn.addEventListener('click', closeMobileSidebar);
 
       // Create new avatar handler with limit check
       createBtn.addEventListener("click", async () => {
