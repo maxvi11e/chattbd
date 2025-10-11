@@ -92,7 +92,6 @@ const archetypeBuckets = {
     "Starfighter Ace",
     "Desert Alien",
     "Rebel Fighter",
-    "Starfighter Ace",
     "Elven King",
     "Space Bard",
     "Astronaut Inventor",

@@ -232,8 +232,8 @@ body {
 }
 .sidebar.collapsed .action-btn img,
 .sidebar.collapsed .action-btn svg {
-  width:22px;
-  height:22px;
+  width: 20px;
+  height: 20px;
 }
 .sidebar.collapsed .sidebar-bottom {
   padding:12px 8px;
@@ -520,7 +520,7 @@ body {
 .avatarFrame {
   width:300px;
   height:300px;
-  border-radius:22px;
+  border-radius:0px;
   overflow:hidden;
   background:#1c1c1c;
   border:1px solid #333;
@@ -612,7 +612,7 @@ body {
 }
 /* TEMP: slow transitions to inspect animation */
 .scroller {
-  max-height:240px;
+  max-height:300px;
   overflow:auto;
   padding:0 0 0 0;
   transition: max-height 0.3s ease;
@@ -797,12 +797,12 @@ body {
 .mobile-nav-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
   margin-left: auto;
 }
 .mobile-nav-btn {
-  width: 44px;
-  height: 44px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -928,6 +928,19 @@ body {
   .sidebar .avatar-section.in-sidebar + .conversations {
     margin-top:12px;
   }
+  .avatarFrame {
+    width: 350px;
+    height: 300px;
+  }
+  .avatarFrame img {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    object-position: center top;
+  }
+  .pane {
+    padding: 0 8px;
+  }
   .chat {
     padding:8px 8px 16px;
   }
@@ -938,20 +951,20 @@ body {
 <body>
   <!-- Mobile Top Nav (hidden on desktop) -->
   <div class="mobile-top-nav">
+    <div class="mobile-nav-left">
+      <button class="mobile-nav-btn" id="mobileToggleBtn" title="Menu">
+        <img src="images/toggle_icon.png" alt="Menu" style="width:20px; height:20px;">
+      </button>
+    </div>
     <div class="mobile-avatar-preview" id="mobileAvatarPreview">
       <img src="images/favicon.png" alt="Avatar" class="mobile-avatar-img" id="mobileAvatarImg">
     </div>
-    <div class="mobile-nav-left">
-      <button class="mobile-nav-btn" id="mobileToggleBtn" title="Menu">
-        <img src="images/toggle_icon.png" alt="Menu" style="width:24px; height:24px; margin-left:-20px;">
-      </button>
-    </div>
     <div class="mobile-nav-right">
       <button class="mobile-nav-btn" id="mobileNewChatBtn" title="New Chat">
-        <img src="images/new_chat_icon.png" alt="New Chat" style="width:24px; height:24px;">
+        <img src="images/new_chat_icon.png" alt="New Chat" style="width:22px; height:22px;">
       </button>
       <button class="mobile-nav-btn" id="mobilePersonalityBtn" title="Personality">
-        <img src="images/sliders_icon.png" alt="Personality" style="width:24px; height:24px;">
+        <img src="images/sliders_icon.png" alt="Personality" style="width:22px; height:22px;">
       </button>
       <button class="mobile-nav-btn" id="mobileLibraryBtn" title="Library">
         <img src="images/library_icon.png" alt="Library" style="width:24px; height:24px;">
@@ -981,6 +994,10 @@ body {
       
       <!-- Sidebar Actions -->
       <div class="sidebar-actions">
+        <a href="billing.html" class="action-btn" title="Account">
+          <img src="images/account_icon.png" alt="Account">
+          <span class="action-label">Account</span>
+        </a>
         <a href="index.html" class="action-btn" title="AI library">
           <img src="images/library_icon.png" alt="AI Library">
           <span class="action-label">AI Library</span>
