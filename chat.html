@@ -1100,7 +1100,15 @@ body {
 
     const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
     const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: window.localStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce'
+      }
+    });
     const COLLAPSED_SIDEBAR_WIDTH = 44;
 
     // Check auth and redirect if not authenticated
