@@ -626,7 +626,7 @@ body {
   max-height:250px;
 }
 .scroller.expanded {
-  max-height:550px;
+  max-height:484px;
 }
 .scroller::-webkit-scrollbar {
   width:12px;
@@ -899,7 +899,7 @@ body {
   }
 
   .scroller.expanded {
-    max-height:550px;
+    max-height:500px;
   }
   /* Sidebar toggle positioning for mobile */
   .sidebar-toggle {
@@ -2539,7 +2539,7 @@ body {
       function updateAvatarPlacement() {
         if (isMinimized && isMobileLayout()) {
           moveAvatarToSidebar();
-          scroller.style.maxHeight = '566px';
+          scroller.style.maxHeight = '500px';
         } else {
           moveAvatarToColumn();
           if (!isMinimized) {
