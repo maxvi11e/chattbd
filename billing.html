@@ -25,14 +25,14 @@
     /* Top Navigation */
     .top-nav{display:flex; justify-content:space-between; align-items:center; padding:14px 48px 0px 48px;}
     .nav-left{display:flex; align-items:center; gap:24px;}
-    .nav-logo{height:48px; width:auto;}
-    .nav-icon{height:32px; width:auto; transition:transform 0.2s ease; cursor:pointer; opacity:1;}
+    .nav-logo{height:32px; width:auto;}
+    .nav-icon{height:24px; width:auto; transition:transform 0.2s ease; cursor:pointer; opacity:1;}
     .nav-icon:hover{transform:scale(1.1);}
     .nav-right{display:flex; gap:16px; align-items:center;}
     .user-email{color:var(--ink); font-size:16px;}
     .logout-btn{padding:8px; border:none; background:transparent; color:var(--ink); border-radius:8px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center;}
     .logout-btn:hover{background:rgba(255,255,255,0.1);}
-    .logout-btn img{width:36px; height:36px;}
+    .logout-btn img{width:24px; height:24px;}
 
     /* Main Content */
     .main-content{padding:40px; max-width:1000px; margin:0 auto;}
@@ -51,9 +51,9 @@
     /* Available Plans */
     .plans-section{margin-bottom:48px;}
     .section-title{font-size:24px; font-weight:600; margin:0 0 24px 0; text-align:center;}
-    .plans-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px;}
+    .plans-grid{display:flex; flex-wrap:wrap; gap:24px; justify-content:center;}
     
-    .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg);}
+    .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg); width:150px !important; max-width:150px !important; flex-shrink:0; flex-grow:0;}
     .plan-card.recommended{border-color:#2196F3; background:rgba(33, 150, 243, 0.1);}
     .plan-card.current{border-color:#4CAF50; background:rgba(76, 175, 80, 0.1); opacity:0.7;}
     
@@ -86,9 +86,9 @@
     @media (max-width: 768px) {
       .top-nav{padding:12px 16px 0px 16px;}
       .main-content{padding:20px 16px;}
-      .plans-grid{grid-template-columns:1fr;}
+      .plans-grid{flex-direction:column; align-items:center;}
       .current-plan{padding:24px 16px;}
-      .plan-card{padding:24px 16px;}
+      .plan-card{padding:24px 16px; width:150px !important; max-width:150px !important;}
       
       .history-table{font-size:14px;}
       .history-table th, .history-table td{padding:12px 8px;}
