@@ -231,7 +231,22 @@ body {
         return; // Let Supabase handle the OAuth callback
       }
       
-      const { data: { session } } = await supabase.auth.getSession();
+      // Try to get session with retry logic (helps with Chrome mobile)
+      let session = null;
+      let attempts = 0;
+      const maxAttempts = 2;
+      
+      while (!session && attempts < maxAttempts) {
+        const { data } = await supabase.auth.getSession();
+        session = data.session;
+        
+        if (!session && attempts < maxAttempts - 1) {
+          console.log(`Session not ready, retry ${attempts + 1}`);
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        attempts++;
+      }
+      
       if (session) {
         console.log("Already authenticated as:", session.user.email, "redirecting to main app");
         // Use replace to avoid back button issues
