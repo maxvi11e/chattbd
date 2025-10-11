@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Aeaea — Sign In</title>
   <link rel="icon" type="image/png" href="images/favicon_black.png" />
   <style>
@@ -211,10 +214,20 @@ body {
 
     // Check if already authenticated
     async function checkExistingAuth() {
+      // Check if we're in the middle of an OAuth callback
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const isOAuthCallback = hashParams.has('access_token') || hashParams.has('error');
+      
+      if (isOAuthCallback) {
+        console.log("OAuth callback detected, waiting for Supabase to process...");
+        return; // Let Supabase handle the OAuth callback
+      }
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         console.log("Already authenticated as:", session.user.email, "redirecting to main app");
-        window.location.href = 'index.html';
+        // Use replace to avoid back button issues
+        window.location.replace('index.html');
       } else {
         console.log("No existing session found");
       }
@@ -339,7 +352,8 @@ body {
             }
 
             console.log('Account created and signed in successfully');
-            window.location.href = 'index.html';
+            // Use replace to avoid back button issues
+            window.location.replace('index.html');
           } else {
             // Some other error
             throw signInError;
@@ -347,7 +361,8 @@ body {
         } else {
           // Sign in successful
           console.log('Successfully signed in as:', signInData.user.email);
-          window.location.href = 'index.html';
+          // Use replace to avoid back button issues
+          window.location.replace('index.html');
         }
         
       } catch (error) {
@@ -370,51 +385,52 @@ body {
 
     // Watch auth state changes
     supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        console.log("Signed in as", session.user.email, "Event:", event);
+      console.log("Auth state change event:", event, session?.user?.email);
+      
+      if (session?.user && event === 'SIGNED_IN') {
+        console.log("Signed in as", session.user.email);
         
         // For OAuth sign-ins, ensure profile exists
-        if (event === 'SIGNED_IN') {
-          try {
-            // Check if profile exists
-            const { data: existingProfile, error: checkError } = await supabase
-              .from('profiles')
-              .select('id')
-              .eq('id', session.user.id)
-              .single();
+        try {
+          // Check if profile exists
+          const { data: existingProfile, error: checkError } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+          
+          // If no profile exists, create one
+          if (checkError || !existingProfile) {
+            console.log('Creating profile for OAuth user:', session.user.id);
             
-            // If no profile exists, create one
-            if (checkError || !existingProfile) {
-              console.log('Creating profile for OAuth user:', session.user.id);
-              
-              // Use Google display name or email as fallback
-              const displayName = session.user.user_metadata?.full_name || 
-                                  session.user.user_metadata?.name || 
-                                  session.user.email?.split('@')[0] || 
-                                  'User';
-              
-              const { error: profileError } = await supabase
-                .from('profiles')
-                .upsert({
-                  id: session.user.id,
-                  display_name: displayName,
-                  created_at: new Date().toISOString()
-                }, { 
-                  onConflict: 'id'
-                });
-              
-              if (profileError) {
-                console.error('Error creating OAuth profile:', profileError);
-              } else {
-                console.log('OAuth profile created successfully');
-              }
+            // Use Google display name or email as fallback
+            const displayName = session.user.user_metadata?.full_name || 
+                                session.user.user_metadata?.name || 
+                                session.user.email?.split('@')[0] || 
+                                'User';
+            
+            const { error: profileError } = await supabase
+              .from('profiles')
+              .upsert({
+                id: session.user.id,
+                display_name: displayName,
+                created_at: new Date().toISOString()
+              }, { 
+                onConflict: 'id'
+              });
+            
+            if (profileError) {
+              console.error('Error creating OAuth profile:', profileError);
+            } else {
+              console.log('OAuth profile created successfully');
             }
-          } catch (error) {
-            console.error('Error checking/creating profile:', error);
           }
+        } catch (error) {
+          console.error('Error checking/creating profile:', error);
         }
         
-        window.location.href = 'index.html';
+        // Use replace to avoid back button issues and clear OAuth state
+        window.location.replace('index.html');
       }
     });
   </script>
