@@ -55,6 +55,8 @@ body {
   position:relative;
   min-width:200px;
   max-width:600px;
+  contain: layout style;
+  will-change: width;
 }
 .sidebar.collapsed {
   width:44px !important;
@@ -277,7 +279,7 @@ body {
   padding:16px;
   display:flex;
   flex-direction:column;
-  gap:8px;
+  gap:0px;
 }
 /* Move sidebar-actions up when avatar is minimized and sidebar is expanded */
 .sidebar:not(.collapsed):has(.avatar-section.minimized) .sidebar-actions {
@@ -363,8 +365,9 @@ body {
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
   line-clamp:2;
-  line-height:1.4;
-  max-height:calc(1.4em * 2);
+  line-height:1.3;
+  max-height:2.6em;
+  /* Exact calculation: 1.3em * 2 lines = 2.6em */
 }
 .conversation-actions {
   opacity:0;
@@ -548,7 +551,7 @@ body {
 .minimize-btn {
   position:absolute;
   top:8px;
-  right:36px;
+  right:8px;
   background:rgba(0,0,0,0.8);
   border:1px solid rgba(255,255,255,0.3);
   color:var(--ink);
@@ -558,8 +561,8 @@ body {
   font-size:12px;
   opacity:1;
   transition:all 0.3s ease;
-  width:24px;
-  height:24px;
+  width:32px;
+  height:32px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -573,7 +576,7 @@ body {
 .edit-btn {
   position:absolute;
   top:8px;
-  right:8px;
+  right:48px;
   background:rgba(0,0,0,0.8);
   border:1px solid rgba(255,255,255,0.3);
   color:var(--ink);
@@ -583,8 +586,8 @@ body {
   font-size:12px;
   opacity:1;
   transition:all 0.3s ease;
-  width:24px;
-  height:24px;
+  width:32px;
+  height:32px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -781,20 +784,21 @@ body {
   background: var(--bg);
   border-bottom: 1px solid #333;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 0 12px;
   z-index: 1001;
-  gap: 0;
+  gap: 12px;
 }
 .mobile-nav-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 .mobile-nav-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  margin-left: auto;
 }
 .mobile-nav-btn {
   width: 44px;
@@ -812,12 +816,12 @@ body {
   background: rgba(255, 255, 255, 0.1);
 }
 .mobile-avatar-preview {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid #333;
+  border: 1px solid #333;
   transition: border-color 0.2s ease;
   display: none;
 }
@@ -853,9 +857,13 @@ body {
     max-width: 280px !important;
     z-index: 1002;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+    will-change: transform;
   }
   .sidebar.mobile-visible {
     display: flex !important;
+    transform: translateX(0);
   }
   /* Mobile sidebar backdrop */
   .mobile-sidebar-backdrop {
@@ -867,9 +875,12 @@ body {
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
   }
   .mobile-sidebar-backdrop.visible {
     display: block;
+    opacity: 1;
   }
   /* Hide sidebar toggle on mobile */
   .sidebar-toggle {
@@ -899,8 +910,8 @@ body {
     border-radius:50%;
   }
   .sidebar:not(.collapsed) .avatar-section.in-sidebar .avatarFrame {
-    width:130px;
-    height:130px;
+    width:180px;
+    height:180px;
     border-radius:50%;
   }
   /* Increase avatar size by 20% when minimized and sidebar is expanded - REMOVED, now always minimized */
@@ -927,18 +938,18 @@ body {
 <body>
   <!-- Mobile Top Nav (hidden on desktop) -->
   <div class="mobile-top-nav">
-    <div class="mobile-nav-left">
-      <button class="mobile-nav-btn" id="mobileToggleBtn" title="Menu">
-        <img src="images/toggle_icon.png" alt="Menu" style="width:24px; height:24px;">
-      </button>
-      <button class="mobile-nav-btn" id="mobileNewChatBtn" title="New Chat">
-        <img src="images/new_chat_icon.png" alt="New Chat" style="width:24px; height:24px;">
-      </button>
-    </div>
     <div class="mobile-avatar-preview" id="mobileAvatarPreview">
       <img src="images/favicon.png" alt="Avatar" class="mobile-avatar-img" id="mobileAvatarImg">
     </div>
+    <div class="mobile-nav-left">
+      <button class="mobile-nav-btn" id="mobileToggleBtn" title="Menu">
+        <img src="images/toggle_icon.png" alt="Menu" style="width:24px; height:24px; margin-left:-20px;">
+      </button>
+    </div>
     <div class="mobile-nav-right">
+      <button class="mobile-nav-btn" id="mobileNewChatBtn" title="New Chat">
+        <img src="images/new_chat_icon.png" alt="New Chat" style="width:24px; height:24px;">
+      </button>
       <button class="mobile-nav-btn" id="mobilePersonalityBtn" title="Personality">
         <img src="images/sliders_icon.png" alt="Personality" style="width:24px; height:24px;">
       </button>
@@ -1167,9 +1178,21 @@ body {
         if (isMobile) {
           const isVisible = sidebar.classList.contains('mobile-visible');
           if (isVisible) {
+            // Start closing animation
             sidebar.classList.remove('mobile-visible');
             mobileSidebarBackdrop?.classList.remove('visible');
+            // Hide display after animation completes
+            setTimeout(() => {
+              if (!sidebar.classList.contains('mobile-visible')) {
+                sidebar.style.display = 'none';
+              }
+            }, 300); // Match transition duration
           } else {
+            // Show immediately then animate in
+            sidebar.style.display = 'flex';
+            mobileSidebarBackdrop.style.display = 'block';
+            // Force reflow to ensure display:flex is applied before transform
+            void sidebar.offsetHeight;
             sidebar.classList.add('mobile-visible');
             sidebar.classList.remove('collapsed');
             mobileSidebarBackdrop?.classList.add('visible');
@@ -1181,6 +1204,12 @@ body {
       mobileSidebarBackdrop?.addEventListener('click', () => {
         sidebar.classList.remove('mobile-visible');
         mobileSidebarBackdrop.classList.remove('visible');
+        setTimeout(() => {
+          if (!sidebar.classList.contains('mobile-visible')) {
+            sidebar.style.display = 'none';
+            mobileSidebarBackdrop.style.display = 'none';
+          }
+        }, 300);
       });
 
       mobileAvatarPreview?.addEventListener('click', () => {
@@ -1327,8 +1356,17 @@ body {
       // Initialize sidebar state (default collapsed if no preference saved)
       collapseSidebar({ saveWidth: false });
 
+      // Debounce function for resize events
+      let resizeTimeout;
+      function debounceResize(callback, delay = 150) {
+        return function(...args) {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => callback.apply(this, args), delay);
+        };
+      }
+
       // Reposition toggle on resize and collapse automatically on mobile
-      window.addEventListener('resize', () => {
+      window.addEventListener('resize', debounceResize(() => {
         const nowMobile = window.innerWidth <= 768;
         const storedState = localStorage.getItem(SIDEBAR_STATE_KEY);
 
@@ -1345,7 +1383,7 @@ body {
         if (!Number.isNaN(width) && width > 0) {
           setTogglePosition(width);
         }
-      });
+      }));
 
       // Simple search function
       // Watch auth state changes
@@ -1601,7 +1639,7 @@ body {
             navigator.vibrate && navigator.vibrate(50); // Haptic feedback if available
             toggleConversationMenu(e, conversationId);
           }, 500); // 500ms for long press
-        });
+        }, { passive: true });
         
         // Touch end - determine if it's a tap or long press
         conversationItem.addEventListener('touchend', (e) => {
@@ -1615,13 +1653,13 @@ body {
             e.preventDefault();
             loadConversation(conversationId);
           }
-        });
+        }, { passive: false });
         
         // Touch cancel - clean up
         conversationItem.addEventListener('touchcancel', () => {
           clearTimeout(longPressTimer);
           longPressTriggered = false;
-        });
+        }, { passive: true });
         
         // Mouse click for desktop - keep original behavior
         conversationItem.addEventListener('click', (e) => {
@@ -1767,6 +1805,9 @@ body {
               addMinimizeButton();
               // Add edit button
               addEditButton();
+              
+              // Initialize minimized state (default)
+              initializeMinimizedState();
         // Idle wiggle removed
             };
             img.onerror = (e) => {
@@ -1783,6 +1824,9 @@ body {
             addMinimizeButton();
             // Add edit button to fallback avatar too
             addEditButton();
+            
+            // Initialize minimized state (default)
+            initializeMinimizedState();
           }
 
           if (isNew) {
@@ -2401,7 +2445,7 @@ body {
   // Idle wiggle removed
 
   // Avatar minimize functionality
-  let isMinimized = false;
+  let isMinimized = true; // Default to minimized state
   const avatarSection = document.querySelector('.avatar-section');
   const scroller = document.getElementById('log');
   const sidebarNav = sidebar.querySelector('.sidebar-nav');
@@ -2482,7 +2526,7 @@ body {
         
         const editBtn = document.createElement('button');
         editBtn.className = 'edit-btn';
-        editBtn.innerHTML = '✎';
+        editBtn.innerHTML = '<img src="images/sliders_icon.png" alt="Edit" style="width:18px; height:18px;">';
         editBtn.title = 'Edit avatar';
         editBtn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -2494,6 +2538,36 @@ body {
           }
         });
         avatar.appendChild(editBtn);
+      }
+
+      function initializeMinimizedState() {
+        // Set up the initial minimized state without toggling
+        avatarSection.classList.add('minimized');
+        scroller.classList.add('expanded');
+        if (isMobileLayout()) {
+          scroller.style.maxHeight = '580px';
+        }
+        // Show mobile avatar preview when minimized
+        mobileAvatarPreview?.classList.add('visible');
+        
+        const minimizeBtn = avatar.querySelector('.minimize-btn');
+        if (minimizeBtn) {
+          minimizeBtn.innerHTML = '+';
+          minimizeBtn.title = 'Expand avatar';
+          minimizeBtn.style.display = 'none';
+        }
+        
+        // Add click handler to expand
+        if (!expandClickHandler) {
+          expandClickHandler = function(e){
+            if (e.target.closest && e.target.closest('.minimize-btn')) return;
+            toggleMinimize();
+          };
+        }
+        avatar.style.cursor = 'pointer';
+        avatar.addEventListener('click', expandClickHandler);
+        
+        updateAvatarPlacement();
       }
 
       function toggleMinimize() {
@@ -2546,7 +2620,8 @@ body {
         updateAvatarPlacement();
       }
 
-      window.addEventListener('resize', updateAvatarPlacement);
+      // Use debounced resize for avatar placement
+      window.addEventListener('resize', debounceResize(updateAvatarPlacement, 150));
       updateAvatarPlacement();
 
     } // End of authenticated check
