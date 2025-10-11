@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Aeaea — Chat</title>
   <link rel="icon" type="image/png" href="images/favicon_black.png" />
   <style>
@@ -1108,13 +1111,30 @@ body {
       
       if (isOAuthCallback) {
         console.log("OAuth callback detected, waiting for session...");
-        // Give Supabase time to process the OAuth tokens
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Give Supabase time to process the OAuth tokens (longer wait for mobile)
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const waitTime = isMobile ? 1000 : 500;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
       }
       
-      const { data: { session } } = await supabase.auth.getSession();
+      // Try to get session with retry logic
+      let session = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+      
+      while (!session && attempts < maxAttempts) {
+        const { data } = await supabase.auth.getSession();
+        session = data.session;
+        
+        if (!session && isOAuthCallback && attempts < maxAttempts - 1) {
+          console.log(`Session not ready, retry ${attempts + 1}/${maxAttempts - 1}`);
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        attempts++;
+      }
+      
       if (!session) {
-        console.log("No session found, redirecting to auth");
+        console.log("No session found after retries, redirecting to auth");
         window.location.replace('auth.html');
         return false;
       }
