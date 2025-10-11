@@ -41,7 +41,7 @@
     .page-subtitle{color:var(--muted); font-size:18px; margin:0;}
 
     /* Current Plan Card */
-    .current-plan{background:rgba(255,255,255,0.05); border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; margin-bottom:40px; text-align:center;}
+    .current-plan{background:rgba(255,255,255,0.05); border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; margin-bottom:40px; text-align:center; width:300px; max-width:300px; margin-left:auto; margin-right:auto;}
     .plan-name{font-size:28px; font-weight:bold; margin:0 0 8px 0; color:var(--ink);}
     .plan-price{font-size:24px; color:var(--muted); margin:0 0 16px 0;}
     .plan-usage{font-size:16px; color:var(--muted); margin:0 0 24px 0;}
@@ -53,7 +53,7 @@
     .section-title{font-size:24px; font-weight:600; margin:0 0 24px 0; text-align:center;}
     .plans-grid{display:flex; flex-wrap:wrap; gap:24px; justify-content:center;}
     
-    .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg); width:150px !important; max-width:150px !important; flex-shrink:0; flex-grow:0;}
+    .plan-card{border:2px solid var(--stroke); border-radius:var(--radius-lg); padding:32px; text-align:center; position:relative; background:var(--bg); width:300px !important; max-width:300px !important; flex-shrink:0; flex-grow:0;}
     .plan-card.recommended{border-color:#2196F3; background:rgba(33, 150, 243, 0.1);}
     .plan-card.current{border-color:#4CAF50; background:rgba(76, 175, 80, 0.1); opacity:0.7;}
     
@@ -82,16 +82,27 @@
     .status-paid{background:#4CAF50; color:white;}
     .status-pending{background:#ff9800; color:white;}
 
+    /* Delete Account Section */
+    .delete-account-section{margin-top:64px; padding-top:48px; border-top:1px solid rgba(255,255,255,0.1);}
+    .delete-account-card{background:rgba(255,59,48,0.1); border:2px solid rgba(255,59,48,0.3); border-radius:var(--radius-lg); padding:24px; display:flex; justify-content:space-between; align-items:center; gap:24px; max-width:800px; margin:0 auto;}
+    .delete-account-info h3{margin:0 0 8px 0; color:#ff453a; font-size:18px;}
+    .delete-account-info p{margin:0; color:var(--muted); font-size:14px;}
+    .delete-btn{background:#ff453a; color:white; border:none; padding:12px 24px; border-radius:var(--radius-md); font-size:14px; font-weight:600; cursor:pointer; transition:background 0.2s; white-space:nowrap;}
+    .delete-btn:hover{background:#ff3b30;}
+
     /* Mobile Responsive */
     @media (max-width: 768px) {
       .top-nav{padding:12px 16px 0px 16px;}
-      .main-content{padding:20px 16px;}
+      .main-content{padding:20px 16px; margin-top:-12px;}
       .plans-grid{flex-direction:column; align-items:center;}
       .current-plan{padding:24px 16px;}
-      .plan-card{padding:24px 16px; width:150px !important; max-width:150px !important;}
+      .plan-card{padding:24px 16px; width:300px !important; max-width:300px !important;}
       
       .history-table{font-size:14px;}
       .history-table th, .history-table td{padding:12px 8px;}
+      
+      .delete-account-card{flex-direction:column; align-items:stretch; text-align:center;}
+      .delete-btn{width:100%;}
     }
   </style>
 </head>
@@ -165,6 +176,18 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Delete Account Section -->
+      <div class="delete-account-section">
+        <h2 class="section-title">Danger Zone</h2>
+        <div class="delete-account-card">
+          <div class="delete-account-info">
+            <h3>Delete Account</h3>
+            <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+          </div>
+          <button id="deleteAccountBtn" class="delete-btn">Delete Account</button>
+        </div>
       </div>
     </div>
   </div>
@@ -326,6 +349,7 @@
       // Setup event handlers
       const logoutBtn = document.getElementById("logoutBtn");
       const chatNavIcon = document.getElementById("chatNavIcon");
+      const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 
       // Sign out handler
       logoutBtn.addEventListener("click", async () => {
@@ -341,6 +365,69 @@
           window.location.href = `chat.html?avatar=${lastAvatarId}`;
         } else {
           alert('Please select an avatar to chat with first!');
+        }
+      });
+
+      // Delete account handler
+      deleteAccountBtn.addEventListener("click", async () => {
+        const confirmed = confirm(
+          "Are you absolutely sure you want to delete your account?\n\n" +
+          "This will permanently delete:\n" +
+          "• All your avatars\n" +
+          "• All chat history\n" +
+          "• Your subscription data\n" +
+          "• All associated data\n\n" +
+          "This action CANNOT be undone."
+        );
+        
+        if (!confirmed) return;
+        
+        // Double confirmation
+        const doubleConfirm = confirm(
+          "FINAL WARNING: This will permanently delete everything. Are you 100% sure?"
+        );
+        
+        if (!doubleConfirm) return;
+        
+        try {
+          deleteAccountBtn.disabled = true;
+          deleteAccountBtn.textContent = "Deleting...";
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) {
+            alert("Session expired. Please log in again.");
+            window.location.href = 'auth.html';
+            return;
+          }
+          
+          // Update the profile to mark as deleted
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ 
+              deleted_at: new Date().toISOString(),
+              display_name: '[DELETED]',
+              email: '[DELETED]'
+            })
+            .eq('id', session.user.id);
+          
+          if (updateError) {
+            console.error('Error marking account as deleted:', updateError);
+            alert('Failed to delete account. Please try again or contact support.');
+            deleteAccountBtn.disabled = false;
+            deleteAccountBtn.textContent = "Delete Account";
+            return;
+          }
+          
+          // Sign out and redirect
+          await supabase.auth.signOut();
+          alert('Your account has been deleted.');
+          window.location.href = 'auth.html';
+          
+        } catch (error) {
+          console.error('Error deleting account:', error);
+          alert('An error occurred while deleting your account. Please try again.');
+          deleteAccountBtn.disabled = false;
+          deleteAccountBtn.textContent = "Delete Account";
         }
       });
 
