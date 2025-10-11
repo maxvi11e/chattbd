@@ -1872,8 +1872,13 @@ body {
             await loadExistingConversation(avatarId);
           }
 
-          // Focus on input
+          // Focus on input and ensure scroll to bottom
           ask.focus();
+          
+          // Final scroll to bottom after everything loads
+          setTimeout(() => {
+            log.scrollTop = log.scrollHeight;
+          }, 100);
 
         } catch (error) {
           console.error('Error in loadAvatar:', error);
