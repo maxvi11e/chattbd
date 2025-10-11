@@ -148,7 +148,16 @@
         // Initialize Supabase
         const supabaseUrl = 'https://ncbagbiwqhcvkjrjhvqd.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jYmFnYml3cWhjdmtqcmpodnFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3NzE1MzksImV4cCI6MjA0OTM0NzUzOX0.VkmHI0dOyKRGJz6S6YCtCtcbMv-TLZnZ8eR8MjVjPOg';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey, {
+          auth: {
+            storage: window.localStorage,
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true,
+            flowType: 'pkce',
+            storageKey: 'sb-auth-token'
+          }
+        });
         window.supabase = supabase;
 
         async function checkSubscriptionStatus() {
