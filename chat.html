@@ -889,6 +889,10 @@ body {
   .sidebar-toggle {
     display: none !important;
   }
+  /* Reduce scroller height by 50px when avatar is expanded (not minimized) */
+  .scroller {
+    max-height:160px;
+  }
   .scroller.expanded {
     max-height:600px;
   }
@@ -943,7 +947,11 @@ body {
   }
   .pane {
     padding: 0 8px;
-    margin-top: -22px;
+    margin-top: -12px;
+  }
+  /* Move pane down when avatar is expanded (not minimized) */
+  .column:not(:has(.avatar-section.minimized)) .pane {
+    margin-top: -10px;
   }
   .chat {
     padding:8px 8px 16px;
@@ -966,9 +974,6 @@ body {
     <div class="mobile-nav-right">
       <button class="mobile-nav-btn" id="mobileNewChatBtn" title="New Chat">
         <img src="images/new_chat_icon.png" alt="New Chat" style="width:22px; height:22px;">
-      </button>
-      <button class="mobile-nav-btn" id="mobilePersonalityBtn" title="Personality">
-        <img src="images/sliders_icon.png" alt="Personality" style="width:22px; height:22px;">
       </button>
       <button class="mobile-nav-btn" id="mobileLibraryBtn" title="Library">
         <img src="images/library_icon.png" alt="Library" style="width:24px; height:24px;">
@@ -1166,7 +1171,6 @@ body {
       // Mobile nav button handlers
       const mobileNewChatBtn = document.getElementById('mobileNewChatBtn');
       const mobileLibraryBtn = document.getElementById('mobileLibraryBtn');
-      const mobilePersonalityBtn = document.getElementById('mobilePersonalityBtn');
       const mobileToggleBtn = document.getElementById('mobileToggleBtn');
       const mobileAvatarPreview = document.getElementById('mobileAvatarPreview');
       const mobileAvatarImg = document.getElementById('mobileAvatarImg');
@@ -1186,12 +1190,6 @@ body {
 
       mobileLibraryBtn?.addEventListener('click', () => {
         window.location.href = 'index.html';
-      });
-
-      mobilePersonalityBtn?.addEventListener('click', () => {
-        if (currentAvatar) {
-          window.location.href = `edit.html?id=${currentAvatar.id}`;
-        }
       });
 
       mobileToggleBtn?.addEventListener('click', () => {
