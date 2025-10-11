@@ -787,12 +787,28 @@ body {
 
     // Check auth and redirect if not authenticated
     async function checkAuthAndRedirect() {
+      // Check if we're coming from an OAuth redirect
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const isOAuthCallback = hashParams.has('access_token') || hashParams.has('error');
+      
+      if (isOAuthCallback) {
+        console.log("OAuth callback detected, waiting for session...");
+        // Give Supabase time to process the OAuth tokens
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        window.location.href = 'auth.html';
+        console.log("No session found, redirecting to auth");
+        window.location.replace('auth.html');
         return false;
       }
       console.log("User authenticated:", session.user.email);
+      
+      // Clear the hash from URL to avoid confusion
+      if (window.location.hash) {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
       
       // Load and display username from profiles table
       await loadUserProfile(session.user);
