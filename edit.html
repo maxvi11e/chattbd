@@ -562,6 +562,40 @@
     color:#a8a8a8;
     text-align:center;
   }
+  /* Edit Credits Indicator */
+  .edit-credits-indicator {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 20px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.2);
+    border-radius:12px;
+    font-size:14px;
+    color:var(--ink);
+    margin-bottom:16px;
+    max-width:400px;
+    width:100%;
+  }
+  .edit-credits-indicator.low-credits {
+    border-color:rgba(255,165,0,0.5);
+    background:rgba(255,165,0,0.1);
+  }
+  .edit-credits-indicator.no-credits {
+    border-color:rgba(255,69,58,0.5);
+    background:rgba(255,69,58,0.1);
+  }
+  .edit-credits-count {
+    font-weight:600;
+    color:var(--ink);
+  }
+  .edit-credits-count.low {
+    color:#ff9500;
+  }
+  .edit-credits-count.depleted {
+    color:#ff453a;
+  }
   /* Edit Form */
   .edit-form {
     display:none;
@@ -1239,6 +1273,10 @@
 
       <!-- Edit Form -->
       <div id="editForm" class="edit-form">
+        <!-- Edit Credits Indicator -->
+        <div id="editCreditsIndicator" class="edit-credits-indicator" style="display:none;">
+          <span>Edit Credits: <span id="editCreditsCount" class="edit-credits-count">0 / 0</span></span>
+        </div>
         <div class="form-group">
           <label class="form-label">What would you like to change?</label>
           <textarea id="editPrompt" class="form-input form-textarea" placeholder="Describe the changes you'd like to make to your AI's appearance or personality..."></textarea>
@@ -1746,10 +1784,59 @@
       
       console.log('🎚️ Populating personality sliders...');
       populatePersonalitySliders(bot.traits);
+      
+      // Load edit credits info
+      loadEditCreditsInfo();
+      
       console.log('✅ Bot displayed successfully');
       } catch (error) {
         console.error('❌ Error in displayBot:', error);
         showError('Failed to display agent. Please refresh the page.');
+      }
+    }
+
+    // Load and display edit credits information
+    async function loadEditCreditsInfo() {
+      try {
+        if (!window.FreemiumUtils) {
+          console.warn('FreemiumUtils not available');
+          return;
+        }
+
+        const subscriptionInfo = await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
+        const editCreditsIndicator = document.getElementById('editCreditsIndicator');
+        const editCreditsCount = document.getElementById('editCreditsCount');
+        
+        if (!editCreditsIndicator || !editCreditsCount) {
+          console.warn('Edit credits elements not found');
+          return;
+        }
+
+        const creditsUsed = subscriptionInfo.edit_credits_used || 0;
+        const creditsLimit = subscriptionInfo.edit_credits_limit || 0;
+        const creditsRemaining = creditsLimit - creditsUsed;
+
+        // Only show if user has edit credits
+        if (creditsLimit > 0) {
+          editCreditsIndicator.style.display = 'flex';
+          editCreditsCount.textContent = `${creditsRemaining} / ${creditsLimit}`;
+          
+          // Update styling based on remaining credits
+          editCreditsIndicator.classList.remove('low-credits', 'no-credits');
+          editCreditsCount.classList.remove('low', 'depleted');
+          
+          if (creditsRemaining === 0) {
+            editCreditsIndicator.classList.add('no-credits');
+            editCreditsCount.classList.add('depleted');
+          } else if (creditsRemaining <= 2) {
+            editCreditsIndicator.classList.add('low-credits');
+            editCreditsCount.classList.add('low');
+          }
+        } else {
+          editCreditsIndicator.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error loading edit credits info:', error);
       }
     }
 
@@ -2565,14 +2652,25 @@
   botVideo.style.display = 'none';
         hideError();
 
-        // Check freemium limits
+        // Check edit credits
         if (window.FreemiumUtils) {
-          const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
-          if (!canCreateResult.canCreate) {
+          const canUseCredit = await window.FreemiumUtils.canUserUseEditCredit(supabase);
+          if (!canUseCredit.canUse) {
             const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
-            await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+            const subscriptionInfo = canUseCredit.subscriptionInfo || await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
+            showError(canUseCredit.reason);
+            await window.FreemiumUtils.showUpgradeModal(subscriptionInfo, plans);
             return;
           }
+          
+          // Use an edit credit
+          const creditResult = await window.FreemiumUtils.useEditCredit(supabase);
+          if (!creditResult.success) {
+            showError(creditResult.error || 'Failed to use edit credit');
+            return;
+          }
+          
+          console.log(`✅ Edit credit used. ${creditResult.creditsRemaining} credits remaining.`);
         }
 
         // Call regeneration API
@@ -2604,6 +2702,9 @@
   // Update the bot image and data
         await updateBotImage(result);
         hideEditForm();
+        
+        // Reload edit credits to show updated count
+        await loadEditCreditsInfo();
         
       } catch (error) {
         console.error('Error regenerating bot:', error);

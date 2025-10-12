@@ -145,6 +145,12 @@
         <div class="usage-bar">
           <div class="usage-fill" id="usageFill" style="width:0%"></div>
         </div>
+        <div class="plan-usage" id="editCreditsUsage" style="margin-top:16px;">
+          <span id="editCreditsUsed">0</span> of <span id="editCreditsLimit">0</span> edit credits used
+        </div>
+        <div class="usage-bar">
+          <div class="usage-fill" id="editCreditsFill" style="width:0%"></div>
+        </div>
       </div>
 
       <!-- Available Plans -->
@@ -302,6 +308,23 @@
         } else {
           document.getElementById('usageFill').style.width = '100%';
           document.getElementById('usageFill').style.background = '#4CAF50';
+        }
+        
+        // Update edit credits info
+        const editCreditsUsed = subscriptionInfo.edit_credits_used || 0;
+        const editCreditsLimit = subscriptionInfo.edit_credits_limit || 0;
+        
+        document.getElementById('editCreditsUsed').textContent = editCreditsUsed;
+        document.getElementById('editCreditsLimit').textContent = editCreditsLimit || 'unlimited';
+        
+        // Update edit credits usage bar
+        if (editCreditsLimit > 0) {
+          const creditsPercentage = (editCreditsUsed / editCreditsLimit) * 100;
+          document.getElementById('editCreditsFill').style.width = Math.min(creditsPercentage, 100) + '%';
+        } else if (editCreditsLimit === null || editCreditsLimit === 0) {
+          // No edit credits for free plan
+          document.getElementById('editCreditsUsage').style.display = editCreditsLimit === 0 ? 'none' : 'block';
+          document.getElementById('editCreditsFill').parentElement.style.display = editCreditsLimit === 0 ? 'none' : 'block';
         }
         
         // Populate plans grid

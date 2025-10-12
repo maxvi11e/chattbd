@@ -520,10 +520,67 @@ async function handlePaidPlanUpgrade(plan) {
   }
 }
 
+/**
+ * Check if user can use an edit credit
+ * @param {object} supabase - Supabase client instance
+ * @returns {Promise<{canUse: boolean, reason?: string, creditsRemaining?: number}>}
+ */
+async function canUserUseEditCredit(supabase) {
+  const subscriptionInfo = await getUserSubscriptionInfo(supabase);
+  
+  if (subscriptionInfo.can_use_edit_credit) {
+    const creditsRemaining = subscriptionInfo.edit_credits_limit - subscriptionInfo.edit_credits_used;
+    return { canUse: true, creditsRemaining };
+  }
+
+  let reason;
+  if (subscriptionInfo.edit_credits_limit === 0) {
+    reason = 'Your current plan does not include edit credits. Upgrade to get edit credits!';
+  } else {
+    reason = `You've used all ${subscriptionInfo.edit_credits_limit} edit credits. Upgrade for more!`;
+  }
+
+  return { canUse: false, reason, subscriptionInfo };
+}
+
+/**
+ * Use an edit credit
+ * @param {object} supabase - Supabase client instance
+ * @returns {Promise<{success: boolean, error?: string, creditsRemaining?: number}>}
+ */
+async function useEditCredit(supabase) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase.rpc('use_edit_credit', {
+      user_uuid: user.id
+    });
+
+    if (error) throw error;
+
+    if (!data.success) {
+      return { success: false, error: data.error };
+    }
+
+    return {
+      success: true,
+      creditsUsed: data.credits_used,
+      creditsLimit: data.credits_limit,
+      creditsRemaining: data.credits_remaining
+    };
+  } catch (error) {
+    console.error('Error using edit credit:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // Export functions for global use
 window.FreemiumUtils = {
   getUserSubscriptionInfo,
   canUserCreateBot,
+  canUserUseEditCredit,
+  useEditCredit,
   getSubscriptionPlans,
   showUpgradeModal,
   formatPrice
