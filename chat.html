@@ -69,7 +69,6 @@ body {
 .sidebar.resizing {
   transition:none;
 }
-/* Disable transition while resizing! */
 .sidebar *::-webkit-scrollbar {
   width:8px;
 }
@@ -1405,11 +1404,7 @@ body {
         
         if (width >= minWidth && width <= maxWidth) {
           sidebar.style.width = `${width}px`;
-
-          // Update the sidebar toggle position
           setTogglePosition(width);
-
-          // Store the width preference
           localStorage.setItem(SIDEBAR_WIDTH_KEY, String(width));
         }
       }
@@ -1421,19 +1416,15 @@ body {
         sidebar.classList.remove('resizing');
         resizeHandle.classList.remove('resizing');
         
-        // Remove global listeners
         document.removeEventListener('mousemove', handleResize);
         document.removeEventListener('mouseup', stopResize);
         
-        // Restore normal cursor and text selection
         document.body.style.userSelect = '';
         document.body.style.cursor = '';
       }
 
-      // Initialize sidebar state (default collapsed if no preference saved)
       collapseSidebar({ saveWidth: false });
 
-      // Debounce function for resize events
       let resizeTimeout;
       function debounceResize(callback, delay = 150) {
         return function(...args) {
@@ -1462,8 +1453,6 @@ body {
         }
       }));
 
-      // Simple search function
-      // Watch auth state changes
       supabase.auth.onAuthStateChange((_event, session) => {
         if (!session) {
           window.location.href = 'auth.html';
@@ -1658,16 +1647,14 @@ body {
         }
       }
 
-      // Generate and update title immediately after first exchange
       async function generateAndUpdateTitle() {
-        if (!currentConversationId || convo.length < 2) return; // Need at least user + assistant message
+        if (!currentConversationId || convo.length < 2) return;
         
         try {
           const currentConv = allConversations.find(c => c.id === currentConversationId);
           if (currentConv && currentConv.title.includes('Conversation with') && !currentConv.custom_title) {
             const firstUserMessage = convo.find(m => m.role === 'user');
             if (firstUserMessage && firstUserMessage.content) {
-              // Get AI-generated title
               const smartTitle = await generateConversationTitle(firstUserMessage.content, currentAvatar.name);
               
               const { error } = await supabase
@@ -1677,7 +1664,6 @@ body {
                 
               if (!error) {
                 currentConv.title = smartTitle;
-                // Refresh the conversations list to show new title immediately
                 displayConversations(allConversations);
               }
             }
@@ -1687,67 +1673,52 @@ body {
         }
       }
 
-      // Start new chat
       function startNewChat() {
         convo.length = 0;
         log.innerHTML = '';
         currentConversationId = null;
         
-        // Show the ask question bar for new conversation
         showAskQuestionBar();
         
-        // Remove active state from all conversations
         displayConversations(allConversations);
       }
 
-      // Conversation management functions
-      // Setup conversation interaction for mobile and desktop
       function setupConversationInteraction(conversationItem, conversationId) {
         let touchStartTime = 0;
         let longPressTimer = null;
         let longPressTriggered = false;
         
-        // Touch start - start timing for long press
         conversationItem.addEventListener('touchstart', (e) => {
-          // Don't handle touch if clicking on menu button
           if (e.target.closest('.conversation-actions')) return;
           
           touchStartTime = Date.now();
           longPressTriggered = false;
           
           longPressTimer = setTimeout(() => {
-            // Long press detected - show menu
             longPressTriggered = true;
-            navigator.vibrate && navigator.vibrate(50); // Haptic feedback if available
+            navigator.vibrate && navigator.vibrate(50);
             toggleConversationMenu(e, conversationId);
-          }, 500); // 500ms for long press
+          }, 500);
         }, { passive: true });
         
-        // Touch end - determine if it's a tap or long press
         conversationItem.addEventListener('touchend', (e) => {
-          // Don't handle touch if clicking on menu button
           if (e.target.closest('.conversation-actions')) return;
           
           clearTimeout(longPressTimer);
           
           if (!longPressTriggered) {
-            // Short tap - load conversation
             e.preventDefault();
             loadConversation(conversationId);
           }
         }, { passive: false });
         
-        // Touch cancel - clean up
         conversationItem.addEventListener('touchcancel', () => {
           clearTimeout(longPressTimer);
           longPressTriggered = false;
         }, { passive: true });
         
-        // Mouse click for desktop - keep original behavior
         conversationItem.addEventListener('click', (e) => {
-          // Only handle if not a touch device or if no touch events fired
           if (!('ontouchstart' in window)) {
-            // Don't trigger if clicking on the menu button or dropdown
             if (!e.target.closest('.conversation-actions')) {
               loadConversation(conversationId);
             }
@@ -1858,21 +1829,14 @@ body {
           }
 
           currentAvatar = avatarData;
-
-          // Isolate novelty memory per avatar (nothing to clear here unless switching from prior avatar handled externally)
-          // Optionally we could namespace by avatar so no action required; leaving placeholder if future cleanup needed.
           
           // Load conversation history now that we have the avatar
           loadConversationHistory();
           
           // Display avatar
-          console.log('Loading avatar image:', avatarData.image_url);
-      // Idle wiggle removed
           if (avatarData.image_url && avatarData.image_url.trim()) {
             const img = new Image();
             img.onload = () => {
-              console.log('Avatar image loaded successfully');
-        // Replace content
               avatar.innerHTML = '';
               img.style.width = '100%';
               img.style.height = '100%';
@@ -1889,7 +1853,6 @@ body {
               
               // Initialize minimized state (default)
               initializeMinimizedState();
-        // Idle wiggle removed
             };
             img.onerror = (e) => {
               console.error('Avatar image failed to load:', e);
@@ -2096,7 +2059,6 @@ body {
             // store for novelty
             const updated = [...recent, q].slice(-12);
             localStorage.setItem(recentKey, JSON.stringify(updated));
-            // Optionally auto-generate conversation record if none exists yet
             if(!currentConversationId){
               const { data: convoData } = await supabase
                 .from('conversations')
@@ -2104,7 +2066,7 @@ body {
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              // Removed refresh to preserve typewriter animation
+              loadConversationHistory();
             }
             // Save message
             if(currentConversationId){
@@ -2194,7 +2156,7 @@ body {
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              // Removed refresh to preserve typewriter animation
+              loadConversationHistory();
             }
             if(currentConversationId){
               await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: topic });
@@ -2332,7 +2294,7 @@ body {
                 .select()
                 .single();
               currentConversationId = convoData?.id || currentConversationId;
-              // Removed refresh to preserve typewriter animation
+              loadConversationHistory();
             }
             if(currentConversationId){
               await supabase.from('messages').insert({ conversation_id: currentConversationId, role:'assistant', text: facts });
@@ -2414,7 +2376,6 @@ body {
           // Use archetype or archetype_specific as persona, fallback to name
           const personaType = currentAvatar.traits?.archetype_specific || currentAvatar.traits?.archetype || currentAvatar.name;
 
-          // Non-stream fetch + typewriter simulation (fallback while real streaming debug)
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
@@ -2431,17 +2392,15 @@ body {
           });
           const { text:fullResp, error:respErr } = await res.json();
           const finalText = (respErr || !fullResp ? 'No response.' : fullResp).trim();
-          // Reuse loading row instead of creating a second placeholder
           let loadingRow = document.getElementById(loadingId);
           let bubble;
           if(loadingRow){
             bubble = loadingRow.querySelector('.bubble');
-            // Clean the loading bubble
             if(bubble){
               bubble.classList.remove('loading-message');
               bubble.textContent = '';
             }
-            loadingRow.removeAttribute('id'); // prevent accidental future removal
+            loadingRow.removeAttribute('id');
           } else {
             // Fallback if loading row missing
             const row = document.createElement('div');
@@ -2452,9 +2411,8 @@ body {
             log.appendChild(row);
           }
           setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
-          // Animate text typing
           let i=0;
-          const speed = 7; // Characters per frame (higher = faster)
+          const speed = 7;
           const animate = ()=>{
             if(!bubble) return;
             bubble.textContent = finalText.slice(0,i);
@@ -2533,9 +2491,7 @@ body {
                    style="width:100%;height:100%;object-fit:cover;">`;
       }
 
-  // Idle wiggle removed
-
-  // Avatar minimize functionality
+      // Avatar minimize functionality
   let isMinimized = true; // Default to minimized state
   const avatarSection = document.querySelector('.avatar-section');
   const scroller = document.getElementById('log');
@@ -2546,7 +2502,7 @@ body {
   if (avatarSection && avatarSection.parentNode) {
     avatarSection.parentNode.insertBefore(avatarPlaceholder, avatarSection.nextSibling);
   }
-  let expandClickHandler = null; // stable reference for minimized->expand click
+  let expandClickHandler = null;
 
       function isMobileLayout() {
         return window.innerWidth <= 768;
@@ -2556,14 +2512,11 @@ body {
         if (!avatarSection || !sidebar) return;
         const sidebarActions = sidebar.querySelector('.sidebar-actions');
         if (sidebarActions && avatarSection.parentNode !== sidebar) {
-          // Insert after sidebar-actions (after "New Conversation")
           sidebarActions.parentNode.insertBefore(avatarSection, sidebarActions.nextSibling);
         } else if (sidebarActions && avatarSection.previousElementSibling !== sidebarActions) {
-          // Move to after sidebar-actions if already in sidebar but wrong position
           sidebarActions.parentNode.insertBefore(avatarSection, sidebarActions.nextSibling);
         }
         avatarSection.classList.add('in-sidebar');
-        // Always show as minimized in sidebar
         avatarSection.classList.add('minimized');
         scroller.classList.add('expanded');
       }
@@ -2574,7 +2527,6 @@ body {
           avatarPlaceholder.parentNode.insertBefore(avatarSection, avatarPlaceholder);
         }
         avatarSection.classList.remove('in-sidebar');
-        // Restore the actual minimized state when moving back to column
         if (!isMinimized) {
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
@@ -2594,7 +2546,6 @@ body {
       }
 
       function addMinimizeButton() {
-        // Remove existing minimize button if any
         const existingBtn = avatar.querySelector('.minimize-btn');
         if (existingBtn) existingBtn.remove();
         
@@ -2604,14 +2555,12 @@ body {
         minimizeBtn.title = 'Minimize avatar';
         minimizeBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          console.log('Minimize button clicked!'); // Debug log
           toggleMinimize();
         });
         avatar.appendChild(minimizeBtn);
       }
 
       function addEditButton() {
-        // Remove existing edit button if any
         const existingBtn = avatar.querySelector('.edit-btn');
         if (existingBtn) existingBtn.remove();
         
@@ -2621,7 +2570,6 @@ body {
         editBtn.title = 'Edit avatar';
         editBtn.addEventListener('click', function(e) {
           e.stopPropagation();
-          // Get current avatar ID from URL or localStorage
           const urlParams = new URLSearchParams(window.location.search);
           const avatarId = urlParams.get('avatar') || localStorage.getItem('lastSelectedAvatar');
           if (avatarId) {
@@ -2632,13 +2580,11 @@ body {
       }
 
       function initializeMinimizedState() {
-        // Set up the initial minimized state without toggling
         avatarSection.classList.add('minimized');
         scroller.classList.add('expanded');
         if (isMobileLayout()) {
           scroller.style.maxHeight = '580px';
         }
-        // Show mobile avatar preview when minimized
         mobileAvatarPreview?.classList.add('visible');
         
         const minimizeBtn = avatar.querySelector('.minimize-btn');
@@ -2648,7 +2594,6 @@ body {
           minimizeBtn.style.display = 'none';
         }
         
-        // Add click handler to expand
         if (!expandClickHandler) {
           expandClickHandler = function(e){
             if (e.target.closest && e.target.closest('.minimize-btn')) return;
@@ -2662,18 +2607,15 @@ body {
       }
 
       function toggleMinimize() {
-        console.log('toggleMinimize called, current state:', isMinimized); // Debug log
         isMinimized = !isMinimized;
         const minimizeBtn = avatar.querySelector('.minimize-btn');
         
         if (isMinimized) {
-          console.log('Minimizing avatar...'); // Debug log
           avatarSection.classList.add('minimized');
           scroller.classList.add('expanded');
           if (isMobileLayout()) {
             scroller.style.maxHeight = '580px';
           }
-          // Show mobile avatar preview when minimized
           mobileAvatarPreview?.classList.add('visible');
           
           if (minimizeBtn) {
@@ -2690,11 +2632,9 @@ body {
           avatar.style.cursor = 'pointer';
           avatar.addEventListener('click', expandClickHandler);
         } else {
-          console.log('Expanding avatar...'); // Debug log
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
           scroller.style.maxHeight = '';
-          // Hide mobile avatar preview when maximized
           mobileAvatarPreview?.classList.remove('visible');
           
           if (minimizeBtn) {
@@ -2711,7 +2651,6 @@ body {
         updateAvatarPlacement();
       }
 
-      // Use debounced resize for avatar placement
       window.addEventListener('resize', debounceResize(updateAvatarPlacement, 150));
       updateAvatarPlacement();
 
