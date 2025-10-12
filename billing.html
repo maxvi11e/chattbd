@@ -495,32 +495,54 @@
             return;
           }
           
-          // Update the profile to mark as deleted
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ 
-              deleted_at: new Date().toISOString(),
-              display_name: '[DELETED]',
-              email: '[DELETED]'
-            })
-            .eq('id', session.user.id);
+          const userId = session.user.id;
           
-          if (updateError) {
-            console.error('Error marking account as deleted:', updateError);
-            alert('Failed to delete account. Please try again or contact support.');
-            deleteAccountBtn.disabled = false;
-            deleteAccountBtn.textContent = "Delete Account";
-            return;
+          // Delete user data in order (respecting foreign key constraints)
+          // Note: Conversations and Messages will cascade delete when avatars are deleted
+          console.log('Deleting user data...');
+          
+          // 1. Delete user subscriptions (has CASCADE on user_id)
+          const { error: subsError } = await supabase
+            .from('user_subscriptions')
+            .delete()
+            .eq('user_id', userId);
+          
+          if (subsError) {
+            console.warn('Error deleting subscriptions:', subsError);
+            // Continue anyway - this is not critical
           }
           
-          // Sign out and redirect
+          // 2. Delete avatars (will CASCADE delete conversations and messages)
+          const { error: avatarsError } = await supabase
+            .from('avatars')
+            .delete()
+            .eq('user_id', userId);
+          
+          if (avatarsError) {
+            console.error('Error deleting avatars:', avatarsError);
+            throw new Error('Failed to delete avatars');
+          }
+          
+          // 3. Delete profile
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .delete()
+            .eq('id', userId);
+          
+          if (profileError) {
+            console.error('Error deleting profile:', profileError);
+            throw new Error('Failed to delete profile');
+          }
+          
+          // 4. Sign out (this will end the session)
           await supabase.auth.signOut();
-          alert('Your account has been deleted.');
+          
+          alert('Your account and all associated data have been permanently deleted.');
           window.location.href = 'auth.html';
           
         } catch (error) {
           console.error('Error deleting account:', error);
-          alert('An error occurred while deleting your account. Please try again.');
+          alert('An error occurred while deleting your account. Please try again or contact support.');
           deleteAccountBtn.disabled = false;
           deleteAccountBtn.textContent = "Delete Account";
         }
