@@ -10,11 +10,38 @@ ALTER TABLE public.user_subscriptions
 ADD COLUMN IF NOT EXISTS edit_credits_used integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS edit_credits_limit integer DEFAULT 0,
 ADD COLUMN IF NOT EXISTS monthly_bots_created integer DEFAULT 0,
-ADD COLUMN IF NOT EXISTS monthly_bot_limit integer DEFAULT NULL;
+ADD COLUMN IF NOT EXISTS monthly_bot_limit integer DEFAULT NULL,
+ADD COLUMN IF NOT EXISTS total_bots_created integer DEFAULT 0;
+
+-- 2a. Initialize total_bots_created for existing users
+UPDATE user_subscriptions us
+SET total_bots_created = (
+  SELECT COUNT(*) 
+  FROM avatars 
+  WHERE user_id = us.user_id
+)
+WHERE status = 'active';
+
+-- 2b. Create a separate table to track bot creation count for ALL users (including free)
+CREATE TABLE IF NOT EXISTS public.user_bot_counters (
+  user_id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  total_bots_created integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
+);
+
+-- Initialize counters for existing users
+INSERT INTO user_bot_counters (user_id, total_bots_created)
+SELECT 
+  id as user_id,
+  (SELECT COUNT(*) FROM avatars WHERE user_id = id) as total_bots_created
+FROM auth.users
+ON CONFLICT (user_id) DO UPDATE 
+SET total_bots_created = EXCLUDED.total_bots_created;
 
 -- 3. Create the 'monthly' plan first (before updating user_subscriptions)
 INSERT INTO subscription_plans (id, name, description, price_cents, billing_interval, bot_limit, edit_credits_limit, features, is_active)
-VALUES ('monthly', 'Monthly Plan', 'Perfect for active creators', 1000, 'monthly', NULL, 20, 
+VALUES ('monthly', 'Monthly Plan', 'Perfect for active creators', 900, 'monthly', NULL, 20, 
   '["Create up to 20 AIs/month", "20 edit credits/month", "Priority support", "Advanced features"]'::jsonb, true)
 ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
@@ -75,7 +102,8 @@ RETURNS TABLE (
     subscription_status text,
     edit_credits_used integer,
     edit_credits_limit integer,
-    can_use_edit_credit boolean
+    can_use_edit_credit boolean,
+    total_bots_created integer
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -85,8 +113,10 @@ BEGIN
             us.status,
             us.edit_credits_used,
             us.edit_credits_limit,
+            us.total_bots_created,
             sp.name as plan_name,
-            sp.bot_limit
+            sp.bot_limit,
+            sp.billing_interval
         FROM public.user_subscriptions us
         JOIN public.subscription_plans sp ON us.plan_id = sp.id
         WHERE us.user_id = user_uuid 
@@ -99,16 +129,41 @@ BEGIN
         FROM public.avatars 
         WHERE user_id = user_uuid 
         AND is_active = true
+    ),
+    bot_counter AS (
+        SELECT COALESCE(total_bots_created, 0) as count
+        FROM public.user_bot_counters
+        WHERE user_id = user_uuid
     )
     SELECT 
         COALESCE(user_sub.plan_id, 'free') as plan_id,
         COALESCE(user_sub.plan_name, 'Free Plan') as plan_name,
-        COALESCE(user_sub.bot_limit, 1) as bot_limit,
+        CASE 
+            WHEN user_sub.plan_id IS NULL THEN 1
+            ELSE COALESCE(user_sub.bot_limit, 1)
+        END as bot_limit,
         COALESCE(bot_count.count, 0) as current_bot_count,
         CASE 
+            -- Check if user has no subscription (free user) - use permanent counter
+            WHEN user_sub.plan_id IS NULL THEN 
+                CASE WHEN COALESCE(bot_counter.count, 0) < 1 THEN true ELSE false END
+            -- Check if user has one-time plan (starter) - use permanent counter from subscription
+            WHEN user_sub.billing_interval = 'one_time' THEN
+                CASE 
+                    WHEN user_sub.bot_limit IS NULL THEN true
+                    WHEN COALESCE(user_sub.total_bots_created, 0) < user_sub.bot_limit THEN true
+                    ELSE false
+                END
+            -- Check if user has monthly plan - only count active bots
+            WHEN user_sub.billing_interval = 'monthly' THEN
+                CASE 
+                    WHEN user_sub.bot_limit IS NULL THEN true
+                    WHEN COALESCE(bot_count.count, 0) < user_sub.bot_limit THEN true
+                    ELSE false
+                END
+            -- Default check for unlimited or other plans
             WHEN user_sub.bot_limit IS NULL THEN true
             WHEN COALESCE(bot_count.count, 0) < user_sub.bot_limit THEN true
-            WHEN user_sub.plan_id IS NULL AND COALESCE(bot_count.count, 0) < 1 THEN true
             ELSE false
         END as can_create_bot,
         COALESCE(user_sub.status, 'free') as subscription_status,
@@ -118,9 +173,14 @@ BEGIN
             WHEN COALESCE(user_sub.edit_credits_limit, 0) = 0 THEN false
             WHEN COALESCE(user_sub.edit_credits_used, 0) < COALESCE(user_sub.edit_credits_limit, 0) THEN true
             ELSE false
-        END as can_use_edit_credit
+        END as can_use_edit_credit,
+        CASE
+            WHEN user_sub.plan_id IS NULL THEN COALESCE(bot_counter.count, 0)
+            ELSE COALESCE(user_sub.total_bots_created, 0)
+        END as total_bots_created
     FROM bot_count
-    LEFT JOIN user_sub ON true;
+    LEFT JOIN user_sub ON true
+    LEFT JOIN bot_counter ON true;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -201,6 +261,34 @@ CREATE TRIGGER initialize_subscription_limits_trigger
     BEFORE INSERT ON public.user_subscriptions
     FOR EACH ROW
     EXECUTE FUNCTION initialize_subscription_limits();
+
+-- 10. Create trigger to increment bot counters when a bot is created
+CREATE OR REPLACE FUNCTION increment_total_bots_created()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Increment total_bots_created for the user's active subscription (if they have one)
+    UPDATE public.user_subscriptions
+    SET total_bots_created = total_bots_created + 1
+    WHERE user_id = NEW.user_id
+    AND status = 'active';
+    
+    -- ALWAYS increment the permanent counter (for all users, including free)
+    INSERT INTO public.user_bot_counters (user_id, total_bots_created)
+    VALUES (NEW.user_id, 1)
+    ON CONFLICT (user_id) 
+    DO UPDATE SET 
+        total_bots_created = user_bot_counters.total_bots_created + 1,
+        updated_at = now();
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS increment_bots_trigger ON public.avatars;
+CREATE TRIGGER increment_bots_trigger
+    AFTER INSERT ON public.avatars
+    FOR EACH ROW
+    EXECUTE FUNCTION increment_total_bots_created();
 
 -- Migration complete
 SELECT 'Edit credits migration completed successfully!' as status;

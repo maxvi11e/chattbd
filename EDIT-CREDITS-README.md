@@ -17,7 +17,7 @@ The edit credits system allows users to regenerate AI avatars on the edit page. 
 - Advanced customization
 - Email support
 
-### Monthly Plan ($10/month)
+### Monthly Plan ($9/month)
 - Create up to 20 AIs per month
 - **20 edit credits per month** (20 regenerations per month)
 - Priority support

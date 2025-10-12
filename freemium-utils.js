@@ -141,7 +141,7 @@ function createUpgradeModal() {
         </div>
         <div class="modal-body">
           <div class="current-usage">
-            <p id="usageText">You've created <strong id="botCount">0</strong> out of <strong id="botLimit">1</strong> allowed agents.</p>
+            <p id="usageText">You've created <strong id="totalBotsCreated">0</strong> agents total. You currently have <strong id="botCount">0</strong> active agents out of <strong id="botLimit">1</strong> allowed.</p>
           </div>
           <div class="pricing-grid" id="pricingGrid">
             <!-- Plans will be inserted here -->
@@ -369,9 +369,11 @@ function createUpgradeModal() {
 function updateUpgradeModalContent(modal, subscriptionInfo, plans) {
   // Update usage text
   const usageText = modal.querySelector('#usageText');
+  const totalBotsCreated = modal.querySelector('#totalBotsCreated');
   const botCount = modal.querySelector('#botCount');
   const botLimit = modal.querySelector('#botLimit');
   
+  if (totalBotsCreated) totalBotsCreated.textContent = subscriptionInfo.total_bots_created || 0;
   if (botCount) botCount.textContent = subscriptionInfo.current_bot_count;
   if (botLimit) {
     botLimit.textContent = subscriptionInfo.bot_limit || 'unlimited';

@@ -426,15 +426,22 @@ function getPlanDetails(planId) {
     },
     'starter': {
       name: 'Starter Plan',
-      description: 'Great for small projects and personal use (temporary promo)',
-      price_cents: 50, // TEMPORARY: reduced to $0.50 one-time
+      description: 'Great for personal projects',
+      price_cents: 400, // $4.00 one-time
       billing_interval: 'one_time',
-      bot_limit: 4
+      bot_limit: 3
+    },
+    'monthly': {
+      name: 'Monthly Plan',
+      description: 'Perfect for active creators',
+      price_cents: 900, // $9.00 per month
+      billing_interval: 'monthly',
+      bot_limit: 20
     },
     'unlimited': {
       name: 'Unlimited Plan',
       description: 'Create unlimited agents',
-      price_cents: 50,
+      price_cents: 900,
       billing_interval: 'monthly',
       bot_limit: null
     }
