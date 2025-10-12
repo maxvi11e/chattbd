@@ -585,5 +585,6 @@ window.FreemiumUtils = {
   useEditCredit,
   getSubscriptionPlans,
   showUpgradeModal,
+  handlePaidPlanUpgrade,
   formatPrice
 };

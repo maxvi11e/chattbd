@@ -431,8 +431,8 @@
 
     // Handle upgrade to paid plan
     async function handlePaidPlanUpgrade(plan) {
-      // TODO: Implement Stripe Checkout
-      alert(`Upgrading to ${plan.name} for ${window.FreemiumUtils.formatPrice(plan.price_cents, plan.billing_interval)} - Stripe integration coming soon!`);
+      // Use the FreemiumUtils function that handles Stripe checkout
+      await window.FreemiumUtils.handlePaidPlanUpgrade(plan);
     }
 
     // Handle downgrade to free plan
