@@ -107,7 +107,8 @@ BEGIN
         COALESCE(bot_count.count, 0) as current_bot_count,
         CASE 
             WHEN user_sub.bot_limit IS NULL THEN true
-            WHEN COALESCE(bot_count.count, 0) < COALESCE(user_sub.bot_limit, 1) THEN true
+            WHEN COALESCE(bot_count.count, 0) < user_sub.bot_limit THEN true
+            WHEN user_sub.plan_id IS NULL AND COALESCE(bot_count.count, 0) < 1 THEN true
             ELSE false
         END as can_create_bot,
         COALESCE(user_sub.status, 'free') as subscription_status,
