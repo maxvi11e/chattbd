@@ -372,9 +372,19 @@
     border-radius:var(--radius-lg);
     object-fit:cover;
     display:none;
+    opacity:0;
+    transition:opacity 0.3s ease;
   }
   .bot-image.visible {
     display:block;
+    opacity:1;
+  }
+  /* Prevent broken image icon from showing */
+  .bot-image:not([src]),
+  .bot-image[src=""],
+  .bot-image[src="about:blank"] {
+    display:none !important;
+    opacity:0 !important;
   }
   .frame-spinner {
     position:absolute;
@@ -2645,11 +2655,15 @@
   // Show loading state and keep frame spinner centered
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
-  // Clear the previous image
-  botImage.src = '';
+  // Clear the previous image completely to prevent broken image icon
   botImage.classList.remove('visible');
-  botVideo.src = '';
+  botImage.style.display = 'none';
+  botImage.src = 'about:blank';
+  botImage.alt = '';
+  // Clear video
+  botVideo.classList.remove('visible');
   botVideo.style.display = 'none';
+  botVideo.src = '';
         hideError();
 
         // Check edit credits
@@ -2660,6 +2674,8 @@
             const subscriptionInfo = canUseCredit.subscriptionInfo || await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
             showError(canUseCredit.reason);
             await window.FreemiumUtils.showUpgradeModal(subscriptionInfo, plans);
+            setLoadingState(false);
+            isRegenerating = false;
             return;
           }
           
@@ -2667,10 +2683,15 @@
           const creditResult = await window.FreemiumUtils.useEditCredit(supabase);
           if (!creditResult.success) {
             showError(creditResult.error || 'Failed to use edit credit');
+            setLoadingState(false);
+            isRegenerating = false;
             return;
           }
           
           console.log(`✅ Edit credit used. ${creditResult.creditsRemaining} credits remaining.`);
+          
+          // Immediately update the UI to show reduced credits
+          await loadEditCreditsInfo();
         }
 
         // Call regeneration API
@@ -2696,6 +2717,8 @@
           const serverMsg = result?.error || 'Failed to regenerate agent. Please try again.';
           const serverDebug = result?.debug ? ` [${JSON.stringify(result.debug).slice(0, 300)}]` : '';
           showError(serverMsg + serverDebug);
+          // Reload credits even on error since credit was already consumed
+          await loadEditCreditsInfo();
           return;
         }
 
@@ -2709,6 +2732,8 @@
       } catch (error) {
         console.error('Error regenerating bot:', error);
         showError('Failed to regenerate agent. Please try again.');
+        // Reload credits in case they were consumed before the error
+        await loadEditCreditsInfo();
       } finally {
         setLoadingState(false);
         isRegenerating = false;

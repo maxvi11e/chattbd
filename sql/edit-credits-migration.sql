@@ -53,6 +53,15 @@ UPDATE subscription_plans SET
   features = '["Create 3 AIs", "5 edit credits", "Advanced customization", "Email support"]'::jsonb
 WHERE id = 'starter';
 
+-- 6a. Initialize edit credits for existing active subscriptions
+UPDATE user_subscriptions us
+SET 
+  edit_credits_limit = sp.edit_credits_limit,
+  edit_credits_used = COALESCE(us.edit_credits_used, 0)
+FROM subscription_plans sp
+WHERE us.plan_id = sp.id
+AND us.status = 'active';
+
 -- 7. Drop and recreate the get_user_subscription_info function to include edit credits
 DROP FUNCTION IF EXISTS get_user_subscription_info(uuid);
 
