@@ -437,25 +437,34 @@
       const chatNavIcon = document.getElementById("chatNavIcon");
       const deleteAccountBtn = document.getElementById("deleteAccountBtn");
 
+      if (!deleteAccountBtn) {
+        console.error('Delete account button not found!');
+      }
+
       // Sign out handler
-      logoutBtn.addEventListener("click", async () => {
-        await supabase.auth.signOut();
-        window.location.href = 'auth.html';
-      });
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+          await supabase.auth.signOut();
+          window.location.href = 'auth.html';
+        });
+      }
 
       // Chat navigation handler
-      chatNavIcon.addEventListener("click", (e) => {
-        e.preventDefault();
-        const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
-        if (lastAvatarId) {
-          window.location.href = `chat.html?avatar=${lastAvatarId}`;
-        } else {
-          alert('Please select an avatar to chat with first!');
-        }
-      });
+      if (chatNavIcon) {
+        chatNavIcon.addEventListener("click", (e) => {
+          e.preventDefault();
+          const lastAvatarId = localStorage.getItem('lastSelectedAvatar');
+          if (lastAvatarId) {
+            window.location.href = `chat.html?avatar=${lastAvatarId}`;
+          } else {
+            alert('Please select an avatar to chat with first!');
+          }
+        });
+      }
 
       // Delete account handler
-      deleteAccountBtn.addEventListener("click", async () => {
+      if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener("click", async () => {
         const confirmed = confirm(
           "Are you absolutely sure you want to delete your account?\n\n" +
           "This will permanently delete:\n" +
@@ -515,7 +524,8 @@
           deleteAccountBtn.disabled = false;
           deleteAccountBtn.textContent = "Delete Account";
         }
-      });
+        });
+      }
 
       // Watch auth state changes
       if (!DESIGN_MODE) {

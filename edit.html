@@ -359,7 +359,7 @@
     max-height:calc(100vw - 80px);
     border-radius:var(--radius-lg);
     border:1px solid #333;
-    background:transparent;
+    background:#000;
     position:relative;
     overflow:hidden;
     display:flex;
@@ -2558,7 +2558,11 @@
   // Show loading state and keep frame spinner centered
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
+  // Clear the previous image
+  botImage.src = '';
   botImage.classList.remove('visible');
+  botVideo.src = '';
+  botVideo.style.display = 'none';
         hideError();
 
         // Check freemium limits
