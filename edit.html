@@ -2996,6 +2996,10 @@
       } finally {
         setLoadingState(false);
         isRegenerating = false;
+        // Ensure resend button stays hidden after regeneration completes
+        if (currentBot?.image_url) {
+          resendBtn.style.display = 'none';
+        }
       }
     }
 
@@ -3045,8 +3049,14 @@
         currentBot = updatedBot;
         displayBot(updatedBot);
         
+        // Explicitly ensure resend button is hidden after successful regeneration
+        resendBtn.style.display = 'none';
+        
         // Reload history to show the new version
         await loadHistory();
+        
+        // Keep resend button hidden after history loads
+        resendBtn.style.display = 'none';
         
       } catch (error) {
         console.error('Error updating bot image:', error);
