@@ -82,7 +82,7 @@
 
     /* Delete Account Section */
     .delete-account-section{margin-top:64px; padding-top:48px; border-top:1px solid rgba(128,128,128,0.3);}
-    .delete-account-card{background:transparent); border:1px solid rgba(255,59,48,0.3); border-radius:var(--radius-lg); padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; max-width:500px; margin:0 auto;}
+    .delete-account-card{background:transparent; border:1px solid rgba(255,59,48,0.3); border-radius:var(--radius-lg); padding:24px; display:flex; flex-direction:column; align-items:center; gap:16px; max-width:500px; margin:0 auto;}
     .delete-account-info{text-align:center;}
     .delete-account-info h3{margin:0 0 8px 0; color:#ff453a; font-size:18px;}
     .delete-account-info p{margin:0; color:var(--muted); font-size:14px;}
@@ -464,7 +464,6 @@
           <div class="plan-card ${plan.isCurrent ? 'current' : ''} ${plan.isRecommended ? 'recommended' : ''}">
             <h3>${plan.name}</h3>
             <div class="price">${formatPrice(plan.price_cents, plan.billing_interval)}</div>
-```
             <p class="description">${plan.description}</p>
             <ul class="features">
               ${plan.features.map(feature => `<li>${feature}</li>`).join('')}
