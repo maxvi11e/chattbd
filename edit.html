@@ -276,7 +276,7 @@
   .main-content {
     padding:24px;
     max-width:1200px;
-    margin:0 auto;
+    margin:-10px auto 0 auto;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -339,7 +339,7 @@
     align-items:flex-start;
     justify-content:center;
     gap:28px;
-    margin-bottom:0px;
+    margin-bottom:-10px;
     transition:gap 0.35s ease;
     flex-wrap:nowrap;
     max-width:fit-content;
@@ -365,6 +365,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
+    margin-top: -10px;
   }
   .bot-image {
     width:100%;
@@ -577,15 +578,15 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
-    padding:12px 20px;
+    gap:4px;
+    padding:10px;
     background:rgba(255,255,255,0.05);
     border:1px solid rgba(255,255,255,0.2);
     border-radius:12px;
     font-size:14px;
     color:var(--ink);
-    margin-bottom:16px;
-    max-width:400px;
+    margin-bottom:4px;
+    max-width:220px;
     width:100%;
   }
   .edit-credits-indicator.low-credits {
@@ -617,11 +618,12 @@
     border:0px solid var(--stroke);
     border-radius:var(--radius-lg);
     background:rgba(255, 255, 255, 0);
-    margin:0 auto;
+    margin:-10px auto 0 auto;
     align-items:center;
   }
   .edit-form.visible {
     display:flex;
+    margin-top:-10px;
   }
   .form-group {
     display:flex;
@@ -748,7 +750,7 @@
     position:fixed;
     right:0;
     top:0;
-    width:360px;
+    width:288px;
     height:100dvh;
     background:var(--bg);
     border-left:1px solid #333;
@@ -793,7 +795,7 @@
   }
   .history-grid {
     display:grid;
-    grid-template-columns:repeat(2, 1fr);
+    grid-template-columns:1fr;
     gap:16px;
   }
   .history-item {
@@ -801,7 +803,7 @@
     cursor:pointer;
     border-radius:12px;
     overflow:hidden;
-    border:2px solid transparent;
+    border:1px solid transparent;
     transition:all 0.2s;
     background:#111;
   }
@@ -1056,12 +1058,14 @@
     }
     .main-content {
       padding:16px;
+      margin-top:-10px;
     }
     .page-title {
       font-size:14px;
       max-width:429px;
       /* 30% wider than bot-frame */
       padding:4px 4px;
+      margin-top:-10px;
       /* Reduced padding for more width */
     }
     .bot-frame {
@@ -1831,7 +1835,9 @@
           .select('edit_credits_used, edit_credits_limit')
           .eq('user_id', user.id)
           .eq('status', 'active')
-          .single();
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
 
         if (error) {
           console.error('Error fetching subscription info:', error);
@@ -1954,7 +1960,7 @@
       const editAppearanceBtnTop = document.getElementById('editAppearanceBtnTop');
       if (editAppearanceBtnTop) {
         editAppearanceBtnTop.addEventListener('click', () => {
-          showEditForm();
+          toggleEditForm();
         });
       }
 
@@ -2461,6 +2467,15 @@
       editForm.classList.remove('visible');
       if (actionButtons) actionButtons.style.display = 'flex';
       editPrompt.value = '';
+    }
+
+    // Toggle edit form (show if hidden, hide if visible)
+    function toggleEditForm() {
+      if (editForm.classList.contains('visible')) {
+        hideEditForm();
+      } else {
+        showEditForm();
+      }
     }
 
     // Confirm bot and go to chat
