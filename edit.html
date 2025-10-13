@@ -1355,6 +1355,9 @@
     });
     const COLLAPSED_SIDEBAR_WIDTH = 44;
 
+    // Track whether we've loaded credits initially
+    let creditsInitiallyLoaded = false;
+
     // Auth check function
     async function checkAuthAndRedirect() {
       if (DESIGN_MODE) {
@@ -1798,10 +1801,10 @@
       
       populatePersonalitySliders(bot.traits);
       
-      // Don't reload edit credits - they're managed separately during regeneration
-      // Only load on initial page load (when there's no currentBot yet)
-      if (!currentBot) {
+      // Only load credits once on initial page load, not during regenerations
+      if (!creditsInitiallyLoaded) {
         loadEditCreditsInfo();
+        creditsInitiallyLoaded = true;
       }
       
       console.log('✅ Bot displayed successfully');
