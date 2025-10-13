@@ -1823,11 +1823,43 @@
     function displayBot(bot) {
       try {
       console.log('🎨 Displaying bot:', bot);
-      // Show spinner in frame until the image loads
-      botImage.classList.remove('visible');
-      botVideo.classList.remove('visible');
-      frameSpinner.classList.remove('hidden');
-      resendBtn.style.display = 'none'; // Hide resend button when displaying a bot
+      
+      // Check if image_url is empty or invalid (failed generation)
+      const hasValidImage = bot.image_url && bot.image_url.trim() !== '' && 
+                           !bot.image_url.includes('redo_icon') && 
+                           bot.image_url !== 'about:blank';
+      
+      if (!hasValidImage) {
+        console.log('⚠️ No valid image found, showing resend button');
+        // Hide spinner and image, show resend button
+        frameSpinner.classList.add('hidden');
+        botImage.classList.remove('visible');
+        botVideo.classList.remove('visible');
+        resendBtn.style.display = 'flex';
+        
+        // Store the bot's traits as the last generation payload for retry
+        if (bot.traits) {
+          lastGenerationPayload = {
+            prompt: bot.traits.original_prompt || '',
+            archetype: bot.traits.archetype || null,
+            archetypeSpecific: bot.traits.archetype_specific || null,
+            vibe: bot.traits.vibe || null,
+            styleChoice: bot.traits.style_choice || 'default',
+            artStyleCustom: bot.traits.art_style_custom || null,
+            traits: bot.traits.persona_traits || null,
+            personalityPrompt: bot.traits.personality_prompt || null,
+            colors: bot.traits.colors || [],
+            setting: bot.traits.setting || null,
+            animal: bot.traits.animal || null
+          };
+        }
+      } else {
+        // Show spinner in frame until the image loads
+        botImage.classList.remove('visible');
+        botVideo.classList.remove('visible');
+        frameSpinner.classList.remove('hidden');
+        resendBtn.style.display = 'none'; // Hide resend button when displaying a bot
+      }
       
       // Set bot name, use abstract name if not set
       const botName = bot.name || (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'Agent');
@@ -1842,20 +1874,25 @@
         pendingNameValue = null;
       }
       
-      // Always show image (video feature disabled for now)
-      botVideo.style.display = 'none';
-      botImage.style.display = 'block';
-      botImage.alt = bot.name || 'Agent preview';
-      botImage.onload = () => {
-        botImage.classList.add('visible');
-        frameSpinner.classList.add('hidden');
-      };
-      botImage.onerror = () => {
-        // Keep spinner to avoid ugly broken image icon
-        frameSpinner.classList.remove('hidden');
-        botImage.classList.remove('visible');
-      };
-      botImage.src = bot.image_url;
+      // Only try to load image if we have a valid URL
+      if (hasValidImage) {
+        // Always show image (video feature disabled for now)
+        botVideo.style.display = 'none';
+        botImage.style.display = 'block';
+        botImage.alt = bot.name || 'Agent preview';
+        botImage.onload = () => {
+          botImage.classList.add('visible');
+          frameSpinner.classList.add('hidden');
+        };
+        botImage.onerror = () => {
+          // Image failed to load - show resend button
+          console.log('❌ Image failed to load, showing resend button');
+          frameSpinner.classList.add('hidden');
+          botImage.classList.remove('visible');
+          resendBtn.style.display = 'flex';
+        };
+        botImage.src = bot.image_url;
+      }
       
       populatePersonalitySliders(bot.traits);
       
