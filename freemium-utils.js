@@ -96,10 +96,12 @@ async function getSubscriptionPlans(supabase) {
 function formatPrice(priceCents, interval = 'one_time') {
   if (priceCents === 0) return 'Free';
   
-  const dollars = (priceCents / 100).toFixed(2);
+  const dollars = priceCents / 100;
+  // Format without cents if it's a whole number, otherwise show cents
+  const formattedDollars = dollars % 1 === 0 ? dollars.toFixed(0) : dollars.toFixed(2);
   const intervalText = interval === 'monthly' ? '/month' : interval === 'yearly' ? '/year' : '';
   
-  return `$${dollars}${intervalText}`;
+  return `$${formattedDollars}${intervalText}`;
 }
 
 /**

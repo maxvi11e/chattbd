@@ -211,7 +211,7 @@
                 <div class="plan-name">${subscriptionInfo.plan.name} Plan</div>
                 <div class="plan-details">
                     ${subscriptionInfo.plan.bot_limit ? `Up to ${subscriptionInfo.plan.bot_limit} agents` : 'Unlimited agents'} • 
-                    $${(subscriptionInfo.plan.price_cents / 100).toFixed(2)}/${subscriptionInfo.plan.billing_interval}
+                    $${(subscriptionInfo.plan.price_cents / 100) % 1 === 0 ? (subscriptionInfo.plan.price_cents / 100).toFixed(0) : (subscriptionInfo.plan.price_cents / 100).toFixed(2)}/${subscriptionInfo.plan.billing_interval}
                 </div>
             `;
             
