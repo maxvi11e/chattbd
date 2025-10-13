@@ -404,8 +404,8 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.9);
-    border: 2px solid var(--stroke);
-    border-radius: var(--radius-md);
+    border: 1px solid #505050;
+    border-radius: 50%;
     color: var(--ink);
     padding: 20px 32px;
     font-size: 18px;
@@ -414,7 +414,7 @@
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     z-index: 10;
     transition: all 0.2s ease;
   }
@@ -1283,7 +1283,7 @@
             <video id="botVideo" src="" class="bot-image" loop muted playsinline style="display: none;"></video>
             <!-- Resend Button (shown on generation failure) -->
             <button id="resendBtn" class="resend-btn" style="display: none;" title="Retry Generation">
-              <img src="images/redo_icon.png" alt="Retry" style="width: 48px; height: 48px;" />
+              <img src="images/redo_icon.png" alt="Retry" style="width: 48px; height: 48px; margin-bottom: -4px;" />
               <span>Retry</span>
             </button>
             <!-- History Toggle Button -->
@@ -1741,6 +1741,8 @@
           console.log('🎨 DESIGN MODE: No bot ID, but continuing for design preview');
           // In design mode, just show the interface without loading a bot
           frameSpinner.classList.add('hidden');
+          resendBtn.style.display = 'flex'; // Show retry button in design mode
+          pageTitle.textContent = 'Design Preview';
           return;
         }
         console.error('❌ No bot ID found');
@@ -2896,6 +2898,7 @@
   // Show loading state and keep frame spinner centered
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
+  resendBtn.style.display = 'none'; // Hide resend button during regeneration
   // Clear the previous image completely to prevent broken image icon
   botImage.classList.remove('visible');
   botImage.style.display = 'none';
