@@ -1885,6 +1885,7 @@
         botImage.onload = () => {
           botImage.classList.add('visible');
           frameSpinner.classList.add('hidden');
+          resendBtn.style.display = 'none'; // Ensure resend button stays hidden
         };
         botImage.onerror = () => {
           // Image failed to load - show resend button
