@@ -1798,8 +1798,9 @@
       
       populatePersonalitySliders(bot.traits);
       
-      // Load edit credits info (but not if we're in the middle of regenerating)
-      if (!isRegenerating) {
+      // Don't reload edit credits - they're managed separately during regeneration
+      // Only load on initial page load (when there's no currentBot yet)
+      if (!currentBot) {
         loadEditCreditsInfo();
       }
       
