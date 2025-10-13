@@ -1796,11 +1796,12 @@
       };
       botImage.src = bot.image_url;
       
-      console.log('🎚️ Populating personality sliders...');
       populatePersonalitySliders(bot.traits);
       
-      // Load edit credits info
-      loadEditCreditsInfo();
+      // Load edit credits info (but not if we're in the middle of regenerating)
+      if (!isRegenerating) {
+        loadEditCreditsInfo();
+      }
       
       console.log('✅ Bot displayed successfully');
       } catch (error) {
@@ -2041,9 +2042,7 @@
 
     function populatePersonalitySliders(traits) {
       if (!personalityPanel) return;
-      console.log('🎚️ populatePersonalitySliders called with traits:', traits);
       const source = extractPersonalityTraits(traits);
-      console.log('📊 Extracted personality traits:', source);
       const sliderState = {};
       personalitySliderKeys.forEach(key => {
         const input = personalitySliderElements[key];
@@ -2054,13 +2053,11 @@
         const storedValue = source ? source[key] : undefined;
         const sliderValue = percentToSlider(storedValue);
         input.value = sliderValue;
-        console.log(`🎚️ Applying color to ${key} slider with value ${sliderValue}`);
         applySliderColor(input);
         sliderState[key] = sliderValue;
       });
       memorizePersonality(sliderState);
       updatePersonalitySaveState();
-      console.log('✅ Personality sliders populated');
     }
 
     function extractPersonalityTraits(traits) {
@@ -2756,23 +2753,19 @@
           const serverMsg = result?.error || 'Failed to regenerate agent. Please try again.';
           const serverDebug = result?.debug ? ` [${JSON.stringify(result.debug).slice(0, 300)}]` : '';
           showError(serverMsg + serverDebug);
-          // Reload credits even on error since credit was already consumed
-          await loadEditCreditsInfo();
+          // Credits already updated in UI above
           return;
         }
 
   // Update the bot image and data
         await updateBotImage(result);
         hideEditForm();
-        
-        // Reload edit credits to show updated count
-        await loadEditCreditsInfo();
+        // Credits already updated in UI above
         
       } catch (error) {
         console.error('Error regenerating bot:', error);
         showError('Failed to regenerate agent. Please try again.');
-        // Reload credits in case they were consumed before the error
-        await loadEditCreditsInfo();
+        // Credits already updated in UI above
       } finally {
         setLoadingState(false);
         isRegenerating = false;
