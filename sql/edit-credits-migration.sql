@@ -182,7 +182,7 @@ BEGIN
     LEFT JOIN user_sub ON true
     LEFT JOIN bot_counter ON true;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql VOLATILE;
 
 -- 8. Create a function to use an edit credit
 CREATE OR REPLACE FUNCTION use_edit_credit(user_uuid uuid)
@@ -235,7 +235,7 @@ BEGIN
         'credits_remaining', sub_record.edit_credits_limit - (sub_record.edit_credits_used + 1)
     );
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql VOLATILE;
 
 -- 9. Create trigger to initialize edit credits when user subscribes
 CREATE OR REPLACE FUNCTION initialize_subscription_limits()
