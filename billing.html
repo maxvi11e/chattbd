@@ -286,34 +286,72 @@
           return;
         }
         
-        const subscriptionInfo = await window.FreemiumUtils.getUserSubscriptionInfo(supabase);
+        // Get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // Query subscription directly from database (no caching)
+        const { data: subscription, error: subError } = await supabase
+          .from('user_subscriptions')
+          .select(`
+            *,
+            subscription_plans (
+              id,
+              name,
+              price_cents,
+              billing_interval,
+              bot_limit,
+              features
+            )
+          `)
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        // Get bot count directly
+        const { count: botCount, error: countError } = await supabase
+          .from('avatars')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('is_active', true);
+
+        // Get all plans
         const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
         
+        // Set defaults for free users
+        const planInfo = subscription?.subscription_plans || { 
+          name: 'Free Plan', 
+          price_cents: 0, 
+          billing_interval: 'one_time', 
+          bot_limit: 1 
+        };
+        const editCreditsUsed = subscription?.edit_credits_used || 0;
+        const editCreditsLimit = subscription?.edit_credits_limit || 0;
+        const currentBotCount = botCount || 0;
+        const botLimit = planInfo.bot_limit || 1;
+        
         // Update current plan info
-        document.getElementById('currentPlanName').textContent = subscriptionInfo.plan_name;
+        document.getElementById('currentPlanName').textContent = planInfo.name;
         document.getElementById('currentPlanPrice').textContent = 
-          window.FreemiumUtils.formatPrice(
-            plans.find(p => p.id === subscriptionInfo.plan_id)?.price_cents || 0,
-            plans.find(p => p.id === subscriptionInfo.plan_id)?.billing_interval || 'one_time'
-          );
+          window.FreemiumUtils.formatPrice(planInfo.price_cents, planInfo.billing_interval);
         
         // Update usage info
-        document.getElementById('botCount').textContent = subscriptionInfo.current_bot_count;
-        document.getElementById('botLimit').textContent = subscriptionInfo.bot_limit || 'unlimited';
+        document.getElementById('botCount').textContent = currentBotCount;
+        document.getElementById('botLimit').textContent = botLimit || 'unlimited';
         
         // Update usage bar
-        if (subscriptionInfo.bot_limit) {
-          const percentage = (subscriptionInfo.current_bot_count / subscriptionInfo.bot_limit) * 100;
+        if (botLimit) {
+          const percentage = (currentBotCount / botLimit) * 100;
           document.getElementById('usageFill').style.width = Math.min(percentage, 100) + '%';
         } else {
           document.getElementById('usageFill').style.width = '100%';
           document.getElementById('usageFill').style.background = '#4CAF50';
         }
         
-        // Update edit credits info
-        const editCreditsUsed = subscriptionInfo.edit_credits_used || 0;
-        const editCreditsLimit = subscriptionInfo.edit_credits_limit || 0;
-        
+        // Update edit credits info - DIRECT from database, no caching
+        console.log('📊 Edit credits (direct query):', { editCreditsUsed, editCreditsLimit });
         document.getElementById('editCreditsUsed').textContent = editCreditsUsed;
         document.getElementById('editCreditsLimit').textContent = editCreditsLimit || 'unlimited';
         
@@ -326,6 +364,16 @@
           document.getElementById('editCreditsUsage').style.display = editCreditsLimit === 0 ? 'none' : 'block';
           document.getElementById('editCreditsFill').parentElement.style.display = editCreditsLimit === 0 ? 'none' : 'block';
         }
+        
+        // Build subscriptionInfo object for plan grid
+        const subscriptionInfo = {
+          plan_id: subscription?.plan_id || 'free',
+          plan_name: planInfo.name,
+          bot_limit: botLimit,
+          current_bot_count: currentBotCount,
+          edit_credits_used: editCreditsUsed,
+          edit_credits_limit: editCreditsLimit
+        };
         
         // Populate plans grid
         const plansGrid = document.getElementById('plansGrid');
