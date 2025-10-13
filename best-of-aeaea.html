@@ -1,0 +1,1021 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Aeaea — Best of Aeaea</title>
+  <link rel="icon" type="image/png" href="images/favicon_black.png" />
+  <style>
+:root {
+  --bg:#000;
+  --ink:#fff;
+  --muted:#d9d9d9;
+  --stroke:#fff;
+}
+* {
+  box-sizing:border-box;
+}
+html,body {
+  height:100%;
+}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+.screen {
+  min-height:100dvh;
+  width:100%;
+}
+/* ===== Dashboard Layout with Sidebar ===== */
+.dashboard {
+  padding:0;
+  min-height:100dvh;
+}
+.chat-container {
+  display:flex;
+  height:100dvh;
+  overflow:hidden;
+}
+/* Sidebar */
+.sidebar {
+  width:300px;
+  background:var(--bg);
+  border-right:1px solid #333;
+  display:flex;
+  flex-direction:column;
+  transition:width 0.3s ease;
+  position:relative;
+  min-width:200px;
+  max-width:600px;
+  height:100dvh;
+  flex-shrink:0;
+}
+.sidebar.collapsed {
+  width:44px !important;
+  min-width:44px !important;
+  overflow:hidden;
+}
+.sidebar.resizing {
+  transition:none;
+}
+.sidebar *::-webkit-scrollbar {
+  width:12px;
+}
+.sidebar *::-webkit-scrollbar-track {
+  background:#000 !important;
+}
+.sidebar *::-webkit-scrollbar-thumb {
+  background:var(--stroke);
+  border-radius:999px;
+}
+.sidebar *::-webkit-scrollbar-corner {
+  background:#000;
+}
+/* Resize Handle */
+.resize-handle {
+  position:absolute;
+  top:0;
+  right:-3px;
+  width:6px;
+  height:100%;
+  cursor:col-resize;
+  background:transparent;
+  z-index:100;
+}
+.resize-handle:hover {
+  background:rgba(255,255,255,0.1);
+}
+.resize-handle.resizing {
+  background:rgba(255,255,255,0.2);
+}
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  position:fixed;
+  top:18px;
+  left:260px;
+  width:22px;
+  height:22px;
+  background:transparent;
+  border:none;
+  border-radius:8px;
+  color:var(--ink);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  font-weight:bold;
+  z-index:1000;
+  transition:left 0.1s ease, top 0.1s ease;
+}
+.sidebar-toggle:hover {
+  background:transparent;
+}
+.sidebar-toggle:active {
+  background:transparent;
+}
+.sidebar-toggle:focus {
+  background:transparent;
+  outline:none;
+}
+.sidebar.collapsed .sidebar-toggle {
+  position:absolute !important;
+  top:14px !important;
+  left:6px !important;
+  border-radius:8px;
+}
+/* Prevent laggy animation of toggle during live resize */
+.sidebar.resizing .sidebar-toggle {
+  transition:none;
+}
+/* Top Navigation in Sidebar */
+.sidebar-nav {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:14px 24px 0px 24px;
+  position:relative;
+}
+.sidebar-nav .sidebar-toggle {
+  position:absolute;
+  right:24px;
+}
+.nav-left {
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.nav-logo {
+  height:34px;
+  width:auto;
+}
+.nav-right {
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.user-email {
+  color:var(--ink);
+  font-size:14px;
+}
+.logout-btn {
+  padding:8px;
+  border:none;
+  background:transparent;
+  color:var(--ink);
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.logout-btn:hover {
+  background:rgba(255,255,255,0.1);
+}
+.logout-btn img {
+  width:24px;
+  height:24px;
+}
+/* Sidebar Actions */
+.sidebar-actions {
+  padding:16px;
+  flex:1;
+  overflow-y:auto;
+}
+.action-btn {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+  padding:12px 16px;
+  background:transparent;
+  border:none;
+  border-radius:8px;
+  color:var(--ink);
+  cursor:pointer;
+  font-size:14px;
+  margin-bottom:8px;
+  text-decoration:none;
+}
+.action-btn:hover {
+  background:rgba(255,255,255,0.1);
+}
+.action-btn img, .action-btn svg {
+  width:16px;
+  height:16px;
+}
+.action-btn .action-label {
+  display:inline-flex;
+  align-items:center;
+}
+/* Sidebar Bottom */
+.sidebar-bottom {
+  padding:16px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.sidebar-bottom .user-email {
+  color:var(--muted);
+  font-size:12px;
+}
+.sidebar.collapsed .sidebar-nav {
+  justify-content:center;
+  padding:14px 0 0 0;
+}
+.sidebar.collapsed .nav-logo {
+  display:none;
+}
+.sidebar.collapsed .nav-left {
+  justify-content:center;
+  gap:0;
+}
+.sidebar.collapsed .sidebar-actions {
+  padding:12px 8px;
+  align-items:center;
+  margin-top:28px;
+}
+.sidebar.collapsed .action-btn {
+  justify-content:center;
+  padding:10px 0;
+  gap:0;
+}
+.sidebar.collapsed .action-btn .action-label {
+  display:none;
+}
+.sidebar.collapsed .action-btn img,
+.sidebar.collapsed .action-btn svg {
+  width:20px;
+  height:20px;
+}
+.sidebar.collapsed .sidebar-bottom {
+  padding:12px 4px;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.sidebar.collapsed .sidebar-bottom .user-email {
+  display:none;
+}
+.sidebar.collapsed .logout-btn {
+  padding:8px 0;
+}
+.sidebar.collapsed .resize-handle {
+  right:-3px;
+}
+/* Main Chat Area wrapper */
+.main-chat {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  min-height:0;
+  overflow:auto;
+}
+/* Main Content */
+.main-content {
+  padding:0px;
+  max-width:1200px;
+  margin:0 auto;
+}
+/* Page Title */
+.page-header {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-bottom:4px;
+  margin-top:0px;
+  justify-content:flex-start;
+  padding:20px 20px 0;
+}
+.page-title {
+  font-size:18pt;
+  font-weight:700;
+  text-align:left;
+  margin:0;
+}
+/* Avatar Grid */
+.avatars-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+  gap:60px 40px;
+  max-width:1000px;
+  margin-top:20px;
+}
+/* Avatar Items */
+.avatar-item {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:pointer;
+  transition:transform 0.2s ease;
+  position:relative;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.avatar-item:hover {
+  transform:scale(1.05);
+}
+.avatar-circle {
+  width:190px;
+  height:190px;
+  border-radius:50%;
+  overflow:hidden;
+  margin-bottom:10px;
+  background:#1a1a1a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  border:1px solid #333;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.avatar-circle img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+.avatar-name {
+  color:var(--ink);
+  font-size:12px;
+  text-align:center;
+  margin:0;
+  padding:0 8px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  max-width:190px;
+  line-height:1.3;
+  word-wrap:break-word;
+  min-height:1.3em;
+}
+
+/* Featured Avatar Dialog Modal */
+#featuredAvatarModal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+}
+
+.modal-overlay {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg);
+  border: 2px solid var(--stroke);
+  border-radius: 24px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #333;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--ink);
+  font-size: 32px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  opacity: 0.7;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.featured-avatar-preview {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.featured-avatar-preview img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  object-fit: cover;
+  margin-bottom: 16px;
+}
+
+.featured-avatar-preview h3 {
+  color: var(--ink);
+  font-size: 16px;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.featured-avatar-description {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-primary {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+.modal-btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.modal-btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--stroke);
+}
+
+.modal-btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    z-index: 999;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    transition: left 0.3s ease;
+  }
+  .mobile-top-nav {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: var(--bg);
+    border-bottom: 1px solid #333;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 998;
+  }
+  .mobile-logo {
+    cursor: pointer;
+  }
+  .mobile-nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--ink);
+  }
+  .mobile-nav-btn {
+    background: transparent;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+  }
+  .sidebar.collapsed {
+    width: 280px !important;
+    min-width: 280px !important;
+  }
+  .sidebar.collapsed .nav-logo {
+    display: block;
+  }
+  .sidebar.collapsed .sidebar-actions {
+    padding: 16px;
+    margin-top: 0;
+  }
+  .sidebar.collapsed .action-btn {
+    justify-content: flex-start;
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .sidebar.collapsed .action-btn .action-label {
+    display: inline-flex;
+  }
+  .sidebar.collapsed .action-btn img,
+  .sidebar.collapsed .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .sidebar.collapsed .sidebar-bottom {
+    padding: 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar.collapsed .sidebar-bottom .user-email {
+    display: block;
+  }
+  .sidebar.collapsed .logout-btn {
+    padding: 8px;
+  }
+  .sidebar.mobile-open {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: none !important;
+  }
+  .chat-container {
+    padding-top: 60px;
+  }
+  .page-header {
+    display:none;
+  }
+  .main-content {
+    padding:0px;
+  }
+  .avatars-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 50px 13px !important;
+    padding: 14px 16px 0;
+    max-width: none;
+  }
+  .avatar-circle {
+    width: 130px;
+    height: 130px;
+    margin-bottom: 8px;
+  }
+  .avatar-name {
+    font-size: 11px;
+    max-width: 130px;
+  }
+  .resize-handle {
+    display: none;
+  }
+  .featured-avatar-preview img {
+    width: 150px;
+    height: 150px;
+  }
+}
+
+.mobile-top-nav {
+  display: none;
+}
+  </style>
+</head>
+<body>
+  
+  <!-- Mobile Top Nav (hidden on desktop) -->
+  <div class="mobile-top-nav">
+    <div class="mobile-logo" id="mobileLogoBtn">
+      <img src="images/favicon.png" alt="Logo" style="width:30px; height:30px;">
+    </div>
+    <h1 class="mobile-nav-title">Best of Aeaea</h1>
+    <button class="mobile-nav-btn" id="mobileMenuBtn" title="Account">
+      <img src="images/account_icon.png" alt="Account" style="width:32px; height:32px;">
+    </button>
+  </div>
+
+  <div class="chat-container">
+    <!-- Sidebar -->
+    <div class="sidebar collapsed">
+      <!-- Top Navigation -->
+      <div class="sidebar-nav">
+        <img src="images/favicon.png" alt="Aeaea Logo" class="nav-logo" id="sidebarNavLogo">
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar">
+          <img src="images/toggle_icon.png" alt="Toggle" style="width:18px; height:18px;">
+        </button>
+      </div>
+      <!-- Sidebar Actions -->
+      <div class="sidebar-actions">
+        <a href="billing.html" class="action-btn" title="Account">
+          <img src="images/account_icon.png" alt="Account">
+          <span class="action-label">Account</span>
+        </a>
+        <a href="index.html" class="action-btn" title="AI library">
+          <img src="images/library_icon.png" alt="AI Library">
+          <span class="action-label">AI Library</span>
+        </a>
+        <a href="best-of-aeaea.html" class="action-btn" title="Best of Aeaea">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 1L10.09 5.26L14.5 5.73L11 9.12L11.82 13.5L8 11.27L4.18 13.5L5 9.12L1.5 5.73L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <span class="action-label">Best of Aeaea</span>
+        </a>
+        <a href="create.html" class="action-btn" title="Create new AI">
+          <img src="images/creator_icon.png" alt="Create AI">
+          <span class="action-label">Create New</span>
+        </a>
+        <a href="#" id="chatNavAction" class="action-btn" title="Chat with latest AI">
+          <img src="images/chat_icon.png" alt="Chat">
+          <span class="action-label">Chat</span>
+        </a>
+      </div>
+      <!-- Bottom User Section -->
+      <div class="sidebar-bottom">
+        <span id="userEmail" class="user-email"></span>
+        <button id="logoutBtn" class="logout-btn" title="Sign out">
+          <img src="images/logout_icon.png" alt="Sign out" />
+        </button>
+      </div>
+      <!-- Resize Handle -->
+      <div class="resize-handle" id="resizeHandle" title="Drag to resize sidebar"></div>
+    </div>
+    <div class="main-chat">
+      <!-- Main Content -->
+      <div class="screen dashboard">
+        <div class="main-content">
+          <!-- Page Header -->
+          <div class="page-header">
+            <h1 class="page-title">Best of Aeaea</h1>
+          </div>
+          
+          <!-- Avatar Grid -->
+          <div id="avatarsGrid" class="avatars-grid">
+            <!-- Featured avatars will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Avatar Modal -->
+  <div id="featuredAvatarModal">
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Add to Library</h2>
+          <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="featured-avatar-preview">
+            <img id="modalAvatarImage" src="" alt="Avatar">
+            <h3 id="modalAvatarName"></h3>
+          </div>
+          <div class="featured-avatar-description" id="modalAvatarDescription">
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-primary" id="addToLibraryBtn">Add to Library</button>
+            <button class="modal-btn modal-btn-secondary" id="cancelBtn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // === Supabase Auth ===
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabaseUrl = "https://eyptqyzkwcpaillnwmle.supabase.co";
+    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5cHRxeXprd2NwYWlsbG53bWxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc2MTkxNzksImV4cCI6MjA3MzE5NTE3OX0.XMSqlh-Vm9ncC2_ecUGR8EIMv3ArcvmJd7BtWMRUa2c";
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: window.localStorage,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+        flowType: 'pkce',
+        storageKey: 'sb-auth-token'
+      }
+    });
+
+    // Featured avatars data
+    const featuredAvatars = [
+      {
+        id: "0abc64d2-487e-4a0e-8aa0-c0af20e62da3",
+        name: "CAMERON: Cognitive AI Model for Enhanced Reasoning, Operations & Navigation",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/24603767-41f0-470b-92ca-7a450d82c971-CAMERON_Cognitive_AI_Model_for_Enhanced_Reasoning_Operations_Navigation.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": "radiant",
+          "animal": null,
+          "colors": [],
+          "status": "complete",
+          "setting": null,
+          "archetype": "abstract",
+          "art_style": null,
+          "style_choice": "default",
+          "persona_traits": {
+            "seriousPlayful": 100,
+            "succinctChatty": 78,
+            "rationalIntuitive": 22,
+            "practicalImaginative": 89
+          },
+          "original_prompt": "Abstract avatar art: Create an abstract digital AI assistant using luminous neon lines.\nDepict a single stylized Sloth figure from chest up, facing forward\nDraw using luminous glowing lines on a black background.\nColor palette: luminous high-chroma spectral gradients. use high saturation, high vibrancy colors.\nLine structure pattern: geometric wireframe rings and grid.\nLine density and spacing: richer line work with tight spacing, but keep background visible within figure.\nVisual symmetry approach: flowing asymmetrical forms for dynamic movement.\nEye design: friendly rounded almond shaped openings with bright inner glow; no detailed pupils.\nArt style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.\nApply extreme brightness and luminosity to all line elements for a glowing neon effect.\nMake approximately 20% of all line elements 10x thicker and brighter for visual emphasis.\nMood: radiant.\n\nRepresenting: Sloth",
+          "art_style_custom": null,
+          "archetype_specific": "Sloth",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "CAMERON is a highly analytical AI assistant with a focus on logical reasoning and imaginative problem-solving. With a radiant presence and serious demeanor, CAMERON excels at providing structured, thoughtful responses while maintaining a balance between rational analysis and creative thinking."
+      }
+    ];
+
+    // === Check Authentication ===
+    async function checkAuth() {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        window.location.href = 'auth.html';
+        return null;
+      }
+      return session.user;
+    }
+
+    // === Initialize Page ===
+    async function init() {
+      const user = await checkAuth();
+      if (!user) return;
+
+      // Display user email
+      document.getElementById('userEmail').textContent = user.email || '';
+
+      // Load featured avatars
+      loadFeaturedAvatars();
+
+      // Setup sidebar and navigation
+      setupSidebar();
+      setupNavigation();
+    }
+
+    // === Load Featured Avatars ===
+    function loadFeaturedAvatars() {
+      const grid = document.getElementById('avatarsGrid');
+      grid.innerHTML = '';
+
+      featuredAvatars.forEach(avatar => {
+        const item = document.createElement('div');
+        item.className = 'avatar-item';
+        item.innerHTML = `
+          <div class="avatar-circle">
+            <img src="${avatar.image_url}" alt="${avatar.name}">
+          </div>
+          <p class="avatar-name">${avatar.name}</p>
+        `;
+        
+        item.addEventListener('click', () => showAvatarModal(avatar));
+        grid.appendChild(item);
+      });
+    }
+
+    // === Show Avatar Modal ===
+    function showAvatarModal(avatar) {
+      const modal = document.getElementById('featuredAvatarModal');
+      const modalImage = document.getElementById('modalAvatarImage');
+      const modalName = document.getElementById('modalAvatarName');
+      const modalDescription = document.getElementById('modalAvatarDescription');
+      
+      modalImage.src = avatar.image_url;
+      modalName.textContent = avatar.name;
+      modalDescription.textContent = avatar.description;
+      
+      modal.style.display = 'flex';
+      
+      // Store current avatar for adding
+      modal.dataset.avatarId = avatar.id;
+      modal.dataset.avatarData = JSON.stringify(avatar);
+    }
+
+    // === Hide Avatar Modal ===
+    function hideAvatarModal() {
+      const modal = document.getElementById('featuredAvatarModal');
+      modal.style.display = 'none';
+    }
+
+    // === Add Avatar to User's Library ===
+    async function addAvatarToLibrary() {
+      const modal = document.getElementById('featuredAvatarModal');
+      const avatarData = JSON.parse(modal.dataset.avatarData);
+      const addBtn = document.getElementById('addToLibraryBtn');
+      
+      // Disable button and show loading
+      addBtn.disabled = true;
+      addBtn.textContent = 'Adding...';
+      
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User not authenticated');
+
+        // Create a copy of the avatar for this user
+        const { data, error } = await supabase
+          .from('avatars')
+          .insert({
+            user_id: user.id,
+            name: avatarData.name,
+            image_url: avatarData.image_url,
+            traits: avatarData.traits,
+            personality_prompt: avatarData.personality_prompt,
+            is_active: true
+          })
+          .select();
+
+        if (error) throw error;
+
+        // Success! Show feedback and redirect
+        addBtn.textContent = 'Added!';
+        setTimeout(() => {
+          hideAvatarModal();
+          window.location.href = 'index.html';
+        }, 500);
+
+      } catch (error) {
+        console.error('Error adding avatar:', error);
+        alert('Failed to add avatar to your library. Please try again.');
+        addBtn.disabled = false;
+        addBtn.textContent = 'Add to Library';
+      }
+    }
+
+    // === Setup Modal Event Listeners ===
+    document.getElementById('modalClose').addEventListener('click', hideAvatarModal);
+    document.getElementById('cancelBtn').addEventListener('click', hideAvatarModal);
+    document.getElementById('addToLibraryBtn').addEventListener('click', addAvatarToLibrary);
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'modalOverlay') {
+        hideAvatarModal();
+      }
+    });
+
+    // === Sidebar Functionality ===
+    function setupSidebar() {
+      const sidebar = document.getElementById('sidebarToggle')?.closest('.sidebar');
+      const toggle = document.getElementById('sidebarToggle');
+      const resizeHandle = document.getElementById('resizeHandle');
+      
+      if (!sidebar) return;
+
+      // Load saved sidebar state
+      const savedState = localStorage.getItem('sidebarState');
+      const savedWidth = localStorage.getItem('sidebarWidth');
+      
+      if (savedState === 'expanded') {
+        sidebar.classList.remove('collapsed');
+      }
+      
+      if (savedWidth && savedState === 'expanded') {
+        sidebar.style.width = savedWidth;
+      }
+
+      // Toggle sidebar
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          sidebar.classList.toggle('collapsed');
+          const isCollapsed = sidebar.classList.contains('collapsed');
+          localStorage.setItem('sidebarState', isCollapsed ? 'collapsed' : 'expanded');
+        });
+      }
+
+      // Resize functionality
+      if (resizeHandle) {
+        let isResizing = false;
+        let startX;
+        let startWidth;
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+          if (sidebar.classList.contains('collapsed')) return;
+          isResizing = true;
+          startX = e.clientX;
+          startWidth = sidebar.offsetWidth;
+          sidebar.classList.add('resizing');
+          resizeHandle.classList.add('resizing');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isResizing) return;
+          const width = startWidth + (e.clientX - startX);
+          const minWidth = 200;
+          const maxWidth = 600;
+          if (width >= minWidth && width <= maxWidth) {
+            sidebar.style.width = width + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isResizing) {
+            isResizing = false;
+            sidebar.classList.remove('resizing');
+            resizeHandle.classList.remove('resizing');
+            localStorage.setItem('sidebarWidth', sidebar.style.width);
+          }
+        });
+      }
+
+      // Mobile sidebar
+      const mobileLogoBtn = document.getElementById('mobileLogoBtn');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (mobileLogoBtn) {
+        mobileLogoBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('mobile-open');
+        });
+      }
+      
+      if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('mobile-open');
+        });
+      }
+
+      // Close sidebar when clicking outside on mobile
+      document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768 && 
+            sidebar.classList.contains('mobile-open') &&
+            !sidebar.contains(e.target) &&
+            e.target !== mobileLogoBtn &&
+            e.target !== mobileMenuBtn) {
+          sidebar.classList.remove('mobile-open');
+        }
+      });
+    }
+
+    // === Setup Navigation ===
+    function setupNavigation() {
+      // Logout
+      document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = 'auth.html';
+      });
+
+      // Chat navigation - go to most recent active avatar
+      document.getElementById('chatNavAction')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data: avatars } = await supabase
+          .from('avatars')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('updated_at', { ascending: false })
+          .limit(1);
+
+        if (avatars && avatars.length > 0) {
+          window.location.href = `chat.html?avatar=${avatars[0].id}`;
+        } else {
+          window.location.href = 'create.html';
+        }
+      });
+    }
+
+    // === Initialize on Load ===
+    init();
+  </script>
+</body>
+</html>
