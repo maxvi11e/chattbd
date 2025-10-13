@@ -2694,8 +2694,26 @@
           
           console.log(`✅ Edit credit used. ${creditResult.creditsRemaining} credits remaining.`);
           
-          // Immediately update the UI to show reduced credits
-          await loadEditCreditsInfo();
+          // Immediately update the UI with the returned values
+          const editCreditsCount = document.getElementById('editCreditsCount');
+          if (editCreditsCount && creditResult.creditsLimit) {
+            editCreditsCount.textContent = `${creditResult.creditsRemaining} / ${creditResult.creditsLimit}`;
+            
+            // Update styling based on remaining credits
+            const editCreditsIndicator = document.getElementById('editCreditsIndicator');
+            if (editCreditsIndicator) {
+              editCreditsIndicator.classList.remove('low-credits', 'no-credits');
+              editCreditsCount.classList.remove('low', 'depleted');
+              
+              if (creditResult.creditsRemaining === 0) {
+                editCreditsIndicator.classList.add('no-credits');
+                editCreditsCount.classList.add('depleted');
+              } else if (creditResult.creditsRemaining <= 2) {
+                editCreditsIndicator.classList.add('low-credits');
+                editCreditsCount.classList.add('low');
+              }
+            }
+          }
         }
 
         // Call regeneration API

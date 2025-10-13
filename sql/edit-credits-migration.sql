@@ -131,9 +131,9 @@ BEGIN
         AND is_active = true
     ),
     bot_counter AS (
-        SELECT COALESCE(total_bots_created, 0) as count
-        FROM public.user_bot_counters
-        WHERE user_id = user_uuid
+        SELECT COALESCE(ubc.total_bots_created, 0) as count
+        FROM public.user_bot_counters ubc
+        WHERE ubc.user_id = user_uuid
     )
     SELECT 
         COALESCE(user_sub.plan_id, 'free') as plan_id,
