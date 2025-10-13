@@ -2905,7 +2905,10 @@
   // Clear the previous image completely to prevent broken image icon
   botImage.classList.remove('visible');
   botImage.style.display = 'none';
-  botImage.src = 'about:blank';
+  // Remove onerror handler temporarily to prevent it from firing during clear
+  botImage.onerror = null;
+  botImage.onload = null;
+  botImage.src = ''; // Use empty string instead of about:blank to avoid ERR_UNKNOWN_URL_SCHEME
   botImage.alt = '';
   // Clear video
   botVideo.classList.remove('visible');
