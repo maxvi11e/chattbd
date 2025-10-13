@@ -397,6 +397,34 @@
   .frame-spinner.hidden {
     display:none;
   }
+  /* Resend Button */
+  .resend-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid var(--stroke);
+    border-radius: var(--radius-md);
+    color: var(--ink);
+    padding: 20px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+    transition: all 0.2s ease;
+  }
+  .resend-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  .resend-btn:active {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
   .bot-preview-main {
     display:flex;
     flex-direction:column;
@@ -1253,6 +1281,11 @@
             </div>
             <img id="botImage" src="" alt="Generated Agent" class="bot-image" />
             <video id="botVideo" src="" class="bot-image" loop muted playsinline style="display: none;"></video>
+            <!-- Resend Button (shown on generation failure) -->
+            <button id="resendBtn" class="resend-btn" style="display: none;" title="Retry Generation">
+              <img src="images/redo_icon.png" alt="Retry" style="width: 48px; height: 48px;" />
+              <span>Retry</span>
+            </button>
             <!-- History Toggle Button -->
             <button id="historyToggleBtn" class="history-toggle-btn" title="View Edit History">
               <img src="images/history_icon.png" alt="History" />
@@ -1427,11 +1460,13 @@
   let pendingNameValue = null;
   let latestNameDraft = '';
   let isSavingName = false;
+  let lastGenerationPayload = null; // Store the last generation payload for retry
 
     // DOM elements
   const botImage = document.getElementById('botImage');
   const botVideo = document.getElementById('botVideo');
   const frameSpinner = document.getElementById('frameSpinner');
+  const resendBtn = document.getElementById('resendBtn');
     const pageTitle = document.getElementById('pageTitle');
     const editNameBtn = document.getElementById('editNameBtn');
     const botPreview = document.getElementById('botPreview');
@@ -1547,6 +1582,7 @@
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
   botImage.classList.remove('visible');
+  resendBtn.style.display = 'none'; // Hide resend button when starting generation
         editForm.classList.remove('visible');
         if (actionButtons) actionButtons.style.display = 'none';
 
@@ -1600,6 +1636,9 @@
           localStorage.setItem('lastSelectedAvatar', placeholderAvatar.id);
           localStorage.setItem('lastGeneratedAvatar', placeholderAvatar.id);
 
+          // Store the payload for potential retry
+          lastGenerationPayload = pending;
+
           // Generate avatar via existing API
           console.log('📤 Sending avatar payload', {
             endpoint: '/api/generate-avatar',
@@ -1619,6 +1658,9 @@
           if (!res.ok || !json?.dataUrl) {
             showError(json?.error || 'Failed to generate avatar.');
             setLoadingState(false);
+            // Show resend button
+            frameSpinner.classList.add('hidden');
+            resendBtn.style.display = 'flex';
             return;
           }
 
@@ -1785,6 +1827,7 @@
       botImage.classList.remove('visible');
       botVideo.classList.remove('visible');
       frameSpinner.classList.remove('hidden');
+      resendBtn.style.display = 'none'; // Hide resend button when displaying a bot
       
       // Set bot name, use abstract name if not set
       const botName = bot.name || (typeof getRandomAbstractName === 'function' ? getRandomAbstractName() : 'Agent');
@@ -1928,6 +1971,117 @@
       // Regenerate button
       regenerateBtn.addEventListener('click', () => {
         regenerateBot();
+      });
+
+      // Resend button (retry generation)
+      resendBtn.addEventListener('click', async () => {
+        if (!lastGenerationPayload) {
+          showError('No generation data to retry. Please start over.');
+          return;
+        }
+        
+        // Hide resend button and show loading
+        resendBtn.style.display = 'none';
+        frameSpinner.classList.remove('hidden');
+        setLoadingState(true);
+        hideError();
+        
+        try {
+          console.log('🔄 Retrying avatar generation with payload:', lastGenerationPayload);
+          
+          const res = await fetch('/api/generate-avatar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(lastGenerationPayload)
+          });
+          
+          const json = await res.json().catch(() => ({}));
+          console.log('📥 Retry response:', json);
+          
+          if (!res.ok || !json?.dataUrl) {
+            showError(json?.error || 'Failed to generate avatar. Please try again.');
+            setLoadingState(false);
+            frameSpinner.classList.add('hidden');
+            resendBtn.style.display = 'flex';
+            return;
+          }
+          
+          // Success! Upload and update the avatar
+          const { data: { user } } = await supabase.auth.getUser();
+          const botId = localStorage.getItem('lastGeneratedAvatar');
+          
+          if (!botId) {
+            showError('Lost track of avatar ID. Please start over.');
+            setLoadingState(false);
+            frameSpinner.classList.add('hidden');
+            resendBtn.style.display = 'flex';
+            return;
+          }
+          
+          // Get current bot to preserve its name
+          const { data: currentBotData } = await supabase
+            .from('avatars')
+            .select('name')
+            .eq('id', botId)
+            .single();
+          
+          const safeFileBase = (currentBotData?.name || 'Avatar').replace(/[^a-z0-9-_]+/gi, '_');
+          const url = await uploadAvatarImage({ 
+            dataUrl: json.dataUrl, 
+            userId: user.id, 
+            fileName: `${safeFileBase}.png` 
+          });
+          
+          // Update the avatar with the generated image
+          const { error: updateError } = await supabase
+            .from('avatars')
+            .update({
+              image_url: url,
+              traits: {
+                ...lastGenerationPayload,
+                original_prompt: lastGenerationPayload.prompt,
+                art_style: json.artStyle || null,
+                status: 'complete'
+              },
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', botId);
+          
+          if (updateError) {
+            console.error('❌ Failed to update avatar:', updateError);
+            showError('Failed to save generated image.');
+            setLoadingState(false);
+            frameSpinner.classList.add('hidden');
+            resendBtn.style.display = 'flex';
+            return;
+          }
+          
+          console.log('✅ Avatar generated and saved successfully');
+          
+          // Load the updated bot
+          const { data: updatedBot, error: loadError } = await supabase
+            .from('avatars')
+            .select('*')
+            .eq('id', botId)
+            .single();
+          
+          if (loadError) {
+            showError('Generated successfully but failed to load. Please refresh.');
+            setLoadingState(false);
+            return;
+          }
+          
+          currentBot = updatedBot;
+          displayBot(updatedBot);
+          setLoadingState(false);
+          
+        } catch (error) {
+          console.error('❌ Retry generation error:', error);
+          showError('An error occurred. Please try again.');
+          setLoadingState(false);
+          frameSpinner.classList.add('hidden');
+          resendBtn.style.display = 'flex';
+        }
       });
 
       // Auto-resize editPrompt textarea
