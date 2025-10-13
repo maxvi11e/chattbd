@@ -6,7 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Aeaea — Best of Aeaea</title>
+  <title>Aeaea — Import to Library</title>
   <link rel="icon" type="image/png" href="images/favicon_black.png" />
   <style>
 :root {
@@ -667,7 +667,7 @@ body {
     <div class="mobile-logo" id="mobileLogoBtn">
       <img src="images/toggle_icon.png" alt="Logo" style="width:22px; height:22px;">
     </div>
-    <h1 class="mobile-nav-title">Best of Aeaea</h1>
+    <h1 class="mobile-nav-title">Add to Library</h1>
     <button class="mobile-nav-btn" id="mobileMenuBtn" title="Account">
       <img src="images/account_icon.png" alt="Account" style="width:32px; height:32px;">
     </button>
@@ -724,7 +724,7 @@ body {
         <div class="main-content">
           <!-- Page Header -->
           <div class="page-header">
-            <h1 class="page-title">Best of Aeaea</h1>
+            <h1 class="page-title">Add to Library</h1>
           </div>
           
           <!-- Avatar Grid -->
@@ -780,6 +780,33 @@ body {
     // Featured avatars data
     const featuredAvatars = [
       {
+        id: "d461c970-c616-47c7-a16a-f85f3ed45ca7",
+        name: "SPENCER",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/22ba2726-f325-4d48-b8f7-48ea64b71a1a-SPENCER_System_for_Processing_Exploration_Navigation_Computation_Enhanced_Reasoning.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": "mysterious",
+          "animal": null,
+          "colors": [],
+          "status": "complete",
+          "setting": null,
+          "archetype": "abstract",
+          "art_style": null,
+          "style_choice": "default",
+          "persona_traits": {
+            "seriousPlayful": 44,
+            "succinctChatty": 89,
+            "rationalIntuitive": 44,
+            "practicalImaginative": 89
+          },
+          "original_prompt": "Abstract avatar art: Create an abstract digital AI assistant using luminous neon lines.\nDepict a single stylized Celestial Architect figure from chest up, facing forward\nDraw using luminous glowing lines on a black background.\nColor palette: deep cool chromatic spectrum with medium vibrancy accents.\nLine structure pattern: mesh of arcs and short lattice segments.\nLine density and spacing: richer line work with tight spacing, but keep background visible within figure.\nVisual symmetry approach: flowing asymmetrical forms for dynamic movement.\nEye design: friendly rounded almond shaped openings with bright inner glow; no detailed pupils.\nArt style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.\nApply extreme brightness and luminosity to all line elements for a glowing neon effect.\nMake approximately 20% of all line elements 10x thicker and brighter for visual emphasis.\nMood: mysterious.\n\nRepresenting: Celestial Architect",
+          "art_style_custom": null,
+          "archetype_specific": "Celestial Architect",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "SPENCER is a mysterious Celestial Architect rendered in luminous neon lines. Balanced and highly conversational, SPENCER combines rational thinking with imaginative problem-solving. Perfect for architectural discussions, cosmic concepts, and creative technical projects with a mystical edge."
+      },
+      {
         id: "0abc64d2-487e-4a0e-8aa0-c0af20e62da3",
         name: "CAMERON: Cognitive AI Model for Enhanced Reasoning, Operations & Navigation",
         image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/24603767-41f0-470b-92ca-7a450d82c971-CAMERON_Cognitive_AI_Model_for_Enhanced_Reasoning_Operations_Navigation.png?width=333&height=333&resize=cover",
@@ -807,11 +834,11 @@ body {
         description: "CAMERON is a highly analytical AI assistant with a focus on logical reasoning and imaginative problem-solving. With a radiant presence and serious demeanor, CAMERON excels at providing structured, thoughtful responses while maintaining a balance between rational analysis and creative thinking."
       },
       {
-        id: "7e3ba69a-6bfb-40f3-9629-720aa802569c",
-        name: "Bison",
-        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/edbb5c20-5992-4e73-9c9a-5795ccc3dd04-Bison.png?width=333&height=333&resize=cover",
+        id: "874a6972-77e5-46d9-ae1a-0e7143628851",
+        name: "Elven King + Poet",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/7e5a4f9d-e54f-4c5b-9e1f-6918dbea3f2e-Elven_King_Poet.png?width=333&height=333&resize=cover",
         traits: {
-          "vibe": "mysterious",
+          "vibe": "serene",
           "animal": null,
           "colors": [],
           "status": "complete",
@@ -820,18 +847,125 @@ body {
           "art_style": null,
           "style_choice": "default",
           "persona_traits": {
-            "seriousPlayful": 89,
-            "succinctChatty": 11,
-            "rationalIntuitive": 78,
-            "practicalImaginative": 22
+            "seriousPlayful": 33,
+            "succinctChatty": 0,
+            "rationalIntuitive": 89,
+            "practicalImaginative": 89
           },
-          "original_prompt": "Abstract avatar art: Create an abstract digital AI assistant using luminous neon lines.\nDepict a single stylized Bison figure from chest up, facing forward\nDraw using luminous glowing lines on a black background.\nColor palette: luminous high-chroma spectral gradients. use high saturation, high vibrancy colors.\nLine structure pattern: flowing energy strands and arcs.\nLine density and spacing: balanced interior with clear negative space between lines.\nVisual symmetry approach: strong bilateral symmetry.\nEye design: friendly rounded almond shaped openings with bright inner glow; no detailed pupils.\nArt style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.\nApply extreme brightness and luminosity to all line elements for a glowing neon effect.\nMake approximately 20% of all line elements 10x thicker and brighter for visual emphasis.\nMood: mysterious.\n\nRepresenting: Bison",
+          "original_prompt": "Abstract avatar art: Create an abstract digital avatar artwork in the style of neon line art.\nDepict a single stylized figure from waist up in a dynamic pose, facing forward or in slight profile.\nDraw using luminous glowing lines on a pure black background.\nColor palette: deep cool spectrum with high vibrancy accents.\nLine structure pattern: flowing energy strands and arcs.\nLine density and spacing: balanced interior with clear negative space between lines.\nVisual symmetry approach: slight asymmetry for energy direction.\nEye design: friendly rounded almond-shaped openings with soft inner glow; no detailed pupils.\nArt style: very bright neon lines with crisp edges; maintain pure black background; avoid any interface elements, HUD overlays, text, or logos.\nApply extreme brightness and luminosity to all line elements for a glowing neon effect.\nMake approximately 10% of all line elements 10x thicker and brighter for visual emphasis.\nMood: serene.\n\nRepresenting: Elven King + Poet",
           "art_style_custom": null,
-          "archetype_specific": "Bison",
+          "archetype_specific": "Elven King + Poet",
           "personality_prompt": null
         },
         personality_prompt: null,
-        description: "Bison is a mysterious and enigmatic AI with a serious, highly rational approach. Extremely succinct in communication, Bison delivers practical, focused responses with minimal elaboration. Perfect for users seeking direct, no-nonsense guidance with a touch of intrigue."
+        description: "Elven King + Poet is a serene abstract neon AI embodying regal wisdom and lyrical artistry. Extremely succinct yet deeply intuitive and imaginative, this AI offers profound poetic insights with minimal words. Perfect for creative writing, philosophical musings, and eloquent guidance with an ethereal, majestic presence."
+      },
+      {
+        id: "898f6d4b-5a44-4072-808f-22c972ba2c65",
+        name: "Space Mystic + Yak",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/9f76909c-f4a3-4e25-848e-062aedc9d76f-Space_Mystic_Yak.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": "radiant",
+          "animal": null,
+          "colors": [],
+          "setting": null,
+          "archetype": null,
+          "art_style": null,
+          "style_choice": "default",
+          "persona_traits": {
+            "seriousPlayful": 56,
+            "succinctChatty": 56,
+            "rationalIntuitive": 22,
+            "practicalImaginative": 44
+          },
+          "original_prompt": "Centered abstract Space Mystic + Yak figure (head, torso) drawn as luminous lines on a pure black background.\nColor: deep cool spectrum with high vibrancy accents.\nStructure: geometric wireframe rings and grid.\nFill: medium density with even spacing.\nSymmetry: near-bilateral with small variations.\nEyes: friendly rounded almond openings with soft glow; no pupils.\nContrast: very bright lines with crisp edges; protect blacks; no interface/HUD, no text, no logos.\nExtreme brightness and luminosity to all elements\n10x thickness and brightness for 10% of all elements\nMood: radiant.\n\nBased on the concept: Space Mystic + Yak",
+          "art_style_custom": null,
+          "archetype_specific": "Space Mystic + Yak",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "Space Mystic + Yak is a radiant abstract AI blending cosmic wisdom with grounded strength. Perfectly balanced between serious and playful, with a highly rational approach and practical focus. Ideal for users seeking spiritual guidance combined with steady, down-to-earth reasoning."
+      },
+      {
+        id: "4fa45704-259e-4136-bea4-43e7b28a111f",
+        name: "SAGE: System for Adaptive Generative Exploration",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/f0382d7f-b32e-4910-9a66-ae97b77a4f9a-SAGE_System_for_Adaptive_Generative_Exploration.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": null,
+          "animal": null,
+          "colors": [],
+          "status": "complete",
+          "setting": null,
+          "archetype": null,
+          "art_style": null,
+          "style_choice": "default",
+          "persona_traits": {
+            "seriousPlayful": 11,
+            "succinctChatty": 0,
+            "rationalIntuitive": 0,
+            "practicalImaginative": 0
+          },
+          "original_prompt": "Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Persona: Competent Administrative Assistant",
+          "art_style_custom": null,
+          "archetype_specific": "Competent Administrative Assistant",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "SAGE is an extremely serious, highly efficient administrative assistant AI. Maximally succinct, purely rational, and completely practical in approach. Perfect for task management, organization, scheduling, and straightforward administrative support without any fluff or unnecessary elaboration."
+      },
+      {
+        id: "157367d1-63be-4565-a998-f44169f80744",
+        name: "GREY: Generative Reasoning Engine for Yield",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/766c1ff2-035b-48cc-a1f8-f87f71bbc569-GREY_Generative_Reasoning_Engine_for_Yield.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": null,
+          "animal": null,
+          "colors": [],
+          "status": "complete",
+          "setting": null,
+          "archetype": null,
+          "art_style": null,
+          "style_choice": "realistic",
+          "persona_traits": {
+            "seriousPlayful": 78,
+            "succinctChatty": 89,
+            "rationalIntuitive": 89,
+            "practicalImaginative": 89
+          },
+          "original_prompt": "Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Persona: Innovative Start Up Founder. Art style: Photo realistic portrait style",
+          "art_style_custom": null,
+          "archetype_specific": "Innovative Start Up Founder",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "GREY is an innovative startup founder AI with a photo-realistic style. Serious yet engaging, highly conversational, and equally balanced between rational thinking and intuitive insights. Perfect for entrepreneurship, strategic planning, product development, and yield-focused decision making with creative imagination."
+      },
+      {
+        id: "2d08271f-794e-4f2c-889c-34999638645b",
+        name: "ETHAN: Enhanced Transformer for Human-Aligned Navigation",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/1fa5b0b6-329f-4bf8-a45e-1a4bc1a4a8fe-ETHAN:%20Enhanced%20Transformer%20for%20Human-Aligned%20Navigation-edit.png?width=333&height=333&resize=cover",
+        traits: {
+          "vibe": null,
+          "animal": null,
+          "colors": [],
+          "status": "complete",
+          "setting": null,
+          "archetype": null,
+          "art_style": null,
+          "style_choice": "realistic",
+          "persona_traits": {
+            "seriousPlayful": 0,
+            "succinctChatty": 56,
+            "rationalIntuitive": 0,
+            "practicalImaginative": 0
+          },
+          "original_prompt": "Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting. Persona: Disciplined No Excuses Life Coach. Art style: Photo realistic portrait style",
+          "art_style_custom": null,
+          "archetype_specific": "Disciplined No Excuses Life Coach",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "ETHAN is a disciplined, no-excuses life coach AI with an extremely serious approach. Highly rational and practical, ETHAN delivers balanced conversational guidance focused on accountability and results. Perfect for users who need tough love, structured coaching, and straightforward advice without sugar-coating."
       },
       {
         id: "353434a1-4bf9-41a0-a5dd-9906d49013e2",
@@ -975,6 +1109,18 @@ body {
         },
         personality_prompt: null,
         description: "Optimus Prine is a contemplative, wise AI with the soul of a troubadour. Blending the strength of a legendary transformer with the heart of an Americana singer-songwriter, Optimus offers encouraging, thoughtful guidance with poetic wisdom and gentle encouragement."
+      },
+      {
+        id: "5bc7d31e-7b9c-4dcb-8d84-0620a15de74b",
+        name: "zen master",
+        image_url: "https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/b3ec9c0e-2071-425e-83f6-3e7e4b39fc39-zen%20master.png?width=333&height=333&resize=cover",
+        traits: {
+          "art_style": null,
+          "original_prompt": "zen master",
+          "personality_prompt": null
+        },
+        personality_prompt: null,
+        description: "zen master embodies tranquility and mindfulness. With a calm, centered presence, this AI offers peaceful guidance rooted in Zen philosophy. Perfect for meditation, stress relief, finding inner peace, and gaining perspective through minimalist wisdom and contemplative insights."
       }
     ];
 
