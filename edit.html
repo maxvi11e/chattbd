@@ -1886,6 +1886,7 @@
           botImage.classList.add('visible');
           frameSpinner.classList.add('hidden');
           resendBtn.style.display = 'none'; // Ensure resend button stays hidden
+          console.log('🖼️ [IMAGE ONLOAD] Resend button hidden, display:', resendBtn.style.display);
         };
         botImage.onerror = () => {
           // Image failed to load - show resend button
@@ -2900,6 +2901,7 @@
   setLoadingState(true);
   frameSpinner.classList.remove('hidden');
   resendBtn.style.display = 'none'; // Hide resend button during regeneration
+  console.log('🔄 [REGENERATE START] Resend button hidden');
   // Clear the previous image completely to prevent broken image icon
   botImage.classList.remove('visible');
   botImage.style.display = 'none';
@@ -3048,15 +3050,19 @@
         // Update display
         currentBot = updatedBot;
         displayBot(updatedBot);
+        console.log('🔄 [AFTER displayBot] Hiding resend button');
         
         // Explicitly ensure resend button is hidden after successful regeneration
         resendBtn.style.display = 'none';
+        console.log('🔄 [AFTER displayBot] Resend button display:', resendBtn.style.display);
         
         // Reload history to show the new version
         await loadHistory();
+        console.log('🔄 [AFTER loadHistory] Hiding resend button again');
         
         // Keep resend button hidden after history loads
         resendBtn.style.display = 'none';
+        console.log('🔄 [AFTER loadHistory] Resend button display:', resendBtn.style.display);
         
       } catch (error) {
         console.error('Error updating bot image:', error);
