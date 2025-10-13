@@ -634,6 +634,7 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 50px 13px !important;
     padding: 14px 16px 0;
+    margin-top:-20px;
     max-width: none;
   }
   .avatar-circle {
@@ -701,7 +702,7 @@ body {
   <!-- Mobile Top Nav (hidden on desktop) -->
   <div class="mobile-top-nav">
     <div class="mobile-logo" id="mobileLogoBtn">
-      <img src="images/favicon.png" alt="Logo" style="width:30px; height:30px;">
+      <img src="images/toggle_icon.png" alt="Logo" style="width:22px; height:22px;">
     </div>
     <h1 class="mobile-nav-title">AI Library</h1>
     <button class="mobile-nav-btn" id="mobileMenuBtn" title="Account">
@@ -772,6 +773,17 @@ body {
             <div class="create-plus"><img src="images/creator_icon.png" alt="Create" /></div>
           </div>
           <p class="avatar-name">Create new</p>
+        </div>
+        <!-- Use Pre Made Button -->
+        <div class="avatar-item" id="preMadeBtn">
+          <div class="avatar-circle create-new">
+            <div class="create-plus">
+              <svg width="110" height="110" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 1L10.09 5.26L14.5 5.73L11 9.12L11.82 13.5L8 11.27L4.18 13.5L5 9.12L1.5 5.73L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
+          </div>
+          <p class="avatar-name">Use pre made</p>
         </div>
       </div>
         </div>
@@ -991,6 +1003,12 @@ body {
           window.location.href = 'create.html';
         }
       });
+
+      // Use pre made button handler
+      const preMadeBtn = document.getElementById("preMadeBtn");
+      preMadeBtn.addEventListener("click", () => {
+        window.location.href = 'best-of-aeaea.html';
+      });
       
   // Optional: add a manage subscription entry elsewhere if needed
 
@@ -1159,10 +1177,12 @@ body {
 
       // Display avatars in grid
       function displayAvatars(avatars) {
-        // Clear existing avatars but keep the create button
+        // Clear existing avatars but keep the create and pre-made buttons
         const createButton = avatarsGrid.querySelector('#createBtn');
+        const preMadeButton = avatarsGrid.querySelector('#preMadeBtn');
         avatarsGrid.innerHTML = '';
         avatarsGrid.appendChild(createButton);
+        avatarsGrid.appendChild(preMadeButton);
         
         avatars.forEach(avatar => {
           const avatarItem = document.createElement('div');
