@@ -212,27 +212,30 @@ body {
 /* === Landing Page Styling === */
 .landing-section {
   min-height: 100dvh;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 20px;
   position: relative;
+  overflow-y: auto;
 }
 
 .landing-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
 }
 
 .landing-header h1 {
-  font-size: 48px;
+  font-size: 36px;
   font-weight: 600;
-  margin: 0 0 16px 0;
+  margin: 0 0 8px 0;
 }
 
 .landing-header p {
-  font-size: 20px;
+  font-size: 18px;
   color: var(--muted);
   margin: 0;
 }
@@ -242,6 +245,10 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  flex-shrink: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .carousel-wrapper {
@@ -249,11 +256,14 @@ body {
   overflow: hidden;
   border-radius: 16px;
   background: #111;
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .carousel-track {
   display: flex;
   transition: transform 0.5s ease-in-out;
+  height: 100%;
 }
 
 .carousel-slide {
@@ -261,8 +271,8 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 40px;
-  padding: 40px;
+  gap: 30px;
+  padding: 20px;
 }
 
 .carousel-image {
@@ -275,7 +285,7 @@ body {
 
 .carousel-image img {
   max-width: 100%;
-  max-height: 500px;
+  max-height: 50vh;
   height: auto;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -287,15 +297,15 @@ body {
 }
 
 .carousel-content h2 {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 600;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
 }
 
 .carousel-content p {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
 }
 
@@ -304,7 +314,8 @@ body {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 30px;
+  margin-top: 16px;
+  flex-shrink: 0;
 }
 
 .carousel-btn {
@@ -334,13 +345,14 @@ body {
 .carousel-dots {
   display: flex;
   gap: 8px;
-  margin-top: 20px;
+  margin-top: 12px;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .carousel-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #444;
   border: none;
@@ -350,14 +362,14 @@ body {
 
 .carousel-dot.active {
   background: var(--ink);
-  width: 32px;
-  border-radius: 6px;
+  width: 28px;
+  border-radius: 5px;
 }
 
 /* Back to Top Button */
 .back-to-auth {
-  margin-top: 40px;
-  padding: 14px 32px;
+  margin-top: 16px;
+  padding: 12px 28px;
   background: #212121;
   color: var(--ink);
   border: 1px solid #d3d3d3;
@@ -366,6 +378,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .back-to-auth:hover {
@@ -375,17 +388,21 @@ body {
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .landing-header h1 {
-    font-size: 36px;
+    font-size: 28px;
   }
 
   .landing-header p {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .landing-header {
+    margin-bottom: 16px;
   }
 
   .carousel-slide {
     flex-direction: column;
-    padding: 20px;
-    gap: 20px;
+    padding: 16px;
+    gap: 16px;
   }
 
   .carousel-image,
@@ -394,49 +411,69 @@ body {
   }
 
   .carousel-image img {
-    max-height: 400px;
+    max-height: 35vh;
   }
 
   .carousel-content h2 {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .carousel-content p {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .scroll-arrow {
     bottom: 20px;
   }
+
+  .carousel-controls {
+    margin-top: 12px;
+  }
+
+  .carousel-dots {
+    margin-top: 8px;
+  }
+
+  .back-to-auth {
+    margin-top: 12px;
+    padding: 10px 24px;
+  }
 }
 
 @media (max-width: 480px) {
   .landing-section {
-    padding: 40px 10px;
+    padding: 16px 10px;
   }
 
   .landing-header {
-    margin-bottom: 40px;
+    margin-bottom: 12px;
   }
 
   .landing-header h1 {
-    font-size: 28px;
+    font-size: 24px;
   }
 
   .landing-header p {
-    font-size: 16px;
+    font-size: 14px;
+  }
+
+  .carousel-slide {
+    padding: 12px;
+    gap: 12px;
   }
 
   .carousel-image img {
-    max-height: 300px;
+    max-height: 30vh;
   }
 
   .carousel-content h2 {
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 8px;
   }
 
   .carousel-content p {
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .carousel-btn {
