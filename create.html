@@ -473,8 +473,8 @@
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="styleChoice" aria-label="Art style" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                     <option value="hologram" selected>AI Hologram (Neon Abstract patterns)</option>                    
-                    <option value="default"> Modern Illustration</option>
-                    <option value="realistic">Photo Realistic</option>
+                    <option value="default"> Illustration</option>
+                    <option value="realistic">Realistic</option>
                     <option value="vector">Simplified Vector</option>
                     <option value="anime">Anime</option>
                     <option value="impressionistic">Impressionism</option>
@@ -496,10 +496,10 @@
                 <div style="width:100%; border:1px solid var(--stroke); border-radius:800px; padding:0 14.4px; height:46.4px; display:flex; align-items:center;">
                   <select id="vibeChoice" aria-label="Vibe / mood" style="flex:1; background:transparent; border:0; outline:none; color:var(--ink); font-size:16px;">
                     <option value="default">Neutral</option>
-                    <option value="radiant">Radiant</option>
                     <option value="calming">Calming</option>
                     <option value="dramatic">Dramatic</option>
                     <option value="serene">Serene</option>
+                    <option value="radiant">Radiant</option>
                     <option value="mysterious">Mysterious</option>
                     <option value="energetic">Energetic</option>
                     <option value="dreamlike">Dreamlike</option>
@@ -879,13 +879,32 @@
         const vibeSelect = document.getElementById('vibeChoice');
         if (vibeSelect){ vibeSelect.value = vibe; dispatch(vibeSelect,'change'); }
         
-        // Randomize style choice (select) - 30% chance for hologram
-        const useHologram = Math.random() < 0.3;
-        const styles = useHologram ? ['hologram'] : ['default','realistic','vector','anime','impressionistic'];
+        // Randomize style choice with weighted probabilities
+        const styleWeights = {
+          'hologram': 0.30,        // 30%
+          'default': 0.15,         // 15%
+          'realistic': 0.05,       // 5% (decreased frequency)
+          'vector': 0.15,          // 15%
+          'anime': 0.15,           // 15%
+          'impressionistic': 0.15, // 15%
+          'cinematographic': 0.05  // 5%
+        };
+        
         const styleSelect = document.getElementById('styleChoice');
         if (styleSelect) {
-          const style = randPick(styles);
-          styleSelect.value = style;
+          const rand = Math.random();
+          let cumulative = 0;
+          let selectedStyle = 'default';
+          
+          for (const [style, weight] of Object.entries(styleWeights)) {
+            cumulative += weight;
+            if (rand < cumulative) {
+              selectedStyle = style;
+              break;
+            }
+          }
+          
+          styleSelect.value = selectedStyle;
           dispatch(styleSelect,'change');
         }
       }

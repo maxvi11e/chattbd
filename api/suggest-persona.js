@@ -5,19 +5,19 @@
 
 const animalBuckets = {
   bucket1: [
-    "Jellyfish", "Crocodile", "Alligator", "Komodo Dragon", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
+    "Jellyfish", "Crocodile", "Alligator", "Tortoise", "Rhino", "Hippo", "Water Buffalo", 
     "Yak", "Bison", "Moose", "Camel", "Lizard", "Iguana", "Sea Turtle", "Panda", "Sloth", 
     "Tiger", "Leopard", "Lion", "Cheetah", "Polar Bear", "Grizzly Bear"
   ],
   bucket2: [
-    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Hyena", "Giraffe", "Zebra", 
+    "Panda", "Sloth", "Tiger", "Leopard", "Lion", "Cheetah", "Wolf", "Giraffe", "Zebra", 
     "Horse", "Cow", "Goat", "Sheep", "Hedgehog", "Owl", "Hawk", "Eagle", "Rabbit",
-    "Fox", "Meerkat", "Prairie Dog", "Koala", "Kangaroo", "Wallaby", "Manatee", "Blue Whale", "Beluga" 
+    "Fox", "Meerkat", "Koala", "Kangaroo", "Wallaby", "Manatee", "Blue Whale", "Beluga" 
   ],
   bucket3: [
     "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog",    
     "Ferret", "River Otter", "Sea Otter", "Penguin", "Orca", "Porpoise", 
-    "Red Panda", "Monkey", "Spider Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
+    "Red Panda", "Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
     "Raccoon", "Panda"
   ]
 };
@@ -27,8 +27,8 @@ const animalBuckets = {
 const humanArchetypeBuckets = {
   bucket1: [
     "Monk", "Zen Master", "Engineer", "Scientist", "Accountant", "Lawyer", 
-    "Archivist", "Farmer", "Surgeon", "Detective", "Analytical Philosopher", "Stoic Thinker", 
-    "Mathematician", "Historian", "Logistician", "Banker", "Professor", "Doctor", "Therapist", "Psychologist", 
+    "Farmer", "Surgeon", "Analytical Philosopher", "Stoic Thinker", 
+    "Mathematician", "Historian", "Logistician", "Professor", "Doctor", "Therapist", "Psychologist", 
     "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Software Developer"
   ],
   bucket2: [ 
@@ -67,16 +67,12 @@ const archetypeBuckets = {
     "Service Droid",
     "Autonomous Factory Robot",
     "Battle Mech",
-    "Drone Swarm",
     "Space Marine",
     "Ice Dragon",
     "Human Knight",
     "Dwarf",
     "Elf",
-    "Terraforming Machine",
     "Dwarf Miner",
-    "Space Knight",
-    "Mystic Alien",
     "Ranger",
     "Hobbit",
     "Grey Alien",
@@ -86,7 +82,6 @@ const archetypeBuckets = {
   bucket2: [ // 134–266: disciplined, heroic, competent
     "Ent",
     "Dryad",
-    "Dragon Rider",
     "Space Knight", // (appears again for thematic balance if desired)
     "Witch",
     "Starfighter Ace",
@@ -94,8 +89,6 @@ const archetypeBuckets = {
     "Rebel Fighter",
     "Elven King",
     "Space Bard",
-    "Astronaut Inventor",
-    "Mage Alien",
     "Merchant Alien",
     "Time Traveler",
     "Yeti",
@@ -105,20 +98,17 @@ const archetypeBuckets = {
     "Space Colonist",
     "Technologist Wizard",
     "Luminous Energy Being",
-    "Wizard Alien",
     "Force-Wielding Sage",
     "Dragon",
     "Wizard",
     "Celestial Architect",
-    "Cosmic Wanderer",
     "Illusionist",
-    "Friendly Droid",
     "Space Mystic",
-    "Space Shaman",
     "Fairy",
     "Sprite",
     "Phoenix",
-    "Griffin"
+    "Griffin",
+    "Druid",
   ]
 };
 
