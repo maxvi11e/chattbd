@@ -74,6 +74,7 @@ export default async function handler(req, res){
     // Generate bot name if not provided
     const providedBotName = botName ? String(botName).trim() : '';
     let finalBotName = providedBotName;
+    let nameExpansion = null;
 
     console.log('🏷️ Name generation check:', {
       providedBotName,
@@ -88,6 +89,7 @@ export default async function handler(req, res){
         const nameData = await generateAvatarName(imageUrl, finalPrompt);
         if (nameData.name) {
           finalBotName = nameData.name;
+          nameExpansion = nameData.expansion;
           console.log('✅ AI-generated name:', nameData);
         }
       } catch (nameError) {
@@ -101,6 +103,7 @@ export default async function handler(req, res){
 
     const responseData = {
       botName: finalBotName,
+      nameExpansion: nameExpansion,
       promptUsed: finalPrompt,
       archetype: archetype || null,
       archetype_specific: archetypeSpecific || null,
