@@ -22,11 +22,11 @@
 html {
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
+  height: 100%;
   overflow-y: scroll;
-  height: 100dvh;
 }
 html,body {
-  height:100dvh;
+  height:100%;
   margin:0;
   padding:0;
 }
@@ -35,6 +35,8 @@ body {
   color:var(--ink);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
 }
 .auth-container {
   min-height:100dvh;
@@ -202,6 +204,29 @@ body {
   opacity: 1;
 }
 
+.scroll-arrow-up {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: bounceUp 2s infinite;
+  z-index: 10;
+  display: none; /* Hidden by default */
+}
+
+.scroll-arrow-up svg {
+  width: 40px;
+  height: 40px;
+  fill: var(--ink);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-arrow-up:hover svg {
+  opacity: 1;
+}
+
 @keyframes bounce {
   0%, 20%, 50%, 80%, 100% {
     transform: translateX(-50%) translateY(0);
@@ -214,6 +239,18 @@ body {
   }
 }
 
+@keyframes bounceUp {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(5px);
+  }
+}
+
 /* === Landing Page Styling === */
 .landing-section {
   min-height: 100dvh;
@@ -221,22 +258,22 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px;
+  justify-content: flex-start;
+  padding: 30px 20px 20px 20px;
   position: relative;
-  overflow-y: auto;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  overflow: hidden;
 }
 
 .landing-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-shrink: 0;
 }
 
 .landing-header h1 {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
@@ -252,7 +289,7 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  flex-shrink: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -263,14 +300,17 @@ body {
   overflow: hidden;
   border-radius: 16px;
   background: #111;
-  flex-shrink: 1;
+  flex: 1;
   min-height: 0;
+  display: flex;
+  align-items: center;
 }
 
 .carousel-track {
   display: flex;
   transition: transform 0.5s ease-in-out;
   height: 100%;
+  width: 100%;
 }
 
 .carousel-slide {
@@ -279,7 +319,7 @@ body {
   flex-direction: row;
   align-items: center;
   gap: 30px;
-  padding: 20px;
+  padding: 30px;
 }
 
 .carousel-image {
@@ -292,7 +332,7 @@ body {
 
 .carousel-image img {
   max-width: 100%;
-  max-height: 50vh;
+  max-height: 60vh;
   height: auto;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -321,13 +361,14 @@ body {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 0px;
+  margin-bottom: 12px;
   flex-shrink: 0;
 }
 
 .carousel-btn {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: #222;
   border: 1px solid #444;
@@ -352,7 +393,8 @@ body {
 .carousel-dots {
   display: flex;
   gap: 8px;
-  margin-top: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
   justify-content: center;
   flex-shrink: 0;
 }
@@ -369,7 +411,7 @@ body {
 
 .carousel-dot.active {
   background: var(--ink);
-  width: 28px;
+  width: 22px;
   border-radius: 5px;
 }
 
@@ -449,7 +491,7 @@ body {
 
 @media (max-width: 480px) {
   .landing-section {
-    padding: 16px 10px;
+    padding: 30px 10px;
   }
 
   .landing-header {
@@ -532,6 +574,13 @@ body {
 
   <!-- Landing/Features Section -->
   <div class="landing-section" id="landing">
+    <!-- Scroll Up Arrow -->
+    <a href="#auth-section" class="scroll-arrow-up" aria-label="Back to login">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 14l5-5 5 5z"/>
+      </svg>
+    </a>
+
     <div class="landing-header">
       <h1>Build Your Perfect AI Assistant</h1>
       <p>Customize personality, appearance, and chat with unique AI characters</p>
@@ -641,6 +690,9 @@ body {
         </div>
       </div>
 
+      <!-- Carousel Dots -->
+      <div class="carousel-dots" id="carouselDots"></div>
+
       <!-- Carousel Controls -->
       <div class="carousel-controls">
         <button class="carousel-btn" id="prevBtn" aria-label="Previous slide">
@@ -654,14 +706,11 @@ body {
           </svg>
         </button>
       </div>
-
-      <!-- Carousel Dots -->
-      <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
-    <button class="back-to-auth" onclick="window.location.href='#auth-section'">
+    <!-- <button class="back-to-auth" onclick="window.location.href='#auth-section'">
       Get Started
-    </button>
+    </button> -->
   </div>
   
   <script type="module">
@@ -1009,6 +1058,40 @@ body {
 
     // Initialize
     updateCarousel();
+
+    // Hide/show scroll arrows based on which section is visible
+    const downArrow = document.querySelector('.scroll-arrow');
+    const upArrow = document.querySelector('.scroll-arrow-up');
+    const authSection = document.getElementById('auth-section');
+    const landingSection = document.getElementById('landing');
+    
+    // Use Intersection Observer to detect which section is visible
+    const observerOptions = {
+      root: null,
+      threshold: 0.5 // Section is considered visible when 50% in viewport
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target.id === 'auth-section') {
+            // Auth section is visible - show down arrow, hide up arrow
+            console.log('Auth section visible');
+            if (downArrow) downArrow.style.display = 'block';
+            if (upArrow) upArrow.style.display = 'none';
+          } else if (entry.target.id === 'landing') {
+            // Landing section is visible - hide down arrow, show up arrow
+            console.log('Landing section visible');
+            if (downArrow) downArrow.style.display = 'none';
+            if (upArrow) upArrow.style.display = 'block';
+          }
+        }
+      });
+    }, observerOptions);
+    
+    // Observe both sections
+    if (authSection) observer.observe(authSection);
+    if (landingSection) observer.observe(landingSection);
   </script>
 </body>
 </html>
