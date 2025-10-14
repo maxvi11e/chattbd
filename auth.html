@@ -375,6 +375,48 @@ body {
   max-height: 55vh;
 }
 
+/* Mobile showcase slide - all images same size */
+.carousel-slide.mobile-showcase {
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.mobile-showcase .mobile-text {
+  text-align: center;
+  max-width: 800px;
+}
+
+.mobile-showcase .mobile-text h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.mobile-showcase .mobile-text p {
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.mobile-showcase .mobile-images {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mobile-showcase .mobile-images img {
+  max-width: 22%;
+  max-height: 50vh;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  flex: 0 1 auto;
+}
+
 .carousel-image {
   flex: 1;
   max-width: 60%;
@@ -535,6 +577,19 @@ body {
     font-size: 16px;
   }
 
+  .mobile-showcase .mobile-images img {
+    max-width: 28%;
+    max-height: 35vh;
+  }
+
+  .mobile-showcase .mobile-text h2 {
+    font-size: 24px;
+  }
+
+  .mobile-showcase .mobile-text p {
+    font-size: 16px;
+  }
+
   .carousel-content h2 {
     font-size: 22px;
   }
@@ -610,6 +665,23 @@ body {
   }
 
   .hero-slide .hero-text p {
+    font-size: 14px;
+  }
+
+  .mobile-showcase .mobile-images {
+    gap: 12px;
+  }
+
+  .mobile-showcase .mobile-images img {
+    max-width: 26%;
+    max-height: 25vh;
+  }
+
+  .mobile-showcase .mobile-text h2 {
+    font-size: 20px;
+  }
+
+  .mobile-showcase .mobile-text p {
     font-size: 14px;
   }
 
@@ -711,7 +783,18 @@ body {
             </div>
           </div>
 
-          <!-- Slide 3: Builder Interface -->
+          <!-- Slide 3: Library -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/library_image.png" alt="AI Assistant Library">
+            </div>
+            <div class="carousel-content">
+              <h2>An AI for Every Task</h2>
+              <p>Build your personal library of specialized AI assistants. Create unique characters optimized for different tasks, conversations, and contexts.</p>
+            </div>
+          </div>
+
+          <!-- Slide 4: Builder Interface -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/builder_interface.png" alt="Character Builder Interface">
@@ -722,7 +805,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 4: Personality Edit -->
+          <!-- Slide 5: Personality Edit -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/personality_edit.png" alt="Personality Customization">
@@ -733,18 +816,20 @@ body {
             </div>
           </div>
 
-          <!-- Slide 5: Mobile Chat -->
-          <div class="carousel-slide">
-            <div class="carousel-image">
-              <img src="landing_images/mobile_chat.PNG" alt="Mobile Chat Experience">
+          <!-- Slide 6: Mobile Experience Showcase -->
+          <div class="carousel-slide mobile-showcase">
+            <div class="mobile-text">
+              <h2>Full Mobile Experience</h2>
+              <p>Chat, edit, and customize your AI assistants seamlessly on any mobile device</p>
             </div>
-            <div class="carousel-content">
-              <h2>Chat Anywhere</h2>
-              <p>Seamlessly chat with your AI assistants on any device. Fully responsive design ensures a great experience on desktop, tablet, and mobile.</p>
+            <div class="mobile-images">
+              <img src="landing_images/mobile_chat.PNG" alt="Mobile Chat Experience">
+              <img src="landing_images/mobile_personality.PNG" alt="Mobile Personality Editor">
+              <img src="landing_images/mobile_questions.PNG" alt="Mobile Interface">
             </div>
           </div>
 
-          <!-- Slide 6: Edit History -->
+          <!-- Slide 7: Edit History -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/edit_history.png" alt="Edit History Feature">
@@ -755,7 +840,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 7: Conversation History -->
+          <!-- Slide 8: Conversation History -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/conversation_history.png" alt="Conversation History">
@@ -763,28 +848,6 @@ body {
             <div class="carousel-content">
               <h2>Never Lose Context</h2>
               <p>All your conversations are saved and organized. Pick up where you left off or reference past discussions anytime.</p>
-            </div>
-          </div>
-
-          <!-- Slide 7: Mobile Personality -->
-          <div class="carousel-slide">
-            <div class="carousel-image">
-              <img src="landing_images/mobile_personality.PNG" alt="Mobile Personality Editor">
-            </div>
-            <div class="carousel-content">
-              <h2>Edit On The Go</h2>
-              <p>Full editing capabilities on mobile. Adjust personality traits and settings wherever inspiration strikes.</p>
-            </div>
-          </div>
-
-          <!-- Slide 8: Mobile Questions -->
-          <div class="carousel-slide">
-            <div class="carousel-image">
-              <img src="landing_images/mobile_questions.PNG" alt="Mobile Interface">
-            </div>
-            <div class="carousel-content">
-              <h2>Optimized Mobile Experience</h2>
-              <p>Every feature works beautifully on mobile. Create, edit, and chat with your AI assistants from your phone.</p>
             </div>
           </div>
 
@@ -1145,25 +1208,43 @@ body {
       if (e.key === 'ArrowRight') nextSlide();
     });
 
-    // Touch/swipe support for mobile
+    // Enhanced touch/swipe support for mobile
     let touchStartX = 0;
     let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+    let isSwiping = false;
 
     track.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
-    });
+      touchStartY = e.changedTouches[0].screenY;
+      isSwiping = true;
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!isSwiping) return;
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+    }, { passive: true });
 
     track.addEventListener('touchend', (e) => {
-      touchEndX = e.changedTouches[0].screenX;
+      if (!isSwiping) return;
+      isSwiping = false;
       handleSwipe();
-    });
+    }, { passive: true });
 
     function handleSwipe() {
       const swipeThreshold = 50;
-      if (touchStartX - touchEndX > swipeThreshold) {
-        nextSlide();
-      } else if (touchEndX - touchStartX > swipeThreshold) {
-        prevSlide();
+      const horizontalDiff = Math.abs(touchStartX - touchEndX);
+      const verticalDiff = Math.abs(touchStartY - touchEndY);
+      
+      // Only treat as horizontal swipe if horizontal movement is greater than vertical
+      if (horizontalDiff > verticalDiff && horizontalDiff > swipeThreshold) {
+        if (touchStartX - touchEndX > swipeThreshold) {
+          nextSlide();
+        } else if (touchEndX - touchStartX > swipeThreshold) {
+          prevSlide();
+        }
       }
     }
 
