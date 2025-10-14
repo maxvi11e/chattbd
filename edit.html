@@ -1273,8 +1273,6 @@
             <img src="images/rename_pencil_icon.png" alt="Edit" />
           </button>
         </div>
-        <!-- Name Expansion (Backronym) -->
-        <div id="nameExpansion" class="page-subtitle" style="display:none;"></div>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -1683,9 +1681,6 @@
           const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
           
           console.log('🏷️ Using final bot name:', finalBotName, '(from AI:', json.botName, ', placeholder:', placeholderBotName, ')');
-          if (json.nameExpansion) {
-            console.log('📖 Name expansion:', json.nameExpansion);
-          }
           
           // Update the placeholder record with the actual image
           const { data: avatarData, error: updateError } = await supabase
@@ -1695,7 +1690,6 @@
               image_url: url,
               traits: {
                 original_prompt: pending.prompt,
-                name_expansion: json.nameExpansion || null,
                 art_style: json.artStyle || null,
                 style_choice: json.styleChoice || pending.styleChoice || 'default',
                 art_style_custom: json.artStyleCustom || pending.artStyleCustom || null,
@@ -1891,16 +1885,6 @@
         pageTitle.textContent = botName;
         latestNameDraft = botName;
         pendingNameValue = null;
-      }
-      
-      // Display name expansion (backronym) if available
-      const nameExpansionEl = document.getElementById('nameExpansion');
-      if (nameExpansionEl && bot.traits?.name_expansion) {
-        nameExpansionEl.textContent = bot.traits.name_expansion;
-        nameExpansionEl.style.display = 'block';
-        console.log('📖 Displaying backronym:', bot.traits.name_expansion);
-      } else if (nameExpansionEl) {
-        nameExpansionEl.style.display = 'none';
       }
       
       // Only try to load image if we have a valid URL
