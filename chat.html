@@ -610,6 +610,74 @@ body {
 .avatar-section.minimized .edit-btn {
   display:none;
 }
+
+/* Show buttons on hover when minimized (desktop only) */
+@media (min-width: 901px) {
+  .avatar-section.minimized .avatarFrame {
+    position: relative;
+  }
+  
+  /* Container for minimized buttons */
+  .avatar-section.minimized .minimized-controls {
+    position: absolute;
+    right: 8px;
+    top: 52px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+  }
+  
+  .avatar-section.minimized .avatarFrame:hover .minimized-controls {
+    opacity: 1;
+  }
+  
+  /* Edit button for minimized state */
+  .avatar-section.minimized .minimized-edit-btn {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--ink);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatar-section.minimized .minimized-edit-btn:hover {
+    background: rgba(0,0,0,0.9);
+    transform: scale(1.1);
+  }
+  
+  /* Maximize button for minimized state */
+  .avatar-section.minimized .minimized-maximize-btn {
+    background: rgba(0,0,0,0.8);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: var(--ink);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatar-section.minimized .minimized-maximize-btn:hover {
+    background: rgba(0,0,0,0.9);
+    transform: scale(1.1);
+  }
+}
 .pane {
   position:relative;
   width:100%;
@@ -707,6 +775,12 @@ body {
   line-height:1.4;
   min-height:22px;
   padding:0;
+  /* Hide scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+.composer textarea::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 .composer textarea::placeholder {
   color:#a8a8a8;
@@ -1019,9 +1093,7 @@ body {
           <span class="action-label">AI Library</span>
         </a>
         <a href="best-of-aeaea.html" class="action-btn" title="Best of Aeaea">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 1L10.09 5.26L14.5 5.73L11 9.12L11.82 13.5L8 11.27L4.18 13.5L5 9.12L1.5 5.73L5.91 5.26L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
+          <img src="images/star_icon.png" alt="Best of Aeaea">
           <span class="action-label">Best of Aeaea</span>
         </a>
         <a href="create.html" class="action-btn" title="Create new AI">
@@ -2585,6 +2657,47 @@ body {
         avatar.appendChild(editBtn);
       }
 
+      function addMinimizedControls() {
+        // Remove existing minimized controls if any
+        const existingControls = avatar.querySelector('.minimized-controls');
+        if (existingControls) existingControls.remove();
+        
+        // Only add on desktop
+        if (window.innerWidth <= 900) return;
+        
+        // Create container
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'minimized-controls';
+        
+        // Create edit button
+        const editBtn = document.createElement('button');
+        editBtn.className = 'minimized-edit-btn';
+        editBtn.innerHTML = '<img src="images/sliders_icon.png" alt="Edit" style="width:18px; height:18px;">';
+        editBtn.title = 'Edit avatar';
+        editBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const urlParams = new URLSearchParams(window.location.search);
+          const avatarId = urlParams.get('avatar') || localStorage.getItem('lastSelectedAvatar');
+          if (avatarId) {
+            window.location.href = `edit.html?avatar=${avatarId}`;
+          }
+        });
+        
+        // Create maximize button
+        const maximizeBtn = document.createElement('button');
+        maximizeBtn.className = 'minimized-maximize-btn';
+        maximizeBtn.innerHTML = '+';
+        maximizeBtn.title = 'Expand avatar';
+        maximizeBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleMinimize();
+        });
+        
+        controlsContainer.appendChild(maximizeBtn);
+        controlsContainer.appendChild(editBtn);
+        avatar.appendChild(controlsContainer);
+      }
+
       function initializeMinimizedState() {
         avatarSection.classList.add('minimized');
         scroller.classList.add('expanded');
@@ -2608,6 +2721,9 @@ body {
         }
         avatar.style.cursor = 'pointer';
         avatar.addEventListener('click', expandClickHandler);
+        
+        // Add minimized controls
+        addMinimizedControls();
         
         updateAvatarPlacement();
       }
@@ -2637,6 +2753,9 @@ body {
           }
           avatar.style.cursor = 'pointer';
           avatar.addEventListener('click', expandClickHandler);
+          
+          // Add minimized controls
+          addMinimizedControls();
         } else {
           avatarSection.classList.remove('minimized');
           scroller.classList.remove('expanded');
@@ -2653,6 +2772,10 @@ body {
             avatar.removeEventListener('click', expandClickHandler);
             expandClickHandler = null;
           }
+          
+          // Remove minimized controls
+          const minimizedControls = avatar.querySelector('.minimized-controls');
+          if (minimizedControls) minimizedControls.remove();
         }
         updateAvatarPlacement();
       }
