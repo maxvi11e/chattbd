@@ -322,6 +322,59 @@ body {
   padding: 30px;
 }
 
+/* Special layout for hero slide with multiple images */
+.carousel-slide.hero-slide {
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+}
+
+.hero-slide .hero-text {
+  text-align: center;
+  max-width: 800px;
+}
+
+.hero-slide .hero-text h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+}
+
+.hero-slide .hero-text p {
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hero-slide .hero-images {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.hero-slide .hero-images img {
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  flex: 0 1 auto;
+}
+
+/* Make mobile images smaller */
+.hero-slide .hero-images img:nth-child(1),
+.hero-slide .hero-images img:nth-child(2) {
+  max-width: 15%;
+  max-height: 45vh;
+}
+
+/* Make Stoic chat larger */
+.hero-slide .hero-images img:nth-child(3) {
+  max-width: 50%;
+  max-height: 55vh;
+}
+
 .carousel-image {
   flex: 1;
   max-width: 60%;
@@ -463,6 +516,25 @@ body {
     max-height: 35vh;
   }
 
+  .hero-slide .hero-images img:nth-child(1),
+  .hero-slide .hero-images img:nth-child(2) {
+    max-width: 20%;
+    max-height: 30vh;
+  }
+
+  .hero-slide .hero-images img:nth-child(3) {
+    max-width: 55%;
+    max-height: 30vh;
+  }
+
+  .hero-slide .hero-text h2 {
+    font-size: 24px;
+  }
+
+  .hero-slide .hero-text p {
+    font-size: 16px;
+  }
+
   .carousel-content h2 {
     font-size: 22px;
   }
@@ -513,6 +585,32 @@ body {
 
   .carousel-image img {
     max-height: 30vh;
+  }
+
+  .hero-slide .hero-images {
+    gap: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .hero-slide .hero-images img:nth-child(1),
+  .hero-slide .hero-images img:nth-child(2) {
+    max-width: 25%;
+    max-height: 18vh;
+  }
+
+  .hero-slide .hero-images img:nth-child(3) {
+    max-width: 60%;
+    max-height: 22vh;
+    flex-basis: 100%;
+  }
+
+  .hero-slide .hero-text h2 {
+    font-size: 20px;
+  }
+
+  .hero-slide .hero-text p {
+    font-size: 14px;
   }
 
   .carousel-content h2 {
@@ -581,15 +679,39 @@ body {
       </svg>
     </a>
 
-    <div class="landing-header">
+    <!-- <div class="landing-header">
       <h1>Build Your Perfect AI Assistant</h1>
       <p>Customize personality, appearance, and chat with unique AI characters</p>
-    </div>
+    </div> -->
 
     <div class="carousel-container">
       <div class="carousel-wrapper">
         <div class="carousel-track" id="carouselTrack">
-          <!-- Slide 1: Builder Interface -->
+          <!-- Slide 1: Hero Slide with Multiple Images -->
+          <div class="carousel-slide hero-slide">
+            <div class="hero-text">
+              <h2>Build Your Perfect AI Assistant</h2>
+              <p>Customize personality, appearance, and chat with unique AI characters</p>
+            </div>
+            <div class="hero-images">
+              <img src="landing_images/mobile_personality.PNG" alt="Mobile Personality Editor">
+              <img src="landing_images/mobile_edit.PNG" alt="Mobile Character Editor">
+              <img src="landing_images/Stoic_chat.png" alt="Chat with AI Characters">
+            </div>
+          </div>
+
+          <!-- Slide 2: Best Of Collection -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/best_of.png" alt="Featured Characters">
+            </div>
+            <div class="carousel-content">
+              <h2>Discover Featured Characters</h2>
+              <p>Explore our curated collection of creative AI assistants. Get inspired or start chatting with pre-built characters right away.</p>
+            </div>
+          </div>
+
+          <!-- Slide 3: Builder Interface -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/builder_interface.png" alt="Character Builder Interface">
@@ -600,7 +722,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 2: Personality Edit -->
+          <!-- Slide 4: Personality Edit -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/personality_edit.png" alt="Personality Customization">
@@ -611,7 +733,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 3: Mobile Chat -->
+          <!-- Slide 5: Mobile Chat -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/mobile_chat.PNG" alt="Mobile Chat Experience">
@@ -622,7 +744,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 4: Edit History -->
+          <!-- Slide 6: Edit History -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/edit_history.png" alt="Edit History Feature">
@@ -633,7 +755,7 @@ body {
             </div>
           </div>
 
-          <!-- Slide 5: Conversation History -->
+          <!-- Slide 7: Conversation History -->
           <div class="carousel-slide">
             <div class="carousel-image">
               <img src="landing_images/conversation_history.png" alt="Conversation History">
@@ -641,17 +763,6 @@ body {
             <div class="carousel-content">
               <h2>Never Lose Context</h2>
               <p>All your conversations are saved and organized. Pick up where you left off or reference past discussions anytime.</p>
-            </div>
-          </div>
-
-          <!-- Slide 6: Best Of Collection -->
-          <div class="carousel-slide">
-            <div class="carousel-image">
-              <img src="landing_images/best_of.png" alt="Featured Characters">
-            </div>
-            <div class="carousel-content">
-              <h2>Discover Featured Characters</h2>
-              <p>Explore our curated collection of creative AI assistants. Get inspired or start chatting with pre-built characters right away.</p>
             </div>
           </div>
 
