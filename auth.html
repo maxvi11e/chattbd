@@ -19,6 +19,9 @@
 * {
   box-sizing:border-box;
 }
+html {
+  scroll-behavior: smooth;
+}
 html,body {
   height:100dvh;
   margin:0;
@@ -28,6 +31,7 @@ body {
   background:var(--bg);
   color:var(--ink);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
 }
 .auth-container {
   min-height:100dvh;
@@ -169,10 +173,282 @@ body {
     font-size: 30px;
   } */
 }
+
+/* === Scroll Arrow Styling === */
+.scroll-arrow {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: bounce 2s infinite;
+  z-index: 10;
+}
+
+.scroll-arrow svg {
+  width: 40px;
+  height: 40px;
+  fill: var(--ink);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-arrow:hover svg {
+  opacity: 1;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+/* === Landing Page Styling === */
+.landing-section {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  position: relative;
+}
+
+.landing-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.landing-header h1 {
+  font-size: 48px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.landing-header p {
+  font-size: 20px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Carousel Container */
+.carousel-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.carousel-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #111;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+}
+
+.carousel-image {
+  flex: 1;
+  max-width: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-image img {
+  max-width: 100%;
+  max-height: 500px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-content {
+  flex: 1;
+  max-width: 40%;
+}
+
+.carousel-content h2 {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.carousel-content p {
+  font-size: 18px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Carousel Controls */
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.carousel-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #222;
+  border: 1px solid #444;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: #333;
+  border-color: #666;
+}
+
+.carousel-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #444;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.carousel-dot.active {
+  background: var(--ink);
+  width: 32px;
+  border-radius: 6px;
+}
+
+/* Back to Top Button */
+.back-to-auth {
+  margin-top: 40px;
+  padding: 14px 32px;
+  background: #212121;
+  color: var(--ink);
+  border: 1px solid #d3d3d3;
+  border-radius: 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-to-auth:hover {
+  background: #404040;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .landing-header h1 {
+    font-size: 36px;
+  }
+
+  .landing-header p {
+    font-size: 18px;
+  }
+
+  .carousel-slide {
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .carousel-image,
+  .carousel-content {
+    max-width: 100%;
+  }
+
+  .carousel-image img {
+    max-height: 400px;
+  }
+
+  .carousel-content h2 {
+    font-size: 24px;
+  }
+
+  .carousel-content p {
+    font-size: 16px;
+  }
+
+  .scroll-arrow {
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .landing-section {
+    padding: 40px 10px;
+  }
+
+  .landing-header {
+    margin-bottom: 40px;
+  }
+
+  .landing-header h1 {
+    font-size: 28px;
+  }
+
+  .landing-header p {
+    font-size: 16px;
+  }
+
+  .carousel-image img {
+    max-height: 300px;
+  }
+
+  .carousel-content h2 {
+    font-size: 20px;
+  }
+
+  .carousel-content p {
+    font-size: 14px;
+  }
+
+  .carousel-btn {
+    width: 40px;
+    height: 40px;
+  }
+}
 </style>
 </head>
 <body>
-  <div class="auth-container">
+  <!-- Auth Section -->
+  <div class="auth-container" id="auth-section">
     <div class="auth-content">
       <!-- Logo -->
       <img src="images/logo.png" alt="Aeaea Logo" class="logo-image" /> <!-- Codex test comment -->
@@ -201,6 +477,147 @@ body {
         <button id="auth-btn" class="auth-btn primary">Sign in</button>
       </div>
     </div>
+
+    <!-- Scroll Down Arrow -->
+    <a href="#landing" class="scroll-arrow" aria-label="Learn more">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 10l5 5 5-5z"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Landing/Features Section -->
+  <div class="landing-section" id="landing">
+    <div class="landing-header">
+      <h1>Build Your Perfect AI Assistant</h1>
+      <p>Customize personality, appearance, and chat with unique AI characters</p>
+    </div>
+
+    <div class="carousel-container">
+      <div class="carousel-wrapper">
+        <div class="carousel-track" id="carouselTrack">
+          <!-- Slide 1: Builder Interface -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/builder_interface.png" alt="Character Builder Interface">
+            </div>
+            <div class="carousel-content">
+              <h2>Create Custom Characters</h2>
+              <p>Design unique AI assistants with our intuitive builder. Choose personality traits, visual style, and conversation tone to match your needs perfectly.</p>
+            </div>
+          </div>
+
+          <!-- Slide 2: Personality Edit -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/personality_edit.png" alt="Personality Customization">
+            </div>
+            <div class="carousel-content">
+              <h2>Fine-Tune Personality</h2>
+              <p>Adjust personality sliders to create characters ranging from serious to playful, succinct to chatty. Make every interaction feel authentic and engaging.</p>
+            </div>
+          </div>
+
+          <!-- Slide 3: Mobile Chat -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/mobile_chat.PNG" alt="Mobile Chat Experience">
+            </div>
+            <div class="carousel-content">
+              <h2>Chat Anywhere</h2>
+              <p>Seamlessly chat with your AI assistants on any device. Fully responsive design ensures a great experience on desktop, tablet, and mobile.</p>
+            </div>
+          </div>
+
+          <!-- Slide 4: Edit History -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/edit_history.png" alt="Edit History Feature">
+            </div>
+            <div class="carousel-content">
+              <h2>Track Your Changes</h2>
+              <p>Every character edit is saved in history. Review past versions, undo changes, or restore previous configurations with ease.</p>
+            </div>
+          </div>
+
+          <!-- Slide 5: Conversation History -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/conversation_history.png" alt="Conversation History">
+            </div>
+            <div class="carousel-content">
+              <h2>Never Lose Context</h2>
+              <p>All your conversations are saved and organized. Pick up where you left off or reference past discussions anytime.</p>
+            </div>
+          </div>
+
+          <!-- Slide 6: Best Of Collection -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/best_of.png" alt="Featured Characters">
+            </div>
+            <div class="carousel-content">
+              <h2>Discover Featured Characters</h2>
+              <p>Explore our curated collection of creative AI assistants. Get inspired or start chatting with pre-built characters right away.</p>
+            </div>
+          </div>
+
+          <!-- Slide 7: Mobile Personality -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/mobile_personality.PNG" alt="Mobile Personality Editor">
+            </div>
+            <div class="carousel-content">
+              <h2>Edit On The Go</h2>
+              <p>Full editing capabilities on mobile. Adjust personality traits and settings wherever inspiration strikes.</p>
+            </div>
+          </div>
+
+          <!-- Slide 8: Mobile Questions -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/mobile_questions.PNG" alt="Mobile Interface">
+            </div>
+            <div class="carousel-content">
+              <h2>Optimized Mobile Experience</h2>
+              <p>Every feature works beautifully on mobile. Create, edit, and chat with your AI assistants from your phone.</p>
+            </div>
+          </div>
+
+          <!-- Slide 9: Billing -->
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              <img src="landing_images/billing.png" alt="Flexible Pricing">
+            </div>
+            <div class="carousel-content">
+              <h2>Flexible Pricing</h2>
+              <p>Start free and upgrade when you're ready. Simple, transparent pricing with full control over your subscription.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carousel Controls -->
+      <div class="carousel-controls">
+        <button class="carousel-btn" id="prevBtn" aria-label="Previous slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button class="carousel-btn" id="nextBtn" aria-label="Next slide">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Carousel Dots -->
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+
+    <button class="back-to-auth" onclick="window.location.href='#auth-section'">
+      Get Started
+    </button>
   </div>
   
   <script type="module">
@@ -457,6 +874,97 @@ body {
         window.location.replace('index.html');
       }
     });
+  </script>
+
+  <!-- Carousel Script -->
+  <script>
+    // Carousel functionality
+    const track = document.getElementById('carouselTrack');
+    const slides = Array.from(track.children);
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const dotsContainer = document.getElementById('carouselDots');
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    // Create dots
+    slides.forEach((_, index) => {
+      const dot = document.createElement('button');
+      dot.classList.add('carousel-dot');
+      dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+      if (index === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(index));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = Array.from(dotsContainer.children);
+
+    function updateCarousel() {
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+      
+      // Update dots
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentIndex);
+      });
+
+      // Update button states
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === totalSlides - 1;
+    }
+
+    function goToSlide(index) {
+      currentIndex = index;
+      updateCarousel();
+    }
+
+    function nextSlide() {
+      if (currentIndex < totalSlides - 1) {
+        currentIndex++;
+        updateCarousel();
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    }
+
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') prevSlide();
+      if (e.key === 'ArrowRight') nextSlide();
+    });
+
+    // Touch/swipe support for mobile
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    track.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    track.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      if (touchStartX - touchEndX > swipeThreshold) {
+        nextSlide();
+      } else if (touchEndX - touchStartX > swipeThreshold) {
+        prevSlide();
+      }
+    }
+
+    // Initialize
+    updateCarousel();
   </script>
 </body>
 </html>

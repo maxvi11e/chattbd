@@ -798,6 +798,7 @@
 
       // Track if any random selection has been made (used by undo button)
       let hasRandomSelections = false;
+      let lastRandomButtonId = null; // Track the last selected random button
 
       async function randomizeAll(){
         // Ensure options mode is visible
@@ -854,13 +855,28 @@
         ].filter(btn => btn); // Filter out any null buttons
         
         if (randomButtons.length >= 1) {
-          // Shuffle and pick 1
-          const shuffled = randomButtons.sort(() => Math.random() - 0.5);
-          const btn1 = shuffled[0];
+          let selectedBtn;
           
-          // Click the button
-          if (btn1 && !btn1.disabled) {
-            btn1.click();
+          // If we have a last button and multiple options, give 70% chance to pick a different one
+          if (lastRandomButtonId && randomButtons.length > 1) {
+            const otherButtons = randomButtons.filter(btn => btn.id !== lastRandomButtonId);
+            
+            if (Math.random() < 0.8 && otherButtons.length > 0) {
+              // 80% chance: pick from buttons that aren't the last one
+              selectedBtn = otherButtons[Math.floor(Math.random() * otherButtons.length)];
+            } else {
+              // 20% chance: pick from all buttons (including potentially the same one)
+              selectedBtn = randomButtons[Math.floor(Math.random() * randomButtons.length)];
+            }
+          } else {
+            // First time or only one button available
+            selectedBtn = randomButtons[Math.floor(Math.random() * randomButtons.length)];
+          }
+          
+          // Click the button and remember it
+          if (selectedBtn && !selectedBtn.disabled) {
+            selectedBtn.click();
+            lastRandomButtonId = selectedBtn.id;
           }
         }
         
@@ -882,12 +898,11 @@
         // Randomize style choice with weighted probabilities
         const styleWeights = {
           'hologram': 0.30,        // 30%
-          'default': 0.15,         // 15%
+          'default': 0.20,         // 20%
           'realistic': 0.05,       // 5% (decreased frequency)
           'vector': 0.15,          // 15%
           'anime': 0.15,           // 15%
           'impressionistic': 0.15, // 15%
-          'cinematographic': 0.05  // 5%
         };
         
         const styleSelect = document.getElementById('styleChoice');
