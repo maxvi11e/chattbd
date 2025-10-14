@@ -21,6 +21,9 @@
 }
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+  overflow-y: scroll;
+  height: 100dvh;
 }
 html,body {
   height:100dvh;
@@ -39,6 +42,8 @@ body {
   align-items:center;
   justify-content:center;
   padding:20px 0px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 .auth-content {
   display:flex;
@@ -220,6 +225,8 @@ body {
   padding: 20px;
   position: relative;
   overflow-y: auto;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .landing-header {
