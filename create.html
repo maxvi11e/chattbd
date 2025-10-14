@@ -1590,8 +1590,9 @@
         }
 
         const payload = { 
-          prompt: finalPrompt, 
-          botName: resolvedName,
+          prompt: finalPrompt,
+          // Don't send botName - let the AI generate it based on the avatar image
+          // botName: resolvedName,
           archetype,
           archetypeSpecific, archetypeSpecificDesc,
           vibe,

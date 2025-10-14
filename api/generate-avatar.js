@@ -75,6 +75,12 @@ export default async function handler(req, res){
     const providedBotName = botName ? String(botName).trim() : '';
     let finalBotName = providedBotName;
 
+    console.log('🏷️ Name generation check:', {
+      providedBotName,
+      hasImageUrl: !!imageUrl,
+      willGenerateAIName: !providedBotName && !!imageUrl
+    });
+
     // If no name provided, generate one using AI
     if (!providedBotName && imageUrl) {
       try {
