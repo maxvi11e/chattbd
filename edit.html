@@ -1665,11 +1665,12 @@
           }
 
           // Upload and update the placeholder avatar with real image
-          const safeFileBase = placeholderBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
+          // Use AI-generated name from API response, or fall back to placeholder
+          const finalBotName = json.botName || placeholderBotName;
+          const safeFileBase = finalBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
           const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
           
-          // Use the placeholder name (which includes abstract name fallback)
-          const finalBotName = placeholderBotName;
+          console.log('🏷️ Using final bot name:', finalBotName, '(from AI:', json.botName, ', placeholder:', placeholderBotName, ')');
           
           // Update the placeholder record with the actual image
           const { data: avatarData, error: updateError } = await supabase
