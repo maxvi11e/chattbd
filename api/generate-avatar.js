@@ -1,7 +1,7 @@
 // api/generate-avatar.js - Simplified for abstract avatar generation
 // Input (POST JSON): { prompt, botName?, archetype?, archetypeSpecific?, traits?, vibe? }
 
-import { pickAbstractName } from './_lib/abstract-names.js';
+import { generateAvatarName } from './_lib/name-generator.js';
 
 export default async function handler(req, res){
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -68,10 +68,30 @@ export default async function handler(req, res){
       durationMs: duration
     });
 
+    // Determine the image URL to use for naming
+    const imageUrl = url || (b64 ? `data:image/png;base64,${b64}` : null);
+
     // Generate bot name if not provided
     const providedBotName = botName ? String(botName).trim() : '';
-    const autoAbstractName = isAbstract && !providedBotName ? pickAbstractName() : null;
-    const finalBotName = providedBotName || autoAbstractName?.label || archetypeSpecific || 'New Avatar';
+    let finalBotName = providedBotName;
+
+    // If no name provided, generate one using AI
+    if (!providedBotName && imageUrl) {
+      try {
+        console.log('🏷️ Generating AI-based name...');
+        const nameData = await generateAvatarName(imageUrl, finalPrompt);
+        if (nameData.name) {
+          finalBotName = nameData.name;
+          console.log('✅ AI-generated name:', nameData);
+        }
+      } catch (nameError) {
+        console.error('❌ Error generating AI name:', nameError);
+        finalBotName = archetypeSpecific || 'New Avatar';
+      }
+    } else if (!providedBotName) {
+      // Fallback if no image URL available
+      finalBotName = archetypeSpecific || 'New Avatar';
+    }
 
     const responseData = {
       botName: finalBotName,
