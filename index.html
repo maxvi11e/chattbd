@@ -302,6 +302,31 @@ body {
   text-align:left;
   margin:0;
 }
+/* Free User Info Banner */
+.free-user-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  max-width: 1000px;
+  color: white;
+  font-size: 14px;
+  line-height: 1.6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.free-user-info strong {
+  font-weight: 600;
+}
+.free-user-info a {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: 600;
+}
+.free-user-info a:hover {
+  opacity: 0.8;
+}
 /* Avatar Grid */
 .avatars-grid {
   display:grid;
@@ -729,7 +754,7 @@ body {
         <a href="create.html" class="action-btn" title="Create new AI">
           <img src="images/creator_icon.png" alt="Create AI">
           <span class="action-label">Create New</span>
-        </a>        
+        </a>
         <a href="best-of-aeaea.html" class="action-btn" title="Best of Aeaea">
           <img src="images/star_icon.png" alt="Best of Aeaea">
           <span class="action-label">Best of Aeaea</span>
@@ -762,6 +787,10 @@ body {
         <h1 class="page-title">AI Library</h1>
       </div>
       
+      <!-- Free User Info Banner (hidden by default, shown for free users) -->
+      <div id="freeUserInfo" class="free-user-info" style="display:none;">
+        <strong>🎉 Welcome to AI Library!</strong> You can create or add <strong>one avatar</strong> and enjoy <strong>unlimited chats</strong>. Want more avatars and full editing capabilities? <a onclick="window.location.href='billing.html'">Upgrade to Unlimited</a> for just $5/month.
+      </div>
 
       <!-- Avatar Grid -->
       <div id="avatarsGrid" class="avatars-grid">
@@ -901,6 +930,12 @@ body {
           if (subscriptionInfo.plan_id === 'unlimited') {
             subscriptionStatus.classList.add('unlimited');
           }
+        }
+        
+        // Show free user info banner if on free plan
+        const freeUserInfo = document.getElementById('freeUserInfo');
+        if (freeUserInfo && subscriptionInfo.plan_id === 'free') {
+          freeUserInfo.style.display = 'block';
         }
         
   // Usage stats UI removed

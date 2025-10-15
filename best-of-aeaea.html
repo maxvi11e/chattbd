@@ -758,6 +758,9 @@ body {
     </div>
   </div>
 
+  <!-- Freemium utilities -->
+  <script type="module" src="freemium-utils.js"></script>
+
   <script type="module">
     // === Supabase Auth ===
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -774,6 +777,9 @@ body {
         storageKey: 'sb-auth-token'
       }
     });
+
+    // Make supabase available globally for freemium-utils.js
+    window.supabase = supabase;
 
     // Featured avatars data
     const featuredAvatars = [
@@ -1200,11 +1206,29 @@ body {
       
       // Disable button and show loading
       addBtn.disabled = true;
-      addBtn.textContent = 'Adding...';
+      addBtn.textContent = 'Checking...';
       
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User not authenticated');
+
+        // Check if user can create a new bot (freemium limits)
+        if (!window.FreemiumUtils) {
+          console.error('FreemiumUtils not loaded - continuing without limits');
+        } else {
+          const canCreateResult = await window.FreemiumUtils.canUserCreateBot(supabase);
+          
+          if (!canCreateResult.canCreate) {
+            // Show upgrade modal instead of adding
+            addBtn.disabled = false;
+            addBtn.textContent = 'Add to Library';
+            const plans = await window.FreemiumUtils.getSubscriptionPlans(supabase);
+            await window.FreemiumUtils.showUpgradeModal(canCreateResult.subscriptionInfo, plans);
+            return;
+          }
+        }
+
+        addBtn.textContent = 'Adding...';
 
         // Create a copy of the avatar for this user
         const { data, error } = await supabase
