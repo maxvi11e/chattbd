@@ -1666,20 +1666,41 @@
             mode: json.mode,
             botName: json.botName
           });
+          
+          // If blocked by safety system, use fallback image
           if (!res.ok || !json?.dataUrl) {
-            showError(json?.error || 'Failed to generate avatar.');
-            setLoadingState(false);
-            // Show resend button
-            frameSpinner.classList.add('hidden');
-            resendBtn.style.display = 'flex';
-            return;
+            if (json?.error && (json.error.includes('safety') || json.error.includes('moderation'))) {
+              console.log('🛡️ Safety system triggered, using fallback image');
+              // Use fallback image URL
+              const fallbackImageUrl = 'https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/6edf900e-d1cb-4f76-be59-49360caba418-NEON_Networked_Entity_Optimized_for_Navigation.png?width=333&height=333&resize=cover';
+              
+              // Create a mock response with the fallback image
+              json.dataUrl = fallbackImageUrl;
+              json.botName = json.botName || placeholderBotName;
+              
+              // Continue with the fallback - don't show error
+            } else {
+              showError(json?.error || 'Failed to generate avatar.');
+              setLoadingState(false);
+              // Show resend button
+              frameSpinner.classList.add('hidden');
+              resendBtn.style.display = 'flex';
+              return;
+            }
           }
 
           // Upload and update the placeholder avatar with real image
           // Use AI-generated name from API response, or fall back to placeholder
           const finalBotName = json.botName || placeholderBotName;
           const safeFileBase = finalBotName.replace(/[^a-z0-9-_]+/gi, '_') || 'New_Avatar';
-          const url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
+          
+          // If dataUrl is already a full URL (fallback case), use it directly
+          let url;
+          if (json.dataUrl.startsWith('http')) {
+            url = json.dataUrl;
+          } else {
+            url = await uploadAvatarImage({ dataUrl: json.dataUrl, userId: user.id, fileName: `${safeFileBase}.png` });
+          }
           
           console.log('🏷️ Using final bot name:', finalBotName, '(from AI:', json.botName, ', placeholder:', placeholderBotName, ')');
           
@@ -2051,12 +2072,21 @@
           const json = await res.json().catch(() => ({}));
           console.log('📥 Retry response:', json);
           
+          // If blocked by safety system, use fallback image
           if (!res.ok || !json?.dataUrl) {
-            showError(json?.error || 'Failed to generate avatar. Please try again.');
-            setLoadingState(false);
-            frameSpinner.classList.add('hidden');
-            resendBtn.style.display = 'flex';
-            return;
+            if (json?.error && (json.error.includes('safety') || json.error.includes('moderation'))) {
+              console.log('🛡️ Safety system triggered on retry, using fallback image');
+              // Use fallback image URL
+              const fallbackImageUrl = 'https://eyptqyzkwcpaillnwmle.supabase.co/storage/v1/render/image/public/avatars/cb7baa30-d4ee-4c51-94a8-ea550a1de37c/6edf900e-d1cb-4f76-be59-49360caba418-NEON_Networked_Entity_Optimized_for_Navigation.png?width=333&height=333&resize=cover';
+              json.dataUrl = fallbackImageUrl;
+              // Continue with the fallback - don't show error
+            } else {
+              showError(json?.error || 'Failed to generate avatar. Please try again.');
+              setLoadingState(false);
+              frameSpinner.classList.add('hidden');
+              resendBtn.style.display = 'flex';
+              return;
+            }
           }
           
           // Success! Upload and update the avatar
@@ -2079,11 +2109,18 @@
             .single();
           
           const safeFileBase = (currentBotData?.name || 'Avatar').replace(/[^a-z0-9-_]+/gi, '_');
-          const url = await uploadAvatarImage({ 
-            dataUrl: json.dataUrl, 
-            userId: user.id, 
-            fileName: `${safeFileBase}.png` 
-          });
+          
+          // If dataUrl is already a full URL (fallback case), use it directly
+          let url;
+          if (json.dataUrl.startsWith('http')) {
+            url = json.dataUrl;
+          } else {
+            url = await uploadAvatarImage({ 
+              dataUrl: json.dataUrl, 
+              userId: user.id, 
+              fileName: `${safeFileBase}.png` 
+            });
+          }
           
           // Update the avatar with the generated image
           const { error: updateError } = await supabase
