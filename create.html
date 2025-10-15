@@ -1591,7 +1591,13 @@
         let finalPrompt = '';
         if (useHologram && hologramDescription) {
           // Hologram mode: use abstract description
-          finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || 'Human'}`;
+          // Only add "Representing:" line if it's not the default "Human"
+          if (archetypeSpecific && archetypeSpecific.toLowerCase() !== 'human') {
+            finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific}`;
+          } else {
+            // For default "Human", omit the "Representing:" line since it's already in the description
+            finalPrompt = `Abstract avatar art: ${hologramDescription}`;
+          }
         } else {
           // Non-hologram mode: build prompt from archetypeSpecific
           const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
