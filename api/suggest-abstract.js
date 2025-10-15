@@ -33,8 +33,8 @@ export default async function handler(req, res){
 
     const fill = {
       low: 'balanced interior with clear negative space between lines',
-      mid: 'medium density with even spacing',
-      high: 'richer line work with tight spacing, but keep background visible within figure'
+      mid: 'medium density grid with even spacing and some connective synapses',
+      high: 'richer line work with intricate details and high density of connective synapses'
     }[b.sc];
 
     const logic = {
