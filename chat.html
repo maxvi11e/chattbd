@@ -1703,7 +1703,8 @@ body {
             body: JSON.stringify({
               persona: 'assistant',
               message: `Create a short, descriptive title (max 4-6 words) for a conversation that starts with: "${firstMessage}". The conversation is with ${avatarName}. Return only the title, no quotes or extra text.`,
-              history: []
+              history: [],
+              stream: false // Keep non-streaming for title generation since it's background
             })
           });
           
@@ -2108,7 +2109,7 @@ body {
           // Use archetype or archetype_specific as persona, fallback to name
           const personaType = currentAvatar.traits?.archetype_specific || currentAvatar.traits?.archetype || currentAvatar.name;
 
-          // Call chat API with empty history (or last assistant message for style?)
+          // Call chat API with streaming enabled
           const res = await fetch('/api/chat', {
             method:'POST',
             headers:{ 'Content-Type':'application/json' },
@@ -2120,19 +2121,77 @@ body {
               history: [], 
               temperature: 0.95, 
               presencePenalty: 0.6, 
-              frequencyPenalty: 0.4 
+              frequencyPenalty: 0.4,
+              stream: true
             })
           });
-          const { text } = await res.json();
-          
-          // Remove loading indicator
-          removeLoading(loadingId);
+
+          // Remove loading indicator and prepare bubble for streaming
+          let loadingRow = document.getElementById(loadingId);
+          let bubble;
+          if(loadingRow){
+            bubble = loadingRow.querySelector('.bubble');
+            if(bubble){
+              bubble.classList.remove('loading-message');
+              bubble.innerHTML = '';
+            }
+            loadingRow.removeAttribute('id');
+          } else {
+            const row = document.createElement('div');
+            row.className = 'row';
+            bubble = document.createElement('div');
+            bubble.className = 'bubble from-bot';
+            row.appendChild(bubble);
+            log.appendChild(row);
+          }
+
+          // Handle streaming response
+          let text = '';
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop();
+
+              for (const line of lines) {
+                if (!line.trim() || !line.startsWith('data: ')) continue;
+                
+                const data = line.replace(/^data:\s*/, '');
+                if (data === '[DONE]') break;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.delta) {
+                    text += parsed.delta;
+                    bubble.textContent = text;
+                    log.scrollTop = log.scrollHeight;
+                  }
+                  if (parsed.error) {
+                    throw new Error(parsed.error);
+                  }
+                } catch (e) {
+                  if (data !== '[DONE]') {
+                    console.error('Error parsing stream:', e);
+                  }
+                }
+              }
+            }
+          } catch (streamError) {
+            console.error('Streaming error:', streamError);
+          }
           
           let q = cleanTrailing((text || '').trim());
           // Ensure it ends with punctuation for polish
           if(q && !/[.!?]$/.test(q)) q += '?';
           if(q){
-            typewriterBot(q);
+            bubble.textContent = q; // Update bubble with final cleaned text
             convo.push({ role:'assistant', content:q });
             // store for novelty
             const updated = [...recent, q].slice(-12);
@@ -2213,17 +2272,75 @@ body {
               history: [], 
               temperature: 0.9, 
               presencePenalty: 0.5, 
-              frequencyPenalty: 0.35 
+              frequencyPenalty: 0.35,
+              stream: true
             })
           });
-          const { text } = await res.json();
-          
-          // Remove loading indicator
-          removeLoading(loadingId);
+
+          // Remove loading indicator and prepare bubble for streaming
+          let loadingRow = document.getElementById(loadingId);
+          let bubble;
+          if(loadingRow){
+            bubble = loadingRow.querySelector('.bubble');
+            if(bubble){
+              bubble.classList.remove('loading-message');
+              bubble.innerHTML = '';
+            }
+            loadingRow.removeAttribute('id');
+          } else {
+            const row = document.createElement('div');
+            row.className = 'row';
+            bubble = document.createElement('div');
+            bubble.className = 'bubble from-bot';
+            row.appendChild(bubble);
+            log.appendChild(row);
+          }
+
+          // Handle streaming response
+          let text = '';
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop();
+
+              for (const line of lines) {
+                if (!line.trim() || !line.startsWith('data: ')) continue;
+                
+                const data = line.replace(/^data:\s*/, '');
+                if (data === '[DONE]') break;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.delta) {
+                    text += parsed.delta;
+                    bubble.textContent = text;
+                    log.scrollTop = log.scrollHeight;
+                  }
+                  if (parsed.error) {
+                    throw new Error(parsed.error);
+                  }
+                } catch (e) {
+                  if (data !== '[DONE]') {
+                    console.error('Error parsing stream:', e);
+                  }
+                }
+              }
+            }
+          } catch (streamError) {
+            console.error('Streaming error:', streamError);
+          }
           
           let topic = cleanTrailing((text || '').trim());
           if(topic){
-            typewriterBot(topic);
+            bubble.textContent = topic; // Update with final cleaned text
             convo.push({ role:'assistant', content: topic });
             const updatedTopics = [...topicRecent, topic].slice(-10);
             localStorage.setItem(topicKey, JSON.stringify(updatedTopics));
@@ -2305,10 +2422,72 @@ body {
               history: [], 
               temperature: 0.92, 
               presencePenalty: 0.55, 
-              frequencyPenalty: 0.4 
+              frequencyPenalty: 0.4,
+              stream: true
             })
           });
-          const { text } = await res.json();
+
+          // Remove loading indicator and prepare bubble for streaming
+          let loadingRow = document.getElementById(loadingId);
+          let bubble;
+          if(loadingRow){
+            bubble = loadingRow.querySelector('.bubble');
+            if(bubble){
+              bubble.classList.remove('loading-message');
+              bubble.innerHTML = '';
+            }
+            loadingRow.removeAttribute('id');
+          } else {
+            const row = document.createElement('div');
+            row.className = 'row';
+            bubble = document.createElement('div');
+            bubble.className = 'bubble from-bot';
+            row.appendChild(bubble);
+            log.appendChild(row);
+          }
+
+          // Handle streaming response
+          let text = '';
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop();
+
+              for (const line of lines) {
+                if (!line.trim() || !line.startsWith('data: ')) continue;
+                
+                const data = line.replace(/^data:\s*/, '');
+                if (data === '[DONE]') break;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.delta) {
+                    text += parsed.delta;
+                    bubble.textContent = text;
+                    log.scrollTop = log.scrollHeight;
+                  }
+                  if (parsed.error) {
+                    throw new Error(parsed.error);
+                  }
+                } catch (e) {
+                  if (data !== '[DONE]') {
+                    console.error('Error parsing stream:', e);
+                  }
+                }
+              }
+            }
+          } catch (streamError) {
+            console.error('Streaming error:', streamError);
+          }
+
           let facts = cleanTrailing((text || '').trim());
           // Defensive cleanup if model still outputs bullets or newlines
           facts = facts
@@ -2338,11 +2517,47 @@ body {
                   history: [], 
                   temperature: 0.95, 
                   presencePenalty: 0.65, 
-                  frequencyPenalty: 0.55 
+                  frequencyPenalty: 0.55,
+                  stream: true
                 })
               });
-              const retryJson = await retryRes.json();
-              let retryFacts = cleanTrailing((retryJson.text || '').trim());
+
+              // Handle streaming retry response
+              let retryText = '';
+              const retryReader = retryRes.body.getReader();
+              const retryDecoder = new TextDecoder();
+              let retryBuffer = '';
+
+              while (true) {
+                const { done, value } = await retryReader.read();
+                if (done) break;
+
+                retryBuffer += retryDecoder.decode(value, { stream: true });
+                const lines = retryBuffer.split('\n');
+                retryBuffer = lines.pop();
+
+                for (const line of lines) {
+                  if (!line.trim() || !line.startsWith('data: ')) continue;
+                  
+                  const data = line.replace(/^data:\s*/, '');
+                  if (data === '[DONE]') break;
+
+                  try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.delta) {
+                      retryText += parsed.delta;
+                      bubble.textContent = retryText;
+                      log.scrollTop = log.scrollHeight;
+                    }
+                  } catch (e) {
+                    if (data !== '[DONE]') {
+                      console.error('Error parsing retry stream:', e);
+                    }
+                  }
+                }
+              }
+
+              let retryFacts = cleanTrailing((retryText || '').trim());
               retryFacts = retryFacts.replace(/^\s*[-*+]\s*/gm,'').replace(/\n+/g,' ').replace(/\s{2,}/g,' ').trim();
               const retrySubjectMatch = retryFacts.match(/^[Ss]ubject:\s*([^\.]+)\./);
               const retrySubjectName = retrySubjectMatch ? retrySubjectMatch[1].trim() : null;
@@ -2353,11 +2568,8 @@ body {
             } catch(_e) { /* ignore retry errors */ }
           }
           
-          // Remove loading indicator
-          removeLoading(loadingId);
-          
           if(facts){
-            typewriterBot(facts);
+            bubble.textContent = facts; // Update with final cleaned text
             convo.push({ role:'assistant', content: facts });
             const updatedLearn = [...learnRecent, facts].slice(-10);
             localStorage.setItem(learnKey, JSON.stringify(updatedLearn));
@@ -2465,18 +2677,19 @@ body {
               history: convo.slice(-10),
               temperature: 0.85,
               presencePenalty: 0.45,
-              frequencyPenalty: 0.35
+              frequencyPenalty: 0.35,
+              stream: true
             })
           });
-          const { text:fullResp, error:respErr } = await res.json();
-          const finalText = (respErr || !fullResp ? 'No response.' : fullResp).trim();
+
+          // Remove loading indicator and prepare bubble for streaming
           let loadingRow = document.getElementById(loadingId);
           let bubble;
           if(loadingRow){
             bubble = loadingRow.querySelector('.bubble');
             if(bubble){
               bubble.classList.remove('loading-message');
-              bubble.textContent = '';
+              bubble.innerHTML = ''; // Clear loading spinner
             }
             loadingRow.removeAttribute('id');
           } else {
@@ -2488,16 +2701,56 @@ body {
             row.appendChild(bubble);
             log.appendChild(row);
           }
-          setTimeout(()=>{ log.scrollTop = log.scrollHeight; },0);
-          let i=0;
-          const speed = 7;
-          const animate = ()=>{
-            if(!bubble) return;
-            bubble.textContent = finalText.slice(0,i);
-            log.scrollTop = log.scrollHeight;
-            if(i < finalText.length){ i+=speed; requestAnimationFrame(animate); }
-          };
-          animate();
+
+          // Handle streaming response
+          let finalText = '';
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop(); // Keep incomplete line in buffer
+
+              for (const line of lines) {
+                if (!line.trim() || !line.startsWith('data: ')) continue;
+                
+                const data = line.replace(/^data:\s*/, '');
+                if (data === '[DONE]') break;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.delta) {
+                    finalText += parsed.delta;
+                    bubble.textContent = finalText;
+                    log.scrollTop = log.scrollHeight;
+                  }
+                  if (parsed.error) {
+                    throw new Error(parsed.error);
+                  }
+                } catch (e) {
+                  if (data !== '[DONE]') {
+                    console.error('Error parsing stream:', e);
+                  }
+                }
+              }
+            }
+          } catch (streamError) {
+            console.error('Streaming error:', streamError);
+            finalText = finalText || 'Error receiving response.';
+            bubble.textContent = finalText;
+          }
+
+          if (!finalText) {
+            finalText = 'No response.';
+            bubble.textContent = finalText;
+          }
+
           convo.push({ role:'assistant', content: finalText });
           const { error: aiMsgError } = await supabase
             .from('messages')
