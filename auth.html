@@ -1288,6 +1288,29 @@ body {
     // Observe both sections
     if (authSection) observer.observe(authSection);
     if (landingSection) observer.observe(landingSection);
+
+    // Add snap-back behavior when user stops scrolling
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        // Check which section is more visible and snap to it
+        const authRect = authSection.getBoundingClientRect();
+        const landingRect = landingSection.getBoundingClientRect();
+        
+        // If we're between sections, snap to the closest one
+        if (authRect.top < 0 && authRect.bottom > window.innerHeight * 0.3) {
+          // Auth section is partially visible, snap to landing
+          landingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (landingRect.top > 0 && landingRect.top < window.innerHeight * 0.7) {
+          // Landing section is partially visible, snap to it
+          landingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (authRect.bottom > 0 && authRect.bottom < window.innerHeight * 0.7) {
+          // Auth section is ending, snap back to it
+          authSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150); // Wait 150ms after scroll stops
+    }, { passive: true });
   </script>
 </body>
 </html>
