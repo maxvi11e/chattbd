@@ -32,9 +32,9 @@ export default async function handler(req, res){
     }[b.sp];
 
     const fill = {
-      low: 'strongly geometric sparse grid with wide spacing and minimal connective synapses',
-      mid: 'medium density grid with even spacing and some connective synapses',
-      high: 'richer line work with intricate details and high density of connective synapses'
+      low: 'strongly geometric medium density grid with wide spacing and minimal connective synapses',
+      mid: 'high density grid with even spacing and some connective synapses',
+      high: 'high density weave with intricate details and high density of connective synapses'
     }[b.sc];
 
     const logic = {
