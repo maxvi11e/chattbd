@@ -1540,6 +1540,11 @@
         // Set archetype based on hologram mode
         const archetype = useHologram ? 'abstract' : null;
         
+        // If archetypeSpecific is blank and we're in hologram mode, set default to "Human"
+        if (!archetypeSpecific && useHologram) {
+          archetypeSpecific = 'Human';
+        }
+        
         // If hologram mode, generate abstract description
         let hologramDescription = '';
         if (useHologram) {
@@ -1558,15 +1563,13 @@
               const data = await response.json();
               hologramDescription = data.description || '';
               
-              // Optionally use the typeValue to customize the description
-              const typeValue = archetypeSpecific || 'abstract form';
-              if (typeValue && typeValue !== 'abstract form') {
-                // Replace "stylized figure" with "stylized [typeValue] figure"
-                hologramDescription = hologramDescription.replace(
-                  'single stylized figure',
-                  `single stylized ${typeValue} figure`
-                );
-              }
+              // Use the typeValue to customize the description
+              const typeValue = archetypeSpecific || 'Human';
+              // Always replace "stylized figure" with "stylized [typeValue] figure"
+              hologramDescription = hologramDescription.replace(
+                'single stylized figure',
+                `single stylized ${typeValue} figure`
+              );
             } else {
               console.error('Failed to fetch abstract description:', response.status);
               // Fallback to a basic description if API fails
@@ -1581,11 +1584,6 @@
 
         if (!p && !isOptionsMode) return;
 
-        // If archetypeSpecific is blank and we're in hologram mode, use a default
-        if (!archetypeSpecific && useHologram) {
-          archetypeSpecific = 'Human';
-        }
-
         // Immediately route to edit page and let it handle generation + save with a loading spinner
         const resolvedName = archetypeSpecific || archetype || 'New Avatar';
 
@@ -1593,7 +1591,7 @@
         let finalPrompt = '';
         if (useHologram && hologramDescription) {
           // Hologram mode: use abstract description
-          finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || archetype || 'abstract form'}`;
+          finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific || 'Human'}`;
         } else {
           // Non-hologram mode: build prompt from archetypeSpecific
           const basePrompt = 'Square portrait avatar, crisp line art, subtle texture, softly lit, centered, clean edge lighting.';
