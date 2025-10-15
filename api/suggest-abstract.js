@@ -53,7 +53,7 @@ export default async function handler(req, res){
 
     const descriptionLines = [
       'Create an abstract digital AI assistant avatar using luminous neon lines.',
-      'Depict a single stylized figure from chest up, facing forward, in a professional avatar portrait style.',
+      'Depict a single stylized figure from chest up, facing forward, in an avatar portrait style.',
       'Draw using luminous glowing lines on a pure black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
