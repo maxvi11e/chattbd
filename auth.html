@@ -21,7 +21,7 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   height: 100%;
   overflow-y: scroll;
 }
@@ -36,7 +36,7 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
 }
 .auth-container {
   min-height:100dvh;
@@ -190,6 +190,7 @@ body {
   cursor: pointer;
   animation: bounce 2s infinite;
   z-index: 10;
+  padding: 20px; /* Larger clickable area */
 }
 
 .scroll-arrow svg {
@@ -213,6 +214,7 @@ body {
   animation: bounceUp 2s infinite;
   z-index: 10;
   display: none; /* Hidden by default */
+  padding: 20px; /* Larger clickable area */
 }
 
 .scroll-arrow-up svg {
@@ -304,6 +306,7 @@ body {
   min-height: 0;
   display: flex;
   align-items: center;
+  touch-action: pan-x pinch-zoom; /* Allow horizontal swipe, prevent vertical scroll */
 }
 
 .carousel-track {
@@ -311,6 +314,7 @@ body {
   transition: transform 0.5s ease-in-out;
   height: 100%;
   width: 100%;
+  touch-action: pan-x pinch-zoom; /* Allow horizontal swipe, prevent vertical scroll */
 }
 
 .carousel-slide {
