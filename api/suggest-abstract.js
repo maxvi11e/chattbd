@@ -52,9 +52,9 @@ export default async function handler(req, res){
     const vibeLine = vibe ? `Mood: ${String(vibe).trim()}.` : '';
 
     const descriptionLines = [
-      'Create an abstract digital AI assistant using luminous neon lines.',
-      'Depict a single stylized figure from chest up, facing forward',
-      'Draw using luminous glowing lines on a black background.',
+      'Create an abstract digital AI assistant avatar using luminous neon lines.',
+      'Depict a single stylized figure from chest up, facing forward, in a professional avatar portrait style.',
+      'Draw using luminous glowing lines on a pure black background.',
       `Color palette: ${palette}.`,
       `Line structure pattern: ${logic}.`,
       `Line density and spacing: ${fill}.`,
@@ -63,6 +63,7 @@ export default async function handler(req, res){
       'Art style: very bright neon lines with crisp edges; avoid any interface elements, HUD overlays, text, or logos.',
       'Apply extreme brightness and luminosity to all line elements for a glowing neon effect.',
       'Make approximately 20% of all line elements 10x thicker and brighter for visual emphasis.',
+      'Professional digital art for AI assistant interface.',
       vibeLine,
     ].filter(Boolean);
     const description = descriptionLines.join('\n');
