@@ -1540,9 +1540,9 @@
         // Set archetype based on hologram mode
         const archetype = useHologram ? 'abstract' : null;
         
-        // If archetypeSpecific is blank and we're in hologram mode, set default to "Human"
+        // If archetypeSpecific is blank and we're in hologram mode, set default to "humanoid"
         if (!archetypeSpecific && useHologram) {
-          archetypeSpecific = 'Human';
+          archetypeSpecific = 'humanoid';
         }
         
         // If hologram mode, generate abstract description
@@ -1564,7 +1564,7 @@
               hologramDescription = data.description || '';
               
               // Use the typeValue to customize the description
-              const typeValue = archetypeSpecific || 'Human';
+              const typeValue = archetypeSpecific || 'humanoid';
               // Always replace "stylized figure" with "stylized [typeValue] figure"
               hologramDescription = hologramDescription.replace(
                 'single stylized figure',
@@ -1591,11 +1591,11 @@
         let finalPrompt = '';
         if (useHologram && hologramDescription) {
           // Hologram mode: use abstract description
-          // Only add "Representing:" line if it's not the default "Human"
-          if (archetypeSpecific && archetypeSpecific.toLowerCase() !== 'human') {
+          // Only add "Representing:" line if it's not the default "humanoid"
+          if (archetypeSpecific && archetypeSpecific.toLowerCase() !== 'humanoid') {
             finalPrompt = `Abstract avatar art: ${hologramDescription}\n\nRepresenting: ${archetypeSpecific}`;
           } else {
-            // For default "Human", omit the "Representing:" line since it's already in the description
+            // For default "humanoid", omit the "Representing:" line since it's already in the description
             finalPrompt = `Abstract avatar art: ${hologramDescription}`;
           }
         } else {
