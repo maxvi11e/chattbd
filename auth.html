@@ -457,20 +457,14 @@ body {
 }
 
 /* Carousel Controls */
-.carousel-controls {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 0px;
-  margin-bottom: 12px;
-  flex-shrink: 0;
-}
-
 .carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #222;
+  background: rgba(34, 34, 34, 0.8);
   border: 1px solid #444;
   color: var(--ink);
   cursor: pointer;
@@ -478,16 +472,26 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  z-index: 10;
+  backdrop-filter: blur(4px);
 }
 
 .carousel-btn:hover {
-  background: #333;
+  background: rgba(51, 51, 51, 0.9);
   border-color: #666;
 }
 
 .carousel-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
+}
+
+#prevBtn {
+  left: 16px;
+}
+
+#nextBtn {
+  right: 16px;
 }
 
 .carousel-dots {
@@ -607,8 +611,12 @@ body {
     bottom: 20px;
   }
 
-  .carousel-controls {
-    margin-top: 12px;
+  #prevBtn {
+    left: 8px;
+  }
+
+  #nextBtn {
+    right: 8px;
   }
 
   .carousel-dots {
@@ -714,7 +722,7 @@ body {
       <!-- Logo -->
       <img src="images/logo.png" alt="AeaeaLogo" class="logo-image" /> <!-- Codex test comment -->
 
-      <div class="tagline">Personalized AI</div>
+      <div class="tagline">Personal AI</div>
 
       <!-- Google Sign-In -->
       <div class="auth-section">
@@ -867,13 +875,8 @@ body {
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Carousel Dots -->
-      <div class="carousel-dots" id="carouselDots"></div>
-
-      <!-- Carousel Controls -->
-      <div class="carousel-controls">
+        <!-- Carousel Navigation Buttons -->
         <button class="carousel-btn" id="prevBtn" aria-label="Previous slide">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"></polyline>
@@ -885,6 +888,9 @@ body {
           </svg>
         </button>
       </div>
+
+      <!-- Carousel Dots -->
+      <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
     <!-- <button class="back-to-auth" onclick="window.location.href='#auth-section'">
