@@ -18,7 +18,7 @@ const animalBuckets = {
     "Octopus", "Seal", "Sea Lion", "Walrus", "Cat", "Dog",    
     "Ferret", "River Otter", "Sea Otter", "Penguin", "Orca", "Porpoise", 
     "Red Panda", "Monkey", "Orangutan", "Gorilla", "Chimpanzee", "Bonobo", "Dolphin", 
-    "Raccoon", "Panda"
+    "Raccoon", "Panda", "Shark", "Hummingbird"
   ]
 };
 
@@ -29,19 +29,19 @@ const humanArchetypeBuckets = {
     "Monk", "Zen Master", "Engineer", "Scientist", "Accountant", "Lawyer", 
     "Farmer", "Surgeon", "Analytical Philosopher", "Stoic Thinker", 
     "Mathematician", "Historian", "Logistician", "Professor", "Doctor", "Therapist", "Psychologist", 
-    "Architect", "Strategist", "Diplomat", "Coach", "Politician", "Priest", "Software Developer"
+    "Architect", "Strategist", "Coach", "Politician", "Software Developer"
   ],
   bucket2: [ 
     "Humanitarian", "Ethical Philosopher", "Counselor", "Inventor", "Activist", "Explorer", "Journalist",
-    "Teacher", "Writer", "Poet", "Painter", "Chef", "Traveler", "Mentor", 
+    "Teacher", "Writer", "Poet", "Painter", "Traveler", "Mentor", 
     "Neighbor", "Friend", "Athlete", "Optimist", "Romantic", 
     "Dreamer", "Comedian", "Visionary", 
   ],
   bucket3: [
     "Eternal Optimist", "Spiritual Seeker", "Mystic", "Revolutionary", 
-    "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Psychonaut", "Futurist", 
-    "Creative Genius", "Rebel", "Idealist", "Story Weaver", 
-    "Dream Architect", "Storyteller", "Music Producer", "Jazz Artist", "Rapper", "Contemporary Artist"],
+    "Inventive Hacker", "Startup Founder", "Existential Philosopher", "Futurist", 
+    "Creative Genius", "Rebel", "Idealist", 
+    "Dream Architect", "Music Producer", "Jazz Artist", "Rapper", "Contemporary Artist"],
 };
 
 const humanBucketMeta = {
@@ -65,7 +65,7 @@ const humanBucketMeta = {
 const archetypeBuckets = {
   bucket1: [ // 0–133: serious, rational, practical
     "Service Droid",
-    "Autonomous Factory Robot",
+    "Humanoid Robot",
     "Battle Mech",
     "Space Marine",
     "Ice Dragon",
